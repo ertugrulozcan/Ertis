@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Ertis.MongoDB.Configuration;
 using Ertis.Tests.Ertis.MongoDB.Tests.Configuration;
 using Ertis.Tests.Ertis.MongoDB.Tests.Models;
 using Ertis.Tests.Ertis.MongoDB.Tests.Services;
 using Ertis.Tests.Ertis.MongoDB.Tests.Services.Interfaces;
+using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace Ertis.Tests.Ertis.MongoDB.Tests
@@ -54,7 +56,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 		public void FindByIdTest()
 		{
 			const string id = "5fc65c27dd7283e0b912f660";
-			var item = this.mockDatabaseRepository.Find(id);
+			var item = this.mockDatabaseRepository.FindOne(id);
 			Console.WriteLine($"{item.Id} - {item.Text}");
 			
 			Assert.Pass();
@@ -86,7 +88,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 		public void UpdateTest()
 		{
 			const string id = "5fc65c27dd7283e0b912f660";
-			var item = this.mockDatabaseRepository.Find(id);
+			var item = this.mockDatabaseRepository.FindOne(id);
 			item.Text += " (new)";
 			var updatedItem = this.mockDatabaseRepository.Update(item);
 			
@@ -116,20 +118,26 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 		[Test]
 		public void QueryTest()
 		{
-			const string query = "{'int_field': {'$gte': 10}}";
-			var paginationResult = this.mockDatabaseRepository.Query(query);
-			if (paginationResult.Items.Any())
+			try
 			{
-				foreach (var item in paginationResult.Items)
+				const string query = "{'int_field': {'$gte': 10}}";
+				Dictionary<string, bool> selectFields = new Dictionary<string, bool>
 				{
-					Console.WriteLine($"{item.Id} - {item.Text}");
-				}	
+					{ "_id", true },
+					{ "array_field", true },
+					{ "array_field.string_field", true }
+				};
+				
+				var paginationResult = this.mockDatabaseRepository.Query(query, selectFields:selectFields);
+				string json = JsonConvert.SerializeObject(paginationResult);
+				Console.WriteLine(json);
 			}
-			else
+			catch (Exception ex)
 			{
-				Console.WriteLine("Collection is empty.");
+				Console.WriteLine(ex);
+				throw;
 			}
-			
+
 			Assert.Pass();
 		}
 		

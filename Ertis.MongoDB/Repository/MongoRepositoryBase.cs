@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ertis.Core.Collections;
@@ -60,31 +61,66 @@ namespace Ertis.MongoDB.Repository
 			return await this.Collection.Find(item => true).ToListAsync();
 		}
 		
-		public IPaginationCollection<TEntity> Find(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
+		public IPaginationCollection<TEntity> Find(
+			Expression<Func<TEntity, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null,
+			IDictionary<string, bool> selectFields = null)
 		{
 			FilterDefinition<TEntity> filterExpression = new ExpressionFilterDefinition<TEntity>(expression);
-			return this.Filter(filterExpression, skip, limit, withCount, sortField, sortDirection);
+			return this.Filter(filterExpression, skip, limit, withCount, sortField, sortDirection, selectFields);
 		}
 		
-		public async Task<IPaginationCollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
+		public async Task<IPaginationCollection<TEntity>> FindAsync(
+			Expression<Func<TEntity, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null,
+			IDictionary<string, bool> selectFields = null)
 		{
 			FilterDefinition<TEntity> filterExpression = new ExpressionFilterDefinition<TEntity>(expression);
-			return await this.FilterAsync(filterExpression, skip, limit, withCount, sortField, sortDirection);
+			return await this.FilterAsync(filterExpression, skip, limit, withCount, sortField, sortDirection, selectFields);
 		}
 		
-		public IPaginationCollection<TEntity> Query(string query, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
+		public IPaginationCollection<TEntity> Query(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null,
+			IDictionary<string, bool> selectFields = null)
 		{
 			var filterDefinition = new JsonFilterDefinition<TEntity>(query);
-			return this.Filter(filterDefinition, skip, limit, withCount, sortField, sortDirection);
+			return this.Filter(filterDefinition, skip, limit, withCount, sortField, sortDirection, selectFields);
 		}
 		
-		public async Task<IPaginationCollection<TEntity>> QueryAsync(string query, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
+		public async Task<IPaginationCollection<TEntity>> QueryAsync(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null,
+			IDictionary<string, bool> selectFields = null)
 		{
 			var filterDefinition = new JsonFilterDefinition<TEntity>(query);
-			return await this.FilterAsync(filterDefinition, skip, limit, withCount, sortField, sortDirection);
+			return await this.FilterAsync(filterDefinition, skip, limit, withCount, sortField, sortDirection, selectFields);
 		}
 
-		private IPaginationCollection<TEntity> Filter(FilterDefinition<TEntity> predicate, int? skip = null, int? limit = null, bool? withCount = null, string orderBy = null, SortDirection? sortDirection = null)
+		private IPaginationCollection<TEntity> Filter(
+			FilterDefinition<TEntity> predicate, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string orderBy = null, 
+			SortDirection? sortDirection = null,
+			IDictionary<string, bool> selectFields = null)
 		{
 			if (predicate == null)
 			{
@@ -99,43 +135,54 @@ namespace Ertis.MongoDB.Repository
 				sortDefinition = sortDirection == null || sortDirection.Value == SortDirection.Ascending ? builder.Ascending(fieldDefinition) : builder.Descending(fieldDefinition);	
 			}
 
+			var selectProjectionDefinition = Builders<TEntity>.Projection.Expression(x => x);
+			if (selectFields != null && selectFields.Any())
+			{
+				var selectDefinition = Builders<TEntity>.Projection.Include("_id");
+				var includedFields = selectFields.Where(x => x.Value);
+				selectDefinition = includedFields.Aggregate(selectDefinition, (current, field) => current.Include(field.Key));
+				var excludedFields = selectFields.Where(x => !x.Value);
+				selectDefinition = excludedFields.Aggregate(selectDefinition, (current, field) => current.Exclude(field.Key));
+				selectProjectionDefinition = selectDefinition;
+			}
+			
 			IFindFluent<TEntity, TEntity> collection;
 			if (sortDefinition == null)
 			{
 				if (skip != null && limit != null)
 				{
-					collection = this.Collection.Find(predicate).Skip(skip).Limit(limit);
+					collection = this.Collection.Find(predicate).Skip(skip).Limit(limit).Project(selectProjectionDefinition);
 				}
 				else if (skip != null)
 				{
-					collection = this.Collection.Find(predicate).Skip(skip);
+					collection = this.Collection.Find(predicate).Skip(skip).Project(selectProjectionDefinition);
 				}
 				else if (limit != null)
 				{
-					collection = this.Collection.Find(predicate).Limit(limit);
+					collection = this.Collection.Find(predicate).Limit(limit).Project(selectProjectionDefinition);
 				}
 				else
 				{
-					collection = this.Collection.Find(predicate);	
+					collection = this.Collection.Find(predicate).Project(selectProjectionDefinition);	
 				}
 			}
 			else
 			{
 				if (skip != null && limit != null)
 				{
-					collection = this.Collection.Find(predicate).Sort(sortDefinition).Skip(skip).Limit(limit);
+					collection = this.Collection.Find(predicate).Sort(sortDefinition).Skip(skip).Limit(limit).Project(selectProjectionDefinition);
 				}
 				else if (skip != null)
 				{
-					collection = this.Collection.Find(predicate).Sort(sortDefinition).Skip(skip);
+					collection = this.Collection.Find(predicate).Sort(sortDefinition).Skip(skip).Project(selectProjectionDefinition);
 				}
 				else if (limit != null)
 				{
-					collection = this.Collection.Find(predicate).Sort(sortDefinition).Limit(limit);
+					collection = this.Collection.Find(predicate).Sort(sortDefinition).Limit(limit).Project(selectProjectionDefinition);
 				}
 				else
 				{
-					collection = this.Collection.Find(predicate).Sort(sortDefinition);	
+					collection = this.Collection.Find(predicate).Sort(sortDefinition).Project(selectProjectionDefinition);	
 				}
 			}
 
@@ -152,7 +199,14 @@ namespace Ertis.MongoDB.Repository
 			};
 		}
 		
-		private async Task<IPaginationCollection<TEntity>> FilterAsync(FilterDefinition<TEntity> predicate, int? skip = null, int? limit = null, bool? withCount = null, string orderBy = null, SortDirection? sortDirection = null)
+		private async Task<IPaginationCollection<TEntity>> FilterAsync(
+			FilterDefinition<TEntity> predicate, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string orderBy = null, 
+			SortDirection? sortDirection = null,
+			IDictionary<string, bool> selectFields = null)
 		{
 			if (predicate == null)
 			{
@@ -167,43 +221,54 @@ namespace Ertis.MongoDB.Repository
 				sortDefinition = sortDirection == null || sortDirection.Value == SortDirection.Ascending ? builder.Ascending(fieldDefinition) : builder.Descending(fieldDefinition);	
 			}
 
+			var selectProjectionDefinition = Builders<TEntity>.Projection.Expression(x => x);
+			if (selectFields != null && selectFields.Any())
+			{
+				var selectDefinition = Builders<TEntity>.Projection.Include("_id");
+				var includedFields = selectFields.Where(x => x.Value);
+				selectDefinition = includedFields.Aggregate(selectDefinition, (current, field) => current.Include(field.Key));
+				var excludedFields = selectFields.Where(x => !x.Value);
+				selectDefinition = excludedFields.Aggregate(selectDefinition, (current, field) => current.Exclude(field.Key));
+				selectProjectionDefinition = selectDefinition;
+			}
+			
 			IFindFluent<TEntity, TEntity> collection;
 			if (sortDefinition == null)
 			{
 				if (skip != null && limit != null)
 				{
-					collection = this.Collection.Find(predicate).Skip(skip).Limit(limit);
+					collection = this.Collection.Find(predicate).Skip(skip).Limit(limit).Project(selectProjectionDefinition);
 				}
 				else if (skip != null)
 				{
-					collection = this.Collection.Find(predicate).Skip(skip);
+					collection = this.Collection.Find(predicate).Skip(skip).Project(selectProjectionDefinition);
 				}
 				else if (limit != null)
 				{
-					collection = this.Collection.Find(predicate).Limit(limit);
+					collection = this.Collection.Find(predicate).Limit(limit).Project(selectProjectionDefinition);
 				}
 				else
 				{
-					collection = this.Collection.Find(predicate);	
+					collection = this.Collection.Find(predicate).Project(selectProjectionDefinition);	
 				}
 			}
 			else
 			{
 				if (skip != null && limit != null)
 				{
-					collection = this.Collection.Find(predicate).Sort(sortDefinition).Skip(skip).Limit(limit);
+					collection = this.Collection.Find(predicate).Sort(sortDefinition).Skip(skip).Limit(limit).Project(selectProjectionDefinition);
 				}
 				else if (skip != null)
 				{
-					collection = this.Collection.Find(predicate).Sort(sortDefinition).Skip(skip);
+					collection = this.Collection.Find(predicate).Sort(sortDefinition).Skip(skip).Project(selectProjectionDefinition);
 				}
 				else if (limit != null)
 				{
-					collection = this.Collection.Find(predicate).Sort(sortDefinition).Limit(limit);
+					collection = this.Collection.Find(predicate).Sort(sortDefinition).Limit(limit).Project(selectProjectionDefinition);
 				}
 				else
 				{
-					collection = this.Collection.Find(predicate).Sort(sortDefinition);	
+					collection = this.Collection.Find(predicate).Sort(sortDefinition).Project(selectProjectionDefinition);	
 				}
 			}
 
@@ -221,7 +286,7 @@ namespace Ertis.MongoDB.Repository
 		}
 		
 		#endregion
-		
+
 		#region Insert Methods
 
 		public TEntity Insert(TEntity entity)

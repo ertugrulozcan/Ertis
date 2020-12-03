@@ -1,7 +1,7 @@
 using System;
 using System.Net;
 
-namespace Ertis.Extensions.AspNetCore.Exceptions
+namespace Ertis.Core.Exceptions
 {
 	public abstract class HttpStatusCodeException : Exception
 	{

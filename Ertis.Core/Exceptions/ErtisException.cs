@@ -1,8 +1,8 @@
 using System;
 using System.Net;
-using Ertis.Extensions.AspNetCore.Models.Response;
+using Ertis.Core.Models.Response;
 
-namespace Ertis.Extensions.AspNetCore.Exceptions
+namespace Ertis.Core.Exceptions
 {
 	public class ErtisException : HttpStatusCodeException, IHasErrorModel
 	{

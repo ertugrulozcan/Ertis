@@ -1,4 +1,4 @@
-namespace Ertis.Extensions.AspNetCore.Models.Response
+namespace Ertis.Core.Models.Response
 {
 	public class ErrorModel
 	{

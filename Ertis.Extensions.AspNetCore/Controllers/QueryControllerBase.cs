@@ -1,24 +1,26 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ertis.Core.Collections;
-using Ertis.Extensions.AspNetCore.Exceptions;
+using Ertis.Core.Exceptions;
+using Ertis.Core.Models.Response;
 using Ertis.Extensions.AspNetCore.Extensions;
-using Ertis.Extensions.AspNetCore.Models.Response;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ertis.Extensions.AspNetCore.Controllers
 {
-	public abstract class QueryControllerBase<T> : ControllerBase
+	public abstract class QueryControllerBase : ControllerBase
 	{
 		#region Methods
 
-		protected abstract Task<IPaginationCollection<T>> GetDataAsync(
+		protected abstract Task<IPaginationCollection<dynamic>> GetDataAsync(
 			string query, 
 			int? skip,
 			int? limit,
 			bool? withCount, 
 			string sortField, 
-			SortDirection? sortDirection);
+			SortDirection? sortDirection,
+			IDictionary<string, bool> selectFields);
 
 		[HttpPost("_query")]
 		public async Task<IActionResult> Query()
@@ -35,12 +37,10 @@ namespace Ertis.Extensions.AspNetCore.Controllers
 
 				var body = await this.ExtractRequestBodyAsync();
 				var whereQuery = this.ExtractWhereQuery(body);
-				var result = await this.GetDataAsync(whereQuery, skip, limit, withCount, sortField, sortDirection);
-				
 				var selectFields = Helpers.QueryHelper.ExtractSelectFields(body);
-				var projectinatedCollection = result.ExecuteSelectQuery(selectFields);
-			
-				return this.Ok(projectinatedCollection);
+				var result = await this.GetDataAsync(whereQuery, skip, limit, withCount, sortField, sortDirection, selectFields);
+
+				return this.Ok(result);
 			}
 			catch (HttpStatusCodeException ex)
 			{

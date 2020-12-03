@@ -11,22 +11,22 @@ namespace Ertis.Data.Repository
 	{
 		#region Find & Query Methods
 
-		TEntity Find(TIdentifier id);
+		TEntity FindOne(TIdentifier id);
 		
-		Task<TEntity> FindAsync(TIdentifier id);
+		Task<TEntity> FindOneAsync(TIdentifier id);
 		
 		IEnumerable<TEntity> Find();
 		
 		Task<IEnumerable<TEntity>> FindAsync();
 		
-		IPaginationCollection<TEntity> Find(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null, IDictionary<string, bool> selectFields = null);
+		IPaginationCollection<TEntity> Find(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
 		
-		Task<IPaginationCollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null, IDictionary<string, bool> selectFields = null);
+		Task<IPaginationCollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
 
-		IPaginationCollection<TEntity> Query(string query, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null, IDictionary<string, bool> selectFields = null);
+		IPaginationCollection<TEntity> Find(string query, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
 
-		Task<IPaginationCollection<TEntity>> QueryAsync(string query, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null, IDictionary<string, bool> selectFields = null);
-
+		Task<IPaginationCollection<TEntity>> FindAsync(string query, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
+		
 		#endregion
 		
 		#region Insert Methods

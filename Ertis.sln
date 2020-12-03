@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Tests", "Ertis.Tests\Ertis.Tests.csproj", "{EA04EB04-2D11-4930-B75E-384ED0106399}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{567AFA8A-A536-4CA2-B045-CBBB30433C80}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Data", "Ertis.Data\Ertis.Data.csproj", "{EC82153D-37BD-4392-BF2A-50E3D8E6B5A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.MongoDB", "Ertis.MongoDB\Ertis.MongoDB.csproj", "{61D05113-A887-49F3-B49D-0B28F16BB9AB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{64D0CAE3-A344-4D55-9E06-7C98EBA4C1D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Core", "Ertis.Core\Ertis.Core.csproj", "{8F8A3355-47FE-470E-A9EA-8378A91F5936}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{5A705C0E-B812-4204-8DE5-3C90C4D48AA7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Extensions.AspNetCore", "Ertis.Extensions.AspNetCore\Ertis.Extensions.AspNetCore.csproj", "{0953A581-EC3A-46AD-91A9-41AD861A06B4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EA04EB04-2D11-4930-B75E-384ED0106399}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA04EB04-2D11-4930-B75E-384ED0106399}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA04EB04-2D11-4930-B75E-384ED0106399}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA04EB04-2D11-4930-B75E-384ED0106399}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC82153D-37BD-4392-BF2A-50E3D8E6B5A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC82153D-37BD-4392-BF2A-50E3D8E6B5A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC82153D-37BD-4392-BF2A-50E3D8E6B5A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC82153D-37BD-4392-BF2A-50E3D8E6B5A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61D05113-A887-49F3-B49D-0B28F16BB9AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61D05113-A887-49F3-B49D-0B28F16BB9AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61D05113-A887-49F3-B49D-0B28F16BB9AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61D05113-A887-49F3-B49D-0B28F16BB9AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F8A3355-47FE-470E-A9EA-8378A91F5936}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F8A3355-47FE-470E-A9EA-8378A91F5936}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F8A3355-47FE-470E-A9EA-8378A91F5936}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F8A3355-47FE-470E-A9EA-8378A91F5936}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0953A581-EC3A-46AD-91A9-41AD861A06B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0953A581-EC3A-46AD-91A9-41AD861A06B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0953A581-EC3A-46AD-91A9-41AD861A06B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0953A581-EC3A-46AD-91A9-41AD861A06B4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EC82153D-37BD-4392-BF2A-50E3D8E6B5A3} = {567AFA8A-A536-4CA2-B045-CBBB30433C80}
+		{61D05113-A887-49F3-B49D-0B28F16BB9AB} = {567AFA8A-A536-4CA2-B045-CBBB30433C80}
+		{8F8A3355-47FE-470E-A9EA-8378A91F5936} = {64D0CAE3-A344-4D55-9E06-7C98EBA4C1D2}
+		{0953A581-EC3A-46AD-91A9-41AD861A06B4} = {5A705C0E-B812-4204-8DE5-3C90C4D48AA7}
+	EndGlobalSection
+EndGlobal

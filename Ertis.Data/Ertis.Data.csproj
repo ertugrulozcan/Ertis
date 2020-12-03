@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+
+        <PackageId>Ertis.Data</PackageId>
+        <PackageVersion>1.0.0</PackageVersion>
+        <Authors>Ertuğrul Özcan</Authors>
+        <Description>Ertis.Data</Description>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <Copyright>Ertuğrul Özcan | Copyright 2020 (c)</Copyright>
+        <PackageReleaseNotes>Initial package</PackageReleaseNotes>
+        <PackageTags>Ertis.Data</PackageTags>
+        <Title>Ertis.Data</Title>
+        <PackageProjectUrl>https://github.com/ertugrulozcan</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/ertugrulozcan</RepositoryUrl>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <FileVersion>1.0.0</FileVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Ertis.Core\Ertis.Core.csproj" />
+    </ItemGroup>
+
+</Project>

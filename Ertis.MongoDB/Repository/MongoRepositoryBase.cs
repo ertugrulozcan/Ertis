@@ -51,15 +51,37 @@ namespace Ertis.MongoDB.Repository
 		{
 			return await this.Collection.Find(item => item.Id == id).FirstOrDefaultAsync();
 		}
-		
-		public IEnumerable<TEntity> Find()
+
+		public IPaginationCollection<TEntity> Find(
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null,
+			string sortField = null, 
+			SortDirection? sortDirection = null)
 		{
-			return this.Collection.Find(item => true).ToList();
+			return this.Find(
+				expression: null,
+				skip,
+				limit,
+				withCount,
+				sortField,
+				sortDirection);
 		}
-		
-		public async Task<IEnumerable<TEntity>> FindAsync()
+
+		public async Task<IPaginationCollection<TEntity>> FindAsync(
+			int? skip = null,
+			int? limit = null,
+			bool? withCount = null,
+			string sortField = null,
+			SortDirection? sortDirection = null)
 		{
-			return await this.Collection.Find(item => true).ToListAsync();
+			return await this.FindAsync(
+				expression: null,
+				skip,
+				limit,
+				withCount,
+				sortField,
+				sortDirection);
 		}
 		
 		public IPaginationCollection<TEntity> Find(
@@ -70,7 +92,7 @@ namespace Ertis.MongoDB.Repository
 			string sortField = null, 
 			SortDirection? sortDirection = null)
 		{
-			FilterDefinition<TEntity> filterExpression = new ExpressionFilterDefinition<TEntity>(expression);
+			FilterDefinition<TEntity> filterExpression = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
 			return this.Filter(filterExpression, skip, limit, withCount, sortField, sortDirection);
 		}
 		
@@ -82,7 +104,7 @@ namespace Ertis.MongoDB.Repository
 			string sortField = null, 
 			SortDirection? sortDirection = null)
 		{
-			FilterDefinition<TEntity> filterExpression = new ExpressionFilterDefinition<TEntity>(expression);
+			FilterDefinition<TEntity> filterExpression = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
 			return await this.FilterAsync(filterExpression, skip, limit, withCount, sortField, sortDirection);
 		}
 		
@@ -94,7 +116,7 @@ namespace Ertis.MongoDB.Repository
 			string sortField = null, 
 			SortDirection? sortDirection = null)
 		{
-			var filterDefinition = new JsonFilterDefinition<TEntity>(query);
+			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<TEntity>.Empty : new JsonFilterDefinition<TEntity>(query);
 			return this.Filter(filterDefinition, skip, limit, withCount, sortField, sortDirection);
 		}
 		
@@ -106,7 +128,7 @@ namespace Ertis.MongoDB.Repository
 			string sortField = null, 
 			SortDirection? sortDirection = null)
 		{
-			var filterDefinition = new JsonFilterDefinition<TEntity>(query);
+			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<TEntity>.Empty : new JsonFilterDefinition<TEntity>(query);
 			return await this.FilterAsync(filterDefinition, skip, limit, withCount, sortField, sortDirection);
 		}
 		

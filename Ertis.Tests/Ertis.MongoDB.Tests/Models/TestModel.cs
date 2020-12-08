@@ -24,6 +24,9 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests.Models
 		[BsonElement("double_field")]
 		public double Double { get; set; }
 		
+		[BsonElement("object_field")]
+		public NestedTestModel Object { get; set; }
+		
 		[BsonElement("datetime_field")]
 		public DateTime? NullableDate { get; set; }
 		
@@ -62,9 +65,41 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests.Models
 				Text = $"Entity - {no}",
 				Integer = no,
 				Double = no * random.NextDouble(),
-				NullableDate = DateTime.Now.AddDays(no),
+				Object = NestedTestModel.GenerateRandom(no + 100),
+				NullableDate = DateTime.Now.AddMinutes(no),
 				Enum = (TestEnum) (no % 4),
 				Array = children.ToArray()
+			};
+		}
+
+		#endregion
+	}
+	
+	public class NestedTestModel
+	{
+		#region Properties
+
+		[BsonElement("string_field")]
+		public string Text { get; set; }
+		
+		[BsonElement("int_field")]
+		public int Integer { get; set; }
+		
+		[BsonElement("double_field")]
+		public double Double { get; set; }
+
+		#endregion
+
+		#region Methods
+
+		public static NestedTestModel GenerateRandom(int no)
+		{
+			var random = new Random((int)DateTime.Now.Ticks);
+			return new NestedTestModel
+			{
+				Text = $"Nested Entity - {no}",
+				Integer = no,
+				Double = no * random.NextDouble()
 			};
 		}
 

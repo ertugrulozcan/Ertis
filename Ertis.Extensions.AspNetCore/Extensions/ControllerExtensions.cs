@@ -25,9 +25,14 @@ namespace Ertis.Extensions.AspNetCore.Extensions
 			return await reader.ReadToEndAsync();
 		}
 		
-		public static string ExtractWhereQuery(this ControllerBase controller, string query)
+		public static string ExtractWhereQuery(this ControllerBase controller, string query, string defaultValue = null)
 		{
 			var whereQuery = Helpers.QueryHelper.ExtractWhereQuery(query);
+			if (string.IsNullOrEmpty(whereQuery) && defaultValue != null)
+			{
+				whereQuery = defaultValue;
+			}
+			
 			return whereQuery;
 		}
 		

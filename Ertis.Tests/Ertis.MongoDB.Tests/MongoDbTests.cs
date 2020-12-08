@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Ertis.MongoDB.Configuration;
 using Ertis.Tests.Ertis.MongoDB.Tests.Configuration;
 using Ertis.Tests.Ertis.MongoDB.Tests.Models;
@@ -43,8 +42,8 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 		[Test]
 		public void FindTest()
 		{
-			var items = this.mockDatabaseRepository.Find();
-			foreach (var item in items)
+			var paginationCollection = this.mockDatabaseRepository.Find();
+			foreach (var item in paginationCollection.Items)
 			{
 				Console.WriteLine($"{item.Id} - {item.Text}");
 			}
@@ -74,13 +73,13 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 		[Test]
 		public void BulkInsertTest()
 		{
-			var mockList= TestModel.GenerateRandom(20);
+			var mockList= TestModel.GenerateRandom(1000000);
 			foreach (var item in mockList)
 			{
 				this.mockDatabaseRepository.Insert(item);
 				Console.WriteLine($"{item.Id} - {item.Text} inserted.");	
 			}
-			
+
 			Assert.Pass();
 		}
 		

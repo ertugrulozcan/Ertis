@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ertis.Core.Collections;
@@ -14,10 +13,10 @@ namespace Ertis.Data.Repository
 		TEntity FindOne(TIdentifier id);
 		
 		Task<TEntity> FindOneAsync(TIdentifier id);
+
+		IPaginationCollection<TEntity> Find(int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
 		
-		IEnumerable<TEntity> Find();
-		
-		Task<IEnumerable<TEntity>> FindAsync();
+		Task<IPaginationCollection<TEntity>> FindAsync(int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
 		
 		IPaginationCollection<TEntity> Find(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
 		

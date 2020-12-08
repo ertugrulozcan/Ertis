@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Ertis.Core.Collections;
 using Ertis.Core.Exceptions;
 using Ertis.Core.Models.Response;
+using Ertis.Extensions.AspNetCore.Exceptions;
 using Ertis.Extensions.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,11 +34,12 @@ namespace Ertis.Extensions.AspNetCore.Controllers
 			try
 			{
 				this.ExtractPaginationParameters(out int? skip, out int? limit, out bool withCount);
-				this.ExtractSortingParameters(out string sortField, out SortDirection? sortDirection);
-
+				this.ValidatePaginationParams(skip, limit);
+				
 				var body = await this.ExtractRequestBodyAsync();
-				var whereQuery = this.ExtractWhereQuery(body);
+				var whereQuery = this.ExtractWhereQuery(body, defaultValue: "{}");
 				var selectFields = Helpers.QueryHelper.ExtractSelectFields(body);
+				this.ExtractSortingParameters(out string sortField, out SortDirection? sortDirection);
 				var result = await this.GetDataAsync(whereQuery, skip, limit, withCount, sortField, sortDirection, selectFields);
 
 				return this.Ok(result);
@@ -56,6 +58,19 @@ namespace Ertis.Extensions.AspNetCore.Controllers
 			catch (Exception ex)
 			{
 				return this.StatusCode(500, ex.Message);
+			}
+		}
+
+		private void ValidatePaginationParams(int? skip, int? limit)
+		{
+			if (skip != null && skip < 0)
+			{
+				throw new NegativeSkipException();
+			}
+			
+			if (limit != null && limit < 0)
+			{
+				throw new NegativeLimitException();
 			}
 		}
 

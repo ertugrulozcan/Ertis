@@ -10,7 +10,7 @@
 *.userosscache
 *.sln.docstates
 
-# IDE
+# JetBrains
 .idea
 
 # User-specific files (MonoDevelop/Xamarin Studio)

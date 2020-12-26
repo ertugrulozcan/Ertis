@@ -12,4 +12,13 @@ namespace Ertis.Core.Models.Response
 
 		#endregion
 	}
+	
+	public class ErrorModel<T> : ErrorModel
+	{
+		#region Properties
+
+		public T Data { get; set; }
+
+		#endregion
+	}
 }

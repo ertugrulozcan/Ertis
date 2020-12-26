@@ -4,12 +4,37 @@ using Ertis.Core.Models.Response;
 
 namespace Ertis.Core.Exceptions
 {
+	public class ErtisException<T> : ErtisException
+	{
+		#region Properties
+
+		public T Payload { get; set; }
+
+		#endregion
+		
+		#region Constructors
+
+		protected ErtisException(HttpStatusCode statusCode, string errorCode) : base(statusCode, errorCode)
+		{
+		}
+
+		protected ErtisException(HttpStatusCode statusCode, string message, string errorCode) : base(statusCode, message, errorCode)
+		{
+		}
+
+		protected ErtisException(HttpStatusCode statusCode, string message, string errorCode, Exception innerException) : base(statusCode, message, errorCode, innerException)
+		{
+		}
+
+		#endregion
+	}
+	
 	public class ErtisException : HttpStatusCodeException, IHasErrorModel
 	{
 		#region Properties
 
 		public string ErrorCode { get; }
-		
+
 		public ErrorModel Error =>
 			new ErrorModel
 			{

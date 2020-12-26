@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Ertis.Core.Collections;
 using Ertis.Data.Models;
 using Ertis.Data.Repository;
-using Newtonsoft.Json.Linq;
 
 namespace Ertis.MongoDB.Repository
 {

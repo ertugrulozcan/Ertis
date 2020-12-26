@@ -5,17 +5,25 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ertis.Core.Collections;
 using Ertis.Data.Models;
+using Ertis.Data.Repository;
 using Ertis.MongoDB.Configuration;
 using Ertis.MongoDB.Exceptions;
 using Ertis.MongoDB.Helpers;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SortDirection = Ertis.Core.Collections.SortDirection;
+using MongoDriver = MongoDB.Driver;
 
 namespace Ertis.MongoDB.Repository
 {
 	public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> where TEntity : IEntity<string>
 	{
+		#region Services
+
+		private readonly IRepositoryActionBinder actionBinder;
+
+		#endregion
+		
 		#region Properties
 
 		private IMongoCollection<TEntity> Collection { get; }
@@ -29,13 +37,16 @@ namespace Ertis.MongoDB.Repository
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="collectionName"></param>
-		protected MongoRepositoryBase(IDatabaseSettings settings, string collectionName)
+		/// <param name="actionBinder"></param>
+		protected MongoRepositoryBase(IDatabaseSettings settings, string collectionName, IRepositoryActionBinder actionBinder = null)
 		{
 			string connectionString = ConnectionStringHelper.GenerateConnectionString(settings);
 			var client = new MongoClient(connectionString);
 			var database = client.GetDatabase(settings.DatabaseName);
 
 			this.Collection = database.GetCollection<TEntity>(collectionName);
+
+			this.actionBinder = actionBinder;
 		}
 
 		#endregion
@@ -50,6 +61,18 @@ namespace Ertis.MongoDB.Repository
 		public async Task<TEntity> FindOneAsync(string id)
 		{
 			return await this.Collection.Find(item => item.Id == id).FirstOrDefaultAsync();
+		}
+
+		public TEntity FindOne(Expression<Func<TEntity, bool>> expression)
+		{
+			FilterDefinition<TEntity> filterDefinition = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
+			return this.Collection.Find(filterDefinition).FirstOrDefault();
+		}
+
+		public async Task<TEntity> FindOneAsync(Expression<Func<TEntity, bool>> expression)
+		{
+			FilterDefinition<TEntity> filterDefinition = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
+			return await (await this.Collection.FindAsync(filterDefinition)).FirstOrDefaultAsync();	
 		}
 
 		public IPaginationCollection<TEntity> Find(
@@ -369,13 +392,35 @@ namespace Ertis.MongoDB.Repository
 
 		public TEntity Insert(TEntity entity)
 		{
+			if (this.actionBinder != null)
+			{
+				entity = this.actionBinder.BeforeInsert(entity);
+			}
+			
 			this.Collection.InsertOne(entity);
+			
+			if (this.actionBinder != null)
+			{
+				entity = this.actionBinder.AfterInsert(entity);
+			}
+			
 			return entity;
 		}
 		
 		public async Task<TEntity> InsertAsync(TEntity entity)
 		{
+			if (this.actionBinder != null)
+			{
+				entity = this.actionBinder.BeforeInsert(entity);
+			}
+			
 			await this.Collection.InsertOneAsync(entity);
+			
+			if (this.actionBinder != null)
+			{
+				entity = this.actionBinder.AfterInsert(entity);
+			}
+			
 			return entity;
 		}
 
@@ -385,13 +430,36 @@ namespace Ertis.MongoDB.Repository
 
 		public TEntity Update(TEntity entity)
 		{
-			this.Collection.ReplaceOne(item => item.Id == entity.Id, entity);
+			if (this.actionBinder != null)
+			{
+				entity = this.actionBinder.BeforeUpdate(entity);
+			}
+
+			string updatedId = entity.Id;
+			this.Collection.ReplaceOne(item => item.Id == updatedId, entity);
+
+			if (this.actionBinder != null)
+			{
+				entity = this.actionBinder.AfterUpdate(entity);
+			}
+			
 			return entity;
 		}
 		
 		public async Task<TEntity> UpdateAsync(TEntity entity)
 		{
+			if (this.actionBinder != null)
+			{
+				entity = this.actionBinder.BeforeUpdate(entity);
+			}
+
 			await this.Collection.ReplaceOneAsync(item => item.Id == entity.Id, entity);
+
+			if (this.actionBinder != null)
+			{
+				entity = this.actionBinder.AfterUpdate(entity);
+			}
+			
 			return entity;
 		}
 

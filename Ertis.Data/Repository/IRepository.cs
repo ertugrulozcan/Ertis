@@ -13,6 +13,10 @@ namespace Ertis.Data.Repository
 		TEntity FindOne(TIdentifier id);
 		
 		Task<TEntity> FindOneAsync(TIdentifier id);
+		
+		TEntity FindOne(Expression<Func<TEntity, bool>> expression);
+		
+		Task<TEntity> FindOneAsync(Expression<Func<TEntity, bool>> expression);
 
 		IPaginationCollection<TEntity> Find(int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
 		

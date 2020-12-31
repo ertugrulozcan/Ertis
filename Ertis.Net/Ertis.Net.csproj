@@ -3,23 +3,27 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
 
-        <PackageId>Ertis.Core</PackageId>
-        <PackageVersion>1.0.7</PackageVersion>
+        <PackageId>Ertis.Net</PackageId>
+        <PackageVersion>1.0.2</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
-        <Description>Ertis.Core</Description>
+        <Description>Ertis.Net</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <Copyright>Ertuğrul Özcan | Copyright 2020 (c)</Copyright>
         <PackageReleaseNotes>Initial package</PackageReleaseNotes>
-        <PackageTags>Ertis.Core</PackageTags>
-        <Title>Ertis.Core</Title>
+        <PackageTags>Ertis.Net</PackageTags>
+        <Title>Ertis.Net</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan</RepositoryUrl>
-        <AssemblyVersion>1.0.7</AssemblyVersion>
-        <FileVersion>1.0.7</FileVersion>
+        <AssemblyVersion>1.0.2</AssemblyVersion>
+        <FileVersion>1.0.2</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+      <ProjectReference Include="..\Ertis.Core\Ertis.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="RestSharp" Version="106.11.7" />
     </ItemGroup>
 
 </Project>

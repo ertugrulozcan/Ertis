@@ -143,5 +143,23 @@
     &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.MongoDbTests.CountByQueryTest&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.MongoDbTests.CountByExpressionTest&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.Security.Tests.Cryptography.HashProviderTests.Sha256Test&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.Test&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.QueryValueWithStringTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.QueryValueWithIntegerTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.QueryValueWithDoubleTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.QueryTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.QueryGroupTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.WhereTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.WhereTest3&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.WhereTest1&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.WhereTest2&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.SelectTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.CombineTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.QueryArrayTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.ContainsTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.NotContainsTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.AndTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests.NotTest&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.Queries.QueryBuilderTests&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

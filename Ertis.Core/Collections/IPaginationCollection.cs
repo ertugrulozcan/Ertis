@@ -12,7 +12,7 @@ namespace Ertis.Core.Collections
 		IEnumerable<T> Items { get; }
 	}
 
-	public struct PaginationCollection<T> : IPaginationCollection<T>
+	public class PaginationCollection<T> : IPaginationCollection<T>
 	{
 		[JsonProperty("count")]
 		public long Count { get; set; }

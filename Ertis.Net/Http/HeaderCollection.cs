@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,41 +22,52 @@ namespace Ertis.Net.Http
 		
 		public static IHeaderCollection Add(IHeaderCollection collection)
 		{
-			return new RequestHeaders(collection.ToDictionary(x => x.Key, y => y.Value));
+			return new RequestHeaders(collection.ToDictionary());
 		}
 
 		#endregion
 	}
 	
-	public class RequestHeaders : Dictionary<string, object>, IHeaderCollection
+	public class RequestHeaders : IHeaderCollection
 	{
+		#region Properties
+
+		private Dictionary<string, object> HeadersDictionary { get; }
+
+		#endregion
+		
 		#region Constructors
 
 		/// <summary>
 		/// Constructor 1
 		/// </summary>
-		internal RequestHeaders() : this(new Dictionary<string, object>())
-		{ }
+		internal RequestHeaders()
+		{
+			this.HeadersDictionary = new Dictionary<string, object>();
+		}
 		
 		/// <summary>
 		/// Constructor 2
 		/// </summary>
 		/// <param name="dictionary"></param>
-		internal RequestHeaders(IDictionary<string, object> dictionary) : base(dictionary)
+		internal RequestHeaders(IDictionary<string, object> dictionary) : this()
 		{
-			
+			foreach (var pair in dictionary)
+			{
+				this.HeadersDictionary.Add(pair.Key, pair.Value);
+			}
 		}
 
 		#endregion
 
 		#region Methods
 
-		public new IHeaderCollection Add(string key, object value)
+		public IHeaderCollection Add(string key, object value)
 		{
-			if (!this.ContainsKey(key))
-				this.Add(key, value);
+			if (!this.HeadersDictionary.ContainsKey(key))
+				this.HeadersDictionary.Add(key, value);
 			else
-				this[key] = value;
+				this.HeadersDictionary[key] = value;
 			
 			return this;
 		}
@@ -68,7 +80,8 @@ namespace Ertis.Net.Http
 		public IHeaderCollection Add(IHeaderCollection collection)
 		{
 			IHeaderCollection headers = this;
-			foreach (var pair in collection)
+			var dictionary = collection.ToDictionary();
+			foreach (var pair in dictionary)
 			{
 				headers = this.Add(pair.Key, pair.Value);
 			}
@@ -76,21 +89,37 @@ namespace Ertis.Net.Http
 			return headers;
 		}
 
-		public new IHeaderCollection Remove(string key)
+		public IHeaderCollection Remove(string key)
 		{
-			if (this.ContainsKey(key))
+			if (this.HeadersDictionary.ContainsKey(key))
 			{
-				this.Remove(key);
+				this.HeadersDictionary.Remove(key);
 			}
 
 			return this;
 		}
 
+		public IDictionary<string, object> ToDictionary()
+		{
+			return this.HeadersDictionary;
+		}
+
 		public override string ToString()
 		{
 			return string.Join("&", 
-				this.Where(x => !string.IsNullOrEmpty(x.Key) && x.Value != null)
+				this.HeadersDictionary
+					.Where(x => !string.IsNullOrEmpty(x.Key) && x.Value != null)
 					.Select(x => $"{x.Key}={Uri.EscapeUriString(x.Value?.ToString() ?? "")}"));
+		}
+
+		public IEnumerator GetEnumerator()
+		{
+			return this.HeadersDictionary.GetEnumerator();
+		}
+
+		IEnumerator<object> IEnumerable<object>.GetEnumerator()
+		{
+			return this.HeadersDictionary.Values.GetEnumerator();
 		}
 
 		#endregion

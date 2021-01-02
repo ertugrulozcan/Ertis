@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,41 +22,52 @@ namespace Ertis.Net.Http
 		
 		public static IQueryString Add(IQueryString collection)
 		{
-			return new HttpQueryString(collection.ToDictionary(x => x.Key, y => y.Value));
+			return new HttpQueryString(collection.ToDictionary());
 		}
 
 		#endregion
 	}
 	
-	public class HttpQueryString : Dictionary<string, object>, IQueryString
+	public class HttpQueryString : IQueryString
 	{
+		#region Properties
+
+		private Dictionary<string, object> QueryDictionary { get; }
+
+		#endregion
+		
 		#region Constructors
 
 		/// <summary>
 		/// Constructor 1
 		/// </summary>
-		internal HttpQueryString() : this(new Dictionary<string, object>())
-		{ }
+		internal HttpQueryString()
+		{
+			this.QueryDictionary = new Dictionary<string, object>();
+		}
 		
 		/// <summary>
 		/// Constructor 2
 		/// </summary>
 		/// <param name="dictionary"></param>
-		internal HttpQueryString(IDictionary<string, object> dictionary) : base(dictionary)
+		internal HttpQueryString(IDictionary<string, object> dictionary) : this()
 		{
-			
+			foreach (var pair in dictionary)
+			{
+				this.QueryDictionary.Add(pair.Key, pair.Value);
+			}
 		}
 
 		#endregion
 
 		#region Methods
 
-		public new IQueryString Add(string key, object value)
+		public IQueryString Add(string key, object value)
 		{
-			if (!this.ContainsKey(key))
-				this.Add(key, value);
+			if (!this.QueryDictionary.ContainsKey(key))
+				this.QueryDictionary.Add(key, value);
 			else
-				this[key] = value;
+				this.QueryDictionary[key] = value;
 			
 			return this;
 		}
@@ -68,7 +80,8 @@ namespace Ertis.Net.Http
 		public IQueryString Add(IQueryString collection)
 		{
 			IQueryString queryString = this;
-			foreach (var pair in collection)
+			var dictionary = collection.ToDictionary();
+			foreach (var pair in dictionary)
 			{
 				queryString = this.Add(pair.Key, pair.Value);
 			}
@@ -76,21 +89,37 @@ namespace Ertis.Net.Http
 			return queryString;
 		}
 
-		public new IQueryString Remove(string key)
+		public IQueryString Remove(string key)
 		{
-			if (this.ContainsKey(key))
+			if (this.QueryDictionary.ContainsKey(key))
 			{
-				this.Remove(key);
+				this.QueryDictionary.Remove(key);
 			}
 
 			return this;
 		}
 
+		public IDictionary<string, object> ToDictionary()
+		{
+			return this.QueryDictionary;
+		}
+
 		public override string ToString()
 		{
 			return string.Join("&", 
-				this.Where(x => !string.IsNullOrEmpty(x.Key) && x.Value != null)
+				this.QueryDictionary
+					.Where(x => !string.IsNullOrEmpty(x.Key) && x.Value != null)
 					.Select(x => $"{x.Key}={Uri.EscapeUriString(x.Value?.ToString() ?? "")}"));
+		}
+
+		public IEnumerator GetEnumerator()
+		{
+			return this.QueryDictionary.GetEnumerator();
+		}
+
+		IEnumerator<object> IEnumerable<object>.GetEnumerator()
+		{
+			return this.QueryDictionary.Values.GetEnumerator();
 		}
 
 		#endregion

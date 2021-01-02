@@ -2,12 +2,14 @@ using System.Collections.Generic;
 
 namespace Ertis.Net.Http
 {
-	public interface IQueryString : IDictionary<string, object>
+	public interface IQueryString : IEnumerable<object>
 	{
-		new IQueryString Add(string key, object value);
+		IQueryString Add(string key, object value);
 
-		new IQueryString Add(KeyValuePair<string, object> pair);
+		IQueryString Add(KeyValuePair<string, object> pair);
 		
-		new IQueryString Remove(string key);
+		IQueryString Remove(string key);
+
+		IDictionary<string, object> ToDictionary();
 	}
 }

@@ -41,7 +41,7 @@ namespace Ertis.Net.Rest
 			var request = new RestRequest(url, restSharpMethod, dataFormat);
 			if (headers != null)
 			{
-				foreach (var header in headers)
+				foreach (var header in headers.ToDictionary())
 				{
 					request.AddHeader(header.Key, header.Value?.ToString() ?? "");
 				}
@@ -74,7 +74,7 @@ namespace Ertis.Net.Rest
 			var request = new RestRequest(url, restSharpMethod, dataFormat);
 			if (headers != null)
 			{
-				foreach (var header in headers)
+				foreach (var header in headers.ToDictionary())
 				{
 					request.AddHeader(header.Key, header.Value?.ToString() ?? "");
 				}
@@ -143,7 +143,7 @@ namespace Ertis.Net.Rest
 			var request = new RestRequest(url, restSharpMethod, dataFormat);
 			if (headers != null)
 			{
-				foreach (var header in headers)
+				foreach (var header in headers.ToDictionary())
 				{
 					request.AddHeader(header.Key, header.Value?.ToString() ?? "");
 				}
@@ -175,7 +175,7 @@ namespace Ertis.Net.Rest
 			var request = new RestRequest(url, restSharpMethod, dataFormat);
 			if (headers != null)
 			{
-				foreach (var header in headers)
+				foreach (var header in headers.ToDictionary())
 				{
 					request.AddHeader(header.Key, header.Value?.ToString() ?? "");
 				}

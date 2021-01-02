@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Ertis.MongoDB.Queries;
+using Ertis.Net.Http;
 using NUnit.Framework;
 
 namespace Ertis.Tests.Ertis.MongoDB.Tests.Queries
@@ -18,6 +19,14 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests.Queries
 		#endregion
 
 		#region Methods
+		
+		[Test]
+		public void QueryStringTest()
+		{
+			var queryString = QueryString.Empty;
+			queryString = queryString.Add("skip", 0);
+			Assert.Pass();
+		}
 		
 		[Test]
 		public void QueryValueWithStringTest()

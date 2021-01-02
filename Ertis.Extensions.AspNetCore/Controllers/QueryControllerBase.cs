@@ -24,7 +24,7 @@ namespace Ertis.Extensions.AspNetCore.Controllers
 			IDictionary<string, bool> selectFields);
 
 		[HttpPost("_query")]
-		public async Task<IActionResult> Query()
+		public virtual async Task<IActionResult> Query()
 		{
 			if (!this.ModelState.IsValid)
 			{
@@ -63,12 +63,12 @@ namespace Ertis.Extensions.AspNetCore.Controllers
 
 		private void ValidatePaginationParams(int? skip, int? limit)
 		{
-			if (skip != null && skip < 0)
+			if (skip < 0)
 			{
 				throw new NegativeSkipException();
 			}
 			
-			if (limit != null && limit < 0)
+			if (limit < 0)
 			{
 				throw new NegativeLimitException();
 			}

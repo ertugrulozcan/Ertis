@@ -282,7 +282,145 @@ namespace Ertis.MongoDB.Repository
 			try
 			{
 				var filterDefinition = new JsonFilterDefinition<TEntity>(query);
-			
+				return this.ExecuteQuery(
+					filterDefinition,
+					skip,
+					limit,
+					withCount,
+					sortField,
+					sortDirection,
+					selectFields);
+			}
+			catch (MongoCommandException ex)
+			{
+				switch (ex.Code)
+				{
+					case 31249:
+						throw new SelectQueryPathCollisionException(ex);
+					case 31254:
+						throw new SelectQueryInclusionException(ex);
+					default:
+						throw;
+				}
+			}
+		}
+
+		public IPaginationCollection<dynamic> Query(
+			Expression<Func<TEntity, bool>> expression,
+			int? skip = null,
+			int? limit = null,
+			bool? withCount = null,
+			string sortField = null,
+			SortDirection? sortDirection = null,
+			IDictionary<string, bool> selectFields = null)
+		{
+			try
+			{
+				FilterDefinition<TEntity> filterDefinition = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
+				return this.ExecuteQuery(
+					filterDefinition,
+					skip,
+					limit,
+					withCount,
+					sortField,
+					sortDirection,
+					selectFields);
+			}
+			catch (MongoCommandException ex)
+			{
+				switch (ex.Code)
+				{
+					case 31249:
+						throw new SelectQueryPathCollisionException(ex);
+					case 31254:
+						throw new SelectQueryInclusionException(ex);
+					default:
+						throw;
+				}
+			}
+		}
+		
+		public async Task<IPaginationCollection<dynamic>> QueryAsync(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null,
+			IDictionary<string, bool> selectFields = null)
+		{
+			try
+			{
+				var filterDefinition = new JsonFilterDefinition<TEntity>(query);
+				return await this.ExecuteQueryAsync(
+					filterDefinition,
+					skip,
+					limit,
+					withCount,
+					sortField,
+					sortDirection,
+					selectFields);
+			}
+			catch (MongoCommandException ex)
+			{
+				switch (ex.Code)
+				{
+					case 31249:
+						throw new SelectQueryPathCollisionException(ex);
+					case 31254:
+						throw new SelectQueryInclusionException(ex);
+					default:
+						throw;
+				}
+			}
+		}
+
+		public async Task<IPaginationCollection<dynamic>> QueryAsync(
+			Expression<Func<TEntity, bool>> expression,
+			int? skip = null,
+			int? limit = null,
+			bool? withCount = null,
+			string sortField = null,
+			SortDirection? sortDirection = null,
+			IDictionary<string, bool> selectFields = null)
+		{
+			try
+			{
+				FilterDefinition<TEntity> filterDefinition = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
+				return await this.ExecuteQueryAsync(
+					filterDefinition,
+					skip,
+					limit,
+					withCount,
+					sortField,
+					sortDirection,
+					selectFields);
+			}
+			catch (MongoCommandException ex)
+			{
+				switch (ex.Code)
+				{
+					case 31249:
+						throw new SelectQueryPathCollisionException(ex);
+					case 31254:
+						throw new SelectQueryInclusionException(ex);
+					default:
+						throw;
+				}
+			}
+		}
+
+		private IPaginationCollection<dynamic> ExecuteQuery(
+			FilterDefinition<TEntity> filterDefinition,
+			int? skip = null,
+			int? limit = null,
+			bool? withCount = null,
+			string sortField = null,
+			SortDirection? sortDirection = null,
+			IDictionary<string, bool> selectFields = null)
+		{
+			try
+			{
 				var filterResult =
 					this.ExecuteFilter(filterDefinition, skip, limit, sortField, sortDirection);
 
@@ -318,19 +456,17 @@ namespace Ertis.MongoDB.Repository
 			}
 		}
 		
-		public async Task<IPaginationCollection<dynamic>> QueryAsync(
-			string query, 
-			int? skip = null, 
-			int? limit = null, 
-			bool? withCount = null, 
-			string sortField = null, 
+		public async Task<IPaginationCollection<dynamic>> ExecuteQueryAsync(
+			FilterDefinition<TEntity> filterDefinition,
+			int? skip = null,
+			int? limit = null,
+			bool? withCount = null,
+			string sortField = null,
 			SortDirection? sortDirection = null,
 			IDictionary<string, bool> selectFields = null)
 		{
 			try
 			{
-				var filterDefinition = new JsonFilterDefinition<TEntity>(query);
-			
 				var filterResult =
 					this.ExecuteFilter(filterDefinition, skip, limit, sortField, sortDirection);
 

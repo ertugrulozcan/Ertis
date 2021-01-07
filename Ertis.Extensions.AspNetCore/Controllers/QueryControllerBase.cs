@@ -37,7 +37,7 @@ namespace Ertis.Extensions.AspNetCore.Controllers
 				this.ValidatePaginationParams(skip, limit);
 				
 				var body = await this.ExtractRequestBodyAsync();
-				var whereQuery = this.ExtractWhereQuery(body, defaultValue: "{}");
+				var whereQuery = this.ExtractWhereQuery(body, body);
 				var selectFields = Helpers.QueryHelper.ExtractSelectFields(body);
 				this.ExtractSortingParameters(out string sortField, out SortDirection? sortDirection);
 				var result = await this.GetDataAsync(whereQuery, skip, limit, withCount, sortField, sortDirection, selectFields);

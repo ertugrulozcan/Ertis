@@ -9,7 +9,7 @@ namespace Ertis.Net.Http
 	{
 		#region Statics
 
-		public static readonly IQueryString Empty = new HttpQueryString();
+		public static readonly IHeaderCollection Empty = new RequestHeaders();
 
 		#endregion
 

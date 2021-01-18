@@ -6,6 +6,8 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests.Configuration
 	{
 		#region Properties
 		
+		public string Scheme { get; set; }
+		
 		public string Username { get; set; }
 		
 		public string Password { get; set; }

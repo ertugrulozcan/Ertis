@@ -4,6 +4,8 @@ namespace Ertis.MongoDB.Configuration
 	{
 		#region Properties
 
+		string Scheme { get; }
+		
 		string Username { get; }
 		
 		string Password { get; }

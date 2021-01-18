@@ -31,9 +31,10 @@ namespace Ertis.MongoDB.Helpers
 			}
 
 			var queryParams = new Dictionary<string, object> {{"authSource", "admin"}};
-			string queryString = $"?{string.Join('&', queryParams.Select(x => $"{x.Key}={x.Value}"))}";
+			var queryString = $"?{string.Join('&', queryParams.Select(x => $"{x.Key}={x.Value}"))}";
+			var scheme = string.IsNullOrEmpty(settings.Scheme) ? "mongodb" : settings.Scheme;
 
-			return $"mongodb://{credentialsSection}{serverSection}{databaseSection}{queryString}";
+			return $"{scheme}://{credentialsSection}{serverSection}{databaseSection}{queryString}";
 		}
 
 		#endregion

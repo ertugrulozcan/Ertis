@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using Ertis.MongoDB.Configuration;
+using Ertis.MongoDB.Helpers;
 using Ertis.Tests.Ertis.MongoDB.Tests.Configuration;
 using Ertis.Tests.Ertis.MongoDB.Tests.Models;
 using Ertis.Tests.Ertis.MongoDB.Tests.Services;
 using Ertis.Tests.Ertis.MongoDB.Tests.Services.Interfaces;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace Ertis.Tests.Ertis.MongoDB.Tests
@@ -25,11 +27,11 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 		{
 			IDatabaseSettings databaseSettings = new MockDatabaseSettings
 			{
-				Username = "",
-				Password = "",
-				Host = "172.17.0.2",
-				Port = 27017,
-				DatabaseName = "test_db"
+				Scheme = "mongodb+srv",
+				Username = "ertugrulozcan",
+				Password = ".Abcd1234!",
+				Host = "davincicluster.0hs0r.mongodb.net",
+				DefaultAuthDatabase = "test_db"
 			};
 			
 			this.mockDatabaseRepository = new MockDatabaseRepository(databaseSettings);
@@ -128,6 +130,26 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 				};
 				
 				var paginationResult = this.mockDatabaseRepository.Query(query, selectFields:selectFields);
+				string json = JsonConvert.SerializeObject(paginationResult);
+				Console.WriteLine(json);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+				throw;
+			}
+
+			Assert.Pass();
+		}
+		
+		[Test]
+		public void QueryTest2()
+		{
+			try
+			{
+				string query = "{ \"sys.created_at\": { \"$gte\": \"2021-01-24T00:00:00.000Z\" } }";
+
+				var paginationResult = this.mockDatabaseRepository.Query(query);
 				string json = JsonConvert.SerializeObject(paginationResult);
 				Console.WriteLine(json);
 			}

@@ -26,7 +26,6 @@ namespace Ertis.MongoDB.Helpers
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex);
 				return json;
 			}
 		}
@@ -60,7 +59,6 @@ namespace Ertis.MongoDB.Helpers
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex);
 				return node;
 			}
 		}

@@ -2,9 +2,9 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Ertis.Core.Collections;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ertis.Extensions.AspNetCore.Extensions
@@ -15,14 +15,40 @@ namespace Ertis.Extensions.AspNetCore.Extensions
 
 		public static string ExtractRequestBody(this ControllerBase controller)
 		{
-			using var reader = new StreamReader(controller.Request.Body, Encoding.UTF8);
-			return reader.ReadToEnd();
+			var requestBodyStream = new MemoryStream();
+			
+			try
+			{
+				controller.Request.EnableBuffering();
+				controller.Request.Body.CopyTo(requestBodyStream);
+				requestBodyStream.Seek(0, SeekOrigin.Begin);
+				var body = new StreamReader(requestBodyStream).ReadToEnd();
+				return body;
+			}
+			finally
+			{
+				requestBodyStream.Seek(0, SeekOrigin.Begin);
+				controller.Request.Body = requestBodyStream;	
+			}
 		}
 		
 		public static async Task<string> ExtractRequestBodyAsync(this ControllerBase controller)
 		{
-			using var reader = new StreamReader(controller.Request.Body, Encoding.UTF8);
-			return await reader.ReadToEndAsync();
+			var requestBodyStream = new MemoryStream();
+			
+			try
+			{
+				controller.Request.EnableBuffering();
+				await controller.Request.Body.CopyToAsync(requestBodyStream);
+				requestBodyStream.Seek(0, SeekOrigin.Begin);
+				var body = await new StreamReader(requestBodyStream).ReadToEndAsync();
+				return body;
+			}
+			finally
+			{
+				requestBodyStream.Seek(0, SeekOrigin.Begin);
+				controller.Request.Body = requestBodyStream;	
+			}
 		}
 		
 		public static string ExtractWhereQuery(this ControllerBase controller, string query, string defaultValue = null)

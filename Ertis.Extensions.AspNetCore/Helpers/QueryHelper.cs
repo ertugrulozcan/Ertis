@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Ertis.Extensions.AspNetCore.Extensions;
 using Newtonsoft.Json.Linq;
@@ -20,13 +21,14 @@ namespace Ertis.Extensions.AspNetCore.Helpers
 			{
 				if (rootNode.ContainsKey("where"))
 				{
-					return rootNode["where"]?.ToString();
+					var whereNode = rootNode["where"];
+					return whereNode?.ToString();
 				}
 			}
 
 			return null;
 		}
-		
+
 		public static Dictionary<string, bool> ExtractSelectFields(dynamic body)
 		{
 			var fieldDictionary = new Dictionary<string, bool>();

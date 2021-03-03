@@ -4,7 +4,7 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
 
         <PackageId>Ertis.Extensions.AspNetCore</PackageId>
-        <PackageVersion>1.0.14</PackageVersion>
+        <PackageVersion>1.0.15</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.Extensions.AspNetCore</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -14,8 +14,8 @@
         <Title>Ertis.Extensions.AspNetCore</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan</RepositoryUrl>
-        <AssemblyVersion>1.0.14</AssemblyVersion>
-        <FileVersion>1.0.14</FileVersion>
+        <AssemblyVersion>1.0.15</AssemblyVersion>
+        <FileVersion>1.0.15</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

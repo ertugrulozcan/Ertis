@@ -41,6 +41,17 @@ namespace Ertis.MongoDB.Queries
 			}
 		}
 		
+		public QueryGroup(IEnumerable<IQuery> queries) : this()
+		{
+			if (queries != null)
+			{
+				foreach (var query in queries)
+				{
+					this.Add(query);
+				}
+			}
+		}
+		
 		#endregion
 
 		#region Methods

@@ -12,6 +12,11 @@ namespace Ertis.MongoDB.Queries
 			return new Query("where", value);
 		}
 		
+		public static IQuery Where(params IQuery[] values)
+		{
+			return new Query("where", new QueryGroup(values));
+		}
+		
 		public static IQuery Where(string key, IQueryable value)
 		{
 			return new Query("where", new QueryGroup

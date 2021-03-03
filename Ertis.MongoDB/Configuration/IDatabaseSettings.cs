@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Ertis.MongoDB.Configuration
 {
 	public interface IDatabaseSettings
@@ -14,7 +16,9 @@ namespace Ertis.MongoDB.Configuration
 		
 		int Port { get; }
 		
-		string DatabaseName { get; }
+		string DefaultAuthDatabase { get; }
+		
+		IDictionary<string, object> QueryString { get; }
 
 		#endregion
 	}

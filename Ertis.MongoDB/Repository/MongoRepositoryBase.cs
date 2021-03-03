@@ -42,7 +42,7 @@ namespace Ertis.MongoDB.Repository
 		{
 			string connectionString = ConnectionStringHelper.GenerateConnectionString(settings);
 			var client = new MongoClient(connectionString);
-			var database = client.GetDatabase(settings.DatabaseName);
+			var database = client.GetDatabase(settings.DefaultAuthDatabase);
 
 			this.Collection = database.GetCollection<TEntity>(collectionName);
 
@@ -281,6 +281,10 @@ namespace Ertis.MongoDB.Repository
 		{
 			try
 			{
+				query = ISODateHelper.EnsureDatetimeFieldsToISODate(query);
+				Console.WriteLine("Executing query:");
+				Console.WriteLine(query);
+				
 				var filterDefinition = new JsonFilterDefinition<TEntity>(query);
 				return this.ExecuteQuery(
 					filterDefinition,
@@ -351,6 +355,10 @@ namespace Ertis.MongoDB.Repository
 		{
 			try
 			{
+				query = ISODateHelper.EnsureDatetimeFieldsToISODate(query);
+				Console.WriteLine("Executing query:");
+				Console.WriteLine(query);
+				
 				var filterDefinition = new JsonFilterDefinition<TEntity>(query);
 				return await this.ExecuteQueryAsync(
 					filterDefinition,

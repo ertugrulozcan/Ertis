@@ -1,0 +1,100 @@
+{
+	"_id": {
+		"type": "string",
+		"is_required": true
+	},
+	"firstname": {
+		"type": "string",
+		"default": ""
+	},
+	"lastname": {
+		"type": "string",
+		"default": "",
+		"is_required": false
+	},
+	"username": {
+		"type": "string",
+		"is_required": true
+	},
+	"email_address": {
+		"type": "string",
+		"is_required": true
+	},
+	"age": {
+		"type": "integer",
+		"default": 21,
+		"is_required": false
+	},
+	"weight": {
+		"type": "double",
+		"default": 70.5,
+		"is_required": false
+	},
+	"birth_date": {
+		"type": "date",
+		"default": "2021-01-29T16:31:58.000Z",
+		"is_required": true
+	},
+	"complex_type": {
+		"type": "object",
+		"is_required": false,
+		"schema": {
+			
+		},
+		"default": {
+			"string_field": "test",
+			"integer_field": 9716,
+			"test_object": {
+				"double_field": 9716.0,
+				"boolean_field": true,
+				"array_field": [
+					{
+						"string_field": "test_1",
+						"double_field": 9716.0
+					},
+					{
+						"string_field": "test_2",
+						"double_field": 9716.1
+					},
+					{
+						"string_field": "test_3",
+						"double_field": 9716.2
+					}
+				]
+			}
+		}
+	},
+	"array": {
+		"type": "array",
+		"is_required": false,
+		"schema": {
+			
+		},
+		"default": [
+			{
+				"string_field": "test_1",
+				"double_field": 9716.0
+			},
+			{
+				"string_field": "test_2",
+				"double_field": 9716.1
+			},
+			{
+				"string_field": "test_3",
+				"double_field": 9716.2
+			}
+		]
+	},
+	"primitive_array": {
+		"type": "array",
+		"is_required": false,
+		"schema": {
+			
+		},
+		"default": [
+			"test_1",
+			"test_2",
+			"test_3"
+		]
+	}
+}

@@ -9,13 +9,26 @@ namespace Ertis.MongoDB.Helpers
 
 		public static string EnsureDatetimeFieldsToISODate(string json)
 		{
-			var root = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
-			if (root is JToken jToken)
+			if (string.IsNullOrEmpty(json))
 			{
-				return EnsureDatetimeFieldsToISODate(jToken).ToString();	
+				return json;
 			}
+			
+			try
+			{
+				var root = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+				if (root is JToken jToken)
+				{
+					return EnsureDatetimeFieldsToISODate(jToken).ToString();	
+				}
 
-			return json;
+				return json;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex);
+				return json;
+			}
 		}
 		
 		public static JToken EnsureDatetimeFieldsToISODate(JToken node)
@@ -25,23 +38,31 @@ namespace Ertis.MongoDB.Helpers
 				return null;
 			}
 
-			if (node is JValue jValue)
+			try
 			{
-				if (node.Type == JTokenType.String || node.Type == JTokenType.Date)
+				if (node is JValue jValue)
 				{
-					if (DateTime.TryParse(node.Value<string>(), out var dateTime))
+					if (node.Type == JTokenType.String || node.Type == JTokenType.Date)
 					{
-						jValue.Replace(new JRaw($"ISODate(\"{dateTime:yyyy-MM-ddTHH:mm:ssZ}\")"));
-					}
-				}	
-			}
+						if (DateTime.TryParse(node.Value<string>(), out var dateTime))
+						{
+							jValue.Replace(new JRaw($"ISODate(\"{dateTime:yyyy-MM-ddTHH:mm:ssZ}\")"));
+						}
+					}	
+				}
 
-			foreach (var child in node)
+				foreach (var child in node)
+				{
+					EnsureDatetimeFieldsToISODate(child);
+				}
+
+				return node;
+			}
+			catch (Exception ex)
 			{
-				EnsureDatetimeFieldsToISODate(child);
+				Console.WriteLine(ex);
+				return node;
 			}
-
-			return node;
 		}
 
 		#endregion

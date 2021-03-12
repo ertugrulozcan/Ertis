@@ -76,12 +76,16 @@ namespace Ertis.MongoDB.Database
 					Filter = new ExpressionFilterDefinition<BsonDocument>(filterExpression)
 				});
 
-				return result.Current;
+				var collectionNames = new List<string>();
+				result.ForEachAsync(collectionName => collectionNames.Add(collectionName));
+				return collectionNames;
 			}
 			else
 			{
 				var result = this.Database.ListCollectionNames();
-				return result.Current;
+				var collectionNames = new List<string>();
+				result.ForEachAsync(collectionName => collectionNames.Add(collectionName));
+				return collectionNames;
 			}
 		}
 		
@@ -96,12 +100,16 @@ namespace Ertis.MongoDB.Database
 					Filter = new ExpressionFilterDefinition<BsonDocument>(filterExpression)
 				}, cancellationToken: cancellationToken);
 
-				return result.Current;
+				var collectionNames = new List<string>();
+				await result.ForEachAsync(collectionName => collectionNames.Add(collectionName), cancellationToken: cancellationToken);
+				return collectionNames;
 			}
 			else
 			{
 				var result = await this.Database.ListCollectionNamesAsync(cancellationToken: cancellationToken);
-				return result.Current;
+				var collectionNames = new List<string>();
+				await result.ForEachAsync(collectionName => collectionNames.Add(collectionName), cancellationToken: cancellationToken);
+				return collectionNames;
 			}
 		}
 		

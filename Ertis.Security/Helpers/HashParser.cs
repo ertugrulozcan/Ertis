@@ -20,7 +20,13 @@ namespace Ertis.Security.Helpers
 			var algorithmNameSegment = segments.FirstOrDefault();
 			var specificOutputSize = 0;
 			var specificStateSize = 0;
-			if (segments.Length > 1)
+
+			if (segments.Length > 2)
+			{
+				int.TryParse(segments[1], out specificStateSize);
+				int.TryParse(segments[2], out specificOutputSize);
+			}
+			else if (segments.Length > 1)
 			{
 				if (segments[1].Contains('/'))
 				{
@@ -39,6 +45,54 @@ namespace Ertis.Security.Helpers
 					algorithm = HashAlgorithms.MD5;
 					outputBitSize = specificOutputSize > 0 ? specificOutputSize : 128;
 					stateSize = specificStateSize > 0 ? specificStateSize : 128;
+					return true;
+				case "SHA":
+					outputBitSize = specificOutputSize;
+					stateSize = 0;
+					if (specificOutputSize == 224)
+					{
+						algorithm = HashAlgorithms.SHA2_224;
+						return true;
+					}
+					else if (specificOutputSize == 256)
+					{
+						algorithm = HashAlgorithms.SHA2_256;
+						return true;
+					}
+					else if (specificOutputSize == 384)
+					{
+						algorithm = HashAlgorithms.SHA2_384;
+						return true;
+					}
+					else if (specificOutputSize == 512)
+					{
+						algorithm = HashAlgorithms.SHA2_512;
+						return true;
+					}
+					else
+					{
+						algorithm = default;
+						return false;
+					}
+				case "SHA224":
+					algorithm = HashAlgorithms.SHA2_224;
+					outputBitSize = 224;
+					stateSize = 0;
+					return true;
+				case "SHA256":
+					algorithm = HashAlgorithms.SHA2_256;
+					outputBitSize = 256;
+					stateSize = 0;
+					return true;
+				case "SHA384":
+					algorithm = HashAlgorithms.SHA2_384;
+					outputBitSize = 384;
+					stateSize = 0;
+					return true;
+				case "SHA512":
+					algorithm = HashAlgorithms.SHA2_512;
+					outputBitSize = 512;
+					stateSize = 0;
 					return true;
 				case "SHA0":
 					algorithm = HashAlgorithms.SHA0;

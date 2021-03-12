@@ -22,9 +22,9 @@ namespace Ertis.MongoDB.Database
 
 		Task RenameCollectionAsync(string oldName, string newName, CancellationToken cancellationToken = default);
 
-		IEnumerable<string> ListCollections(string oldName, string newName, Expression<Func<BsonDocument, bool>> filterExpression = null);
+		IEnumerable<string> ListCollections(Expression<Func<BsonDocument, bool>> filterExpression = null);
 
-		Task<IEnumerable<string>> ListCollectionsAsync(string oldName, string newName, Expression<Func<BsonDocument, bool>> filterExpression = null, CancellationToken cancellationToken = default);
+		Task<IEnumerable<string>> ListCollectionsAsync(Expression<Func<BsonDocument, bool>> filterExpression = null, CancellationToken cancellationToken = default);
 
 		MongoDbStatistics GetDatabaseStatistics();
 

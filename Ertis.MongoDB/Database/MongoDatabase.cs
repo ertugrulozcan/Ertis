@@ -67,7 +67,7 @@ namespace Ertis.MongoDB.Database
 			await this.Database.RenameCollectionAsync(oldName, newName, cancellationToken: cancellationToken);
 		}
 		
-		public IEnumerable<string> ListCollections(string oldName, string newName, Expression<Func<BsonDocument, bool>> filterExpression = null)
+		public IEnumerable<string> ListCollections(Expression<Func<BsonDocument, bool>> filterExpression = null)
 		{
 			if (filterExpression != null)
 			{
@@ -85,9 +85,7 @@ namespace Ertis.MongoDB.Database
 			}
 		}
 		
-		public async Task<IEnumerable<string>> ListCollectionsAsync(
-			string oldName, 
-			string newName, 
+		public async Task<IEnumerable<string>> ListCollectionsAsync( 
 			Expression<Func<BsonDocument, bool>> filterExpression = null, 
 			CancellationToken cancellationToken = default)
 		{

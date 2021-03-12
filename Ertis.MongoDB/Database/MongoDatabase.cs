@@ -26,7 +26,7 @@ namespace Ertis.MongoDB.Database
 		/// Constructor
 		/// </summary>
 		/// <param name="settings"></param>
-		protected MongoDatabase(IDatabaseSettings settings)
+		public MongoDatabase(IDatabaseSettings settings)
 		{
 			string connectionString = ConnectionStringHelper.GenerateConnectionString(settings);
 			var client = new MongoClient(connectionString);

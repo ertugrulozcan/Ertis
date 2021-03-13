@@ -24,7 +24,7 @@ namespace Ertis.MongoDB.Helpers
 
 				return json;
 			}
-			catch (Exception ex)
+			catch
 			{
 				return json;
 			}
@@ -57,7 +57,7 @@ namespace Ertis.MongoDB.Helpers
 
 				return node;
 			}
-			catch (Exception ex)
+			catch
 			{
 				return node;
 			}

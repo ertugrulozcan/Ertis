@@ -29,5 +29,9 @@ namespace Ertis.MongoDB.Database
 		MongoDbStatistics GetDatabaseStatistics();
 
 		Task<MongoDbStatistics> GetDatabaseStatisticsAsync(CancellationToken cancellationToken = default);
+		
+		BsonDocument GetDatabaseStatisticsDocument();
+
+		Task<BsonDocument> GetDatabaseStatisticsDocumentAsync(CancellationToken cancellationToken = default);
 	}
 }

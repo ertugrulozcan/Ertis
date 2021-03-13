@@ -7,6 +7,7 @@ using Ertis.MongoDB.Configuration;
 using Ertis.MongoDB.Helpers;
 using Ertis.MongoDB.Models;
 using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Driver;
 using MongoDriver = MongoDB.Driver;
 
@@ -115,18 +116,36 @@ namespace Ertis.MongoDB.Database
 		
 		public MongoDbStatistics GetDatabaseStatistics()
 		{
-			var command = new BsonDocument { { "dbstats", 1 } };
-			var resultDocument = this.Database.RunCommand<BsonDocument>(command);
-			var json = resultDocument.ToString();
+			var resultDocument = this.GetDatabaseStatisticsDocument();
+			var json = resultDocument.ToJson(new JsonWriterSettings
+			{
+				OutputMode = JsonOutputMode.RelaxedExtendedJson
+			});
+			
 			return Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbStatistics>(json);
 		}
 		
 		public async Task<MongoDbStatistics> GetDatabaseStatisticsAsync(CancellationToken cancellationToken = default)
 		{
-			var command = new BsonDocument { { "dbstats", 1 } };
-			var resultDocument = await this.Database.RunCommandAsync<BsonDocument>(command, cancellationToken:cancellationToken);
-			var json = resultDocument.ToString();
+			var resultDocument = await this.GetDatabaseStatisticsDocumentAsync(cancellationToken);
+			var json = resultDocument.ToJson(new JsonWriterSettings
+			{
+				OutputMode = JsonOutputMode.RelaxedExtendedJson
+			});
+			
 			return Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbStatistics>(json);
+		}
+
+		public BsonDocument GetDatabaseStatisticsDocument()
+		{
+			var command = new BsonDocument { { "dbstats", 1 } };
+			return this.Database.RunCommand<BsonDocument>(command);
+		}
+
+		public async Task<BsonDocument> GetDatabaseStatisticsDocumentAsync(CancellationToken cancellationToken = default)
+		{
+			var command = new BsonDocument { { "dbstats", 1 } };
+			return await this.Database.RunCommandAsync<BsonDocument>(command, cancellationToken:cancellationToken);
 		}
 
 		#endregion

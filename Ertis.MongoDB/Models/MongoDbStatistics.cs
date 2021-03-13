@@ -28,44 +28,44 @@ namespace Ertis.MongoDB.Models
 		[JsonProperty("db")]
 		public string DatabaseName { get; set; }
 		
-		[JsonProperty("collections")]
-		public int CollectionCount { get; set; }
+		[JsonProperty("collections", NullValueHandling = NullValueHandling.Ignore)]
+		public int? CollectionCount { get; set; }
 		
-		[JsonProperty("views")]
-		public int ViewCount { get; set; }
+		[JsonProperty("views", NullValueHandling = NullValueHandling.Ignore)]
+		public int? ViewCount { get; set; }
 		
-		[JsonProperty("objects")]
-		public int ObjectCount { get; set; }
+		[JsonProperty("objects", NullValueHandling = NullValueHandling.Ignore)]
+		public int? ObjectCount { get; set; }
 		
-		[JsonProperty("avgObjSize")]
-		public double AverageObjectSize { get; set; }
+		[JsonProperty("avgObjSize", NullValueHandling = NullValueHandling.Ignore)]
+		public double? AverageObjectSize { get; set; }
 		
-		[JsonProperty("dataSize")]
-		public double DataSize { get; set; }
+		[JsonProperty("dataSize", NullValueHandling = NullValueHandling.Ignore)]
+		public double? DataSize { get; set; }
 		
-		[JsonProperty("storageSize")]
-		public double StorageSize { get; set; }
+		[JsonProperty("storageSize", NullValueHandling = NullValueHandling.Ignore)]
+		public double? StorageSize { get; set; }
 		
-		[JsonProperty("indexes")]
-		public int IndexCount { get; set; }
+		[JsonProperty("indexes", NullValueHandling = NullValueHandling.Ignore)]
+		public int? IndexCount { get; set; }
 		
-		[JsonProperty("indexSize")]
-		public double IndexSize { get; set; }
+		[JsonProperty("indexSize", NullValueHandling = NullValueHandling.Ignore)]
+		public double? IndexSize { get; set; }
 		
-		[JsonProperty("totalSize")]
-		public double TotalSize { get; set; }
+		[JsonProperty("totalSize", NullValueHandling = NullValueHandling.Ignore)]
+		public double? TotalSize { get; set; }
 		
-		[JsonProperty("scaleFactor")]
-		public double ScaleFactor { get; set; }
+		[JsonProperty("scaleFactor", NullValueHandling = NullValueHandling.Ignore)]
+		public double? ScaleFactor { get; set; }
 		
-		[JsonProperty("fsUsedSize")]
-		public double FileStorageUsedSize { get; set; }
+		[JsonProperty("fsUsedSize", NullValueHandling = NullValueHandling.Ignore)]
+		public double? FileStorageUsedSize { get; set; }
 		
-		[JsonProperty("fsTotalSize")]
-		public double FileStorageTotalSize { get; set; }
+		[JsonProperty("fsTotalSize", NullValueHandling = NullValueHandling.Ignore)]
+		public double? FileStorageTotalSize { get; set; }
 		
-		[JsonProperty("ok")]
-		public double State { get; set; }
+		[JsonProperty("ok", NullValueHandling = NullValueHandling.Ignore)]
+		public double? State { get; set; }
 
 		#endregion
 	}

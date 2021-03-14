@@ -59,7 +59,12 @@ namespace Ertis.Net.Rest
 			}
 			else
 			{
-				return new ResponseResult<TResult>(response.StatusCode, response.Content);
+				return new ResponseResult<TResult>(response.StatusCode)
+				{
+					Message = response.Content,
+					Json = response.Content,
+					RawData = response.RawBytes
+				};
 			}
 		}
 
@@ -92,7 +97,12 @@ namespace Ertis.Net.Rest
 			}
 			else
 			{
-				return new ResponseResult<TResult>(response.StatusCode, response.Content);
+				return new ResponseResult<TResult>(response.StatusCode)
+				{
+					Message = response.Content,
+					Json = response.Content,
+					RawData = response.RawBytes
+				};
 			}
 		}
 
@@ -160,7 +170,12 @@ namespace Ertis.Net.Rest
 			}
 			else
 			{
-				return new ResponseResult(response.StatusCode, response.Content);
+				return new ResponseResult(response.StatusCode)
+				{
+					Message = response.Content,
+					Json = response.Content,
+					RawData = response.RawBytes
+				};
 			}
 		}
 
@@ -192,7 +207,12 @@ namespace Ertis.Net.Rest
 			}
 			else
 			{
-				return new ResponseResult(response.StatusCode, response.Content);
+				return new ResponseResult(response.StatusCode)
+				{
+					Message = response.Content,
+					Json = response.Content,
+					RawData = response.RawBytes
+				};
 			}
 		}
 

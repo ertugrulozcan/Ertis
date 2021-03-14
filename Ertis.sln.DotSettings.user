@@ -165,5 +165,6 @@
     &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.MongoDbTests.QueryTest2&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.MongoDB.Tests.MongoDbTests.Anan&lt;/TestId&gt;
     &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.Security.Tests.Helpers.HashParserTests&lt;/TestId&gt;
+    &lt;TestId&gt;NUnit3x::EA04EB04-2D11-4930-B75E-384ED0106399::.NETCoreApp,Version=v3.1::Ertis.Tests.Ertis.Net.Tests.Rest.RestSharpRestHandlerTests.GetMembershipTestAsync&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

@@ -45,10 +45,11 @@ namespace Ertis.Net.Rest
 				var response = await httpClient.SendAsync(request);
 				if (response != null)
 				{
+					var rawData = await response.Content.ReadAsByteArrayAsync();
+					var json = await response.Content.ReadAsStringAsync();
+					
 					if (response.IsSuccessStatusCode)
 					{
-						var rawData = await response.Content.ReadAsByteArrayAsync();
-						var json = await response.Content.ReadAsStringAsync();
 						return new ResponseResult<TResult>(response.StatusCode)
 						{
 							Json = json,
@@ -58,7 +59,11 @@ namespace Ertis.Net.Rest
 					}
 					else
 					{
-						return new ResponseResult<TResult>(response.StatusCode, await response.Content.ReadAsStringAsync());
+						return new ResponseResult<TResult>(response.StatusCode, json)
+						{
+							Json = json,
+							RawData = rawData
+						};
 					}
 				}
 				else

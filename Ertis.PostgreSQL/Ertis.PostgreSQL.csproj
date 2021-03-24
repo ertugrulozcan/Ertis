@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+
+        <PackageId>Ertis.PostgreSQL</PackageId>
+        <PackageVersion>1.0.1</PackageVersion>
+        <Authors>Ertuğrul Özcan</Authors>
+        <Description>Ertis.PostgreSQL</Description>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <Copyright>Ertuğrul Özcan | Copyright 2021 (c)</Copyright>
+        <PackageReleaseNotes>Initial package</PackageReleaseNotes>
+        <PackageTags>Ertis.PostgreSQL</PackageTags>
+        <Title>Ertis.PostgreSQL</Title>
+        <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
+        <AssemblyVersion>1.0.1</AssemblyVersion>
+        <FileVersion>1.0.1</FileVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Ertis.Data\Ertis.Data.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.9.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.2" />
+      <PackageReference Include="Npgsql" Version="5.0.3" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="5.0.2" />
+    </ItemGroup>
+
+</Project>

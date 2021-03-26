@@ -5,6 +5,6 @@ namespace Ertis.PostgreSQL.Repository
 {
 	public interface IPostgreRepository<TEntity> : IRepository<TEntity, int> where TEntity : IEntity<int>
 	{
-		
+		bool TrackingEnabled { get; set; }
 	}
 }

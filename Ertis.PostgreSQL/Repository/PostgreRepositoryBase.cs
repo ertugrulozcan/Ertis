@@ -18,6 +18,12 @@ namespace Ertis.PostgreSQL.Repository
 
 		#endregion
 
+		#region Properties
+
+		public bool TrackingEnabled { get; set; } = false;
+
+		#endregion
+		
 		#region Constructors
 
 		/// <summary>
@@ -35,22 +41,50 @@ namespace Ertis.PostgreSQL.Repository
 
 		public TEntity FindOne(int id)
 		{
-			return this.database.Set<TEntity>().Find(id);
+			if (this.TrackingEnabled)
+			{
+				return this.database.Set<TEntity>().Find(id);
+			}
+			else
+			{
+				return this.database.Set<TEntity>().AsNoTracking().FirstOrDefault(x => x.Id == id);
+			}
 		}
 
 		public async Task<TEntity> FindOneAsync(int id)
 		{
-			return await this.database.Set<TEntity>().FindAsync(id);
+			if (this.TrackingEnabled)
+			{
+				return await this.database.Set<TEntity>().FindAsync(id);
+			}
+			else
+			{
+				return await this.database.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+			}
 		}
 
 		public TEntity FindOne(Expression<Func<TEntity, bool>> expression)
 		{
-			return this.database.Set<TEntity>().FirstOrDefault(expression);
+			if (this.TrackingEnabled)
+			{
+				return this.database.Set<TEntity>().FirstOrDefault(expression);	
+			}
+			else
+			{
+				return this.database.Set<TEntity>().AsNoTracking().FirstOrDefault(expression);
+			}
 		}
 
 		public async Task<TEntity> FindOneAsync(Expression<Func<TEntity, bool>> expression)
 		{
-			return await this.database.Set<TEntity>().FirstOrDefaultAsync(expression);
+			if (this.TrackingEnabled)
+			{
+				return await this.database.Set<TEntity>().FirstOrDefaultAsync(expression);
+			}
+			else
+			{
+				return await this.database.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(expression);	
+			}
 		}
 
 		public IPaginationCollection<TEntity> Find(int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
@@ -89,53 +123,54 @@ namespace Ertis.PostgreSQL.Repository
 		{
 			IQueryable<TEntity> queryable;
 			long? totalCount = null;
-			
+
+			var dbSet = this.TrackingEnabled ? this.database.Set<TEntity>() : this.database.Set<TEntity>().AsNoTracking();
 			if (expression != null)
 			{
 				if (skip != null && limit != null)
 				{
-					queryable = this.database.Set<TEntity>().Where(expression).Skip(skip.Value).Take(limit.Value);
+					queryable = dbSet.Where(expression).Skip(skip.Value).Take(limit.Value);
 				}
 				else if (skip != null)
 				{
-					queryable = this.database.Set<TEntity>().Where(expression).Skip(skip.Value);
+					queryable = dbSet.Where(expression).Skip(skip.Value);
 				}
 				else if (limit != null)
 				{
-					queryable = this.database.Set<TEntity>().Where(expression).Take(limit.Value);
+					queryable = dbSet.Where(expression).Take(limit.Value);
 				}
 				else
 				{
-					queryable = this.database.Set<TEntity>().Where(expression);
+					queryable = dbSet.Where(expression);
 				}
 
 				if (withCount != null && withCount.Value)
 				{
-					totalCount = this.database.Set<TEntity>().LongCount(expression);
+					totalCount = dbSet.LongCount(expression);
 				}
 			}
 			else
 			{
 				if (skip != null && limit != null)
 				{
-					queryable = this.database.Set<TEntity>().Skip(skip.Value).Take(limit.Value);
+					queryable = dbSet.Skip(skip.Value).Take(limit.Value);
 				}
 				else if (skip != null)
 				{
-					queryable = this.database.Set<TEntity>().Skip(skip.Value);
+					queryable = dbSet.Skip(skip.Value);
 				}
 				else if (limit != null)
 				{
-					queryable = this.database.Set<TEntity>().Take(limit.Value);
+					queryable = dbSet.Take(limit.Value);
 				}
 				else
 				{
-					queryable = this.database.Set<TEntity>();
+					queryable = dbSet;
 				}
 				
 				if (withCount != null && withCount.Value)
 				{
-					totalCount = this.database.Set<TEntity>().LongCount();
+					totalCount = dbSet.LongCount();
 				}
 			}
 
@@ -177,52 +212,53 @@ namespace Ertis.PostgreSQL.Repository
 			IQueryable<TEntity> queryable;
 			long? totalCount = null;
 			
+			var dbSet = this.TrackingEnabled ? this.database.Set<TEntity>() : this.database.Set<TEntity>().AsNoTracking();
 			if (expression != null)
 			{
 				if (skip != null && limit != null)
 				{
-					queryable = this.database.Set<TEntity>().Where(expression).Skip(skip.Value).Take(limit.Value);
+					queryable = dbSet.Where(expression).Skip(skip.Value).Take(limit.Value);
 				}
 				else if (skip != null)
 				{
-					queryable = this.database.Set<TEntity>().Where(expression).Skip(skip.Value);
+					queryable = dbSet.Where(expression).Skip(skip.Value);
 				}
 				else if (limit != null)
 				{
-					queryable = this.database.Set<TEntity>().Where(expression).Take(limit.Value);
+					queryable = dbSet.Where(expression).Take(limit.Value);
 				}
 				else
 				{
-					queryable = this.database.Set<TEntity>().Where(expression);
+					queryable = dbSet.Where(expression);
 				}
 
 				if (withCount != null && withCount.Value)
 				{
-					totalCount = await this.database.Set<TEntity>().LongCountAsync(expression);
+					totalCount = await dbSet.LongCountAsync(expression);
 				}
 			}
 			else
 			{
 				if (skip != null && limit != null)
 				{
-					queryable = this.database.Set<TEntity>().Skip(skip.Value).Take(limit.Value);
+					queryable = dbSet.Skip(skip.Value).Take(limit.Value);
 				}
 				else if (skip != null)
 				{
-					queryable = this.database.Set<TEntity>().Skip(skip.Value);
+					queryable = dbSet.Skip(skip.Value);
 				}
 				else if (limit != null)
 				{
-					queryable = this.database.Set<TEntity>().Take(limit.Value);
+					queryable = dbSet.Take(limit.Value);
 				}
 				else
 				{
-					queryable = this.database.Set<TEntity>();
+					queryable = dbSet;
 				}
 				
 				if (withCount != null && withCount.Value)
 				{
-					totalCount = await this.database.Set<TEntity>().LongCountAsync();
+					totalCount = await dbSet.LongCountAsync();
 				}
 			}
 
@@ -265,16 +301,34 @@ namespace Ertis.PostgreSQL.Repository
 
 		public TEntity Insert(TEntity entity)
 		{
-			var cursor = this.database.Set<TEntity>().Add(entity);
-			this.database.SaveChanges();
-			return cursor?.Entity;
+			if (this.TrackingEnabled)
+			{
+				var cursor = this.database.Set<TEntity>().Add(entity);
+				this.database.SaveChanges();
+				return cursor?.Entity;
+			}
+			else
+			{
+				this.database.Set<TEntity>().AsNoTracking().ToList().Add(entity);
+				this.database.SaveChanges();
+				return entity;
+			}
 		}
 
 		public async Task<TEntity> InsertAsync(TEntity entity)
 		{
-			var cursor = (await this.database.Set<TEntity>().AddAsync(entity));
-			await this.database.SaveChangesAsync();
-			return cursor?.Entity;
+			if (this.TrackingEnabled)
+			{
+				var cursor = (await this.database.Set<TEntity>().AddAsync(entity));
+				await this.database.SaveChangesAsync();
+				return cursor?.Entity;	
+			}
+			else
+			{
+				(await this.database.Set<TEntity>().AsNoTracking().ToListAsync()).Add(entity);
+				await this.database.SaveChangesAsync();
+				return entity;
+			}
 		}
 
 		#endregion
@@ -283,16 +337,46 @@ namespace Ertis.PostgreSQL.Repository
 
 		public TEntity Update(TEntity entity)
 		{
-			var cursor = this.database.Set<TEntity>().Update(entity);
-			this.database.SaveChanges();
-			return cursor?.Entity;
+			if (this.TrackingEnabled)
+			{
+				var cursor = this.database.Set<TEntity>().Update(entity);
+				this.database.SaveChanges();
+				return cursor?.Entity;
+			}
+			else
+			{
+				var current = this.database.Set<TEntity>().AsNoTracking().FirstOrDefault(x => x.Id == entity.Id);
+				if (current == null)
+				{
+					return null;
+				}
+				
+				this.database.Entry(current).CurrentValues.SetValues(entity);
+				this.database.SaveChanges();
+				return entity;
+			}
 		}
 
 		public async Task<TEntity> UpdateAsync(TEntity entity)
 		{
-			var cursor = this.database.Set<TEntity>().Update(entity);
-			await this.database.SaveChangesAsync();
-			return cursor?.Entity;
+			if (this.TrackingEnabled)
+			{
+				var cursor = this.database.Set<TEntity>().Update(entity);
+				await this.database.SaveChangesAsync();
+				return cursor?.Entity;	
+			}
+			else
+			{
+				var current = await this.database.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == entity.Id);
+				if (current == null)
+				{
+					return null;
+				}
+				
+				this.database.Entry(current).CurrentValues.SetValues(entity);
+				await this.database.SaveChangesAsync();
+				return entity;
+			}
 		}
 
 		public TEntity Upsert(TEntity entity)
@@ -327,9 +411,17 @@ namespace Ertis.PostgreSQL.Repository
 
 		public bool Delete(TEntity entity)
 		{
-			this.database.Set<TEntity>().Remove(entity);
-			this.database.SaveChanges();
-			return true;
+			if (this.TrackingEnabled)
+			{
+				this.database.Set<TEntity>().Remove(entity);
+				this.database.SaveChanges();
+				return true;
+			}
+			else
+			{
+				this.database.Set<TEntity>().AsNoTracking().ToList().Remove(entity);
+				return this.database.SaveChanges() > 0;
+			}
 		}
 		
 		public bool Delete(int id)
@@ -343,9 +435,17 @@ namespace Ertis.PostgreSQL.Repository
 
 		public async Task<bool> DeleteAsync(TEntity entity)
 		{
-			this.database.Set<TEntity>().Remove(entity);
-			await this.database.SaveChangesAsync();
-			return true;
+			if (this.TrackingEnabled)
+			{
+				this.database.Set<TEntity>().Remove(entity);
+				await this.database.SaveChangesAsync();
+				return true;
+			}
+			else
+			{
+				(await this.database.Set<TEntity>().AsNoTracking().ToListAsync()).Remove(entity);
+				return await this.database.SaveChangesAsync() > 0;
+			}
 		}
 		
 		public async Task<bool> DeleteAsync(int id)
@@ -363,12 +463,26 @@ namespace Ertis.PostgreSQL.Repository
 
 		public long Count()
 		{
-			return this.database.Set<TEntity>().LongCount();
+			if (this.TrackingEnabled)
+			{
+				return this.database.Set<TEntity>().LongCount();
+			}
+			else
+			{
+				return this.database.Set<TEntity>().AsNoTracking().LongCount();	
+			}
 		}
 
 		public async Task<long> CountAsync()
 		{
-			return await this.database.Set<TEntity>().LongCountAsync();
+			if (this.TrackingEnabled)
+			{
+				return await this.database.Set<TEntity>().LongCountAsync();
+			}
+			else
+			{
+				return await this.database.Set<TEntity>().AsNoTracking().LongCountAsync();	
+			}
 		}
 
 		public long Count(string query)
@@ -385,12 +499,26 @@ namespace Ertis.PostgreSQL.Repository
 
 		public long Count(Expression<Func<TEntity, bool>> expression)
 		{
-			return this.database.Set<TEntity>().Count(expression);
+			if (this.TrackingEnabled)
+			{
+				return this.database.Set<TEntity>().Count(expression);
+			}
+			else
+			{
+				return this.database.Set<TEntity>().AsNoTracking().Count(expression);	
+			}
 		}
 
 		public async Task<long> CountAsync(Expression<Func<TEntity, bool>> expression)
 		{
-			return await this.database.Set<TEntity>().CountAsync(expression);
+			if (this.TrackingEnabled)
+			{
+				return await this.database.Set<TEntity>().CountAsync(expression);
+			}
+			else
+			{
+				return await this.database.Set<TEntity>().AsNoTracking().CountAsync(expression);	
+			}
 		}
 
 		#endregion

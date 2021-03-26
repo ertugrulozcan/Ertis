@@ -361,8 +361,10 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					return null;
 				}
-				
-				this.database.Entry(current).CurrentValues.SetValues(entity);
+
+				var entry = this.database.Entry(current);
+				entry.State = EntityState.Modified;
+				entry.CurrentValues.SetValues(entity);
 				this.database.SaveChanges();
 				return entity;
 			}
@@ -383,8 +385,10 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					return null;
 				}
-				
-				this.database.Entry(current).CurrentValues.SetValues(entity);
+
+				var entry = this.database.Entry(current);
+				entry.State = EntityState.Modified;
+				entry.CurrentValues.SetValues(entity);
 				await this.database.SaveChangesAsync();
 				return entity;
 			}

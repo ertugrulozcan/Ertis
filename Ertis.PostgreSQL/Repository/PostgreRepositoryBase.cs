@@ -39,51 +39,60 @@ namespace Ertis.PostgreSQL.Repository
 		
 		#region Find Methods
 
+		protected virtual IQueryable<TEntity> ConfigureDbSet(DbContext dbContext)
+		{
+			return dbContext.Set<TEntity>();
+		}
+		
 		public TEntity FindOne(int id)
 		{
+			var dbSet = this.ConfigureDbSet(this.database);
 			if (this.TrackingEnabled)
 			{
-				return this.database.Set<TEntity>().Find(id);
+				return dbSet.FirstOrDefault(x => x.Id == id);
 			}
 			else
 			{
-				return this.database.Set<TEntity>().AsNoTracking().FirstOrDefault(x => x.Id == id);
+				return dbSet.AsNoTracking().FirstOrDefault(x => x.Id == id);
 			}
 		}
 
 		public async Task<TEntity> FindOneAsync(int id)
 		{
+			var dbSet = this.ConfigureDbSet(this.database);
 			if (this.TrackingEnabled)
 			{
-				return await this.database.Set<TEntity>().FindAsync(id);
+				return await dbSet.FirstOrDefaultAsync(x => x.Id == id);
 			}
 			else
 			{
-				return await this.database.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+				return await dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 			}
 		}
 
 		public TEntity FindOne(Expression<Func<TEntity, bool>> expression)
 		{
+			var dbSet = this.ConfigureDbSet(this.database);
 			if (this.TrackingEnabled)
 			{
-				return this.database.Set<TEntity>().FirstOrDefault(expression);	
+				return dbSet.FirstOrDefault(expression);	
 			}
 			else
 			{
-				return this.database.Set<TEntity>().AsNoTracking().FirstOrDefault(expression);
+				return dbSet.AsNoTracking().FirstOrDefault(expression);
 			}
 		}
 
 		public async Task<TEntity> FindOneAsync(Expression<Func<TEntity, bool>> expression)
 		{
+			var dbSet = this.ConfigureDbSet(this.database);
 			if (this.TrackingEnabled)
 			{
-				return await this.database.Set<TEntity>().FirstOrDefaultAsync(expression);
+				return await dbSet.FirstOrDefaultAsync(expression);
 			}
 			else
 			{
-				return await this.database.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(expression);	
+				return await dbSet.AsNoTracking().FirstOrDefaultAsync(expression);	
 			}
 		}
 
@@ -124,7 +133,8 @@ namespace Ertis.PostgreSQL.Repository
 			IQueryable<TEntity> queryable;
 			long? totalCount = null;
 
-			var dbSet = this.TrackingEnabled ? this.database.Set<TEntity>() : this.database.Set<TEntity>().AsNoTracking();
+			var db = this.ConfigureDbSet(this.database);
+			var dbSet = this.TrackingEnabled ? db : db.AsNoTracking();
 			if (expression != null)
 			{
 				if (skip != null && limit != null)
@@ -212,7 +222,8 @@ namespace Ertis.PostgreSQL.Repository
 			IQueryable<TEntity> queryable;
 			long? totalCount = null;
 			
-			var dbSet = this.TrackingEnabled ? this.database.Set<TEntity>() : this.database.Set<TEntity>().AsNoTracking();
+			var db = this.ConfigureDbSet(this.database);
+			var dbSet = this.TrackingEnabled ? db : db.AsNoTracking();
 			if (expression != null)
 			{
 				if (skip != null && limit != null)

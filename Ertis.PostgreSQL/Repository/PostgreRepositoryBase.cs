@@ -312,34 +312,16 @@ namespace Ertis.PostgreSQL.Repository
 
 		public TEntity Insert(TEntity entity)
 		{
-			if (this.TrackingEnabled)
-			{
-				var cursor = this.database.Set<TEntity>().Add(entity);
-				this.database.SaveChanges();
-				return cursor?.Entity;
-			}
-			else
-			{
-				this.database.Set<TEntity>().AsNoTracking().ToList().Add(entity);
-				this.database.SaveChanges();
-				return entity;
-			}
+			var cursor = this.database.Set<TEntity>().Add(entity);
+			this.database.SaveChanges();
+			return cursor?.Entity;
 		}
 
 		public async Task<TEntity> InsertAsync(TEntity entity)
 		{
-			if (this.TrackingEnabled)
-			{
-				var cursor = (await this.database.Set<TEntity>().AddAsync(entity));
-				await this.database.SaveChangesAsync();
-				return cursor?.Entity;	
-			}
-			else
-			{
-				(await this.database.Set<TEntity>().AsNoTracking().ToListAsync()).Add(entity);
-				await this.database.SaveChangesAsync();
-				return entity;
-			}
+			var cursor = (await this.database.Set<TEntity>().AddAsync(entity));
+			await this.database.SaveChangesAsync();
+			return cursor?.Entity;
 		}
 
 		#endregion
@@ -426,17 +408,9 @@ namespace Ertis.PostgreSQL.Repository
 
 		public bool Delete(TEntity entity)
 		{
-			if (this.TrackingEnabled)
-			{
-				this.database.Set<TEntity>().Remove(entity);
-				this.database.SaveChanges();
-				return true;
-			}
-			else
-			{
-				this.database.Set<TEntity>().AsNoTracking().ToList().Remove(entity);
-				return this.database.SaveChanges() > 0;
-			}
+			this.database.Set<TEntity>().Remove(entity);
+			this.database.SaveChanges();
+			return true;
 		}
 		
 		public bool Delete(int id)
@@ -450,17 +424,9 @@ namespace Ertis.PostgreSQL.Repository
 
 		public async Task<bool> DeleteAsync(TEntity entity)
 		{
-			if (this.TrackingEnabled)
-			{
-				this.database.Set<TEntity>().Remove(entity);
-				await this.database.SaveChangesAsync();
-				return true;
-			}
-			else
-			{
-				(await this.database.Set<TEntity>().AsNoTracking().ToListAsync()).Remove(entity);
-				return await this.database.SaveChangesAsync() > 0;
-			}
+			this.database.Set<TEntity>().Remove(entity);
+			await this.database.SaveChangesAsync();
+			return true;
 		}
 		
 		public async Task<bool> DeleteAsync(int id)

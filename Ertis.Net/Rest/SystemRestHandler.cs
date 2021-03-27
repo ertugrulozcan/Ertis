@@ -124,7 +124,51 @@ namespace Ertis.Net.Rest
 			IHeaderCollection headers = null, 
 			IRequestBody body = null)
 		{
-			return await this.ExecuteRequestAsync<object>(method, url, headers, body);
+			using (var httpClient = new HttpClient())
+			{
+				var request = new HttpRequestMessage(method, url);
+				if (headers != null)
+				{
+					foreach (var header in headers.ToDictionary())
+					{
+						request.Headers.Add(header.Key, header.Value.ToString());	
+					}
+				}
+
+				var httpContent = body?.GetHttpContent();
+				if (httpContent != null)
+				{
+					request.Content = httpContent;
+				}
+
+				var response = await httpClient.SendAsync(request);
+				if (response != null)
+				{
+					var rawData = await response.Content.ReadAsByteArrayAsync();
+					var json = await response.Content.ReadAsStringAsync();
+					
+					if (response.IsSuccessStatusCode)
+					{
+						return new ResponseResult(response.StatusCode)
+						{
+							Json = json,
+							RawData = rawData
+						};
+					}
+					else
+					{
+						return new ResponseResult(response.StatusCode, json)
+						{
+							Json = json,
+							RawData = rawData
+						};
+					}
+				}
+				else
+				{
+					return new ResponseResult(false, "Response is null!");
+				}
+			}
 		}
 
 		public IResponseResult ExecuteRequest(

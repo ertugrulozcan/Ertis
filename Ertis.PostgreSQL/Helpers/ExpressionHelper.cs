@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.Scripting;
 
 namespace Ertis.PostgreSQL.Helpers
 {
-	internal static class ExpressionHelper
+	public static class ExpressionHelper
 	{
 		internal static Expression<Func<T, bool>> ParseExpression<T>(string query) => ParseExpressionAsync<T>(query).ConfigureAwait(false).GetAwaiter().GetResult();
 		

@@ -6,7 +6,6 @@ using Ertis.Core.Collections;
 using Ertis.Data.Models;
 using Ertis.PostgreSQL.Helpers;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace Ertis.PostgreSQL.Repository
 {
@@ -140,23 +139,80 @@ namespace Ertis.PostgreSQL.Repository
 
 			var db = this.ConfigureDbSet(this.database);
 			var dbSet = this.TrackingEnabled ? db : db.AsNoTracking();
+			var sortExpression = ExpressionHelper.ConvertSortExpression<TEntity>(sortField);
 			if (expression != null)
 			{
 				if (skip != null && limit != null)
 				{
-					queryable = dbSet.Where(expression).Skip(skip.Value).Take(limit.Value);
+					if (sortExpression != null)
+					{
+						if (sortDirection == SortDirection.Descending)
+						{
+							queryable = dbSet.Where(expression).OrderByDescending(sortExpression).Skip(skip.Value).Take(limit.Value);
+						}
+						else
+						{
+							queryable = dbSet.Where(expression).OrderBy(sortExpression).Skip(skip.Value).Take(limit.Value);
+						}
+					}
+					else
+					{
+						queryable = dbSet.Where(expression).Skip(skip.Value).Take(limit.Value);	
+					}
 				}
 				else if (skip != null)
 				{
-					queryable = dbSet.Where(expression).Skip(skip.Value);
+					if (sortExpression != null)
+					{
+						if (sortDirection == SortDirection.Descending)
+						{
+							queryable = dbSet.Where(expression).OrderByDescending(sortExpression).Skip(skip.Value);	
+						}
+						else
+						{
+							queryable = dbSet.Where(expression).OrderBy(sortExpression).Skip(skip.Value);
+						}
+					}
+					else
+					{
+						queryable = dbSet.Where(expression).Skip(skip.Value);	
+					}
 				}
 				else if (limit != null)
 				{
-					queryable = dbSet.Where(expression).Take(limit.Value);
+					if (sortExpression != null)
+					{
+						if (sortDirection == SortDirection.Descending)
+						{
+							queryable = dbSet.Where(expression).OrderByDescending(sortExpression).Take(limit.Value);
+						}
+						else
+						{
+							queryable = dbSet.Where(expression).OrderBy(sortExpression).Take(limit.Value);
+						}
+					}
+					else
+					{
+						queryable = dbSet.Where(expression).Take(limit.Value);	
+					}
 				}
 				else
 				{
-					queryable = dbSet.Where(expression);
+					if (sortExpression != null)
+					{
+						if (sortDirection == SortDirection.Descending)
+						{
+							queryable = dbSet.Where(expression).OrderByDescending(sortExpression);
+						}
+						else
+						{
+							queryable = dbSet.Where(expression).OrderBy(sortExpression);
+						}
+					}
+					else
+					{
+						queryable = dbSet.Where(expression);	
+					}
 				}
 
 				if (withCount != null && withCount.Value)
@@ -168,51 +224,80 @@ namespace Ertis.PostgreSQL.Repository
 			{
 				if (skip != null && limit != null)
 				{
-					queryable = dbSet.Skip(skip.Value).Take(limit.Value);
+					if (sortExpression != null)
+					{
+						if (sortDirection == SortDirection.Descending)
+						{
+							queryable = dbSet.OrderByDescending(sortExpression).Skip(skip.Value).Take(limit.Value);
+						}
+						else
+						{
+							queryable = dbSet.OrderBy(sortExpression).Skip(skip.Value).Take(limit.Value);
+						}
+					}
+					else
+					{
+						queryable = dbSet.Skip(skip.Value).Take(limit.Value);	
+					}
 				}
 				else if (skip != null)
 				{
-					queryable = dbSet.Skip(skip.Value);
+					if (sortExpression != null)
+					{
+						if (sortDirection == SortDirection.Descending)
+						{
+							queryable = dbSet.OrderByDescending(sortExpression).Skip(skip.Value);
+						}
+						else
+						{
+							queryable = dbSet.OrderBy(sortExpression).Skip(skip.Value);		
+						}
+					}
+					else
+					{
+						queryable = dbSet.Skip(skip.Value);	
+					}
 				}
 				else if (limit != null)
 				{
-					queryable = dbSet.Take(limit.Value);
+					if (sortExpression != null)
+					{
+						if (sortDirection == SortDirection.Descending)
+						{
+							queryable = dbSet.OrderByDescending(sortExpression).Take(limit.Value);
+						}
+						else
+						{
+							queryable = dbSet.OrderBy(sortExpression).Take(limit.Value);
+						}
+					}
+					else
+					{
+						queryable = dbSet.Take(limit.Value);	
+					}
 				}
 				else
 				{
-					queryable = dbSet;
+					if (sortExpression != null)
+					{
+						if (sortDirection == SortDirection.Descending)
+						{
+							queryable = dbSet.OrderByDescending(sortExpression);
+						}
+						else
+						{
+							queryable = dbSet.OrderBy(sortExpression);
+						}
+					}
+					else
+					{
+						queryable = dbSet;	
+					}
 				}
 				
 				if (withCount != null && withCount.Value)
 				{
 					totalCount = dbSet.LongCount();
-				}
-			}
-
-			if (!string.IsNullOrEmpty(sortField))
-			{
-				var type = typeof(TEntity);
-				var propertyInfo = type.GetProperty(sortField);
-				if (propertyInfo == null)
-				{
-					propertyInfo = type.GetProperties().FirstOrDefault(x => x
-						.GetCustomAttributes(typeof(JsonPropertyAttribute), true)
-						.Cast<JsonPropertyAttribute>()
-						.FirstOrDefault(y => y.PropertyName == sortField) != null);	
-				}
-
-				if (propertyInfo != null)
-				{
-					var param = Expression.Parameter(typeof(TEntity), "item");
-					var sortExpression = Expression.Lambda<Func<TEntity, object>>(Expression.Convert(Expression.Property(param, propertyInfo), typeof(object)), param);
-					if (sortDirection == SortDirection.Descending)
-					{
-						queryable = queryable.OrderByDescending(sortExpression);
-					}
-					else
-					{
-						queryable = queryable.OrderBy(sortExpression);
-					}
 				}
 			}
 
@@ -230,23 +315,80 @@ namespace Ertis.PostgreSQL.Repository
 			
 			var db = this.ConfigureDbSet(this.database);
 			var dbSet = this.TrackingEnabled ? db : db.AsNoTracking();
+			var sortExpression = ExpressionHelper.ConvertSortExpression<TEntity>(sortField);
 			if (expression != null)
 			{
 				if (skip != null && limit != null)
 				{
-					queryable = dbSet.Where(expression).Skip(skip.Value).Take(limit.Value);
+					if (sortExpression != null)
+					{
+						if (sortDirection == SortDirection.Descending)
+						{
+							queryable = dbSet.Where(expression).OrderByDescending(sortExpression).Skip(skip.Value).Take(limit.Value);
+						}
+						else
+						{
+							queryable = dbSet.Where(expression).OrderBy(sortExpression).Skip(skip.Value).Take(limit.Value);	
+						}
+					}
+					else
+					{
+						queryable = dbSet.Where(expression).Skip(skip.Value).Take(limit.Value);	
+					}
 				}
 				else if (skip != null)
 				{
-					queryable = dbSet.Where(expression).Skip(skip.Value);
+					if (sortExpression != null)
+					{
+						if (sortDirection == SortDirection.Descending)
+						{
+							queryable = dbSet.Where(expression).OrderByDescending(sortExpression).Skip(skip.Value);
+						}
+						else
+						{
+							queryable = dbSet.Where(expression).OrderBy(sortExpression).Skip(skip.Value);
+						}
+					}
+					else
+					{
+						queryable = dbSet.Where(expression).Skip(skip.Value);	
+					}
 				}
 				else if (limit != null)
 				{
-					queryable = dbSet.Where(expression).Take(limit.Value);
+					if (sortExpression != null)
+					{
+						if (sortDirection == SortDirection.Descending)
+						{
+							queryable = dbSet.Where(expression).OrderByDescending(sortExpression).Take(limit.Value);
+						}
+						else
+						{
+							queryable = dbSet.Where(expression).OrderBy(sortExpression).Take(limit.Value);
+						}
+					}
+					else
+					{
+						queryable = dbSet.Where(expression).Take(limit.Value);	
+					}
 				}
 				else
 				{
-					queryable = dbSet.Where(expression);
+					if (sortExpression != null)
+					{
+						if (sortDirection == SortDirection.Descending)
+						{
+							queryable = dbSet.Where(expression).OrderByDescending(sortExpression);
+						}
+						else
+						{
+							queryable = dbSet.Where(expression).OrderBy(sortExpression);
+						}
+					}
+					else
+					{
+						queryable = dbSet.Where(expression);	
+					}
 				}
 
 				if (withCount != null && withCount.Value)
@@ -258,51 +400,80 @@ namespace Ertis.PostgreSQL.Repository
 			{
 				if (skip != null && limit != null)
 				{
-					queryable = dbSet.Skip(skip.Value).Take(limit.Value);
+					if (sortExpression != null)
+					{
+						if (sortDirection == SortDirection.Descending)
+						{
+							queryable = dbSet.OrderByDescending(sortExpression).Skip(skip.Value).Take(limit.Value);
+						}
+						else
+						{
+							queryable = dbSet.OrderBy(sortExpression).Skip(skip.Value).Take(limit.Value);
+						}
+					}
+					else
+					{
+						queryable = dbSet.Skip(skip.Value).Take(limit.Value);	
+					}
 				}
 				else if (skip != null)
 				{
-					queryable = dbSet.Skip(skip.Value);
+					if (sortExpression != null)
+					{
+						if (sortDirection == SortDirection.Descending)
+						{
+							queryable = dbSet.OrderByDescending(sortExpression).Skip(skip.Value);
+						}
+						else
+						{
+							queryable = dbSet.OrderBy(sortExpression).Skip(skip.Value);
+						}
+					}
+					else
+					{
+						queryable = dbSet.Skip(skip.Value);	
+					}
 				}
 				else if (limit != null)
 				{
-					queryable = dbSet.Take(limit.Value);
+					if (sortExpression != null)
+					{
+						if (sortDirection == SortDirection.Descending)
+						{
+							queryable = dbSet.OrderByDescending(sortExpression).Take(limit.Value);
+						}
+						else
+						{
+							queryable = dbSet.OrderBy(sortExpression).Take(limit.Value);
+						}
+					}
+					else
+					{
+						queryable = dbSet.Take(limit.Value);	
+					}
 				}
 				else
 				{
-					queryable = dbSet;
+					if (sortExpression != null)
+					{
+						if (sortDirection == SortDirection.Descending)
+						{
+							queryable = dbSet.OrderByDescending(sortExpression);
+						}
+						else
+						{
+							queryable = dbSet.OrderBy(sortExpression);
+						}
+					}
+					else
+					{
+						queryable = dbSet;	
+					}
 				}
 				
 				if (withCount != null && withCount.Value)
 				{
 					totalCount = await dbSet.LongCountAsync();
-				}
-			}
-
-			if (!string.IsNullOrEmpty(sortField))
-			{
-				var type = typeof(TEntity);
-				var propertyInfo = type.GetProperty(sortField);
-				if (propertyInfo == null)
-				{
-					propertyInfo = type.GetProperties().FirstOrDefault(x => x
-						.GetCustomAttributes(typeof(JsonPropertyAttribute), true)
-						.Cast<JsonPropertyAttribute>()
-						.FirstOrDefault(y => y.PropertyName == sortField) != null);	
-				}
-
-				if (propertyInfo != null)
-				{
-					var param = Expression.Parameter(typeof(TEntity), "item");
-					var sortExpression = Expression.Lambda<Func<TEntity, object>>(Expression.Convert(Expression.Property(param, propertyInfo), typeof(object)), param);
-					if (sortDirection == SortDirection.Descending)
-					{
-						queryable = queryable.OrderByDescending(sortExpression);
-					}
-					else
-					{
-						queryable = queryable.OrderBy(sortExpression);
-					}
 				}
 			}
 
@@ -312,7 +483,7 @@ namespace Ertis.PostgreSQL.Repository
 				Count = totalCount ?? 0
 			};
 		}
-
+		
 		#endregion
 		
 		#region Insert Methods

@@ -203,7 +203,8 @@ namespace Ertis.PostgreSQL.Repository
 
 				if (propertyInfo != null)
 				{
-					Expression<Func<TEntity, dynamic>> sortExpression = x => propertyInfo.GetValue(x, null);
+					var param = Expression.Parameter(typeof(TEntity), "item");
+					var sortExpression = Expression.Lambda<Func<TEntity, object>>(Expression.Convert(Expression.Property(param, propertyInfo), typeof(object)), param);
 					if (sortDirection == SortDirection.Descending)
 					{
 						queryable = queryable.OrderByDescending(sortExpression);
@@ -292,7 +293,8 @@ namespace Ertis.PostgreSQL.Repository
 
 				if (propertyInfo != null)
 				{
-					Expression<Func<TEntity, dynamic>> sortExpression = x => propertyInfo.GetValue(x, null);
+					var param = Expression.Parameter(typeof(TEntity), "item");
+					var sortExpression = Expression.Lambda<Func<TEntity, object>>(Expression.Convert(Expression.Property(param, propertyInfo), typeof(object)), param);
 					if (sortDirection == SortDirection.Descending)
 					{
 						queryable = queryable.OrderByDescending(sortExpression);

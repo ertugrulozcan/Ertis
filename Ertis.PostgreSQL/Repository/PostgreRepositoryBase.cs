@@ -492,14 +492,24 @@ namespace Ertis.PostgreSQL.Repository
 		{
 			var cursor = this.GetDbSet().Add(entity);
 			this.database.SaveChanges();
-			return cursor?.Entity;
+			if (cursor == null)
+			{
+				return null;
+			}
+			
+			return this.FindOne(cursor.Entity.Id);
 		}
 
 		public virtual async Task<TEntity> InsertAsync(TEntity entity)
 		{
 			var cursor = (await this.GetDbSet().AddAsync(entity));
 			await this.database.SaveChangesAsync();
-			return cursor?.Entity;
+			if (cursor == null)
+			{
+				return null;
+			}
+			
+			return await this.FindOneAsync(cursor.Entity.Id);
 		}
 
 		#endregion
@@ -510,13 +520,19 @@ namespace Ertis.PostgreSQL.Repository
 		{
 			if (this.TrackingEnabled)
 			{
-				var cursor = this.database.Set<TEntity>().Update(entity);
+				var cursor = this.GetDbSet().Update(entity);
 				this.database.SaveChanges();
-				return cursor?.Entity;
+				
+				if (cursor == null)
+				{
+					return null;
+				}
+			
+				return this.FindOne(cursor.Entity.Id);
 			}
 			else
 			{
-				var current = this.database.Set<TEntity>().AsNoTracking().FirstOrDefault(x => x.Id == entity.Id);
+				var current = this.GetDbSet().AsNoTracking().FirstOrDefault(x => x.Id == entity.Id);
 				if (current == null)
 				{
 					return null;
@@ -534,13 +550,13 @@ namespace Ertis.PostgreSQL.Repository
 		{
 			if (this.TrackingEnabled)
 			{
-				var cursor = this.database.Set<TEntity>().Update(entity);
+				var cursor = this.GetDbSet().Update(entity);
 				await this.database.SaveChangesAsync();
 				return cursor?.Entity;	
 			}
 			else
 			{
-				var current = await this.database.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == entity.Id);
+				var current = await this.GetDbSet().AsNoTracking().FirstOrDefaultAsync(x => x.Id == entity.Id);
 				if (current == null)
 				{
 					return null;
@@ -586,7 +602,7 @@ namespace Ertis.PostgreSQL.Repository
 
 		public bool Delete(TEntity entity)
 		{
-			this.database.Set<TEntity>().Remove(entity);
+			this.GetDbSet().Remove(entity);
 			this.database.SaveChanges();
 			return true;
 		}
@@ -602,7 +618,7 @@ namespace Ertis.PostgreSQL.Repository
 
 		public async Task<bool> DeleteAsync(TEntity entity)
 		{
-			this.database.Set<TEntity>().Remove(entity);
+			this.GetDbSet().Remove(entity);
 			await this.database.SaveChangesAsync();
 			return true;
 		}
@@ -624,11 +640,11 @@ namespace Ertis.PostgreSQL.Repository
 		{
 			if (this.TrackingEnabled)
 			{
-				return this.database.Set<TEntity>().LongCount();
+				return this.GetDbSet().LongCount();
 			}
 			else
 			{
-				return this.database.Set<TEntity>().AsNoTracking().LongCount();	
+				return this.GetDbSet().AsNoTracking().LongCount();	
 			}
 		}
 
@@ -636,11 +652,11 @@ namespace Ertis.PostgreSQL.Repository
 		{
 			if (this.TrackingEnabled)
 			{
-				return await this.database.Set<TEntity>().LongCountAsync();
+				return await this.GetDbSet().LongCountAsync();
 			}
 			else
 			{
-				return await this.database.Set<TEntity>().AsNoTracking().LongCountAsync();	
+				return await this.GetDbSet().AsNoTracking().LongCountAsync();	
 			}
 		}
 
@@ -660,11 +676,11 @@ namespace Ertis.PostgreSQL.Repository
 		{
 			if (this.TrackingEnabled)
 			{
-				return this.database.Set<TEntity>().Count(expression);
+				return this.GetDbSet().Count(expression);
 			}
 			else
 			{
-				return this.database.Set<TEntity>().AsNoTracking().Count(expression);	
+				return this.GetDbSet().AsNoTracking().Count(expression);	
 			}
 		}
 
@@ -672,11 +688,11 @@ namespace Ertis.PostgreSQL.Repository
 		{
 			if (this.TrackingEnabled)
 			{
-				return await this.database.Set<TEntity>().CountAsync(expression);
+				return await this.GetDbSet().CountAsync(expression);
 			}
 			else
 			{
-				return await this.database.Set<TEntity>().AsNoTracking().CountAsync(expression);	
+				return await this.GetDbSet().AsNoTracking().CountAsync(expression);	
 			}
 		}
 

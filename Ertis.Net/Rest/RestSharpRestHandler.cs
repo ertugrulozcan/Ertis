@@ -39,6 +39,19 @@ namespace Ertis.Net.Rest
 			var restSharpMethod = method.ConvertToRestSharpMethod();
 			var dataFormat = body.ConvertToRestSharpDataFormat();
 			var request = new RestRequest(url, restSharpMethod, dataFormat);
+
+			if (body != null)
+			{
+				if (body.Type == BodyTypes.Xml)
+				{
+					request.AddXmlBody(body.Payload);
+				}
+				else
+				{
+					request.AddJsonBody(body.Payload);
+				}
+			}
+
 			if (headers != null)
 			{
 				foreach (var header in headers.ToDictionary())
@@ -77,6 +90,19 @@ namespace Ertis.Net.Rest
 			var restSharpMethod = method.ConvertToRestSharpMethod();
 			var dataFormat = body.ConvertToRestSharpDataFormat();
 			var request = new RestRequest(url, restSharpMethod, dataFormat);
+			
+			if (body != null)
+			{
+				if (body.Type == BodyTypes.Xml)
+				{
+					request.AddXmlBody(body.Payload);
+				}
+				else
+				{
+					request.AddJsonBody(body.Payload);
+				}
+			}
+			
 			if (headers != null)
 			{
 				foreach (var header in headers.ToDictionary())
@@ -151,6 +177,19 @@ namespace Ertis.Net.Rest
 			var restSharpMethod = method.ConvertToRestSharpMethod();
 			var dataFormat = body.ConvertToRestSharpDataFormat();
 			var request = new RestRequest(url, restSharpMethod, dataFormat);
+			
+			if (body != null)
+			{
+				if (body.Type == BodyTypes.Xml)
+				{
+					request.AddXmlBody(body.Payload);
+				}
+				else
+				{
+					request.AddJsonBody(body.Payload);
+				}
+			}
+			
 			if (headers != null)
 			{
 				foreach (var header in headers.ToDictionary())
@@ -188,6 +227,19 @@ namespace Ertis.Net.Rest
 			var restSharpMethod = method.ConvertToRestSharpMethod();
 			var dataFormat = body.ConvertToRestSharpDataFormat();
 			var request = new RestRequest(url, restSharpMethod, dataFormat);
+			
+			if (body != null)
+			{
+				if (body.Type == BodyTypes.Xml)
+				{
+					request.AddXmlBody(body.Payload);
+				}
+				else
+				{
+					request.AddJsonBody(body.Payload);
+				}
+			}
+			
 			if (headers != null)
 			{
 				foreach (var header in headers.ToDictionary())

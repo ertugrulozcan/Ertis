@@ -662,12 +662,9 @@ namespace Ertis.PostgreSQL.Repository
 			}
 			else
 			{
-				foreach (var dto in entities)
-				{
-					this.database.Attach(dto);
-				}
-			
-				this.GetDbSet().RemoveRange(entities);
+				var table = this.GetDbSet();
+				var noTrackingEntities = entities.Select(x => table.First(y => y.Id == x.Id));
+				table.RemoveRange(noTrackingEntities);
 				this.database.SaveChanges();
 				return true;	
 			}
@@ -683,12 +680,9 @@ namespace Ertis.PostgreSQL.Repository
 			}
 			else
 			{
-				foreach (var dto in entities)
-				{
-					this.database.Attach(dto);
-				}
-			
-				this.GetDbSet().RemoveRange(entities);
+				var table = this.GetDbSet();
+				var noTrackingEntities = entities.Select(x => table.First(y => y.Id == x.Id));
+				table.RemoveRange(noTrackingEntities);
 				await this.database.SaveChangesAsync();
 				return true;	
 			}

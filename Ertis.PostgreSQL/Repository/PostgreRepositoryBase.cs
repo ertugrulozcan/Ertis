@@ -631,6 +631,20 @@ namespace Ertis.PostgreSQL.Repository
 			
 			return await this.DeleteAsync(entity);
 		}
+		
+		public bool BulkDelete(TEntity[] entities)
+		{
+			this.GetDbSet().RemoveRange(entities);
+			this.database.SaveChanges();
+			return true;
+		}
+
+		public async Task<bool> BulkDeleteAsync(TEntity[] entities)
+		{
+			this.GetDbSet().RemoveRange(entities);
+			await this.database.SaveChangesAsync();
+			return true;
+		}
 
 		#endregion
 		

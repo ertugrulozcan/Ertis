@@ -4,7 +4,7 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
 
         <PackageId>Ertis.Data</PackageId>
-        <PackageVersion>1.0.11</PackageVersion>
+        <PackageVersion>1.0.12</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.Data</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -14,8 +14,8 @@
         <Title>Ertis.Data</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan</RepositoryUrl>
-        <AssemblyVersion>1.0.11</AssemblyVersion>
-        <FileVersion>1.0.11</FileVersion>
+        <AssemblyVersion>1.0.12</AssemblyVersion>
+        <FileVersion>1.0.12</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

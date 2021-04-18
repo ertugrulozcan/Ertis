@@ -57,6 +57,10 @@ namespace Ertis.Data.Repository
 		bool Delete(TIdentifier id);
 		
 		Task<bool> DeleteAsync(TIdentifier id);
+		
+		bool BulkDelete(TEntity[] entities);
+		
+		Task<bool> BulkDeleteAsync(TEntity[] entities);
 
 		#endregion
 		

@@ -649,6 +649,18 @@ namespace Ertis.MongoDB.Repository
 			return result.IsAcknowledged && result.DeletedCount == 1;
 		}
 
+		public bool BulkDelete(TEntity[] entities)
+		{
+			var result = this.Collection.DeleteMany(Builders<TEntity>.Filter.In(d => d.Id, entities.Select(x => x.Id)));
+			return result.IsAcknowledged && result.DeletedCount == entities.Length;
+		}
+
+		public async Task<bool> BulkDeleteAsync(TEntity[] entities)
+		{
+			var result = await this.Collection.DeleteManyAsync(Builders<TEntity>.Filter.In(d => d.Id, entities.Select(x => x.Id)));
+			return result.IsAcknowledged && result.DeletedCount == entities.Length;
+		}
+
 		#endregion
 		
 		#region Count Methods

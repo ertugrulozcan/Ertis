@@ -4,7 +4,7 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
 
         <PackageId>Ertis.PostgreSQL</PackageId>
-        <PackageVersion>1.1.3</PackageVersion>
+        <PackageVersion>1.1.4</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.PostgreSQL</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -14,8 +14,8 @@
         <Title>Ertis.PostgreSQL</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>1.1.3</AssemblyVersion>
-        <FileVersion>1.1.3</FileVersion>
+        <AssemblyVersion>1.1.4</AssemblyVersion>
+        <FileVersion>1.1.4</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

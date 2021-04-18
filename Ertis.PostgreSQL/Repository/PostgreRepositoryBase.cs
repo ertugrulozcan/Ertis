@@ -602,9 +602,19 @@ namespace Ertis.PostgreSQL.Repository
 
 		public bool Delete(TEntity entity)
 		{
-			this.GetDbSet().Remove(entity);
-			this.database.SaveChanges();
-			return true;
+			if (this.TrackingEnabled)
+			{
+				this.GetDbSet().Remove(entity);
+				this.database.SaveChanges();
+				return true;
+			}
+			else
+			{
+				this.database.Entry(entity).State = EntityState.Deleted;
+				this.GetDbSet().Remove(entity);
+				this.database.SaveChanges();
+				return true;	
+			}
 		}
 		
 		public virtual bool Delete(int id)
@@ -618,9 +628,19 @@ namespace Ertis.PostgreSQL.Repository
 
 		public async Task<bool> DeleteAsync(TEntity entity)
 		{
-			this.GetDbSet().Remove(entity);
-			await this.database.SaveChangesAsync();
-			return true;
+			if (this.TrackingEnabled)
+			{
+				this.GetDbSet().Remove(entity);
+				await this.database.SaveChangesAsync();
+				return true;
+			}
+			else
+			{
+				this.database.Entry(entity).State = EntityState.Deleted;
+				this.GetDbSet().Remove(entity);
+				await this.database.SaveChangesAsync();
+				return true;	
+			}
 		}
 		
 		public virtual async Task<bool> DeleteAsync(int id)
@@ -634,16 +654,44 @@ namespace Ertis.PostgreSQL.Repository
 		
 		public bool BulkDelete(TEntity[] entities)
 		{
-			this.GetDbSet().RemoveRange(entities);
-			this.database.SaveChanges();
-			return true;
+			if (this.TrackingEnabled)
+			{
+				this.GetDbSet().RemoveRange(entities);
+				this.database.SaveChanges();
+				return true;
+			}
+			else
+			{
+				foreach (var dto in entities)
+				{
+					this.database.Attach(dto);
+				}
+			
+				this.GetDbSet().RemoveRange(entities);
+				this.database.SaveChanges();
+				return true;	
+			}
 		}
 
 		public async Task<bool> BulkDeleteAsync(TEntity[] entities)
 		{
-			this.GetDbSet().RemoveRange(entities);
-			await this.database.SaveChangesAsync();
-			return true;
+			if (this.TrackingEnabled)
+			{
+				this.GetDbSet().RemoveRange(entities);
+				await this.database.SaveChangesAsync();
+				return true;
+			}
+			else
+			{
+				foreach (var dto in entities)
+				{
+					this.database.Attach(dto);
+				}
+			
+				this.GetDbSet().RemoveRange(entities);
+				await this.database.SaveChangesAsync();
+				return true;	
+			}
 		}
 
 		#endregion

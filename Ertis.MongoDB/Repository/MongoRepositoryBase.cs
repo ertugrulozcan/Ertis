@@ -568,6 +568,16 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 
+		public void BulkInsert(IEnumerable<TEntity> entities)
+		{
+			this.Collection.InsertMany(entities);
+		}
+
+		public async Task BulkInsertAsync(IEnumerable<TEntity> entities)
+		{
+			await this.Collection.InsertManyAsync(entities);
+		}
+
 		#endregion
 		
 		#region Update Methods
@@ -649,16 +659,18 @@ namespace Ertis.MongoDB.Repository
 			return result.IsAcknowledged && result.DeletedCount == 1;
 		}
 
-		public bool BulkDelete(TEntity[] entities)
+		public bool BulkDelete(IEnumerable<TEntity> entities)
 		{
-			var result = this.Collection.DeleteMany(Builders<TEntity>.Filter.In(d => d.Id, entities.Select(x => x.Id)));
-			return result.IsAcknowledged && result.DeletedCount == entities.Length;
+			var array = entities.ToArray();
+			var result = this.Collection.DeleteMany(Builders<TEntity>.Filter.In(d => d.Id, array.Select(x => x.Id)));
+			return result.IsAcknowledged && result.DeletedCount == array.Length;
 		}
 
-		public async Task<bool> BulkDeleteAsync(TEntity[] entities)
+		public async Task<bool> BulkDeleteAsync(IEnumerable<TEntity> entities)
 		{
-			var result = await this.Collection.DeleteManyAsync(Builders<TEntity>.Filter.In(d => d.Id, entities.Select(x => x.Id)));
-			return result.IsAcknowledged && result.DeletedCount == entities.Length;
+			var array = entities.ToArray();
+			var result = await this.Collection.DeleteManyAsync(Builders<TEntity>.Filter.In(d => d.Id, array.Select(x => x.Id)));
+			return result.IsAcknowledged && result.DeletedCount == array.Length;
 		}
 
 		#endregion

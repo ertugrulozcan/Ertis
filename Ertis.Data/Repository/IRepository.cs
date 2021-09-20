@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ertis.Core.Collections;
@@ -37,6 +38,10 @@ namespace Ertis.Data.Repository
 		TEntity Insert(TEntity entity);
 		
 		Task<TEntity> InsertAsync(TEntity entity);
+		
+		void BulkInsert(IEnumerable<TEntity> entity);
+		
+		Task BulkInsertAsync(IEnumerable<TEntity> entity);
 
 		#endregion
 		
@@ -58,9 +63,9 @@ namespace Ertis.Data.Repository
 		
 		Task<bool> DeleteAsync(TIdentifier id);
 		
-		bool BulkDelete(TEntity[] entities);
+		bool BulkDelete(IEnumerable<TEntity> entities);
 		
-		Task<bool> BulkDeleteAsync(TEntity[] entities);
+		Task<bool> BulkDeleteAsync(IEnumerable<TEntity> entities);
 
 		#endregion
 		

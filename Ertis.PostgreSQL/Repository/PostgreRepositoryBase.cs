@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -511,6 +512,18 @@ namespace Ertis.PostgreSQL.Repository
 			
 			return await this.FindOneAsync(cursor.Entity.Id);
 		}
+		
+		public void BulkInsert(IEnumerable<TEntity> entities)
+		{
+			this.GetDbSet().AddRange(entities);
+			this.database.SaveChanges();
+		}
+
+		public async Task BulkInsertAsync(IEnumerable<TEntity> entities)
+		{
+			await this.GetDbSet().AddRangeAsync(entities);
+			await this.database.SaveChangesAsync();
+		}
 
 		#endregion
 		
@@ -652,7 +665,7 @@ namespace Ertis.PostgreSQL.Repository
 			return await this.DeleteAsync(entity);
 		}
 		
-		public bool BulkDelete(TEntity[] entities)
+		public bool BulkDelete(IEnumerable<TEntity> entities)
 		{
 			if (this.TrackingEnabled)
 			{
@@ -670,7 +683,7 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public async Task<bool> BulkDeleteAsync(TEntity[] entities)
+		public async Task<bool> BulkDeleteAsync(IEnumerable<TEntity> entities)
 		{
 			if (this.TrackingEnabled)
 			{

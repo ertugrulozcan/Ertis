@@ -43,32 +43,25 @@ namespace Ertis.Net.Rest
 				}
 
 				var response = await httpClient.SendAsync(request);
-				if (response != null)
-				{
-					var rawData = await response.Content.ReadAsByteArrayAsync();
-					var json = await response.Content.ReadAsStringAsync();
+				var rawData = await response.Content.ReadAsByteArrayAsync();
+				var json = await response.Content.ReadAsStringAsync();
 					
-					if (response.IsSuccessStatusCode)
+				if (response.IsSuccessStatusCode)
+				{
+					return new ResponseResult<TResult>(response.StatusCode)
 					{
-						return new ResponseResult<TResult>(response.StatusCode)
-						{
-							Json = json,
-							RawData = rawData,
-							Data = Newtonsoft.Json.JsonConvert.DeserializeObject<TResult>(json),
-						};
-					}
-					else
-					{
-						return new ResponseResult<TResult>(response.StatusCode, json)
-						{
-							Json = json,
-							RawData = rawData
-						};
-					}
+						Json = json,
+						RawData = rawData,
+						Data = Newtonsoft.Json.JsonConvert.DeserializeObject<TResult>(json),
+					};
 				}
 				else
 				{
-					return new ResponseResult<TResult>(false, "Response is null!");
+					return new ResponseResult<TResult>(response.StatusCode, json)
+					{
+						Json = json,
+						RawData = rawData
+					};
 				}
 			}
 		}
@@ -142,31 +135,24 @@ namespace Ertis.Net.Rest
 				}
 
 				var response = await httpClient.SendAsync(request);
-				if (response != null)
-				{
-					var rawData = await response.Content.ReadAsByteArrayAsync();
-					var json = await response.Content.ReadAsStringAsync();
+				var rawData = await response.Content.ReadAsByteArrayAsync();
+				var json = await response.Content.ReadAsStringAsync();
 					
-					if (response.IsSuccessStatusCode)
+				if (response.IsSuccessStatusCode)
+				{
+					return new ResponseResult(response.StatusCode)
 					{
-						return new ResponseResult(response.StatusCode)
-						{
-							Json = json,
-							RawData = rawData
-						};
-					}
-					else
-					{
-						return new ResponseResult(response.StatusCode, json)
-						{
-							Json = json,
-							RawData = rawData
-						};
-					}
+						Json = json,
+						RawData = rawData
+					};
 				}
 				else
 				{
-					return new ResponseResult(false, "Response is null!");
+					return new ResponseResult(response.StatusCode, json)
+					{
+						Json = json,
+						RawData = rawData
+					};
 				}
 			}
 		}

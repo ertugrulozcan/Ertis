@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Ertis.MongoDB.Configuration;
-using Ertis.MongoDB.Helpers;
 using Ertis.Tests.Ertis.MongoDB.Tests.Configuration;
 using Ertis.Tests.Ertis.MongoDB.Tests.Models;
 using Ertis.Tests.Ertis.MongoDB.Tests.Services;
 using Ertis.Tests.Ertis.MongoDB.Tests.Services.Interfaces;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace Ertis.Tests.Ertis.MongoDB.Tests

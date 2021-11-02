@@ -1,21 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net5.0</TargetFramework>
 
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="NUnit" Version="3.12.0" />
-        <PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+        <PackageReference Include="NUnit" Version="3.13.1" />
+        <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+        <PackageReference Include="coverlet.collector" Version="3.0.2" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Ertis.Core\Ertis.Core.csproj" />
-      <ProjectReference Include="..\Ertis.Data\Ertis.Data.csproj" />
       <ProjectReference Include="..\Ertis.MongoDB\Ertis.MongoDB.csproj" />
       <ProjectReference Include="..\Ertis.Net\Ertis.Net.csproj" />
       <ProjectReference Include="..\Ertis.Security\Ertis.Security.csproj" />
     </ItemGroup>
+
 </Project>

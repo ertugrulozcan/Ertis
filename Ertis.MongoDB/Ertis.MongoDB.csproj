@@ -1,29 +1,30 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
-
+        <TargetFramework>net5.0</TargetFramework>
         <PackageId>Ertis.MongoDB</PackageId>
-        <PackageVersion>1.3.2</PackageVersion>
+        <PackageVersion>5.1.0</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.MongoDB</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        <Copyright>Ertuğrul Özcan | Copyright 2020 (c)</Copyright>
-        <PackageReleaseNotes>QueryBuilder added</PackageReleaseNotes>
+        <Copyright>Ertuğrul Özcan | Copyright 2021 (c)</Copyright>
+        <PackageReleaseNotes>.Net 5</PackageReleaseNotes>
         <PackageTags>Ertis.MongoDB</PackageTags>
         <Title>Ertis.MongoDB</Title>
-        <PackageProjectUrl>https://github.com/ertugrulozcan</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/ertugrulozcan</RepositoryUrl>
-        <AssemblyVersion>1.3.2</AssemblyVersion>
-        <FileVersion>1.3.2</FileVersion>
+        <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
+        <AssemblyVersion>5.1.0</AssemblyVersion>
+        <FileVersion>5.1.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Ertis.Data\Ertis.Data.csproj" />
+      <PackageReference Include="MongoDB.Driver" Version="2.13.2" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="MongoDB.Driver" Version="2.11.5" />
+      <ProjectReference Include="..\Ertis.Core\Ertis.Core.csproj" />
+      <ProjectReference Include="..\Ertis.Data\Ertis.Data.csproj" />
     </ItemGroup>
 
 </Project>

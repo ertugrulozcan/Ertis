@@ -1,1 +1,0 @@
-dotnet nuget push Ertis.Core.1.0.0.nupkg --api-key oy2lboaefbfj2shucyzqwmhsltesj7fu3mkb6vpr4mfjwu --source https://api.nuget.org/v3/index.json

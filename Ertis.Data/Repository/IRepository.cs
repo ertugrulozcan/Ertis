@@ -13,23 +13,23 @@ namespace Ertis.Data.Repository
 
 		TEntity FindOne(TIdentifier id);
 		
-		Task<TEntity> FindOneAsync(TIdentifier id);
+		ValueTask<TEntity> FindOneAsync(TIdentifier id);
 		
 		TEntity FindOne(Expression<Func<TEntity, bool>> expression);
 		
-		Task<TEntity> FindOneAsync(Expression<Func<TEntity, bool>> expression);
+		ValueTask<TEntity> FindOneAsync(Expression<Func<TEntity, bool>> expression);
 
 		IPaginationCollection<TEntity> Find(int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
 		
-		Task<IPaginationCollection<TEntity>> FindAsync(int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
+		ValueTask<IPaginationCollection<TEntity>> FindAsync(int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
 		
 		IPaginationCollection<TEntity> Find(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
 		
-		Task<IPaginationCollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
+		ValueTask<IPaginationCollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
 
 		IPaginationCollection<TEntity> Find(string query, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
 
-		Task<IPaginationCollection<TEntity>> FindAsync(string query, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
+		ValueTask<IPaginationCollection<TEntity>> FindAsync(string query, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
 		
 		#endregion
 		
@@ -37,11 +37,11 @@ namespace Ertis.Data.Repository
 
 		TEntity Insert(TEntity entity);
 		
-		Task<TEntity> InsertAsync(TEntity entity);
+		ValueTask<TEntity> InsertAsync(TEntity entity);
 		
 		void BulkInsert(IEnumerable<TEntity> entity);
 		
-		Task BulkInsertAsync(IEnumerable<TEntity> entity);
+		ValueTask BulkInsertAsync(IEnumerable<TEntity> entity);
 
 		#endregion
 		
@@ -49,11 +49,11 @@ namespace Ertis.Data.Repository
 
 		TEntity Update(TEntity entity);
 		
-		Task<TEntity> UpdateAsync(TEntity entity);
+		ValueTask<TEntity> UpdateAsync(TEntity entity);
 
 		TEntity Upsert(TEntity entity);
 		
-		Task<TEntity> UpsertAsync(TEntity entity);
+		ValueTask<TEntity> UpsertAsync(TEntity entity);
 
 		#endregion
 		
@@ -61,11 +61,11 @@ namespace Ertis.Data.Repository
 
 		bool Delete(TIdentifier id);
 		
-		Task<bool> DeleteAsync(TIdentifier id);
+		ValueTask<bool> DeleteAsync(TIdentifier id);
 		
 		bool BulkDelete(IEnumerable<TEntity> entities);
 		
-		Task<bool> BulkDeleteAsync(IEnumerable<TEntity> entities);
+		ValueTask<bool> BulkDeleteAsync(IEnumerable<TEntity> entities);
 
 		#endregion
 		
@@ -73,15 +73,15 @@ namespace Ertis.Data.Repository
 
 		long Count();
 		
-		Task<long> CountAsync();
+		ValueTask<long> CountAsync();
 		
 		long Count(string query);
 		
-		Task<long> CountAsync(string query);
+		ValueTask<long> CountAsync(string query);
 
 		long Count(Expression<Func<TEntity, bool>> expression);
 
-		Task<long> CountAsync(Expression<Func<TEntity, bool>> expression);
+		ValueTask<long> CountAsync(Expression<Func<TEntity, bool>> expression);
 
 		#endregion
 	}

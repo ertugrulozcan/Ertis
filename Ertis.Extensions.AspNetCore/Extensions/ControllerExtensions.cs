@@ -32,7 +32,7 @@ namespace Ertis.Extensions.AspNetCore.Extensions
 			}
 		}
 		
-		public static async Task<string> ExtractRequestBodyAsync(this ControllerBase controller)
+		public static async ValueTask<string> ExtractRequestBodyAsync(this ControllerBase controller)
 		{
 			var requestBodyStream = new MemoryStream();
 			
@@ -68,7 +68,7 @@ namespace Ertis.Extensions.AspNetCore.Extensions
 			return controller.ExtractWhereQuery(query);
 		}
 		
-		public static async Task<string> ExtractWhereQueryAsync(this ControllerBase controller)
+		public static async ValueTask<string> ExtractWhereQueryAsync(this ControllerBase controller)
 		{
 			string query = await controller.ExtractRequestBodyAsync();
 			return controller.ExtractWhereQuery(query);

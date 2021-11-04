@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <PackageId>Ertis.Net</PackageId>
-        <PackageVersion>5.1.0</PackageVersion>
+        <PackageVersion>5.1.1</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.Net</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -13,8 +13,8 @@
         <Title>Ertis.Net</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>5.1.0</AssemblyVersion>
-        <FileVersion>5.1.0</FileVersion>
+        <AssemblyVersion>5.1.1</AssemblyVersion>
+        <FileVersion>5.1.1</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

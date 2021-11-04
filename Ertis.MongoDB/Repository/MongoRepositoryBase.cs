@@ -58,7 +58,7 @@ namespace Ertis.MongoDB.Repository
 			return this.Collection.Find(item => item.Id == id).FirstOrDefault();
 		}
 		
-		public async Task<TEntity> FindOneAsync(string id)
+		public async ValueTask<TEntity> FindOneAsync(string id)
 		{
 			return await this.Collection.Find(item => item.Id == id).FirstOrDefaultAsync();
 		}
@@ -69,7 +69,7 @@ namespace Ertis.MongoDB.Repository
 			return this.Collection.Find(filterDefinition).FirstOrDefault();
 		}
 
-		public async Task<TEntity> FindOneAsync(Expression<Func<TEntity, bool>> expression)
+		public async ValueTask<TEntity> FindOneAsync(Expression<Func<TEntity, bool>> expression)
 		{
 			FilterDefinition<TEntity> filterDefinition = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
 			return await (await this.Collection.FindAsync(filterDefinition)).FirstOrDefaultAsync();	
@@ -91,7 +91,7 @@ namespace Ertis.MongoDB.Repository
 				sortDirection);
 		}
 
-		public async Task<IPaginationCollection<TEntity>> FindAsync(
+		public async ValueTask<IPaginationCollection<TEntity>> FindAsync(
 			int? skip = null,
 			int? limit = null,
 			bool? withCount = null,
@@ -119,7 +119,7 @@ namespace Ertis.MongoDB.Repository
 			return this.Filter(filterExpression, skip, limit, withCount, sortField, sortDirection);
 		}
 		
-		public async Task<IPaginationCollection<TEntity>> FindAsync(
+		public async ValueTask<IPaginationCollection<TEntity>> FindAsync(
 			Expression<Func<TEntity, bool>> expression, 
 			int? skip = null, 
 			int? limit = null, 
@@ -143,7 +143,7 @@ namespace Ertis.MongoDB.Repository
 			return this.Filter(filterDefinition, skip, limit, withCount, sortField, sortDirection);
 		}
 		
-		public async Task<IPaginationCollection<TEntity>> FindAsync(
+		public async ValueTask<IPaginationCollection<TEntity>> FindAsync(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -179,7 +179,7 @@ namespace Ertis.MongoDB.Repository
 			};
 		}
 		
-		private async Task<IPaginationCollection<TEntity>> FilterAsync(
+		private async ValueTask<IPaginationCollection<TEntity>> FilterAsync(
 			FilterDefinition<TEntity> predicate, 
 			int? skip = null, 
 			int? limit = null, 
@@ -344,7 +344,7 @@ namespace Ertis.MongoDB.Repository
 			}
 		}
 		
-		public async Task<IPaginationCollection<dynamic>> QueryAsync(
+		public async ValueTask<IPaginationCollection<dynamic>> QueryAsync(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -383,7 +383,7 @@ namespace Ertis.MongoDB.Repository
 			}
 		}
 
-		public async Task<IPaginationCollection<dynamic>> QueryAsync(
+		public async ValueTask<IPaginationCollection<dynamic>> QueryAsync(
 			Expression<Func<TEntity, bool>> expression,
 			int? skip = null,
 			int? limit = null,
@@ -464,7 +464,7 @@ namespace Ertis.MongoDB.Repository
 			}
 		}
 		
-		public async Task<IPaginationCollection<dynamic>> ExecuteQueryAsync(
+		public async ValueTask<IPaginationCollection<dynamic>> ExecuteQueryAsync(
 			FilterDefinition<TEntity> filterDefinition,
 			int? skip = null,
 			int? limit = null,
@@ -551,7 +551,7 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 		
-		public async Task<TEntity> InsertAsync(TEntity entity)
+		public async ValueTask<TEntity> InsertAsync(TEntity entity)
 		{
 			if (this.actionBinder != null)
 			{
@@ -573,7 +573,7 @@ namespace Ertis.MongoDB.Repository
 			this.Collection.InsertMany(entities);
 		}
 
-		public async Task BulkInsertAsync(IEnumerable<TEntity> entities)
+		public async ValueTask BulkInsertAsync(IEnumerable<TEntity> entities)
 		{
 			await this.Collection.InsertManyAsync(entities);
 		}
@@ -600,7 +600,7 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 		
-		public async Task<TEntity> UpdateAsync(TEntity entity)
+		public async ValueTask<TEntity> UpdateAsync(TEntity entity)
 		{
 			if (this.actionBinder != null)
 			{
@@ -630,7 +630,7 @@ namespace Ertis.MongoDB.Repository
 			}
 		}
 		
-		public async Task<TEntity> UpsertAsync(TEntity entity)
+		public async ValueTask<TEntity> UpsertAsync(TEntity entity)
 		{
 			var item = await this.FindAsync(entity.Id);
 			if (item == null)
@@ -653,7 +653,7 @@ namespace Ertis.MongoDB.Repository
 			return result.IsAcknowledged && result.DeletedCount == 1;
 		}
 		
-		public async Task<bool> DeleteAsync(string id)
+		public async ValueTask<bool> DeleteAsync(string id)
 		{
 			var result = await this.Collection.DeleteOneAsync(item => item.Id == id);
 			return result.IsAcknowledged && result.DeletedCount == 1;
@@ -666,7 +666,7 @@ namespace Ertis.MongoDB.Repository
 			return result.IsAcknowledged && result.DeletedCount == array.Length;
 		}
 
-		public async Task<bool> BulkDeleteAsync(IEnumerable<TEntity> entities)
+		public async ValueTask<bool> BulkDeleteAsync(IEnumerable<TEntity> entities)
 		{
 			var array = entities.ToArray();
 			var result = await this.Collection.DeleteManyAsync(Builders<TEntity>.Filter.In(d => d.Id, array.Select(x => x.Id)));
@@ -682,7 +682,7 @@ namespace Ertis.MongoDB.Repository
 			return this.Collection.CountDocuments(item => true);
 		}
 		
-		public async Task<long> CountAsync()
+		public async ValueTask<long> CountAsync()
 		{
 			return await this.Collection.CountDocumentsAsync(item => true);
 		}
@@ -693,7 +693,7 @@ namespace Ertis.MongoDB.Repository
 			return this.Collection.CountDocuments(filterExpression);
 		}
 		
-		public async Task<long> CountAsync(Expression<Func<TEntity, bool>> expression)
+		public async ValueTask<long> CountAsync(Expression<Func<TEntity, bool>> expression)
 		{
 			FilterDefinition<TEntity> filterExpression = new ExpressionFilterDefinition<TEntity>(expression);
 			return await this.Collection.CountDocumentsAsync(filterExpression);
@@ -705,7 +705,7 @@ namespace Ertis.MongoDB.Repository
 			return this.Collection.CountDocuments(filterDefinition);
 		}
 		
-		public async Task<long> CountAsync(string query)
+		public async ValueTask<long> CountAsync(string query)
 		{
 			var filterDefinition = new JsonFilterDefinition<TEntity>(query);
 			return await this.Collection.CountDocumentsAsync(filterDefinition);

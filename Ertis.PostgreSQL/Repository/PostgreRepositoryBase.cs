@@ -62,7 +62,7 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public virtual async Task<TEntity> FindOneAsync(int id)
+		public virtual async ValueTask<TEntity> FindOneAsync(int id)
 		{
 			var dbSet = this.ConfigureDbSet(this.database);
 			if (this.TrackingEnabled)
@@ -88,7 +88,7 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public virtual async Task<TEntity> FindOneAsync(Expression<Func<TEntity, bool>> expression)
+		public virtual async ValueTask<TEntity> FindOneAsync(Expression<Func<TEntity, bool>> expression)
 		{
 			var dbSet = this.ConfigureDbSet(this.database);
 			if (this.TrackingEnabled)
@@ -106,7 +106,7 @@ namespace Ertis.PostgreSQL.Repository
 			return this.ExecuteWhere(null, skip, limit, withCount, sortField, sortDirection);
 		}
 
-		public virtual async Task<IPaginationCollection<TEntity>> FindAsync(int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
+		public virtual async ValueTask<IPaginationCollection<TEntity>> FindAsync(int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
 		{
 			return await this.ExecuteWhereAsync(null, skip, limit, withCount, sortField, sortDirection);
 		}
@@ -116,7 +116,7 @@ namespace Ertis.PostgreSQL.Repository
 			return this.ExecuteWhere(expression, skip, limit, withCount, sortField, sortDirection);
 		}
 
-		public virtual async Task<IPaginationCollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
+		public virtual async ValueTask<IPaginationCollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
 		{
 			return await this.ExecuteWhereAsync(expression, skip, limit, withCount, sortField, sortDirection);
 		}
@@ -127,7 +127,7 @@ namespace Ertis.PostgreSQL.Repository
 			return this.ExecuteWhere(expression, skip, limit, withCount, sortField, sortDirection);
 		}
 
-		public virtual async Task<IPaginationCollection<TEntity>> FindAsync(string query, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
+		public virtual async ValueTask<IPaginationCollection<TEntity>> FindAsync(string query, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
 		{
 			var expression = await ExpressionHelper.ParseExpressionAsync<TEntity>(query);
 			return await this.ExecuteWhereAsync(expression, skip, limit, withCount, sortField, sortDirection);
@@ -309,7 +309,7 @@ namespace Ertis.PostgreSQL.Repository
 			};
 		}
 		
-		private async Task<IPaginationCollection<TEntity>> ExecuteWhereAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
+		private async ValueTask<IPaginationCollection<TEntity>> ExecuteWhereAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
 		{
 			IQueryable<TEntity> queryable;
 			long? totalCount = null;
@@ -501,7 +501,7 @@ namespace Ertis.PostgreSQL.Repository
 			return this.FindOne(cursor.Entity.Id);
 		}
 
-		public virtual async Task<TEntity> InsertAsync(TEntity entity)
+		public virtual async ValueTask<TEntity> InsertAsync(TEntity entity)
 		{
 			var cursor = (await this.GetDbSet().AddAsync(entity));
 			await this.database.SaveChangesAsync();
@@ -519,7 +519,7 @@ namespace Ertis.PostgreSQL.Repository
 			this.database.SaveChanges();
 		}
 
-		public async Task BulkInsertAsync(IEnumerable<TEntity> entities)
+		public async ValueTask BulkInsertAsync(IEnumerable<TEntity> entities)
 		{
 			await this.GetDbSet().AddRangeAsync(entities);
 			await this.database.SaveChangesAsync();
@@ -559,7 +559,7 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public virtual async Task<TEntity> UpdateAsync(TEntity entity)
+		public virtual async ValueTask<TEntity> UpdateAsync(TEntity entity)
 		{
 			if (this.TrackingEnabled)
 			{
@@ -596,7 +596,7 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public virtual async Task<TEntity> UpsertAsync(TEntity entity)
+		public virtual async ValueTask<TEntity> UpsertAsync(TEntity entity)
 		{
 			var current = await this.FindOneAsync(entity.Id);
 			if (current == null)
@@ -639,7 +639,7 @@ namespace Ertis.PostgreSQL.Repository
 			return this.Delete(entity);
 		}
 
-		public async Task<bool> DeleteAsync(TEntity entity)
+		public async ValueTask<bool> DeleteAsync(TEntity entity)
 		{
 			if (this.TrackingEnabled)
 			{
@@ -656,7 +656,7 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 		
-		public virtual async Task<bool> DeleteAsync(int id)
+		public virtual async ValueTask<bool> DeleteAsync(int id)
 		{
 			var entity = await this.FindOneAsync(id);
 			if (entity == null)
@@ -683,7 +683,7 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public async Task<bool> BulkDeleteAsync(IEnumerable<TEntity> entities)
+		public async ValueTask<bool> BulkDeleteAsync(IEnumerable<TEntity> entities)
 		{
 			if (this.TrackingEnabled)
 			{
@@ -717,7 +717,7 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public virtual async Task<long> CountAsync()
+		public virtual async ValueTask<long> CountAsync()
 		{
 			if (this.TrackingEnabled)
 			{
@@ -735,7 +735,7 @@ namespace Ertis.PostgreSQL.Repository
 			return this.Count(expression);
 		}
 
-		public virtual async Task<long> CountAsync(string query)
+		public virtual async ValueTask<long> CountAsync(string query)
 		{
 			var expression = await ExpressionHelper.ParseExpressionAsync<TEntity>(query);
 			return await this.CountAsync(expression);
@@ -753,7 +753,7 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public virtual async Task<long> CountAsync(Expression<Func<TEntity, bool>> expression)
+		public virtual async ValueTask<long> CountAsync(Expression<Func<TEntity, bool>> expression)
 		{
 			if (this.TrackingEnabled)
 			{
@@ -774,7 +774,7 @@ namespace Ertis.PostgreSQL.Repository
 			return this.database.SaveChanges();
 		}
 		
-		protected async Task<int> SaveChangesAsync()
+		protected async ValueTask<int> SaveChangesAsync()
 		{
 			return await this.database.SaveChangesAsync();
 		}

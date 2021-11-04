@@ -38,7 +38,7 @@ namespace Ertis.Net.Services
 			return this.restHandler.ExecuteRequest(HttpMethod.Get, url, queryString, headers, body);
 		}
 
-		protected async Task<IResponseResult> GetAsync(
+		protected async ValueTask<IResponseResult> GetAsync(
 			string url,
 			IQueryString queryString = null,
 			IHeaderCollection headers = null,
@@ -56,7 +56,7 @@ namespace Ertis.Net.Services
 			return this.restHandler.ExecuteRequest<TResult>(HttpMethod.Get, url, queryString, headers, body);
 		}
 
-		protected async Task<IResponseResult<TResult>> GetAsync<TResult>(
+		protected async ValueTask<IResponseResult<TResult>> GetAsync<TResult>(
 			string url,
 			IQueryString queryString = null,
 			IHeaderCollection headers = null,
@@ -74,7 +74,7 @@ namespace Ertis.Net.Services
 			return this.restHandler.ExecuteRequest(HttpMethod.Post, url, queryString, headers, body);
 		}
 
-		protected async Task<IResponseResult> PostAsync(
+		protected async ValueTask<IResponseResult> PostAsync(
 			string url,
 			IQueryString queryString = null,
 			IHeaderCollection headers = null,
@@ -92,7 +92,7 @@ namespace Ertis.Net.Services
 			return this.restHandler.ExecuteRequest<TResult>(HttpMethod.Post, url, queryString, headers, body);
 		}
 
-		protected async Task<IResponseResult<TResult>> PostAsync<TResult>(
+		protected async ValueTask<IResponseResult<TResult>> PostAsync<TResult>(
 			string url,
 			IQueryString queryString = null,
 			IHeaderCollection headers = null,
@@ -110,7 +110,7 @@ namespace Ertis.Net.Services
 			return this.restHandler.ExecuteRequest(HttpMethod.Put, url, queryString, headers, body);
 		}
 
-		protected async Task<IResponseResult> PutAsync(
+		protected async ValueTask<IResponseResult> PutAsync(
 			string url,
 			IQueryString queryString = null,
 			IHeaderCollection headers = null,
@@ -128,7 +128,7 @@ namespace Ertis.Net.Services
 			return this.restHandler.ExecuteRequest<TResult>(HttpMethod.Put, url, queryString, headers, body);
 		}
 
-		protected async Task<IResponseResult<TResult>> PutAsync<TResult>(
+		protected async ValueTask<IResponseResult<TResult>> PutAsync<TResult>(
 			string url,
 			IQueryString queryString = null,
 			IHeaderCollection headers = null,
@@ -146,7 +146,7 @@ namespace Ertis.Net.Services
 			return this.restHandler.ExecuteRequest(HttpMethod.Delete, url, queryString, headers, body);
 		}
 
-		protected async Task<IResponseResult> DeleteAsync(
+		protected async ValueTask<IResponseResult> DeleteAsync(
 			string url,
 			IQueryString queryString = null,
 			IHeaderCollection headers = null,
@@ -164,7 +164,7 @@ namespace Ertis.Net.Services
 			return this.restHandler.ExecuteRequest<TResult>(HttpMethod.Delete, url, queryString, headers, body);
 		}
 
-		protected async Task<IResponseResult<TResult>> DeleteAsync<TResult>(
+		protected async ValueTask<IResponseResult<TResult>> DeleteAsync<TResult>(
 			string url,
 			IQueryString queryString = null,
 			IHeaderCollection headers = null,

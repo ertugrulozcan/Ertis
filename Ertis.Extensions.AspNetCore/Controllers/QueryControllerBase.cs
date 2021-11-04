@@ -14,7 +14,7 @@ namespace Ertis.Extensions.AspNetCore.Controllers
 	{
 		#region Methods
 
-		protected abstract Task<IPaginationCollection<dynamic>> GetDataAsync(
+		protected abstract ValueTask<IPaginationCollection<dynamic>> GetDataAsync(
 			string query, 
 			int? skip,
 			int? limit,
@@ -24,7 +24,7 @@ namespace Ertis.Extensions.AspNetCore.Controllers
 			IDictionary<string, bool> selectFields);
 
 		[HttpPost("_query")]
-		public virtual async Task<IActionResult> Query()
+		public virtual async ValueTask<IActionResult> Query()
 		{
 			if (!this.ModelState.IsValid)
 			{

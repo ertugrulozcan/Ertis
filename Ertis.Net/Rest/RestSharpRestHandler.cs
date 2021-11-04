@@ -81,7 +81,7 @@ namespace Ertis.Net.Rest
 			}
 		}
 
-		public async ValueTask<IResponseResult<TResult>> ExecuteRequestAsync<TResult>(
+		public async Task<IResponseResult<TResult>> ExecuteRequestAsync<TResult>(
 			HttpMethod method, 
 			string url, 
 			IHeaderCollection headers = null,
@@ -150,7 +150,7 @@ namespace Ertis.Net.Rest
 			}
 		}
 
-		public async ValueTask<IResponseResult<TResult>> ExecuteRequestAsync<TResult>(
+		public async Task<IResponseResult<TResult>> ExecuteRequestAsync<TResult>(
 			HttpMethod method, 
 			string baseUrl, 
 			IQueryString queryString = null,
@@ -218,7 +218,7 @@ namespace Ertis.Net.Rest
 			}
 		}
 
-		public async ValueTask<IResponseResult> ExecuteRequestAsync(
+		public async Task<IResponseResult> ExecuteRequestAsync(
 			HttpMethod method, 
 			string url, 
 			IHeaderCollection headers = null, 
@@ -286,7 +286,7 @@ namespace Ertis.Net.Rest
 			}
 		}
 
-		public async ValueTask<IResponseResult> ExecuteRequestAsync(
+		public async Task<IResponseResult> ExecuteRequestAsync(
 			HttpMethod method, 
 			string baseUrl, 
 			IQueryString queryString = null, 

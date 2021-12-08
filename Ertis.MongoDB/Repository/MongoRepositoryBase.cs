@@ -582,14 +582,14 @@ namespace Ertis.MongoDB.Repository
 		
 		#region Update Methods
 
-		public TEntity Update(TEntity entity)
+		public TEntity Update(TEntity entity, string id = default)
 		{
 			if (this.actionBinder != null)
 			{
 				entity = this.actionBinder.BeforeUpdate(entity);
 			}
 
-			string updatedId = entity.Id;
+			var updatedId = string.IsNullOrEmpty(id) ? entity.Id : id;
 			this.Collection.ReplaceOne(item => item.Id == updatedId, entity);
 
 			if (this.actionBinder != null)
@@ -600,14 +600,15 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 		
-		public async ValueTask<TEntity> UpdateAsync(TEntity entity)
+		public async ValueTask<TEntity> UpdateAsync(TEntity entity, string id = default)
 		{
 			if (this.actionBinder != null)
 			{
 				entity = this.actionBinder.BeforeUpdate(entity);
 			}
 
-			await this.Collection.ReplaceOneAsync(item => item.Id == entity.Id, entity);
+			var updatedId = string.IsNullOrEmpty(id) ? entity.Id : id;
+			await this.Collection.ReplaceOneAsync(item => item.Id == updatedId, entity);
 
 			if (this.actionBinder != null)
 			{

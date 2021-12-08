@@ -529,7 +529,7 @@ namespace Ertis.PostgreSQL.Repository
 		
 		#region Update Methods
 
-		public virtual TEntity Update(TEntity entity)
+		public virtual TEntity Update(TEntity entity, int id = default)
 		{
 			if (this.TrackingEnabled)
 			{
@@ -559,7 +559,7 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public virtual async ValueTask<TEntity> UpdateAsync(TEntity entity)
+		public virtual async ValueTask<TEntity> UpdateAsync(TEntity entity, int id = default)
 		{
 			if (this.TrackingEnabled)
 			{

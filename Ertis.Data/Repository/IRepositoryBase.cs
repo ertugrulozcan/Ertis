@@ -46,9 +46,9 @@ namespace Ertis.Data.Repository
 		
 		#region Update Methods
 
-		TEntity Update(TEntity entity);
+		TEntity Update(TEntity entity, TIdentifier id = default);
 		
-		ValueTask<TEntity> UpdateAsync(TEntity entity);
+		ValueTask<TEntity> UpdateAsync(TEntity entity, TIdentifier id = default);
 
 		TEntity Upsert(TEntity entity);
 		

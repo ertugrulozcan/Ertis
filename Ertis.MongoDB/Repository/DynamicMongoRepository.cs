@@ -668,7 +668,7 @@ namespace Ertis.MongoDB.Repository
 				entity = this._actionBinder.BeforeUpdate(entity);
 			}
 
-			string updatedId = entity.Id;
+			string updatedId = entity._id;
 			this.Collection.ReplaceOne(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(updatedId)), entity);
 
 			if (this._actionBinder != null)
@@ -686,7 +686,7 @@ namespace Ertis.MongoDB.Repository
 				entity = this._actionBinder.BeforeUpdate(entity);
 			}
 
-			string updatedId = entity.Id;
+			string updatedId = entity._id;
 			await this.Collection.ReplaceOneAsync(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(updatedId)), entity);
 
 			if (this._actionBinder != null)
@@ -699,13 +699,13 @@ namespace Ertis.MongoDB.Repository
 
 		public dynamic Upsert(dynamic entity)
 		{
-			var item = this.Find(entity.Id);
+			var item = this.Find(entity._id);
 			return item == null ? this.Insert(entity) : this.Update(entity);
 		}
 		
 		public async ValueTask<dynamic> UpsertAsync(dynamic entity)
 		{
-			var item = await this.FindAsync(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(entity.Id)));
+			var item = await this.FindAsync(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(entity._id)));
 			if (item == null)
 			{
 				return await this.InsertAsync(entity);

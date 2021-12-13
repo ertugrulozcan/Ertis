@@ -25,8 +25,10 @@ namespace Ertis.MongoDB.Repository
 		#endregion
 		
 		#region Properties
-
+		
 		private IMongoCollection<dynamic> Collection { get; }
+		
+		private IMongoCollection<BsonDocument> DocumentCollection { get; }
 
 		#endregion
 
@@ -45,6 +47,7 @@ namespace Ertis.MongoDB.Repository
 			var database = client.GetDatabase(settings.DefaultAuthDatabase);
 
 			this.Collection = database.GetCollection<dynamic>(collectionName);
+			this.DocumentCollection = database.GetCollection<BsonDocument>(collectionName);
 
 			this._actionBinder = actionBinder;
 		}
@@ -531,15 +534,22 @@ namespace Ertis.MongoDB.Repository
 		
 		#region Insert Methods
 
-		public dynamic Insert(dynamic entity)
+		public dynamic Insert(object entity)
 		{
 			if (this._actionBinder != null)
 			{
 				entity = this._actionBinder.BeforeInsert(entity);
 			}
-			
-			this.Collection.InsertOne(entity);
-			
+
+			if (entity is BsonDocument document)
+			{
+				this.DocumentCollection.InsertOne(document);
+			}
+			else
+			{
+				this.Collection.InsertOne(entity);	
+			}
+
 			if (this._actionBinder != null)
 			{
 				entity = this._actionBinder.AfterInsert(entity);
@@ -548,15 +558,22 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 		
-		public async ValueTask<dynamic> InsertAsync(dynamic entity)
+		public async ValueTask<dynamic> InsertAsync(object entity)
 		{
 			if (this._actionBinder != null)
 			{
 				entity = this._actionBinder.BeforeInsert(entity);
 			}
 			
-			await this.Collection.InsertOneAsync(entity);
-			
+			if (entity is BsonDocument document)
+			{
+				await this.DocumentCollection.InsertOneAsync(document);
+			}
+			else
+			{
+				await this.Collection.InsertOneAsync(entity);	
+			}
+
 			if (this._actionBinder != null)
 			{
 				entity = this._actionBinder.AfterInsert(entity);
@@ -565,9 +582,9 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 
-		public void BulkInsert(IEnumerable<dynamic> entities)
+		public void BulkInsert(IEnumerable<object> entities)
 		{
-			var enumerable = entities as dynamic[] ?? entities.ToArray();
+			var enumerable = entities as object[] ?? entities.ToArray();
 			
 			if (this._actionBinder != null)
 			{
@@ -588,9 +605,9 @@ namespace Ertis.MongoDB.Repository
 			}
 		}
 
-		public async ValueTask BulkInsertAsync(IEnumerable<dynamic> entities)
+		public async ValueTask BulkInsertAsync(IEnumerable<object> entities)
 		{
-			var enumerable = entities as dynamic[] ?? entities.ToArray();
+			var enumerable = entities as object[] ?? entities.ToArray();
 			
 			if (this._actionBinder != null)
 			{
@@ -611,7 +628,7 @@ namespace Ertis.MongoDB.Repository
 			}
 		}
 
-		public ICollection<dynamic> InsertMany(ICollection<dynamic> entities)
+		public ICollection<dynamic> InsertMany(ICollection<object> entities)
 		{
 			if (this._actionBinder != null)
 			{
@@ -634,7 +651,7 @@ namespace Ertis.MongoDB.Repository
 			return entities;
 		}
 		
-		public async Task<ICollection<dynamic>> InsertManyAsync(ICollection<dynamic> entities)
+		public async Task<ICollection<dynamic>> InsertManyAsync(ICollection<object> entities)
 		{
 			if (this._actionBinder != null)
 			{

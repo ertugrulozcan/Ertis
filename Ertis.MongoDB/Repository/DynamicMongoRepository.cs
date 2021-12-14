@@ -678,14 +678,21 @@ namespace Ertis.MongoDB.Repository
 		
 		#region Update Methods
 
-		public dynamic Update(dynamic entity, string id = default)
+		public dynamic Update(object entity, string id = default)
 		{
 			if (this._actionBinder != null)
 			{
 				entity = this._actionBinder.BeforeUpdate(entity);
 			}
 
-			this.Collection.ReplaceOne(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)), entity);
+			if (entity is BsonDocument document)
+			{
+				this.DocumentCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(id)), document);
+			}
+			else
+			{
+				this.Collection.ReplaceOne(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)), entity);	
+			}
 
 			if (this._actionBinder != null)
 			{
@@ -695,14 +702,21 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 		
-		public async ValueTask<dynamic> UpdateAsync(dynamic entity, string id = default)
+		public async ValueTask<dynamic> UpdateAsync(object entity, string id = default)
 		{
 			if (this._actionBinder != null)
 			{
 				entity = this._actionBinder.BeforeUpdate(entity);
 			}
 
-			await this.Collection.ReplaceOneAsync(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)), entity);
+			if (entity is BsonDocument document)
+			{
+				await this.DocumentCollection.ReplaceOneAsync(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(id)), document);
+			}
+			else
+			{
+				await this.Collection.ReplaceOneAsync(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)), entity);	
+			}
 
 			if (this._actionBinder != null)
 			{

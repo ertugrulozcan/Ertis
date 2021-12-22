@@ -1,51 +1,76 @@
-using System.Globalization;
-using System.Linq;
+using System.Text;
 
 namespace Ertis.Core.Helpers
 {
 	public static class Slugifier
 	{
-		public static string Slugify(string text)
+		public static string Slugify(string input)
 		{
-			if (string.IsNullOrEmpty(text))
+			if (string.IsNullOrEmpty(input))
 			{
-				return text;
+				return input;
 			}
 
-			var words = text.Split(" ").ToList();
-			words.ForEach(x => x = x.Replace('&', '-'));
-			words.RemoveAll(x => x == "&");
-			return string.Join("-", words.Select(x => ConvertTurkishCharacters(x.ToLower(CultureInfo.GetCultureInfo(0x0409)))));
-		}
+			var inputLength = input.Length;
+			var previousDash = false;
+			var slugBuilder = new StringBuilder(inputLength * 2);
 
-		private static string ConvertTurkishCharacters(string text)
-		{
-			if (string.IsNullOrEmpty(text))
+			for (var i = 0; i < inputLength; i++)
 			{
-				return text;
+				var c = input[i];
+				switch (c)
+				{
+					case >= 'a' and <= 'z':
+					case >= '0' and <= '9':
+						slugBuilder.Append(c);
+						previousDash = false;
+						break;
+					case >= 'A' and <= 'Z':
+						slugBuilder.Append((char)(c | 32));
+						previousDash = false;
+						break;
+					case ' ':
+					case ',':
+					case '.':
+					case '/':
+					case '\\':
+					case '-':
+					case '_':
+					case '=':
+					{
+						if (!previousDash && slugBuilder.Length > 0)
+						{
+							slugBuilder.Append('-');
+							previousDash = true;
+						}
+
+						break;
+					}
+					default:
+					{
+						if (c >= 128)
+						{
+							var previousLength = slugBuilder.Length;
+							slugBuilder.Append(NonAscii.RemapToAscii(c));
+							if (previousLength != slugBuilder.Length)
+							{
+								previousDash = false;
+							}
+						}
+
+						break;
+					}
+				}
 			}
-			
-			return text
-				.Replace("ç", "c")
-				.Replace("Ç", "C")
-				.Replace("ğ", "g")
-				.Replace("Ğ", "G")
-				.Replace("ı", "i")
-				.Replace("İ", "I")
-				.Replace("ö", "o")
-				.Replace("Ö", "O")
-				.Replace("ş", "s")
-				.Replace("Ş", "S")
-				.Replace("ü", "u")
-				.Replace("Ü", "U");
-		}
 
-		public static string TrimSlug(string slug)
-		{
-			if (string.IsNullOrEmpty(slug))
-				return slug;
+			var str = slugBuilder.ToString();
+			if (previousDash)
+			{
+				// ReSharper disable once ReplaceSubstringWithRangeIndexer
+				str = str.Substring(0, slugBuilder.Length - 1);
+			}
 
-			return slug.TrimStart('/').TrimEnd('/');
+			return str;
 		}
 	}
 }

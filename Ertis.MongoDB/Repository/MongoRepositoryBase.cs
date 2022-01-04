@@ -2,14 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using Ertis.Core.Collections;
 using Ertis.Data.Models;
 using Ertis.Data.Repository;
+using Ertis.MongoDB.Attributes;
 using Ertis.MongoDB.Configuration;
 using Ertis.MongoDB.Exceptions;
 using Ertis.MongoDB.Helpers;
+using Ertis.MongoDB.Queries;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using SortDirection = Ertis.Core.Collections.SortDirection;
 using MongoDriver = MongoDB.Driver;
@@ -40,13 +45,66 @@ namespace Ertis.MongoDB.Repository
 		/// <param name="actionBinder"></param>
 		protected MongoRepositoryBase(IDatabaseSettings settings, string collectionName, IRepositoryActionBinder actionBinder = null)
 		{
-			string connectionString = ConnectionStringHelper.GenerateConnectionString(settings);
+			var connectionString = ConnectionStringHelper.GenerateConnectionString(settings);
 			var client = new MongoClient(connectionString);
 			var database = client.GetDatabase(settings.DefaultAuthDatabase);
 
 			this.Collection = database.GetCollection<TEntity>(collectionName);
+			this.CreateSearchIndexesAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
 			this.actionBinder = actionBinder;
+		}
+
+		#endregion
+
+		#region Index Methods
+
+		private async Task CreateSearchIndexesAsync()
+		{
+			try
+			{
+				var currentIndexesCursor = await this.Collection.Indexes.ListAsync();
+				var currentIndexes = await currentIndexesCursor.ToListAsync();
+				var currentTextIndexes = currentIndexes.Where(x =>
+					x.Contains("key") &&
+					x["key"].IsBsonDocument &&
+					x["key"].AsBsonDocument.Contains("_fts") &&
+					x["key"].AsBsonDocument["_fts"].IsString &&
+					x["key"].AsBsonDocument["_fts"].AsString == "text");
+
+				var indexedPropertyNames = currentTextIndexes.SelectMany(x => x["weights"].AsBsonDocument.Names).ToArray();
+				var nonIndexedPropertyNames = new List<string>();
+			
+				var propertyInfos = typeof(TEntity).GetProperties();
+				foreach (var propertyInfo in propertyInfos)
+				{
+					var searchableAttribute = propertyInfo.GetCustomAttribute(typeof(SearchableAttribute), true);
+					if (searchableAttribute is SearchableAttribute)
+					{
+						var attribute = propertyInfo.GetCustomAttribute(typeof(BsonElementAttribute), true);
+						if (attribute is BsonElementAttribute bsonElementAttribute)
+						{
+							if (!indexedPropertyNames.Contains(bsonElementAttribute.ElementName))
+							{
+								nonIndexedPropertyNames.Add(bsonElementAttribute.ElementName);
+							}
+						}
+					}
+				}
+
+				if (nonIndexedPropertyNames.Any())
+				{
+					var combinedTextIndexDefinition = Builders<TEntity>.IndexKeys.Combine(
+						nonIndexedPropertyNames.Select(x => Builders<TEntity>.IndexKeys.Text(x)));
+				
+					await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<TEntity>(combinedTextIndexDefinition));	
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine($"An error occured while creating search indexes for '{typeof(TEntity).Name}' entity type;");
+				Console.WriteLine(ex);
+			}
 		}
 
 		#endregion
@@ -508,6 +566,42 @@ namespace Ertis.MongoDB.Repository
 						throw;
 				}
 			}
+		}
+
+		#endregion
+
+		#region Search Methods
+
+		public IPaginationCollection<TEntity> Search(
+			string keyword, 
+			int? skip = null, 
+			int? limit = null,
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null)
+		{
+			var queryResults = this.Query(QueryBuilder.Search(keyword).ToString(), skip, limit, withCount, sortField, sortDirection);
+			return new PaginationCollection<TEntity>
+			{
+				Count = queryResults.Count,
+				Items = queryResults.Items.Cast<BsonDocument>().Select(x => BsonSerializer.Deserialize<TEntity>(x))
+			};
+		}
+
+		public async ValueTask<IPaginationCollection<TEntity>> SearchAsync(
+			string keyword, 
+			int? skip = null,
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null)
+		{
+			var queryResults = await this.QueryAsync(QueryBuilder.Search(keyword).ToString(), skip, limit, withCount, sortField, sortDirection);
+			return new PaginationCollection<TEntity>
+			{
+				Count = queryResults.Count,
+				Items = queryResults.Items.Cast<BsonDocument>().Select(x => BsonSerializer.Deserialize<TEntity>(x))
+			};
 		}
 
 		#endregion

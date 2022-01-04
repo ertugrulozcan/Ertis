@@ -584,7 +584,7 @@ namespace Ertis.MongoDB.Repository
 			return new PaginationCollection<TEntity>
 			{
 				Count = queryResults.Count,
-				Items = queryResults.Items.Cast<BsonDocument>().Select(x => BsonSerializer.Deserialize<TEntity>(x))
+				Items = queryResults.Items.Select(x => BsonSerializer.Deserialize<TEntity>((x as object).ToJson()))
 			};
 		}
 
@@ -600,7 +600,7 @@ namespace Ertis.MongoDB.Repository
 			return new PaginationCollection<TEntity>
 			{
 				Count = queryResults.Count,
-				Items = queryResults.Items.Cast<BsonDocument>().Select(x => BsonSerializer.Deserialize<TEntity>(x))
+				Items = queryResults.Items.Select(x => BsonSerializer.Deserialize<TEntity>((x as object).ToJson()))
 			};
 		}
 

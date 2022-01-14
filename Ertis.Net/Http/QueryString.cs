@@ -64,6 +64,16 @@ namespace Ertis.Net.Http
 
 		public IQueryString Add(string key, object value)
 		{
+			if (string.IsNullOrEmpty(key))
+			{
+				throw new ArgumentException("QueryString key is empty!");
+			}
+
+			if (value == null || string.IsNullOrEmpty(value.ToString()))
+			{
+				throw new ArgumentException("QueryString value is null or empty!");
+			}
+			
 			if (!this.QueryDictionary.ContainsKey(key))
 				this.QueryDictionary.Add(key, value);
 			else
@@ -102,6 +112,11 @@ namespace Ertis.Net.Http
 		public IDictionary<string, object> ToDictionary()
 		{
 			return this.QueryDictionary;
+		}
+
+		public bool ContainsKey(string key)
+		{
+			return this.QueryDictionary.ContainsKey(key);
 		}
 
 		public override string ToString()

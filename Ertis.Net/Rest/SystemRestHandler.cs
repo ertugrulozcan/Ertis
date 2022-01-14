@@ -30,9 +30,9 @@ namespace Ertis.Net.Rest
 				var request = new HttpRequestMessage(method, url);
 				if (headers != null)
 				{
-					foreach (var header in headers.ToDictionary())
+					foreach (var (key, value) in headers.ToDictionary())
 					{
-						request.Headers.Add(header.Key, header.Value.ToString());	
+						request.Headers.Add(key, value.ToString());	
 					}
 				}
 

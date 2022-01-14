@@ -9,13 +9,7 @@ namespace Ertis.Net.Http
 
 		public object Payload { get; }
 		
-		public BodyTypes Type
-		{
-			get
-			{
-				return BodyTypes.Json;
-			}
-		}
+		public BodyTypes Type => BodyTypes.Json;
 
 		public string Json
 		{

@@ -34,6 +34,10 @@ namespace Ertis.Net.Http
 
 		private Dictionary<string, object> HeadersDictionary { get; }
 
+		public IEnumerable<string> Keys => this.HeadersDictionary.Keys;
+		
+		public IEnumerable<object> Values => this.HeadersDictionary.Values;
+
 		#endregion
 		
 		#region Constructors
@@ -64,6 +68,16 @@ namespace Ertis.Net.Http
 
 		public IHeaderCollection Add(string key, object value)
 		{
+			if (string.IsNullOrEmpty(key))
+			{
+				throw new ArgumentException("Header key is empty!");
+			}
+
+			if (value == null || string.IsNullOrEmpty(value.ToString()))
+			{
+				throw new ArgumentException("Header value is null or empty!");
+			}
+			
 			if (!this.HeadersDictionary.ContainsKey(key))
 				this.HeadersDictionary.Add(key, value);
 			else
@@ -102,6 +116,11 @@ namespace Ertis.Net.Http
 		public IDictionary<string, object> ToDictionary()
 		{
 			return this.HeadersDictionary;
+		}
+
+		public bool ContainsKey(string key)
+		{
+			return this.HeadersDictionary.ContainsKey(key);
 		}
 
 		public override string ToString()

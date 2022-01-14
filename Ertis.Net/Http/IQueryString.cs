@@ -11,5 +11,7 @@ namespace Ertis.Net.Http
 		IQueryString Remove(string key);
 
 		IDictionary<string, object> ToDictionary();
+		
+		bool ContainsKey(string key);
 	}
 }

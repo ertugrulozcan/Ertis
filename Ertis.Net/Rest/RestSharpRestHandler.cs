@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using RestSharp;
 
 namespace Ertis.Net.Rest
 {
+	[Obsolete("It is recommended to use SystemRestHandler")]
 	public class RestSharpRestHandler : IRestHandler
 	{
 		#region Properties

@@ -7,7 +7,7 @@ namespace Ertis.MongoDB.Queries
     {
         #region Properties
 
-        public MongoOperator? Operator { get; init; }
+        internal MongoOperator? Operator { get; init; }
 
         #endregion
         
@@ -26,22 +26,17 @@ namespace Ertis.MongoDB.Queries
 
         #region Methods
 
-        public string ToQuery(bool addFieldName = true, bool simplifyEqualsQueries = true)
+        public override string ToString()
         {
             if (this.Operator != null)
             {
-                var operatorTag = OperatorHelper.GetTag(this.Operator.Value);
-                return "{ $" + operatorTag + ": [ " + string.Join(", ", this.Select(x => x.ToQuery(simplifyEqualsQueries))) + " ] }";
+                var operatorTag = QueryHelper.GetOperatorTag(this.Operator.Value);
+                return "{ $" + operatorTag + ": [ " + string.Join(", ", this.Select(x => x.ToString())) + " ] }";
             }
             else
             {
-                return "[ " + string.Join(", ", this.Select(x => x.ToQuery(simplifyEqualsQueries))) + " ]";   
+                return "[ " + string.Join(", ", this.Select(x => x.ToString())) + " ]";   
             }
-        }
-        
-        public override string ToString()
-        {
-            return this.ToQuery();
         }
 
         #endregion

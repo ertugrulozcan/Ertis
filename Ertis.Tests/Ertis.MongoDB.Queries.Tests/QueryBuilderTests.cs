@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Ertis.MongoDB.Queries;
 using NUnit.Framework;
 
@@ -10,55 +11,134 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
         [Test]
         public void WhereTest1()
         {
-            QueryBuilder.Where("username", "ertugrul.ozcan");
-            Assert.Pass();
+            var query = QueryBuilder.Where("username", "ertugrul.ozcan");
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ \"username\": \"ertugrul.ozcan\" }".Trim(), queryJson.Trim());
         }
         
         [Test]
         public void WhereTest2()
         {
-            QueryBuilder.Where(QueryBuilder.Equals("username", "ertugrul.ozcan"));
-            Assert.Pass();
+            var query = QueryBuilder.Where(QueryBuilder.Equals("username", "ertugrul.ozcan"));
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ \"username\": \"ertugrul.ozcan\" }".Trim(), queryJson.Trim());
         }
         
         [Test]
         public void WhereTest3()
         {
-            QueryBuilder.Where(QueryBuilder.Equals("first_name", "Ertuğrul"), QueryBuilder.Equals("last_name", "Özcan"));
-            Assert.Pass();
+            var query = QueryBuilder.Where(QueryBuilder.Equals("first_name", "Ertuğrul"), QueryBuilder.Equals("last_name", "Özcan"));
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ \"first_name\": \"Ertuğrul\", \"last_name\": \"Özcan\" }".Trim(), queryJson.Trim());
         }
         
         [Test]
         public void WhereTest4()
         {
-            var queries = new[]
+            IEnumerable<IQuery> queries = new []
             {
                 QueryBuilder.Equals("first_name", "Ertuğrul"),
                 QueryBuilder.Equals("last_name", "Özcan")
             };
             
-            QueryBuilder.Where(queries);
-            
-            Assert.Pass();
+            var query = QueryBuilder.Where(queries);
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ \"first_name\": \"Ertuğrul\", \"last_name\": \"Özcan\" }".Trim(), queryJson.Trim());
         }
         
         [Test]
         public void WhereTest5()
         {
-            QueryBuilder.Where(QueryBuilder.And(QueryBuilder.Equals("first_name", "Ertuğrul"), QueryBuilder.Equals("last_name", "Özcan")));
-            Assert.Pass();
+            var query = QueryBuilder.Where(QueryBuilder.And(QueryBuilder.Equals("first_name", "Ertuğrul"), QueryBuilder.Equals("last_name", "Özcan")));
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ $and: [ { \"first_name\": \"Ertuğrul\" }, { \"last_name\": \"Özcan\" } ] }".Trim(), queryJson.Trim());
         }
         
         [Test]
         public void WhereTest6()
         {
-            QueryBuilder.Where(QueryBuilder.And(new []
+            IQuery[] queries =
             {
-                QueryBuilder.Equals("first_name", "Ertuğrul"), 
+                QueryBuilder.Equals("first_name", "Ertuğrul"),
                 QueryBuilder.Equals("last_name", "Özcan")
-            }));
+            };
             
-            Assert.Pass();
+            var query = QueryBuilder.Where(QueryBuilder.And(queries));
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ $and: [ { \"first_name\": \"Ertuğrul\" }, { \"last_name\": \"Özcan\" } ] }".Trim(), queryJson.Trim());
+        }
+        
+        [Test]
+        public void WhereTest7()
+        {
+            IQuery[] queries =
+            {
+                QueryBuilder.Equals("first_name", "Ertuğrul"),
+                QueryBuilder.Equals("last_name", "Özcan")
+            };
+            
+            var query = QueryBuilder.Where(QueryBuilder.Or(queries));
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ $or: [ { \"first_name\": \"Ertuğrul\" }, { \"last_name\": \"Özcan\" } ] }".Trim(), queryJson.Trim());
+        }
+
+        #endregion
+
+        #region Projection Tests
+
+        [Test]
+        public void SelectTest()
+        {
+            var query = QueryBuilder.Select(new Dictionary<string, bool>
+            {
+                { "first_name", false },
+                { "last_name", true },
+            });
+            
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ \"select\": { \"first_name\": 0, \"last_name\": 1 } }".Trim(), queryJson.Trim());
+        }
+
+        #endregion
+        
+        #region Combine Queries Tests
+
+        [Test]
+        public void CombineTest()
+        {
+            IEnumerable<IQuery> whereQueries = new []
+            {
+                QueryBuilder.Equals("first_name", "Ertuğrul"),
+                QueryBuilder.Equals("last_name", "Özcan")
+            };
+            
+            var whereQuery = QueryBuilder.WhereOut(whereQueries);
+            var whereQueryJson = whereQuery.ToString();
+            Assert.NotNull(whereQueryJson);
+            Assert.AreEqual("{ \"where\": { \"first_name\": \"Ertuğrul\", \"last_name\": \"Özcan\" } }".Trim(), whereQueryJson.Trim());
+            
+            var selectQuery = QueryBuilder.Select(new Dictionary<string, bool>
+            {
+                { "first_name", false },
+                { "last_name", true },
+            });
+            
+            var selectQueryJson = selectQuery.ToString();
+            Assert.NotNull(selectQueryJson);
+            Assert.AreEqual("{ \"select\": { \"first_name\": 0, \"last_name\": 1 } }".Trim(), selectQueryJson.Trim());
+
+            var combinedQuery = QueryBuilder.Combine(whereQuery, selectQuery);
+            var combinedQueryJson = combinedQuery.ToString();
+            Assert.NotNull(combinedQueryJson);
+            Assert.AreEqual("{ \"where\": { \"first_name\": \"Ertuğrul\", \"last_name\": \"Özcan\" }, \"select\": { \"first_name\": 0, \"last_name\": 1 } }".Trim(), combinedQueryJson.Trim());
         }
 
         #endregion
@@ -161,7 +241,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
         [Test]
         public void AndTest2()
         {
-            var expressions = new[]
+            IQuery[] expressions = 
             {
                 QueryBuilder.GreaterThanOrEqual("age", 30),
                 QueryBuilder.Equals("gender", "female")
@@ -185,7 +265,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
         [Test]
         public void OrTest2()
         {
-            var expressions = new[]
+            IQuery[] expressions =
             {
                 QueryBuilder.GreaterThanOrEqual("age", 30),
                 QueryBuilder.Equals("gender", "female")
@@ -209,7 +289,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
         [Test]
         public void NorTest2()
         {
-            var expressions = new[]
+            IQuery[] expressions =
             {
                 QueryBuilder.GreaterThanOrEqual("age", 30),
                 QueryBuilder.Equals("gender", "female")
@@ -261,6 +341,37 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             Assert.AreEqual("{ \"qty\": { $type: \"maxKey\" } }".Trim(), queryJson.Trim());
         }
         
+        #endregion
+        
+        #region Evaluation Queries
+
+        [Test]
+        public void RegexTest()
+        {
+            var query = QueryBuilder.Regex("name", "/acme.*corp/", RegexOptions.AllowDot | RegexOptions.CaseInsensitivity);
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ \"name\": { $regex: \"acme.*corp\", $options: \"si\" } }".Trim(), queryJson.Trim());
+        }
+        
+        [Test]
+        public void FullTextSearchTest1()
+        {
+            var query = QueryBuilder.FullTextSearch("Test Keyword", "tr", true, true);
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ $text: { $search: \"Test Keyword\", $language: \"tr\", $caseSensitive: true, $diacriticSensitive: true } }".Trim(), queryJson.Trim());
+        }
+        
+        [Test]
+        public void FullTextSearchTest2()
+        {
+            var query = QueryBuilder.FullTextSearch("Test Keyword", isCaseSensitive: true);
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ $text: { $search: \"Test Keyword\", $caseSensitive: true } }".Trim(), queryJson.Trim());
+        }
+
         #endregion
     }
 }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Ertis.MongoDB.Queries
 {
-    internal class QueryExpression : IQueryExpression, IHasChildren
+    internal class Query : IQuery, IHasChildren
     {
         #region Fields
 
@@ -12,7 +12,7 @@ namespace Ertis.MongoDB.Queries
         
         #region Properties
 
-        public string Field { get; init; }
+        internal MongoOperator? Operator { get; init; }
         
         internal IQuery Value 
         {
@@ -25,11 +25,11 @@ namespace Ertis.MongoDB.Queries
         }
 
         public List<IQuery> Children { get; } = new();
-        
+
         #endregion
 
         #region Methods
-        
+
         public void AddQuery(IQuery query)
         {
             this.Children.Add(query);
@@ -39,8 +39,16 @@ namespace Ertis.MongoDB.Queries
         {
             if (this.Children.Count == 1)
             {
-                var expressionJson = this.Value.ToString();
-                return "{ \"" + this.Field + "\": " + expressionJson + " }";
+                if (this.Operator != null)
+                {
+                    var operatorTag = QueryHelper.GetOperatorTag(this.Operator.Value);
+                    var expressionJson = this.Value.ToString();
+                    return "{ $" + operatorTag + ": " + expressionJson + " }";
+                }
+                else
+                {
+                    return this.Value.ToString();
+                }       
             }
             else
             {
@@ -53,8 +61,16 @@ namespace Ertis.MongoDB.Queries
                         expressionJsons.Add(expressionJson);
                     }
                 }
-            
-                return "{ \"" + this.Field + "\": { " + string.Join(", ", expressionJsons) + " } }";
+                
+                if (this.Operator != null)
+                {
+                    var operatorTag = QueryHelper.GetOperatorTag(this.Operator.Value);
+                    return "{ $" + operatorTag + ": { " + string.Join(", ", expressionJsons) + " } }";
+                }
+                else
+                {
+                    return "{ " + string.Join(", ", expressionJsons) + " }";
+                }
             }
         }
 

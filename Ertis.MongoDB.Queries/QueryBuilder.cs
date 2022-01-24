@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Ertis.MongoDB.Queries
@@ -8,19 +7,85 @@ namespace Ertis.MongoDB.Queries
     {
         #region Where Methods
 
-        public static void Where<T>(string key, T value)
+        public static IQuery Where<T>(string key, T value)
         {
-            
+            return WhereCore(new []
+            {
+                Equals(key, value)
+            });
         }
         
-        public static void Where(IEnumerable<IQuery> queries)
+        public static IQuery WhereOut<T>(string key, T value)
         {
-            
+            return WhereCore(new []
+            {
+                Equals(key, value)
+            }, true);
         }
         
-        public static void Where(params IQuery[] queries)
+        public static IQuery Where(IEnumerable<IQuery> queries)
         {
-            
+            return WhereCore(queries);
+        }
+        
+        public static IQuery WhereOut(IEnumerable<IQuery> queries)
+        {
+            return WhereCore(queries, true);
+        }
+        
+        public static IQuery Where(params IQuery[] queries)
+        {
+            return WhereCore(queries);
+        }
+        
+        public static IQuery WhereOut(params IQuery[] queries)
+        {
+            return WhereCore(queries, true);
+        }
+        
+        private static IQuery WhereCore(IEnumerable<IQuery> queries, bool showOperatorTag = false)
+        {
+            return new CustomQuery
+            {
+                Operator = "where",
+                Children = queries.ToList(),
+                ShowOperatorTag = showOperatorTag
+            };
+        }
+
+        #endregion
+        
+        #region Projection Methods
+
+        public static IQuery Select(IDictionary<string, bool> selections)
+        {
+            return new CustomQuery
+            {
+                Operator = "select",
+                Children = selections.Select(x => Equals(x.Key, new QueryValue<int>(x.Value ? 1 : 0))).Cast<IQuery>().ToList()
+            };
+        }
+
+        #endregion
+        
+        #region Merge Queries
+
+        public static IQuery Combine(params IQuery[] queries)
+        {
+            return CombineCore(queries);
+        }
+        
+        public static IQuery Combine(IEnumerable<IQuery> queries)
+        {
+            return CombineCore(queries);
+        }
+        
+        private static IQuery CombineCore(IEnumerable<IQuery> queries)
+        {
+            return new CustomQuery
+            {
+                Children = queries.ToList()
+            };
         }
 
         #endregion
@@ -38,7 +103,6 @@ namespace Ertis.MongoDB.Queries
             return new QueryExpression
             {
                 Field = key,
-                Operator = MongoOperator.Equals,
                 Value = new QueryValue<T>(value)
             };
         }
@@ -54,8 +118,11 @@ namespace Ertis.MongoDB.Queries
             return new QueryExpression
             {
                 Field = key,
-                Operator = MongoOperator.NotEquals,
-                Value = new QueryValue<T>(value)
+                Value = new Query
+                {
+                    Operator = MongoOperator.NotEquals,
+                    Value = new QueryValue<T>(value)   
+                }
             };
         }
         
@@ -70,8 +137,11 @@ namespace Ertis.MongoDB.Queries
             return new QueryExpression
             {
                 Field = key,
-                Operator = MongoOperator.GreaterThan,
-                Value = new QueryValue<T>(value)
+                Value = new Query
+                {
+                    Operator = MongoOperator.GreaterThan,
+                    Value = new QueryValue<T>(value)   
+                }
             };
         }
         
@@ -86,8 +156,11 @@ namespace Ertis.MongoDB.Queries
             return new QueryExpression
             {
                 Field = key,
-                Operator = MongoOperator.GreaterThanOrEqual,
-                Value = new QueryValue<T>(value)
+                Value = new Query
+                {
+                    Operator = MongoOperator.GreaterThanOrEqual,
+                    Value = new QueryValue<T>(value)   
+                }
             };
         }
         
@@ -102,8 +175,11 @@ namespace Ertis.MongoDB.Queries
             return new QueryExpression
             {
                 Field = key,
-                Operator = MongoOperator.LessThan,
-                Value = new QueryValue<T>(value)
+                Value = new Query
+                {
+                    Operator = MongoOperator.LessThan,
+                    Value = new QueryValue<T>(value)   
+                }
             };
         }
         
@@ -118,8 +194,11 @@ namespace Ertis.MongoDB.Queries
             return new QueryExpression
             {
                 Field = key,
-                Operator = MongoOperator.LessThanOrEqual,
-                Value = new QueryValue<T>(value)
+                Value = new Query
+                {
+                    Operator = MongoOperator.LessThanOrEqual,
+                    Value = new QueryValue<T>(value)   
+                }
             };
         }
         
@@ -134,8 +213,11 @@ namespace Ertis.MongoDB.Queries
             return new QueryExpression
             {
                 Field = key,
-                Operator = MongoOperator.Contains,
-                Value = new QueryArray(values.Select(x => new QueryValue<T>(x)))
+                Value = new Query
+                {
+                    Operator = MongoOperator.Contains,
+                    Value = new QueryArray(values.Select(x => new QueryValue<T>(x)))   
+                }
             };
         }
         
@@ -150,8 +232,11 @@ namespace Ertis.MongoDB.Queries
             return new QueryExpression
             {
                 Field = key,
-                Operator = MongoOperator.NotContains,
-                Value = new QueryArray(values.Select(x => new QueryValue<T>(x)))
+                Value = new Query
+                {
+                    Operator = MongoOperator.NotContains,
+                    Value = new QueryArray(values.Select(x => new QueryValue<T>(x)))   
+                }
             };
         }
 
@@ -241,8 +326,15 @@ namespace Ertis.MongoDB.Queries
             return new QueryExpression
             {
                 Field = key,
-                Operator = MongoOperator.Not,
-                Value = Equals(key, value)
+                Value = new Query
+                {
+                    Operator = MongoOperator.Not,
+                    Value = new Query
+                    {
+                        Operator = MongoOperator.Equals,
+                        Value = new QueryValue<T>(value)
+                    }
+                }
             };
         }
         
@@ -252,12 +344,30 @@ namespace Ertis.MongoDB.Queries
         /// <param name="expression">Operator Expression</param>
         public static IQueryExpression Not(IQueryExpression expression)
         {
-            return new QueryExpression
+            if (expression is QueryExpression queryExpression)
             {
-                Field = expression.Field,
-                Operator = MongoOperator.Not,
-                Value = expression
-            };
+                return new QueryExpression
+                {
+                    Field = expression.Field,
+                    Value = new Query
+                    {
+                        Operator = MongoOperator.Not,
+                        Value = queryExpression.Value
+                    }
+                };
+            }
+            else
+            {
+                return new QueryExpression
+                {
+                    Field = expression.Field,
+                    Value = new Query
+                    {
+                        Operator = MongoOperator.Not,
+                        Value = expression
+                    }
+                };
+            }
         }
         
         #endregion
@@ -274,8 +384,11 @@ namespace Ertis.MongoDB.Queries
             return new QueryExpression
             {
                 Field = key,
-                Operator = MongoOperator.Exist,
-                Value = new QueryValue<bool>(value)
+                Value = new Query
+                {
+                    Operator = MongoOperator.Exist,
+                    Value = new QueryValue<bool>(value)
+                }
             };
         }
         
@@ -292,8 +405,11 @@ namespace Ertis.MongoDB.Queries
             return new QueryExpression
             {
                 Field = key,
-                Operator = MongoOperator.TypeOf,
-                Value = new QueryValue<string>(bsonTypeName)
+                Value = new Query
+                {
+                    Operator = MongoOperator.TypeOf,
+                    Value = new QueryValue<string>(bsonTypeName)
+                }
             };
         }
 
@@ -309,12 +425,27 @@ namespace Ertis.MongoDB.Queries
         /// <param name="options">Options</param>
         public static IQueryExpression Regex(string key, string regex, RegexOptions? options = null)
         {
-            return new QueryExpression
+            var queryExpression = new QueryExpression
             {
                 Field = key,
-                Operator = MongoOperator.Regex,
-                Value = new QueryValue<string>(regex)
+                Value = new Query
+                {
+                    Operator = MongoOperator.Regex,
+                    Value = new QueryValue<string>(regex.TrimStart('/').TrimEnd('/'))
+                }
             };
+            
+            var regexOptions = QueryHelper.ConvertRegexOptions(options);
+            if (!string.IsNullOrEmpty(regexOptions))
+            {
+                queryExpression.AddQuery(new Query
+                {
+                    Operator = MongoOperator.RegexOptions,
+                    Value = new QueryValue<string>(regexOptions)
+                });
+            }
+
+            return queryExpression;
         }
         
         /// <summary>
@@ -326,7 +457,44 @@ namespace Ertis.MongoDB.Queries
         /// <param name="isDiacriticSensitive">A boolean flag to enable or disable diacritic sensitive search against version 3 text indexes.</param>
         public static IQuery FullTextSearch(string keyword, string language = "none", bool isCaseSensitive = false, bool isDiacriticSensitive = false)
         {
-            throw new NotImplementedException();
+            var query = new Query
+            {
+                Operator = MongoOperator.Text,
+                Value = new Query
+                {
+                    Operator = MongoOperator.TextSearch,
+                    Value = new QueryValue<string>(keyword)
+                }
+            };
+
+            if (!string.IsNullOrEmpty(language) && language != "none")
+            {
+                query.AddQuery(new Query
+                {
+                    Operator = MongoOperator.TextSearchLanguage,
+                    Value = new QueryValue<string>(language)
+                });
+            }
+
+            if (isCaseSensitive)
+            {
+                query.AddQuery(new Query
+                {
+                    Operator = MongoOperator.TextSearchCaseSensitive,
+                    Value = new QueryValue<bool>(true)
+                });
+            }
+
+            if (isDiacriticSensitive)
+            {
+                query.AddQuery(new Query
+                {
+                    Operator = MongoOperator.TextSearchDiacriticSensitive,
+                    Value = new QueryValue<bool>(true)
+                });
+            }
+
+            return query;
         }
 
         #endregion

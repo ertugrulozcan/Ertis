@@ -17,6 +17,11 @@ namespace Ertis.MongoDB.Queries
         Exist,
         TypeOf,
         Regex,
-        Text
+        Text,
+        RegexOptions,
+        TextSearch,
+        TextSearchLanguage,
+        TextSearchCaseSensitive,
+        TextSearchDiacriticSensitive
     }
 }

@@ -1,3 +1,5 @@
+using System;
+
 namespace Ertis.MongoDB.Queries
 {
     internal class QueryValue<T> : IQuery
@@ -22,12 +24,12 @@ namespace Ertis.MongoDB.Queries
         #endregion
         
         #region Methods
-        
-        public string ToQuery(bool addFieldName = true, bool simplifyEqualsQueries = true)
+
+        public override string ToString()
         {
             if (this.Value is IQuery query)
             {
-                return query.ToQuery(simplifyEqualsQueries);
+                return query.ToString();
             }
             else if (typeof(T) == typeof(string))
             {
@@ -37,15 +39,19 @@ namespace Ertis.MongoDB.Queries
             {
                 return this.Value.ToString()?.ToLower();
             }
+            else if (typeof(T) == typeof(DateTime))
+            {
+                var dateTime = this.Value is DateTime time ? time : default;
+                return "\"" + dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "\"";
+            }
+            else if (this.Value == null)
+            {
+                return "null";
+            }
             else
             {
                 return this.Value.ToString();
             }
-        }
-
-        public override string ToString()
-        {
-            return this.ToQuery();
         }
 
         #endregion

@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <PackageId>Ertis.Extensions.AspNetCore</PackageId>
-        <PackageVersion>5.1.4</PackageVersion>
+        <PackageVersion>5.1.5</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.Extensions.AspNetCore</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -13,8 +13,8 @@
         <Title>Ertis.Extensions.AspNetCore</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>5.1.4</AssemblyVersion>
-        <FileVersion>5.1.4</FileVersion>
+        <AssemblyVersion>5.1.5</AssemblyVersion>
+        <FileVersion>5.1.5</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Ertis.MongoDB.Queries
@@ -7,7 +8,47 @@ namespace Ertis.MongoDB.Queries
     {
         #region Where Methods
 
-        public static IQuery Where<T>(string key, T value)
+        public static IQuery Where(string key, string value)
+        {
+            return WhereCore(key, value);
+        }
+        
+        public static IQuery Where(string key, char value)
+        {
+            return WhereCore(key, value);
+        }
+        
+        public static IQuery Where(string key, int value)
+        {
+            return WhereCore(key, value);
+        }
+        
+        public static IQuery Where(string key, long value)
+        {
+            return WhereCore(key, value);
+        }
+        
+        public static IQuery Where(string key, double value)
+        {
+            return WhereCore(key, value);
+        }
+        
+        public static IQuery Where(string key, float value)
+        {
+            return WhereCore(key, value);
+        }
+        
+        public static IQuery Where(string key, bool value)
+        {
+            return WhereCore(key, value);
+        }
+        
+        public static IQuery Where(string key, DateTime value)
+        {
+            return WhereCore(key, value);
+        }
+        
+        private static IQuery WhereCore<T>(string key, T value)
         {
             return WhereCore(new []
             {
@@ -15,12 +56,61 @@ namespace Ertis.MongoDB.Queries
             });
         }
         
-        public static IQuery WhereOut<T>(string key, T value)
+        public static IQuery WhereOut(string key, string value)
+        {
+            return WhereOutCore(key, value);
+        }
+        
+        public static IQuery WhereOut(string key, char value)
+        {
+            return WhereOutCore(key, value);
+        }
+        
+        public static IQuery WhereOut(string key, int value)
+        {
+            return WhereOutCore(key, value);
+        }
+        
+        public static IQuery WhereOut(string key, long value)
+        {
+            return WhereOutCore(key, value);
+        }
+        
+        public static IQuery WhereOut(string key, double value)
+        {
+            return WhereOutCore(key, value);
+        }
+        
+        public static IQuery WhereOut(string key, float value)
+        {
+            return WhereOutCore(key, value);
+        }
+        
+        public static IQuery WhereOut(string key, bool value)
+        {
+            return WhereOutCore(key, value);
+        }
+        
+        public static IQuery WhereOut(string key, DateTime value)
+        {
+            return WhereOutCore(key, value);
+        }
+        
+        private static IQuery WhereOutCore<T>(string key, T value)
         {
             return WhereCore(new []
             {
                 Equals(key, value)
             }, true);
+        }
+        
+        public static IQuery Where(string key, IEnumerable<IQuery> queries)
+        {
+            return new QueryExpression
+            {
+                Field = key,
+                Value = Combine(queries)
+            };
         }
         
         public static IQuery Where(IEnumerable<IQuery> queries)
@@ -108,6 +198,20 @@ namespace Ertis.MongoDB.Queries
         }
         
         /// <summary>
+        /// Equals ($eq)
+        /// </summary>
+        /// <param name="value">Operand Value</param>
+        /// <typeparam name="T">Value Type</typeparam>
+        public static IQuery Equals<T>(T value)
+        {
+            return new Query
+            {
+                Operator = MongoOperator.Equals,
+                Value = new QueryValue<T>(value)
+            };
+        }
+        
+        /// <summary>
         /// NotEquals ($ne)
         /// </summary>
         /// <param name="key">Field Name</param>
@@ -123,6 +227,20 @@ namespace Ertis.MongoDB.Queries
                     Operator = MongoOperator.NotEquals,
                     Value = new QueryValue<T>(value)   
                 }
+            };
+        }
+        
+        /// <summary>
+        /// NotEquals ($ne)
+        /// </summary>
+        /// <param name="value">Operand Value</param>
+        /// <typeparam name="T">Value Type</typeparam>
+        public static IQuery NotEquals<T>(T value)
+        {
+            return new Query
+            {
+                Operator = MongoOperator.NotEquals,
+                Value = new QueryValue<T>(value)   
             };
         }
         
@@ -146,6 +264,21 @@ namespace Ertis.MongoDB.Queries
         }
         
         /// <summary>
+        /// GreaterThan ($gt)
+        /// </summary>
+        /// <param name="value">Operand Value</param>
+        /// <typeparam name="T">Value Type</typeparam>
+        /// <returns></returns>
+        public static IQuery GreaterThan<T>(T value)
+        {
+            return new Query
+            {
+                Operator = MongoOperator.GreaterThan,
+                Value = new QueryValue<T>(value)   
+            };
+        }
+        
+        /// <summary>
         /// GreaterThanOrEqual ($gte)
         /// </summary>
         /// <param name="key">Field Name</param>
@@ -161,6 +294,20 @@ namespace Ertis.MongoDB.Queries
                     Operator = MongoOperator.GreaterThanOrEqual,
                     Value = new QueryValue<T>(value)   
                 }
+            };
+        }
+        
+        /// <summary>
+        /// GreaterThanOrEqual ($gte)
+        /// </summary>
+        /// <param name="value">Operand Value</param>
+        /// <typeparam name="T">Value Type</typeparam>
+        public static IQuery GreaterThanOrEqual<T>(T value)
+        {
+            return new Query
+            {
+                Operator = MongoOperator.GreaterThanOrEqual,
+                Value = new QueryValue<T>(value)
             };
         }
         
@@ -184,6 +331,20 @@ namespace Ertis.MongoDB.Queries
         }
         
         /// <summary>
+        /// LessThan ($lt)
+        /// </summary>
+        /// <param name="value">Operand Value</param>
+        /// <typeparam name="T">Value Type</typeparam>
+        public static IQuery LessThan<T>(T value)
+        {
+            return new Query
+            {
+                Operator = MongoOperator.LessThan,
+                Value = new QueryValue<T>(value)   
+            };
+        }
+        
+        /// <summary>
         /// LessThanOrEqual ($lte)
         /// </summary>
         /// <param name="key">Field Name</param>
@@ -199,6 +360,20 @@ namespace Ertis.MongoDB.Queries
                     Operator = MongoOperator.LessThanOrEqual,
                     Value = new QueryValue<T>(value)   
                 }
+            };
+        }
+        
+        /// <summary>
+        /// LessThanOrEqual ($lte)
+        /// </summary>
+        /// <param name="value">Operand Value</param>
+        /// <typeparam name="T">Value Type</typeparam>
+        public static IQuery LessThanOrEqual<T>(T value)
+        {
+            return new Query
+            {
+                Operator = MongoOperator.LessThanOrEqual,
+                Value = new QueryValue<T>(value)   
             };
         }
         
@@ -222,6 +397,20 @@ namespace Ertis.MongoDB.Queries
         }
         
         /// <summary>
+        /// Contains ($in)
+        /// </summary>
+        /// <param name="values">Operand Values</param>
+        /// <typeparam name="T">Value Type</typeparam>
+        public static IQuery Contains<T>(IEnumerable<T> values)
+        {
+            return new Query
+            {
+                Operator = MongoOperator.Contains,
+                Value = new QueryArray(values.Select(x => new QueryValue<T>(x)))   
+            };
+        }
+        
+        /// <summary>
         /// NotContains ($nin)
         /// </summary>
         /// <param name="key">Field Name</param>
@@ -237,6 +426,20 @@ namespace Ertis.MongoDB.Queries
                     Operator = MongoOperator.NotContains,
                     Value = new QueryArray(values.Select(x => new QueryValue<T>(x)))   
                 }
+            };
+        }
+        
+        /// <summary>
+        /// NotContains ($nin)
+        /// </summary>
+        /// <param name="values">Operand Values</param>
+        /// <typeparam name="T">Value Type</typeparam>
+        public static IQuery NotContains<T>(IEnumerable<T> values)
+        {
+            return new Query
+            {
+                Operator = MongoOperator.NotContains,
+                Value = new QueryArray(values.Select(x => new QueryValue<T>(x)))   
             };
         }
 
@@ -337,6 +540,23 @@ namespace Ertis.MongoDB.Queries
                 }
             };
         }
+
+        /// <summary>
+        /// Not ($not)
+        /// </summary>
+        /// <param name="value">Value</param>
+        public static IQuery Not<T>(T value)
+        {
+            return new Query
+            {
+                Operator = MongoOperator.Not,
+                Value = new Query
+                {
+                    Operator = MongoOperator.Equals,
+                    Value = new QueryValue<T>(value)
+                }
+            };
+        }
         
         /// <summary>
         /// Not ($not)
@@ -393,6 +613,19 @@ namespace Ertis.MongoDB.Queries
         }
         
         /// <summary>
+        /// Exist ($exist)
+        /// </summary>
+        /// <param name="value">Operand Value</param>
+        public static IQuery Exist(bool value)
+        {
+            return new Query
+            {
+                Operator = MongoOperator.Exist,
+                Value = new QueryValue<bool>(value)
+            };
+        }
+        
+        /// <summary>
         /// TypeOf ($type)
         /// </summary>
         /// <param name="key">Field Name</param>
@@ -410,6 +643,22 @@ namespace Ertis.MongoDB.Queries
                     Operator = MongoOperator.TypeOf,
                     Value = new QueryValue<string>(bsonTypeName)
                 }
+            };
+        }
+        
+        /// <summary>
+        /// TypeOf ($type)
+        /// </summary>
+        /// <param name="type">Bson Type</param>
+        public static IQuery TypeOf(BsonType type)
+        {
+            var bsonTypeName = type.ToString();
+            bsonTypeName = char.ToLower(bsonTypeName[0]) + bsonTypeName.Substring(1);
+            
+            return new Query
+            {
+                Operator = MongoOperator.TypeOf,
+                Value = new QueryValue<string>(bsonTypeName)
             };
         }
 

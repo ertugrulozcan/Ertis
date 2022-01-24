@@ -88,6 +88,45 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             Assert.NotNull(queryJson);
             Assert.AreEqual("{ $or: [ { \"first_name\": \"Ertuğrul\" }, { \"last_name\": \"Özcan\" } ] }".Trim(), queryJson.Trim());
         }
+        
+        [Test]
+        public void WhereTest8()
+        {
+            var startTime = System.DateTime.Now;
+            var endTime = System.DateTime.Now.AddDays(1);
+            
+            IQuery[] queries =
+            {
+                QueryBuilder.GreaterThanOrEqual(startTime),
+                QueryBuilder.LessThanOrEqual(endTime)
+            };
+            
+            var query = QueryBuilder.Where("event_time", queries);
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ \"event_time\": { $gte: \"" + startTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "\", $lte: \"" + endTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "\" } }".Trim(), queryJson.Trim());
+        }
+        
+        [Test]
+        public void WhereTest9()
+        {
+            var startTime = System.DateTime.Now;
+            var endTime = System.DateTime.Now.AddDays(1);
+            
+            IQuery[] eventTimeQueries =
+            {
+                QueryBuilder.GreaterThanOrEqual(startTime),
+                QueryBuilder.LessThanOrEqual(endTime)
+            };
+            
+            var eventTimeQuery = QueryBuilder.Where("event_time", eventTimeQueries);
+            var eventTypeQuery = QueryBuilder.Equals("event_type", "TokenVerified");
+            
+            var query = QueryBuilder.Where(eventTypeQuery, eventTimeQuery);
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ \"event_type\": \"TokenVerified\", \"event_time\": { $gte: \"" + startTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "\", $lte: \"" + endTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "\" } }".Trim(), queryJson.Trim());
+        }
 
         #endregion
 

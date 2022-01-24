@@ -3,18 +3,18 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <PackageId>Ertis.MongoDB</PackageId>
-        <PackageVersion>5.2.1</PackageVersion>
+        <PackageVersion>5.2.2</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.MongoDB</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        <Copyright>Ertuğrul Özcan | Copyright 2021 (c)</Copyright>
+        <Copyright>Ertuğrul Özcan | Copyright 2022 (c)</Copyright>
         <PackageReleaseNotes>.Net 5</PackageReleaseNotes>
         <PackageTags>Ertis.MongoDB</PackageTags>
         <Title>Ertis.MongoDB</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>5.2.1</AssemblyVersion>
-        <FileVersion>5.2.1</FileVersion>
+        <AssemblyVersion>5.2.2</AssemblyVersion>
+        <FileVersion>5.2.2</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

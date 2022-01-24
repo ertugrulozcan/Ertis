@@ -2,6 +2,19 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+        <PackageId>Ertis.MongoDB.Queries</PackageId>
+        <PackageVersion>5.0.0</PackageVersion>
+        <Authors>Ertuğrul Özcan</Authors>
+        <Description>Ertis.MongoDB.Queries</Description>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <Copyright>Ertuğrul Özcan | Copyright 2021 (c)</Copyright>
+        <PackageReleaseNotes>.Net 5</PackageReleaseNotes>
+        <PackageTags>Ertis.MongoDB.Queries</PackageTags>
+        <Title>Ertis.MongoDB.Queries</Title>
+        <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
+        <AssemblyVersion>5.0.0</AssemblyVersion>
+        <FileVersion>5.0.0</FileVersion>
     </PropertyGroup>
 
 </Project>

@@ -580,7 +580,7 @@ namespace Ertis.MongoDB.Repository
 			string sortField = null, 
 			SortDirection? sortDirection = null)
 		{
-			var queryResults = this.Query(QueryBuilder.Search(keyword).ToString(), skip, limit, withCount, sortField, sortDirection);
+			var queryResults = this.Query(QueryBuilder.FullTextSearch(keyword).ToString(), skip, limit, withCount, sortField, sortDirection);
 			return new PaginationCollection<TEntity>
 			{
 				Count = queryResults.Count,
@@ -599,7 +599,7 @@ namespace Ertis.MongoDB.Repository
 			string sortField = null, 
 			SortDirection? sortDirection = null)
 		{
-			var queryResults = await this.QueryAsync(QueryBuilder.Search(keyword).ToString(), skip, limit, withCount, sortField, sortDirection);
+			var queryResults = await this.QueryAsync(QueryBuilder.FullTextSearch(keyword).ToString(), skip, limit, withCount, sortField, sortDirection);
 			return new PaginationCollection<TEntity>
 			{
 				Count = queryResults.Count,

@@ -24,6 +24,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Ertis.Data\Ertis.Data.csproj" />
+      <ProjectReference Include="..\Ertis.MongoDB.Queries\Ertis.MongoDB.Queries.csproj" />
     </ItemGroup>
 
 </Project>

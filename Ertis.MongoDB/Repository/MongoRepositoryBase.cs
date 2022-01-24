@@ -574,13 +574,15 @@ namespace Ertis.MongoDB.Repository
 
 		public IPaginationCollection<TEntity> Search(
 			string keyword, 
+			Queries.TextSearchOptions options = null,
 			int? skip = null, 
 			int? limit = null,
 			bool? withCount = null, 
 			string sortField = null, 
 			SortDirection? sortDirection = null)
 		{
-			var queryResults = this.Query(QueryBuilder.FullTextSearch(keyword).ToString(), skip, limit, withCount, sortField, sortDirection);
+			var query = options != null ? QueryBuilder.FullTextSearch(keyword, options.Language.ISO6391Code, options.IsCaseSensitive, options.IsDiacriticSensitive) : QueryBuilder.FullTextSearch(keyword);
+			var queryResults = this.Query(query.ToString(), skip, limit, withCount, sortField, sortDirection);
 			return new PaginationCollection<TEntity>
 			{
 				Count = queryResults.Count,
@@ -593,13 +595,15 @@ namespace Ertis.MongoDB.Repository
 
 		public async ValueTask<IPaginationCollection<TEntity>> SearchAsync(
 			string keyword, 
+			Queries.TextSearchOptions options = null,
 			int? skip = null,
 			int? limit = null, 
 			bool? withCount = null, 
 			string sortField = null, 
 			SortDirection? sortDirection = null)
 		{
-			var queryResults = await this.QueryAsync(QueryBuilder.FullTextSearch(keyword).ToString(), skip, limit, withCount, sortField, sortDirection);
+			var query = options != null ? QueryBuilder.FullTextSearch(keyword, options.Language.ISO6391Code, options.IsCaseSensitive, options.IsDiacriticSensitive) : QueryBuilder.FullTextSearch(keyword);
+			var queryResults = await this.QueryAsync(query.ToString(), skip, limit, withCount, sortField, sortDirection);
 			return new PaginationCollection<TEntity>
 			{
 				Count = queryResults.Count,

@@ -18,6 +18,7 @@
       <ProjectReference Include="..\Ertis.MongoDB\Ertis.MongoDB.csproj" />
       <ProjectReference Include="..\Ertis.Net\Ertis.Net.csproj" />
       <ProjectReference Include="..\Ertis.Security\Ertis.Security.csproj" />
+      <ProjectReference Include="..\Ertis.TemplateEngine\Ertis.TemplateEngine.csproj" />
     </ItemGroup>
 
 </Project>

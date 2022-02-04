@@ -183,6 +183,20 @@ namespace Ertis.MongoDB.Queries
         #region Comparison Queries
 
         /// <summary>
+        /// Equals by document object id ($eq)
+        /// </summary>
+        /// <param name="key">Field Name</param>
+        /// <param name="id">Object ID</param>
+        public static IQueryExpression Id(string key, string id)
+        {
+            return new QueryExpression
+            {
+                Field = key,
+                Value = new QueryValue<string>($"ObjectId(\"{id}\")")
+            };
+        }
+        
+        /// <summary>
         /// Equals ($eq)
         /// </summary>
         /// <param name="key">Field Name</param>

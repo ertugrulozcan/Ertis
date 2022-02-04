@@ -6,6 +6,21 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
 {
     public class QueryBuilderTests
     {
+        #region ObjectId Tests
+
+        [Test]
+        public void ObjectIdTest1()
+        {
+            const string membershipId = "61b7bfa7fa20a74224879e13";
+            const string id = "61fdb0eb923408d9b5d7f14a";
+            var query = QueryBuilder.Where(QueryBuilder.Equals("membership_id", membershipId), QueryBuilder.ObjectId(id));
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ \"membership_id\": \"61b7bfa7fa20a74224879e13\", \"_id\": ObjectId(\"61fdb0eb923408d9b5d7f14a\") }".Trim(), queryJson.Trim());
+        }
+
+        #endregion
+        
         #region Basic Where Methods
 
         [Test]

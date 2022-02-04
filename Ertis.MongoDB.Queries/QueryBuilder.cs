@@ -185,13 +185,12 @@ namespace Ertis.MongoDB.Queries
         /// <summary>
         /// Equals by document object id ($eq)
         /// </summary>
-        /// <param name="key">Field Name</param>
         /// <param name="id">Object ID</param>
-        public static IQueryExpression Id(string key, string id)
+        public static IQueryExpression Id(string id)
         {
             return new QueryExpression
             {
-                Field = key,
+                Field = "_id",
                 Value = new QueryValue<string>($"ObjectId(\"{id}\")")
             };
         }

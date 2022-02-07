@@ -9,6 +9,9 @@ namespace Ertis.Schema.Types
     {
         #region Properties
 
+        [JsonProperty("slug")]
+        string Slug { get; }
+        
         [JsonProperty("properties")]
         [JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
         IReadOnlyCollection<IFieldInfo> Properties { get; }

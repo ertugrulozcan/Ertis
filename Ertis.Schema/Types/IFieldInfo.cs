@@ -25,7 +25,7 @@ namespace Ertis.Schema.Types
 
         [JsonProperty("type")]
         [JsonConverter(typeof(StringEnumConverter))]
-        PrimitiveType Type { get; }
+        FieldType Type { get; }
 
         [JsonProperty("isRequired", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
         bool IsRequired { get; }

@@ -10,7 +10,7 @@ namespace Ertis.Schema.Types.Primitives
 
         [JsonProperty("type")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public override PrimitiveType Type => PrimitiveType.boolean;
+        public override FieldType Type => FieldType.boolean;
         
         #endregion
 

@@ -19,7 +19,7 @@ namespace Ertis.Schema.Types.Primitives
 
         [JsonProperty("type")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public override PrimitiveType Type => PrimitiveType.@string;
+        public override FieldType Type => FieldType.@string;
         
         [JsonProperty("minLength", NullValueHandling = NullValueHandling.Ignore)]
         public int? MinLength
@@ -85,17 +85,10 @@ namespace Ertis.Schema.Types.Primitives
 
                 if (!string.IsNullOrEmpty(this.RegexPattern))
                 {
-                    try
+                    var match = Regex.Match(text, this.RegexPattern);
+                    if (!match.Success)
                     {
-                        var match = Regex.Match(text, this.RegexPattern);
-                        if (!match.Success)
-                        {
-                            throw new FieldValidationException($"String value is not valid by the regular expression rule. ({this.RegexPattern})", this);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new FieldValidationException($"String value is not valid by the regular expression rule. ({ex.Message})", this);
+                        throw new FieldValidationException($"String value is not valid by the regular expression rule. ('{this.RegexPattern}')", this);
                     }
                 }
             }

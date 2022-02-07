@@ -18,7 +18,7 @@ namespace Ertis.Schema.Types.Primitives
 
         [JsonProperty("type")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public override PrimitiveType Type => PrimitiveType.@enum;
+        public override FieldType Type => FieldType.@enum;
         
         [JsonProperty("items")]
         public object[] Items
@@ -49,6 +49,7 @@ namespace Ertis.Schema.Types.Primitives
 
         protected override void Validate(object obj)
         {
+            bool isExistInEnums;
             if (obj != null)
             {
                 var type = obj.GetType();
@@ -56,18 +57,18 @@ namespace Ertis.Schema.Types.Primitives
                 {
                     throw new FieldValidationException($"Enum value is must be primitive type ({this.Name})", this);   
                 }
-                
-                if (this.Items.All(x => !x.Equals(obj)))
-                {
-                    throw new FieldValidationException($"The value does not exist in the enum items. The '{this.Name}' value must be one of them [{string.Join(", ", this.Items)}]", this);
-                }
+
+                isExistInEnums = this.Items.Any(x => x != null && x.Equals(obj));
             }
             else
             {
-                if (this.Items.All(x => x != null))
-                {
-                    throw new FieldValidationException($"The value does not exist in the enum items. The '{this.Name}' value must be one of them [{string.Join(", ", this.Items)}]", this);
-                }
+                isExistInEnums = this.Items.Any(x => x == null);
+            }
+
+            if (!isExistInEnums)
+            {
+                var enumValues = string.Join(", ", this.Items.Select(x => x == null ? "null" : (x is string ? $"'{x}'" : x.ToString())));
+                throw new FieldValidationException($"The value does not exist in the enum items. The '{this.Name}' value must be one of them [{enumValues}]", this);   
             }
         }
 

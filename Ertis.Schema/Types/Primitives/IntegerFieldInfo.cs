@@ -21,7 +21,7 @@ namespace Ertis.Schema.Types.Primitives
 
         [JsonProperty("type")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public override PrimitiveType Type => PrimitiveType.integer;
+        public override FieldType Type => FieldType.integer;
         
         /// <summary>
         /// Greater than or equal
@@ -164,12 +164,6 @@ namespace Ertis.Schema.Types.Primitives
         
         private bool ValidateMinimum(out Exception exception)
         {
-            if (this.Minimum < 0)
-            {
-                exception = new FieldValidationException($"The 'minimum' value can not be less than zero ({this.Name})", this);
-                return false;
-            }
-
             if (this.Maximum != null && this.Minimum != null && this.Maximum < this.Minimum)
             {
                 exception = new FieldValidationException($"The 'minimum' value can not be greater than the 'maximum' value ({this.Name})", this);
@@ -188,12 +182,6 @@ namespace Ertis.Schema.Types.Primitives
         
         private bool ValidateMaximum(out Exception exception)
         {
-            if (this.Maximum < 0)
-            {
-                exception = new FieldValidationException($"The 'maximum' value can not be less than zero ({this.Name})", this);
-                return false;
-            }
-
             if (this.Minimum != null && this.Maximum != null && this.Minimum > this.Maximum)
             {
                 exception = new FieldValidationException($"The 'maximum' value can not be less than the 'minimum' value ({this.Name})", this);
@@ -212,12 +200,6 @@ namespace Ertis.Schema.Types.Primitives
         
         private bool ValidateExclusiveMinimum(out Exception exception)
         {
-            if (this.ExclusiveMinimum < 0)
-            {
-                exception = new FieldValidationException($"The 'exclusiveMinimum' value can not be less than zero ({this.Name})", this);
-                return false;
-            }
-
             if (this.Maximum != null && this.ExclusiveMinimum != null && this.Maximum < this.ExclusiveMinimum)
             {
                 exception = new FieldValidationException($"The 'exclusiveMinimum' value can not be greater than the 'maximum' value ({this.Name})", this);
@@ -236,12 +218,6 @@ namespace Ertis.Schema.Types.Primitives
         
         private bool ValidateExclusiveMaximum(out Exception exception)
         {
-            if (this.ExclusiveMaximum < 0)
-            {
-                exception = new FieldValidationException($"The 'exclusiveMaximum' value can not be less than zero ({this.Name})", this);
-                return false;
-            }
-
             if (this.Minimum != null && this.ExclusiveMaximum != null && this.Minimum > this.ExclusiveMaximum)
             {
                 exception = new FieldValidationException($"The 'exclusiveMaximum' value can not be less than the 'minimum' value ({this.Name})", this);

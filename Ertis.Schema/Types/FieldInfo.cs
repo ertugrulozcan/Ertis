@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Ertis.Schema.Exceptions;
+using Ertis.Schema.Types.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -24,7 +25,19 @@ namespace Ertis.Schema.Types
         public IFieldInfo Parent { get; set; }
 
         [JsonIgnore]
-        public string Path => this.Parent != null ? $"{this.Parent.Path}.{this.Name}" : this.Name;
+        public string Path
+        {
+            get
+            {
+                var path = this.Parent != null ? $"{this.Parent.Path}.{this.Name}" : this.Name;
+                if (string.IsNullOrEmpty(this.Name) && this.Parent is ArrayFieldInfo arrayFieldInfo)
+                {
+                    path = $"{this.Parent.Path}.{arrayFieldInfo.Name}[]";   
+                }
+
+                return path;
+            }
+        }
 
         [JsonProperty("displayName", NullValueHandling = NullValueHandling.Ignore)]
         public string DisplayName { get; set; }
@@ -34,7 +47,7 @@ namespace Ertis.Schema.Types
 
         [JsonProperty("type")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public abstract PrimitiveType Type { get; }
+        public abstract FieldType Type { get; }
 
         [JsonProperty("isRequired", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool IsRequired { get; init; }
@@ -75,9 +88,9 @@ namespace Ertis.Schema.Types
                     throw new FieldValidationException($"'{this.Name}' is required", this);
                 default:
                 {
-                    if (obj != null && !IsCompatibleType(obj))
+                    if (obj != null && !this.IsCompatibleType(obj))
                     {
-                        if (string.IsNullOrEmpty(this.Name) && this.Parent is {Type: PrimitiveType.array})
+                        if (string.IsNullOrEmpty(this.Name) && this.Parent is {Type: FieldType.array})
                         {
                             throw new FieldValidationException($"Type mismatch error. Array items are must be '{GetPrimitiveName(typeof(T))}'", this);
                         }
@@ -97,10 +110,15 @@ namespace Ertis.Schema.Types
             }
         }
 
-        private static bool IsCompatibleType(object obj)
+        private bool IsCompatibleType(object obj)
         {
             if (obj is not T)
             {
+                if (this.Type is FieldType.date or FieldType.datetime && obj is DateTime && typeof(T) == typeof(string))
+                {
+                    return true;
+                }
+                
                 var integerCompatibleTypes = new[]
                 {
                     typeof(int),
@@ -122,10 +140,13 @@ namespace Ertis.Schema.Types
                     typeof(double)
                 };
 
-                return integerCompatibleTypes.Contains(obj.GetType()) && 
-                       integerCompatibleTypes.Contains(typeof(T)) ||
-                       floatCompatibleTypes.Contains(obj.GetType()) && 
-                       floatCompatibleTypes.Contains(typeof(T));
+                var isSchemaInteger = integerCompatibleTypes.Contains(typeof(T));
+                var isDataInteger = integerCompatibleTypes.Contains(obj.GetType());
+                var isSchemaFloat = floatCompatibleTypes.Contains(typeof(T));
+                var isDataFloat = floatCompatibleTypes.Contains(obj.GetType());
+                var isIntegerCompatible = isSchemaInteger && isDataInteger;
+                var isFloatCompatible = isSchemaFloat && isDataFloat;
+                return isIntegerCompatible || isFloatCompatible;
             }
 
             return true;

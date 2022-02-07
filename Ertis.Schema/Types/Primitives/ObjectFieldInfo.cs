@@ -12,7 +12,28 @@ using DynamicObject = Ertis.Schema.Dynamics.DynamicObject;
 
 namespace Ertis.Schema.Types.Primitives
 {
-    public class ObjectFieldInfo : FieldInfo<object>, ISchema
+    public abstract class ObjectFieldInfoBase : FieldInfo<object>, ISchema
+    {
+        #region Properties
+
+        [JsonProperty("slug")] 
+        public string Slug => this.Name;
+
+        public abstract IReadOnlyCollection<IFieldInfo> Properties { get; init; }
+
+        #endregion
+
+        #region Abstract Methods
+
+        public bool ValidateContent(object obj, out Exception exception)
+        {
+            return this.IsValid(obj, out exception);
+        }
+
+        #endregion
+    }
+    
+    public sealed class ObjectFieldInfo : ObjectFieldInfoBase
     {
         #region Fields
 
@@ -24,11 +45,11 @@ namespace Ertis.Schema.Types.Primitives
 
         [JsonProperty("type")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public override PrimitiveType Type => PrimitiveType.@object;
-        
+        public override FieldType Type => FieldType.@object;
+
         [JsonProperty("properties")]
         [JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
-        public IReadOnlyCollection<IFieldInfo> Properties
+        public override IReadOnlyCollection<IFieldInfo> Properties
         {
             get => this.properties;
             init
@@ -48,7 +69,7 @@ namespace Ertis.Schema.Types.Primitives
                 }
             }
         }
-        
+
         [JsonProperty("allowAdditionalProperties", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool AllowAdditionalProperties { get; init; }
 
@@ -125,11 +146,6 @@ namespace Ertis.Schema.Types.Primitives
             }
         }
         
-        public bool ValidateContent(object obj, out Exception exception)
-        {
-            return this.IsValid(obj, out exception);
-        }
-
         private bool ValidateProperties(out Exception exception)
         {
             if (this.Properties == null)

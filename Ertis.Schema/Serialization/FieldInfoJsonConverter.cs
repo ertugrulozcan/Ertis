@@ -1,9 +1,12 @@
+using System;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types;
 using Ertis.Schema.Types.CustomTypes;
 using Ertis.Schema.Types.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using DateTime = Ertis.Schema.Types.CustomTypes.DateTime;
+using Uri = Ertis.Schema.Types.CustomTypes.Uri;
 
 namespace Ertis.Schema.Serialization
 {
@@ -15,7 +18,7 @@ namespace Ertis.Schema.Serialization
             jToken.WriteTo(writer);
         }
 
-        public override IFieldInfo ReadJson(JsonReader reader, System.Type objectType, IFieldInfo existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override IFieldInfo ReadJson(JsonReader reader, Type objectType, IFieldInfo existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var jObject = JObject.Load(reader);
             return Deserialize(jObject, null);
@@ -28,7 +31,7 @@ namespace Ertis.Schema.Serialization
                 if (jObject.ContainsKey("type"))
                 {
                     var fieldTypeName = jObject["type"]?.Value<string>();
-                    if (System.Enum.TryParse(fieldTypeName, out FieldType fieldType))
+                    if (Enum.TryParse(fieldTypeName, out FieldType fieldType))
                     {
                         var json = jObject.ToString(Formatting.None);
                         IFieldInfo fieldInfo = fieldType switch
@@ -74,7 +77,7 @@ namespace Ertis.Schema.Serialization
                     throw new ErtisSchemaValidationException($"Field type is required ({fieldName})");
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 if (ex.InnerException is FieldValidationException)
                 {

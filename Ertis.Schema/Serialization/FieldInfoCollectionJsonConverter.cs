@@ -39,9 +39,12 @@ namespace Ertis.Schema.Serialization
             var rootNode = new JObject();
             foreach (var fieldInfo in properties)
             {
-                var jObject = JObject.FromObject(fieldInfo);
-                jObject.Remove("name");
-                rootNode.Add(fieldInfo.Name, jObject);
+                if (!string.IsNullOrEmpty(fieldInfo.Name))
+                {
+                    var jObject = JObject.FromObject(fieldInfo);
+                    jObject.Remove("name");
+                    rootNode.Add(fieldInfo.Name, jObject);   
+                }
             }
 
             return rootNode;

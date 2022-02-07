@@ -31,6 +31,10 @@ namespace Ertis.Schema.Types.Primitives
             init
             {
                 this.itemSchema = value;
+                if (value != null)
+                {
+                    value.Parent = this;
+                }
                 
                 if (!this.ValidateItemSchema(out var exception))
                 {

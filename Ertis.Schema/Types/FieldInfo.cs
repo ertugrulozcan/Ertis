@@ -73,6 +73,11 @@ namespace Ertis.Schema.Types
             }
             else if (obj != null && !IsCompatibleType(obj))
             {
+                if (string.IsNullOrEmpty(this.Name) && this.Parent is {Type: PrimitiveType.array})
+                {
+                    throw new FieldValidationException($"Type mismatch error. Array items are must be '{GetPrimitiveName(typeof(T))}'", this);
+                }
+                
                 throw new FieldValidationException($"Type mismatch error. '{this.Name}' is must be '{GetPrimitiveName(typeof(T))}'", this);
             }
             else if (typeof(T) == typeof(object))

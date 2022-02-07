@@ -67,24 +67,32 @@ namespace Ertis.Schema.Types
 
         protected virtual void Validate(object obj)
         {
-            if (obj == null && this.IsRequired)
+            switch (obj)
             {
-                throw new FieldValidationException($"'{this.Name}' is required", this);
-            }
-            else if (obj != null && !IsCompatibleType(obj))
-            {
-                if (string.IsNullOrEmpty(this.Name) && this.Parent is {Type: PrimitiveType.array})
+                case null when !this.IsRequired:
+                    return;
+                case null when this.IsRequired:
+                    throw new FieldValidationException($"'{this.Name}' is required", this);
+                default:
                 {
-                    throw new FieldValidationException($"Type mismatch error. Array items are must be '{GetPrimitiveName(typeof(T))}'", this);
-                }
+                    if (obj != null && !IsCompatibleType(obj))
+                    {
+                        if (string.IsNullOrEmpty(this.Name) && this.Parent is {Type: PrimitiveType.array})
+                        {
+                            throw new FieldValidationException($"Type mismatch error. Array items are must be '{GetPrimitiveName(typeof(T))}'", this);
+                        }
                 
-                throw new FieldValidationException($"Type mismatch error. '{this.Name}' is must be '{GetPrimitiveName(typeof(T))}'", this);
-            }
-            else if (typeof(T) == typeof(object))
-            {
-                if (obj is not IDictionary<string, object>)
-                {
-                    throw new FieldValidationException($"Type mismatch error. '{this.Name}' is must be 'object'", this);
+                        throw new FieldValidationException($"Type mismatch error. '{this.Name}' is must be '{GetPrimitiveName(typeof(T))}'", this);
+                    }
+                    else if (typeof(T) == typeof(object))
+                    {
+                        if (obj is not IDictionary<string, object>)
+                        {
+                            throw new FieldValidationException($"Type mismatch error. '{this.Name}' is must be 'object'", this);
+                        }
+                    }
+
+                    break;
                 }
             }
         }

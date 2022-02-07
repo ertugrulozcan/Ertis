@@ -7,6 +7,7 @@ namespace Ertis.Schema.Types
         integer,
         @float,
         boolean,
-        array
+        array,
+        @enum
     }
 }

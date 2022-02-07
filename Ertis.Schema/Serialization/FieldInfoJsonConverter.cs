@@ -28,21 +28,6 @@ namespace Ertis.Schema.Serialization
                 if (jObject.ContainsKey("type"))
                 {
                     var type = jObject["type"]?.Value<string>();
-                    
-                    /*
-                    if (type == "array" && jObject.ContainsKey("itemSchema") && jObject["itemSchema"] is JObject itemSchemaNode)
-                    {
-                        if (itemSchemaNode.ContainsKey("name"))
-                        {
-                            itemSchemaNode["name"] = $"{fieldName}_item";
-                        }
-                        else
-                        {
-                            itemSchemaNode.Add("name", $"{fieldName}_item");
-                        }
-                    }
-                    */
-
                     var json = jObject.ToString(Formatting.None);
                     IFieldInfo fieldInfo = type switch
                     {
@@ -52,6 +37,7 @@ namespace Ertis.Schema.Serialization
                         "float" => JsonConvert.DeserializeObject<FloatFieldInfo>(json),
                         "boolean" => JsonConvert.DeserializeObject<BooleanFieldInfo>(json),
                         "array" => JsonConvert.DeserializeObject<ArrayFieldInfo>(json),
+                        "enum" => JsonConvert.DeserializeObject<EnumFieldInfo>(json),
                         _ => throw new ErtisSchemaValidationException($"Unknown field type : '{type}' ({fieldName})")
                     };
 

@@ -16,7 +16,7 @@ namespace Ertis.Schema.Types.Primitives
     {
         #region Properties
 
-        [JsonProperty("slug")] 
+        [JsonIgnore]
         public string Slug => this.Name;
 
         public abstract IReadOnlyCollection<IFieldInfo> Properties { get; init; }

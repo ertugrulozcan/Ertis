@@ -49,9 +49,10 @@ namespace Ertis.Schema.Dynamics
         
         public static DynamicObject Create(IDictionary<string, object> dictionary)
         {
+            object model = dictionary.ToDynamic();
             return new DynamicObject
             {
-                PropertyDictionary = dictionary
+                PropertyDictionary = model.ToDictionary()
             };
         }
 
@@ -176,10 +177,60 @@ namespace Ertis.Schema.Dynamics
                     return value;
                 }
             }
+            else if (TryGetValueFromArray(key, dictionary, out var foundValue))
+            {
+                return foundValue;
+            }
             else
             {
                 throw new InvalidOperationException("Undefined");
             }
+        }
+
+        private static bool TryGetValueFromArray(string key, IDictionary<string, object> dictionary, out object foundValue)
+        {
+            if (key.Contains('[') && key.EndsWith(']'))
+            {
+                var indexerStartIndex = key.IndexOf('[');
+                var indexerCloseIndex = key.IndexOf(']');
+
+                var originalKey = key.Substring(0, indexerStartIndex);
+                if (dictionary.ContainsKey(originalKey))
+                {
+                    var value = dictionary[originalKey];
+                    if (value is Array array)
+                    {
+                        var indexStr = key.Substring(indexerStartIndex + 1, indexerCloseIndex - indexerStartIndex - 1);
+                        if (int.TryParse(indexStr, out var index))
+                        {
+                            if (index < array.Length)
+                            {
+                                foundValue = array.GetValue(index);
+                                return true;
+                            }
+                            else
+                            {
+                                throw new InvalidOperationException($"Out of range (length: {array.Length}, index: {index})");
+                            }
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException($"Array index is not valid integer ('{indexStr}')");
+                        }
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"Indexed node is not an array");
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException("Undefined");
+                }
+            }
+
+            foundValue = null;
+            return false;
         }
         
         // ReSharper disable once MemberCanBePrivate.Global
@@ -203,7 +254,7 @@ namespace Ertis.Schema.Dynamics
             }
         }
         
-        private static void SetValueCore(string path, object value, IDictionary<string, object> dictionary, bool createIfNotExist)
+        private static void SetValueCore(string path, object obj, IDictionary<string, object> dictionary, bool createIfNotExist)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -214,12 +265,13 @@ namespace Ertis.Schema.Dynamics
             var key = segments[0];
             if (dictionary.ContainsKey(key))
             {
+                var value = dictionary[key];
                 if (segments.Length > 1)
                 {
                     if (value is IDictionary<string, object> subDictionary)
                     {
                         var subPath = string.Join(".", segments.Skip(1));
-                        SetValueCore(subPath, value, subDictionary, createIfNotExist);
+                        SetValueCore(subPath, obj, subDictionary, createIfNotExist);
                     }
                     else
                     {
@@ -228,19 +280,23 @@ namespace Ertis.Schema.Dynamics
                 }
                 else
                 {
-                    dictionary[key] = value;
+                    dictionary[key] = obj;
                 }
+            }
+            else if (TrySetValueOnArray(key, dictionary, obj))
+            {
+                // NOP
             }
             else if (createIfNotExist)
             {
                 if (segments.Length > 1)
                 {
                     var subPath = string.Join(".", segments.Skip(1));
-                    SetValueCore(subPath, value, new Dictionary<string, object>(), true);
+                    SetValueCore(subPath, obj, new Dictionary<string, object>(), true);
                 }
                 else
                 {
-                    dictionary.Add(key, value);
+                    dictionary.Add(key, obj);
                 }
             }
             else
@@ -249,6 +305,51 @@ namespace Ertis.Schema.Dynamics
             }
         }
 
+        private static bool TrySetValueOnArray(string key, IDictionary<string, object> dictionary, object setValue)
+        {
+            if (key.Contains('[') && key.EndsWith(']'))
+            {
+                var indexerStartIndex = key.IndexOf('[');
+                var indexerCloseIndex = key.IndexOf(']');
+
+                var originalKey = key.Substring(0, indexerStartIndex);
+                if (dictionary.ContainsKey(originalKey))
+                {
+                    var value = dictionary[originalKey];
+                    if (value is Array array)
+                    {
+                        var indexStr = key.Substring(indexerStartIndex + 1, indexerCloseIndex - indexerStartIndex - 1);
+                        if (int.TryParse(indexStr, out var index))
+                        {
+                            if (index < array.Length)
+                            {
+                                array.SetValue(setValue, index);
+                                return true;
+                            }
+                            else
+                            {
+                                throw new InvalidOperationException($"Out of range (length: {array.Length}, index: {index})");
+                            }
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException($"Array index is not valid integer ('{indexStr}')");
+                        }
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"Indexed node is not an array");
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException("Undefined");
+                }
+            }
+
+            return false;
+        }
+        
         public bool ContainsProperty(string path)
         {
             if (!this.TryGetValue(path, out _, out var exception))

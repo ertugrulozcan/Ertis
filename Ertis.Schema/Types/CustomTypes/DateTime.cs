@@ -1,6 +1,7 @@
 using System.Globalization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
+using Ertis.Schema.Validation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -24,9 +25,9 @@ namespace Ertis.Schema.Types.CustomTypes
 
         #region Methods
 
-        protected override void Validate(object obj)
+        public override bool Validate(object obj, IValidationContext validationContext)
         {
-            base.Validate(obj);
+            var isValid = base.Validate(obj, validationContext);
 
             if (obj is not System.DateTime)
             {
@@ -34,10 +35,13 @@ namespace Ertis.Schema.Types.CustomTypes
                 {
                     if (!IsValidDateTime(dateStr))
                     {
-                        throw new FieldValidationException($"Datetime is not valid. Datetime values must be '{StringFormat}' format.", this);
+                        isValid = false;
+                        validationContext.Errors.Add(new FieldValidationException($"Datetime is not valid. Datetime values must be '{StringFormat}' format.", this));
                     }
                 }
             }
+
+            return isValid;
         }
         
         private static bool IsValidDateTime(string dateString)
@@ -47,6 +51,22 @@ namespace Ertis.Schema.Types.CustomTypes
                 return false;
 
             return System.DateTime.TryParseExact(dateString, StringFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
+        }
+
+        public override object Clone()
+        {
+            return new DateTime
+            {
+                Name = this.Name,
+                Description = this.Description,
+                DisplayName = this.DisplayName,
+                Parent = this.Parent,
+                IsRequired = this.IsRequired,
+                DefaultValue = this.DefaultValue,
+                MinLength = this.MinLength,
+                MaxLength = this.MaxLength,
+                RegexPattern = this.RegexPattern
+            };
         }
 
         #endregion

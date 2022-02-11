@@ -3,23 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
+using Ertis.Schema.Validation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types
 {
-    public abstract class FieldInfo<T> : IFieldInfo, IHasDefault<T>
+    public abstract class FieldInfo : IFieldInfo
     {
         #region Fields
 
-        private readonly T defaultValue;
+        private string name;
 
         #endregion
-
-        #region Properties
         
+        #region Properties
+
         [JsonIgnore]
-        public string Name { get; set; }
+        public string Name
+        {
+            get => this.name;
+            set
+            {
+                this.name = value;
+
+                this.OnReady();
+            }
+        }
         
         [JsonIgnore]
         public IFieldInfo Parent { get; set; }
@@ -30,9 +40,9 @@ namespace Ertis.Schema.Types
             get
             {
                 var path = this.Parent != null ? $"{this.Parent.Path}.{this.Name}" : this.Name;
-                if (string.IsNullOrEmpty(this.Name) && this.Parent is ArrayFieldInfo arrayFieldInfo)
+                if (this.Parent is ArrayFieldInfo arrayFieldInfo)
                 {
-                    path = $"{this.Parent.Path}.{arrayFieldInfo.Name}[]";   
+                    path = $"{this.Parent.Path}[{arrayFieldInfo.IndexOf(this)}]";   
                 }
 
                 return path;
@@ -51,65 +61,178 @@ namespace Ertis.Schema.Types
 
         [JsonProperty("isRequired", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool IsRequired { get; init; }
-
-        [JsonProperty("defaultValue", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public T DefaultValue
-        {
-            get => this.defaultValue;
-            init
-            {
-                this.Validate(value);
-                this.defaultValue = value;
-            }
-        }
+        
+        [JsonIgnore]
+        protected internal object CurrentObject { get; private set; }
 
         #endregion
 
         #region Abstract Methods
 
-        public virtual bool ValidateSchema(out Exception exception)
-        {
-            this.ValidateName(out exception);
-            
-            return exception == null;
-        }
-
+        protected abstract bool ValidateSchemaCore(out Exception exception);
+        
+        protected abstract bool ValidateCore(object obj, IValidationContext validationContext);
+        
+        public abstract object Clone();
+        
         #endregion
 
         #region Methods
 
-        protected virtual void Validate(object obj)
+        protected virtual void OnReady()
+        { }
+
+        public virtual bool ValidateSchema(out Exception exception)
         {
+            this.ValidateName(out exception);
+            this.ValidateSchemaCore(out exception);
+            
+            return exception == null;
+        }
+        
+        public virtual bool Validate(object obj, IValidationContext validationContext)
+        {
+            this.CurrentObject = obj;
+            
+            var isValid = true;
+            if (validationContext == null)
+            {
+                throw new ArgumentNullException(nameof(validationContext), "ValidationContext is null");
+            }
+            
             switch (obj)
             {
                 case null when !this.IsRequired:
-                    return;
+                    break;
                 case null when this.IsRequired:
-                    throw new FieldValidationException($"'{this.Name}' is required", this);
+                    isValid = false;
+                    validationContext.Errors.Add(new FieldValidationException($"'{this.Name}' is required", this));
+                    break;
                 default:
                 {
-                    if (obj != null && !this.IsCompatibleType(obj))
-                    {
-                        if (string.IsNullOrEmpty(this.Name) && this.Parent is {Type: FieldType.array})
-                        {
-                            throw new FieldValidationException($"Type mismatch error. Array items are must be '{GetPrimitiveName(typeof(T))}'", this);
-                        }
-                
-                        throw new FieldValidationException($"Type mismatch error. '{this.Name}' is must be '{GetPrimitiveName(typeof(T))}'", this);
-                    }
-                    else if (typeof(T) == typeof(object))
-                    {
-                        if (obj is not IDictionary<string, object>)
-                        {
-                            throw new FieldValidationException($"Type mismatch error. '{this.Name}' is must be 'object'", this);
-                        }
-                    }
-
+                    isValid &= ValidateCore(obj, validationContext);
                     break;
                 }
             }
+            
+            return isValid;
         }
 
+        // ReSharper disable once UnusedMethodReturnValue.Local
+        private bool ValidateName(out Exception exception)
+        {
+            if (this.Name == null || string.IsNullOrEmpty(this.Name.Trim()) || string.IsNullOrWhiteSpace(this.Name))
+            {
+                exception = new FieldValidationException("The field name is required", this);
+                return false;
+            }
+
+            if (this.Name.Contains(' '))
+            {
+                exception = new FieldValidationException("The field name can not include any whitespace", this);
+                return false;
+            }
+                
+            if (char.IsDigit(this.Name[0]))
+            {
+                exception = new FieldValidationException("The field name can not start with a digit", this);
+                return false;
+            }
+                
+            if (!this.Name.Where(x => x != '_').All(char.IsLetterOrDigit))
+            {
+                exception = new FieldValidationException("The field names can only use letters, digits and underscore", this);
+                return false;
+            }
+            
+            exception = null;
+            return true;
+        }
+
+        public bool IsAnArrayItem(out ArrayFieldInfo arrayFieldInfo)
+        {
+            switch (this.Parent)
+            {
+                case ArrayFieldInfo parentArrayFieldInfo:
+                    arrayFieldInfo = parentArrayFieldInfo;
+                    return true;
+                case FieldInfo parentFieldInfo:
+                    return parentFieldInfo.IsAnArrayItem(out arrayFieldInfo);
+                default:
+                    arrayFieldInfo = null;
+                    return false;
+            }
+        }
+
+        #endregion
+    }
+    
+    public abstract class FieldInfo<T> : FieldInfo, IHasDefault<T>
+    {
+        #region Properties
+        
+        [JsonProperty("defaultValue", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public T DefaultValue { get; init; }
+        
+        #endregion
+
+        #region Methods
+
+        protected override bool ValidateCore(object obj, IValidationContext validationContext)
+        {
+            var isValid = true;
+
+            var isCompatibleType = this.IsCompatibleType(obj);
+            if (obj != null && !isCompatibleType)
+            {
+                if (string.IsNullOrEmpty(this.Name) && this.Parent is {Type: FieldType.array})
+                {
+                    isValid = false;
+                    validationContext.Errors.Add(new FieldValidationException(
+                        $"Type mismatch error. Array items are must be '{GetPrimitiveName(typeof(T))}'", 
+                        this));
+                }
+                else
+                {
+                    isValid = false;
+                    validationContext.Errors.Add(new FieldValidationException(
+                        $"Type mismatch error. '{this.Name}' is must be '{GetPrimitiveName(typeof(T))}'",
+                        this));
+                }
+            }
+            else if (this.Type == FieldType.@object && obj is not IDictionary<string, object>)
+            {
+                isValid = false;
+                validationContext.Errors.Add(
+                    new FieldValidationException($"Type mismatch error. '{this.Name}' is must be 'object'",
+                        this));
+            }
+
+            return isValid;
+        }
+
+        protected override bool ValidateSchemaCore(out Exception exception)
+        {
+            return ValidateDefaultValue(out exception);
+        }
+
+        // ReSharper disable once UnusedMethodReturnValue.Local
+        private bool ValidateDefaultValue(out Exception exception)
+        {
+            if (this.DefaultValue != null)
+            {
+                var validationContext = new FieldValidationContext();
+                this.Validate(this.DefaultValue, validationContext);
+                var isValidated = !validationContext.Errors.Any();
+                exception = !isValidated ? validationContext.Errors.First() : null;
+
+                return isValidated;    
+            }
+
+            exception = null;
+            return true;
+        }
+        
         private bool IsCompatibleType(object obj)
         {
             if (obj is not T)
@@ -118,40 +241,14 @@ namespace Ertis.Schema.Types
                 {
                     return true;
                 }
-                
-                var integerCompatibleTypes = new[]
-                {
-                    typeof(int),
-                    typeof(uint),
-                    typeof(nint),
-                    typeof(nuint),
-                    typeof(byte),
-                    typeof(sbyte),
-                    typeof(decimal),
-                    typeof(long),
-                    typeof(ulong),
-                    typeof(short),
-                    typeof(ushort)
-                };
-                
-                var floatCompatibleTypes = new[]
-                {
-                    typeof(float),
-                    typeof(double)
-                };
 
-                var isSchemaInteger = integerCompatibleTypes.Contains(typeof(T));
-                var isDataInteger = integerCompatibleTypes.Contains(obj.GetType());
-                var isSchemaFloat = floatCompatibleTypes.Contains(typeof(T));
-                var isDataFloat = floatCompatibleTypes.Contains(obj.GetType());
-                var isIntegerCompatible = isSchemaInteger && isDataInteger;
-                var isFloatCompatible = isSchemaFloat && isDataFloat;
-                return isIntegerCompatible || isFloatCompatible;
+                var isAssignableTo = Helpers.NumericTypeHelper.IsAssignableTo(obj.GetType(), typeof(T));
+                return isAssignableTo != null && isAssignableTo.Value;
             }
 
             return true;
         }
-
+        
         private static string GetPrimitiveName(Type type)
         {
             var primitiveTypeName = type.Name;
@@ -179,53 +276,7 @@ namespace Ertis.Schema.Types
 
             return primitiveTypeName;
         }
-
-        public bool IsValid(object obj, out Exception exception)
-        {
-            try
-            {
-                this.Validate(obj);
-                exception = null;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                exception = ex;
-                return false;
-            }
-        }
         
-        // ReSharper disable once UnusedMethodReturnValue.Local
-        private bool ValidateName(out Exception exception)
-        {
-            if (this.Name == null || string.IsNullOrEmpty(this.Name.Trim()) || string.IsNullOrWhiteSpace(this.Name))
-            {
-                exception = new ErtisSchemaValidationException("The field name is required");
-                return false;
-            }
-
-            if (this.Name.Contains(' '))
-            {
-                exception = new ErtisSchemaValidationException("The field name can not include any whitespace");
-                return false;
-            }
-                
-            if (char.IsDigit(this.Name[0]))
-            {
-                exception = new ErtisSchemaValidationException("The field name can not start with a digit");
-                return false;
-            }
-                
-            if (!this.Name.Where(x => x != '_').All(char.IsLetterOrDigit))
-            {
-                exception = new ErtisSchemaValidationException("The field names can only use letters, digits and underscore");
-                return false;
-            }
-            
-            exception = null;
-            return true;
-        }
-
         #endregion
     }
 }

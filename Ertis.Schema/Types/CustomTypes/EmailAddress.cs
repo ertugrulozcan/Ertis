@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
+using Ertis.Schema.Validation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -20,17 +21,20 @@ namespace Ertis.Schema.Types.CustomTypes
 
         #region Methods
 
-        protected override void Validate(object obj)
+        public override bool Validate(object obj, IValidationContext validationContext)
         {
-            base.Validate(obj);
+            var isValid = base.Validate(obj, validationContext);
             
             if (obj is string emailAddress)
             {
                 if (!IsValidEmail(emailAddress))
                 {
-                    throw new FieldValidationException($"Email address is not valid", this);
+                    isValid = false;
+                    validationContext.Errors.Add(new FieldValidationException($"Email address is not valid", this));
                 }
             }
+
+            return isValid;
         }
         
         private static bool IsValidEmail(string email)
@@ -72,6 +76,22 @@ namespace Ertis.Schema.Types.CustomTypes
             {
                 return false;
             }
+        }
+
+        public override object Clone()
+        {
+            return new EmailAddress
+            {
+                Name = this.Name,
+                Description = this.Description,
+                DisplayName = this.DisplayName,
+                Parent = this.Parent,
+                IsRequired = this.IsRequired,
+                DefaultValue = this.DefaultValue,
+                MinLength = this.MinLength,
+                MaxLength = this.MaxLength,
+                RegexPattern = this.RegexPattern
+            };
         }
 
         #endregion

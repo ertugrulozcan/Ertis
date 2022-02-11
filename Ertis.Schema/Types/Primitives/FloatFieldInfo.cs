@@ -1,11 +1,12 @@
 using System;
 using Ertis.Schema.Exceptions;
+using Ertis.Schema.Validation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.Primitives
 {
-    public class FloatFieldInfo : FieldInfo<double>
+    public class FloatFieldInfo : FieldInfo<double>, IPrimitiveType
     {
         #region Fields
 
@@ -94,6 +95,9 @@ namespace Ertis.Schema.Types.Primitives
             }
         }
         
+        [JsonProperty("isUnique", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool IsUnique { get; set; }
+        
         #endregion
 
         #region Methods
@@ -109,32 +113,38 @@ namespace Ertis.Schema.Types.Primitives
             return exception == null;
         }
         
-        protected override void Validate(object obj)
+        public override bool Validate(object obj, IValidationContext validationContext)
         {
-            base.Validate(obj);
+            var isValid = base.Validate(obj, validationContext);
             
             if (obj is double doubleValue)
             {
                 if (this.Maximum != null && doubleValue > this.Maximum.Value)
                 {
-                    throw new FieldValidationException($"The '{this.Name}' value can not be greater than {this.Maximum}", this);
+                    isValid = false;
+                    validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be greater than {this.Maximum}", this));
                 }
                 
                 if (this.Minimum != null && doubleValue < this.Minimum.Value)
                 {
-                    throw new FieldValidationException($"The '{this.Name}' value can not be less than {this.Minimum}", this);
+                    isValid = false;
+                    validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be less than {this.Minimum}", this));
                 }
                 
                 if (this.ExclusiveMaximum != null && doubleValue >= this.ExclusiveMaximum.Value)
                 {
-                    throw new FieldValidationException($"The '{this.Name}' value can not be greater than or equal {this.ExclusiveMaximum}", this);
+                    isValid = false;
+                    validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be greater than or equal {this.ExclusiveMaximum}", this));
                 }
                 
                 if (this.ExclusiveMinimum != null && doubleValue < this.ExclusiveMinimum.Value)
                 {
-                    throw new FieldValidationException($"The '{this.Name}' value can not be less than or equal {this.ExclusiveMinimum}", this);
+                    isValid = false;
+                    validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be less than or equal {this.ExclusiveMinimum}", this));
                 }
             }
+            
+            return isValid;
         }
         
         private bool ValidateMinimum(out Exception exception)
@@ -207,6 +217,23 @@ namespace Ertis.Schema.Types.Primitives
             
             exception = null;
             return true;
+        }
+
+        public override object Clone()
+        {
+            return new FloatFieldInfo
+            {
+                Name = this.Name,
+                Description = this.Description,
+                DisplayName = this.DisplayName,
+                Parent = this.Parent,
+                IsRequired = this.IsRequired,
+                DefaultValue = this.DefaultValue,
+                Minimum = this.Minimum,
+                Maximum = this.Maximum,
+                ExclusiveMinimum = this.ExclusiveMinimum,
+                ExclusiveMaximum = this.ExclusiveMaximum
+            };
         }
         
         #endregion

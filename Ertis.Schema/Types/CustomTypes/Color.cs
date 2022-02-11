@@ -1,5 +1,6 @@
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
+using Ertis.Schema.Validation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -29,21 +30,37 @@ namespace Ertis.Schema.Types.CustomTypes
 
         #region Methods
 
-        protected override void Validate(object obj)
+        public override bool Validate(object obj, IValidationContext validationContext)
         {
             try
             {
-                base.Validate(obj);
+                return base.Validate(obj, validationContext);
             }
             catch (FieldValidationException ex)
             {
-                if (ex.Message == $"String value is not valid by the regular expression rule. ('{this.RegexPattern}')")
-                {
-                    throw new FieldValidationException("Color code is not valid", this);
-                }
+                validationContext.Errors.Add(
+                    ex.Message == $"String value is not valid by the regular expression rule. ('{this.RegexPattern}')"
+                        ? new FieldValidationException("Color code is not valid", this)
+                        : ex);
 
-                throw;
+                return false;
             }
+        }
+
+        public override object Clone()
+        {
+            return new Color
+            {
+                Name = this.Name,
+                Description = this.Description,
+                DisplayName = this.DisplayName,
+                Parent = this.Parent,
+                IsRequired = this.IsRequired,
+                DefaultValue = this.DefaultValue,
+                MinLength = this.MinLength,
+                MaxLength = this.MaxLength,
+                RegexPattern = this.RegexPattern
+            };
         }
 
         #endregion

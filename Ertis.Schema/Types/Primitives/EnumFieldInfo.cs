@@ -1,12 +1,13 @@
 using System;
 using System.Linq;
 using Ertis.Schema.Exceptions;
+using Ertis.Schema.Validation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.Primitives
 {
-    public class EnumFieldInfo : FieldInfo<object>
+    public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
     {
         #region Fields
 
@@ -35,6 +36,9 @@ namespace Ertis.Schema.Types.Primitives
             }
         }
         
+        [JsonProperty("isUnique", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool IsUnique { get; set; }
+        
         #endregion
 
         #region Methods
@@ -47,15 +51,18 @@ namespace Ertis.Schema.Types.Primitives
             return exception == null;
         }
 
-        protected override void Validate(object obj)
+        public override bool Validate(object obj, IValidationContext validationContext)
         {
+            var isValid = base.Validate(obj, validationContext);
+            
             bool isExistInEnums;
             if (obj != null)
             {
                 var type = obj.GetType();
                 if (!type.IsPrimitive && type != typeof(string))
                 {
-                    throw new FieldValidationException($"Enum value is must be primitive type ({this.Name})", this);   
+                    isValid = false;
+                    validationContext.Errors.Add(new FieldValidationException($"Enum value is must be primitive type ({this.Name})", this));   
                 }
 
                 isExistInEnums = this.Items.Any(x => x != null && x.Equals(obj));
@@ -67,9 +74,12 @@ namespace Ertis.Schema.Types.Primitives
 
             if (!isExistInEnums)
             {
+                isValid = false;
                 var enumValues = string.Join(", ", this.Items.Select(x => x == null ? "null" : (x is string ? $"'{x}'" : x.ToString())));
-                throw new FieldValidationException($"The value does not exist in the enum items. The '{this.Name}' value must be one of them [{enumValues}]", this);   
+                validationContext.Errors.Add(new FieldValidationException($"The value does not exist in the enum items. The '{this.Name}' value must be one of them [{enumValues}]", this));   
             }
+            
+            return isValid;
         }
 
         private bool ValidateItems(out Exception exception)
@@ -98,6 +108,20 @@ namespace Ertis.Schema.Types.Primitives
 
             exception = null;
             return true;
+        }
+
+        public override object Clone()
+        {
+            return new EnumFieldInfo
+            {
+                Name = this.Name,
+                Description = this.Description,
+                DisplayName = this.DisplayName,
+                Parent = this.Parent,
+                IsRequired = this.IsRequired,
+                DefaultValue = this.DefaultValue,
+                Items = this.Items
+            };
         }
 
         #endregion

@@ -1,10 +1,11 @@
 using System;
+using Ertis.Schema.Types.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types
 {
-    public interface IFieldInfo
+    public interface IFieldInfo : ICloneable
     {
         #region Properties
 
@@ -35,8 +36,8 @@ namespace Ertis.Schema.Types
         #region Methods
 
         bool ValidateSchema(out Exception exception);
-        
-        bool IsValid(object obj, out Exception exception);
+
+        bool IsAnArrayItem(out ArrayFieldInfo arrayFieldInfo);
 
         #endregion
     }

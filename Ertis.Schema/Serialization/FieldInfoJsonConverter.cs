@@ -57,7 +57,7 @@ namespace Ertis.Schema.Serialization
                             FieldType.location => JsonConvert.DeserializeObject<Location>(json),
 
                             // Unknown Type
-                            _ => throw new ErtisSchemaValidationException($"Unknown field type : '{fieldTypeName}' ({fieldName})")
+                            _ => throw new SchemaValidationException($"Unknown field type : '{fieldTypeName}' ({fieldName})")
                         };
 
                         if (fieldInfo != null)
@@ -69,22 +69,25 @@ namespace Ertis.Schema.Serialization
                     }
                     else
                     {
-                        throw new ErtisSchemaValidationException($"Unknown field type : '{fieldTypeName}' ({fieldName})");
+                        throw new SchemaValidationException($"Unknown field type : '{fieldTypeName}' ({fieldName})");
                     }
                 }
                 else
                 {
-                    throw new ErtisSchemaValidationException($"Field type is required ({fieldName})");
+                    throw new SchemaValidationException($"Field type is required ({fieldName})");
                 }
             }
             catch (Exception ex)
             {
-                if (ex.InnerException is FieldValidationException)
+                switch (ex.InnerException)
                 {
-                    throw ex.InnerException;
+                    case FieldValidationException:
+                        throw ex.InnerException;
+                    case SchemaValidationException:
+                        throw ex.InnerException;
+                    default:
+                        throw new SchemaValidationException(ex.Message);
                 }
-                
-                throw;
             }
         }
     }

@@ -2,7 +2,7 @@ using System;
 
 namespace Ertis.Schema.Exceptions
 {
-    public class ErtisSchemaValidationException : Exception
+    public abstract class ErtisSchemaValidationException : Exception
     {
         #region Constructors
 
@@ -10,7 +10,7 @@ namespace Ertis.Schema.Exceptions
         /// Constructor
         /// </summary>
         /// <param name="message"></param>
-        public ErtisSchemaValidationException(string message) : base(message)
+        protected ErtisSchemaValidationException(string message) : base(message)
         {
             
         }

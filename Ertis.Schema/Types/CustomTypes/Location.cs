@@ -48,6 +48,20 @@ namespace Ertis.Schema.Types.CustomTypes
             };
         }
 
+        public override object Clone()
+        {
+            return new Location
+            {
+                Name = this.Name,
+                Description = this.Description,
+                DisplayName = this.DisplayName,
+                Parent = this.Parent,
+                IsRequired = this.IsRequired,
+                DefaultValue = this.DefaultValue,
+                Properties = this.Properties
+            };
+        }
+
         #endregion
     }
 }

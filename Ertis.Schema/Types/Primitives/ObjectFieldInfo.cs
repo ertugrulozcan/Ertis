@@ -6,6 +6,7 @@ using System.Linq;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
 using Ertis.Schema.Serialization;
+using Ertis.Schema.Validation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using DynamicObject = Ertis.Schema.Dynamics.DynamicObject;
@@ -19,15 +20,19 @@ namespace Ertis.Schema.Types.Primitives
         [JsonIgnore]
         public string Slug => this.Name;
 
+        #endregion
+
+        #region Abstract Properties
+
         public abstract IReadOnlyCollection<IFieldInfo> Properties { get; init; }
 
         #endregion
 
         #region Abstract Methods
 
-        public bool ValidateContent(object obj, out Exception exception)
+        public bool ValidateContent(object obj, IValidationContext validationContext)
         {
-            return this.IsValid(obj, out exception);
+            return this.Validate(obj, validationContext);
         }
 
         #endregion
@@ -98,9 +103,9 @@ namespace Ertis.Schema.Types.Primitives
             return exception == null;
         }
         
-        protected override void Validate(object obj)
+        public override bool Validate(object obj, IValidationContext validationContext)
         {
-            base.Validate(obj);
+            var isValid = base.Validate(obj, validationContext);
 
             if (obj != null && this.Properties != null)
             {
@@ -120,14 +125,12 @@ namespace Ertis.Schema.Types.Primitives
                     var fieldInfo = this.Properties.FirstOrDefault(x => x.Name == propertyName);
                     if (fieldInfo != null)
                     {
-                        if (!fieldInfo.IsValid(propertyValue, out var ex))
-                        {
-                            throw ex;
-                        }
+                        isValid &= ((FieldInfo) fieldInfo).Validate(propertyValue, validationContext);
                     }
                     else if (!this.AllowAdditionalProperties)
                     {
-                        throw new FieldValidationException($"Additional properties not allowed in this object schema. ({propertyName})", this);
+                        isValid = false;
+                        validationContext.Errors.Add(new FieldValidationException($"Additional properties not allowed in this object schema. ({propertyName})", this));
                     }
                 
                     validatedProperties.Add(propertyName);
@@ -137,13 +140,12 @@ namespace Ertis.Schema.Types.Primitives
                 {
                     if (!validatedProperties.Contains(fieldInfo.Name))
                     {
-                        if (!fieldInfo.IsValid(null, out var ex))
-                        {
-                            throw ex;
-                        }
+                        isValid &= ((FieldInfo) fieldInfo).Validate(null, validationContext);
                     }
                 }   
             }
+            
+            return isValid;
         }
         
         private bool ValidateProperties(out Exception exception)
@@ -164,7 +166,32 @@ namespace Ertis.Schema.Types.Primitives
             
             this.CheckPropertiesUniqueness(out exception);
             
+            var uniqueProperties = this.GetUniqueProperties();
+            foreach (var uniqueProperty in uniqueProperties)
+            {
+                if (uniqueProperty.IsAnArrayItem(out _))
+                {
+                    exception = new SchemaValidationException($"The unique constraints could not use in arrays. Use the 'uniqueBy' feature instead of. ('{uniqueProperty.Name}')");
+                    
+                    return false;
+                }
+            }
+            
             return exception == null;
+        }
+
+        public override object Clone()
+        {
+            return new ObjectFieldInfo(this.Properties.Select(x => x.Clone() as IFieldInfo))
+            {
+                Name = this.Name,
+                Description = this.Description,
+                DisplayName = this.DisplayName,
+                Parent = this.Parent,
+                IsRequired = this.IsRequired,
+                DefaultValue = this.DefaultValue,
+                AllowAdditionalProperties = this.AllowAdditionalProperties
+            };
         }
 
         #endregion

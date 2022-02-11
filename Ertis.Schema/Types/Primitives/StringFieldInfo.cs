@@ -1,12 +1,13 @@
 using System;
 using System.Text.RegularExpressions;
 using Ertis.Schema.Exceptions;
+using Ertis.Schema.Validation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.Primitives
 {
-    public class StringFieldInfo : FieldInfo<string>
+    public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
     {
         #region Fields
 
@@ -54,6 +55,9 @@ namespace Ertis.Schema.Types.Primitives
         [JsonProperty("regexPattern", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string RegexPattern { get; init; }
 
+        [JsonProperty("isUnique", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool IsUnique { get; set; }
+        
         #endregion
 
         #region Methods
@@ -67,20 +71,22 @@ namespace Ertis.Schema.Types.Primitives
             return exception == null;
         }
 
-        protected override void Validate(object obj)
+        public override bool Validate(object obj, IValidationContext validationContext)
         {
-            base.Validate(obj);
+            var isValid = base.Validate(obj, validationContext);
             
             if (obj is string text)
             {
                 if (this.MaxLength != null && text.Length > this.MaxLength.Value)
                 {
-                    throw new FieldValidationException($"String length can not be greater than {this.MaxLength}", this);
+                    isValid = false;
+                    validationContext.Errors.Add(new FieldValidationException($"String length can not be greater than {this.MaxLength}", this));
                 }
                 
                 if (this.MinLength != null && text.Length < this.MinLength.Value)
                 {
-                    throw new FieldValidationException($"String length can not be less than {this.MinLength}", this);
+                    isValid = false;
+                    validationContext.Errors.Add(new FieldValidationException($"String length can not be less than {this.MinLength}", this));
                 }
 
                 if (!string.IsNullOrEmpty(this.RegexPattern))
@@ -88,10 +94,13 @@ namespace Ertis.Schema.Types.Primitives
                     var match = Regex.Match(text, this.RegexPattern);
                     if (!match.Success)
                     {
-                        throw new FieldValidationException($"String value is not valid by the regular expression rule. ('{this.RegexPattern}')", this);
+                        isValid = false;
+                        validationContext.Errors.Add(new FieldValidationException($"String value is not valid by the regular expression rule. ('{this.RegexPattern}')", this));
                     }
                 }
             }
+            
+            return isValid;
         }
         
         private bool ValidateMinLength(out Exception exception)
@@ -128,6 +137,22 @@ namespace Ertis.Schema.Types.Primitives
             
             exception = null;
             return true;
+        }
+
+        public override object Clone()
+        {
+            return new StringFieldInfo
+            {
+                Name = this.Name,
+                Description = this.Description,
+                DisplayName = this.DisplayName,
+                Parent = this.Parent,
+                IsRequired = this.IsRequired,
+                DefaultValue = this.DefaultValue,
+                MinLength = this.MinLength,
+                MaxLength = this.MaxLength,
+                RegexPattern = this.RegexPattern
+            };
         }
         
         #endregion

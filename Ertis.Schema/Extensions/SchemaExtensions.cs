@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types;
+using Ertis.Schema.Types.CustomTypes;
 using Ertis.Schema.Types.Primitives;
 
 namespace Ertis.Schema.Extensions
@@ -115,6 +116,45 @@ namespace Ertis.Schema.Extensions
             }
 
             return uniqueProperties;
+        }
+        
+        public static IEnumerable<Reference> GetReferenceProperties(this ISchema schema)
+        {
+            var referenceProperties = new List<Reference>();
+            var fieldInfos = schema.Properties;
+            foreach (var fieldInfo in fieldInfos)
+            {
+                referenceProperties.AddRange(GetReferenceProperties(fieldInfo));
+            }
+
+            return referenceProperties;
+        }
+        
+        private static IEnumerable<Reference> GetReferenceProperties(IFieldInfo fieldInfo)
+        {
+            var referenceProperties = new List<Reference>();
+            
+            // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
+            switch (fieldInfo.Type)
+            {
+                case FieldType.reference:
+                    referenceProperties.Add(fieldInfo as Reference);
+                    break;
+                case FieldType.@object when fieldInfo is ObjectFieldInfo objectFieldInfo:
+                {
+                    foreach (var property in objectFieldInfo.Properties)
+                    {
+                        referenceProperties.AddRange(GetReferenceProperties(property));
+                    }
+
+                    break;
+                }
+                case FieldType.@object when fieldInfo is ArrayFieldInfo arrayFieldInfo:
+                    referenceProperties.AddRange(GetReferenceProperties(arrayFieldInfo.ItemSchema));
+                    break;
+            }
+
+            return referenceProperties;
         }
 
         #endregion

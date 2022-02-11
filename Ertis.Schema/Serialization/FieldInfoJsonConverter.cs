@@ -55,6 +55,7 @@ namespace Ertis.Schema.Serialization
                             FieldType.hostname => JsonConvert.DeserializeObject<HostName>(json),
                             FieldType.color => JsonConvert.DeserializeObject<Color>(json),
                             FieldType.location => JsonConvert.DeserializeObject<Location>(json),
+                            FieldType.reference => JsonConvert.DeserializeObject<Reference>(json),
 
                             // Unknown Type
                             _ => throw new SchemaValidationException($"Unknown field type : '{fieldTypeName}' ({fieldName})")

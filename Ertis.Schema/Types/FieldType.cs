@@ -17,6 +17,7 @@ namespace Ertis.Schema.Types
         uri,
         hostname,
         color,
-        location
+        location,
+        reference
     }
 }

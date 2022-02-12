@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Ertis.Schema.Dynamics;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types;
 using Ertis.Schema.Types.CustomTypes;
@@ -155,6 +156,41 @@ namespace Ertis.Schema.Extensions
             }
 
             return referenceProperties;
+        }
+        
+        public static void SetDefaultValues(this ISchema schema, DynamicObject model)
+        {
+            SetDefaultValues(schema.Properties, model);
+        }
+        
+        private static void SetDefaultValues(IEnumerable<IFieldInfo> properties, DynamicObject model)
+        {
+            foreach (var fieldInfo in properties)
+            {
+                SetDefaultValues(fieldInfo, model);
+            }
+        }
+        
+        private static void SetDefaultValues(IFieldInfo fieldInfo, DynamicObject model)
+        {
+            if (fieldInfo is IHasDefault hasDefault)
+            {
+                var defaultValue = hasDefault.GetDefaultValue();
+                if (defaultValue != null)
+                {
+                    var path = fieldInfo.Path;
+                    var segments = path.Split('.');
+                    if (segments.Length > 1)
+                    {
+                        path = string.Join(".", segments.Skip(1));
+                    }
+
+                    if (!model.TryGetValue(path, out var currentValue, out _) || currentValue == null)
+                    {
+                        model.TrySetValue(path, defaultValue, out _, true);
+                    }
+                }
+            }
         }
 
         #endregion

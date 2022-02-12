@@ -2,7 +2,16 @@ using Newtonsoft.Json;
 
 namespace Ertis.Schema.Types
 {
-    public interface IHasDefault<T>
+    public interface IHasDefault
+    {
+        #region Methods
+
+        object GetDefaultValue();
+
+        #endregion
+    }
+    
+    public interface IHasDefault<out T>
     {
         #region Properties
         

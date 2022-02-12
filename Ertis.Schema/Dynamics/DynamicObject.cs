@@ -239,11 +239,11 @@ namespace Ertis.Schema.Dynamics
             SetValueCore(path, value, this.PropertyDictionary, createIfNotExist);
         }
         
-        public bool TrySetValue(string path, object value, out Exception exception)
+        public bool TrySetValue(string path, object value, out Exception exception, bool createIfNotExist = false)
         {
             try
             {
-                SetValue(path, value);
+                SetValue(path, value, createIfNotExist);
                 exception = null;
                 return true;
             }

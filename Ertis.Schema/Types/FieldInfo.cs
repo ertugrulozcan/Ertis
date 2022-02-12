@@ -9,7 +9,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types
 {
-    public abstract class FieldInfo : IFieldInfo
+    public abstract class FieldInfo : IFieldInfo, IHasDefault
     {
         #region Fields
 
@@ -73,6 +73,8 @@ namespace Ertis.Schema.Types
         
         protected abstract bool ValidateCore(object obj, IValidationContext validationContext);
         
+        public abstract object GetDefaultValue();
+        
         public abstract object Clone();
         
         #endregion
@@ -104,7 +106,7 @@ namespace Ertis.Schema.Types
             {
                 case null when !this.IsRequired:
                     break;
-                case null when this.IsRequired:
+                case null when this.IsRequired && this.GetDefaultValue() == null:
                     isValid = false;
                     validationContext.Errors.Add(new FieldValidationException($"'{this.Name}' is required", this));
                     break;
@@ -216,6 +218,11 @@ namespace Ertis.Schema.Types
             return ValidateDefaultValue(out exception);
         }
 
+        public override object GetDefaultValue()
+        {
+            return this.DefaultValue;
+        }
+
         // ReSharper disable once UnusedMethodReturnValue.Local
         private bool ValidateDefaultValue(out Exception exception)
         {
@@ -235,6 +242,11 @@ namespace Ertis.Schema.Types
         
         private bool IsCompatibleType(object obj)
         {
+            if (obj == null)
+            {
+                return false;
+            }
+            
             if (obj is not T)
             {
                 if (this.Type is FieldType.date or FieldType.datetime && obj is DateTime && typeof(T) == typeof(string))

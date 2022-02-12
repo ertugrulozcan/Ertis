@@ -60,6 +60,11 @@ namespace Ertis.Schema.Types.CustomTypes
             
             return isValid;
         }
+        
+        public override object GetDefaultValue()
+        {
+            return null;
+        }
 
         public override object Clone()
         {

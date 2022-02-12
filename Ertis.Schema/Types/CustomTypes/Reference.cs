@@ -29,6 +29,9 @@ namespace Ertis.Schema.Types.CustomTypes
         [JsonProperty("referenceType")]
         [JsonConverter(typeof(StringEnumConverter))]
         public ReferenceTypes ReferenceType { get; set; }
+        
+        [JsonProperty("contentType", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string ContentType { get; set; }
 
         #endregion
 

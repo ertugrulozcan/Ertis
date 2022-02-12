@@ -11,7 +11,7 @@ namespace Ertis.Schema.Extensions
 {
     public static class SchemaExtensions
     {
-        #region Methods
+        #region Schema Tree Methods
         
         public static IFieldInfo FindField(this ISchema schema, string path)
         {
@@ -48,6 +48,10 @@ namespace Ertis.Schema.Extensions
             }
         }
 
+        #endregion
+
+        #region Uniqueness Methods
+
         public static bool CheckPropertiesUniqueness(this ISchema schema, out Exception exception)
         {
             var fieldInfos = schema.Properties;
@@ -81,6 +85,10 @@ namespace Ertis.Schema.Extensions
             exception = null;
             return true;
         }
+
+        #endregion
+        
+        #region Unique Property Methods
 
         public static IEnumerable<IFieldInfo> GetUniqueProperties(this ISchema schema)
         {
@@ -118,10 +126,14 @@ namespace Ertis.Schema.Extensions
 
             return uniqueProperties;
         }
+
+        #endregion
         
-        public static IEnumerable<Reference> GetReferenceProperties(this ISchema schema)
+        #region Reference Content Methods
+
+        public static IEnumerable<ReferenceFieldInfo> GetReferenceProperties(this ISchema schema)
         {
-            var referenceProperties = new List<Reference>();
+            var referenceProperties = new List<ReferenceFieldInfo>();
             var fieldInfos = schema.Properties;
             foreach (var fieldInfo in fieldInfos)
             {
@@ -131,15 +143,15 @@ namespace Ertis.Schema.Extensions
             return referenceProperties;
         }
         
-        private static IEnumerable<Reference> GetReferenceProperties(IFieldInfo fieldInfo)
+        private static IEnumerable<ReferenceFieldInfo> GetReferenceProperties(IFieldInfo fieldInfo)
         {
-            var referenceProperties = new List<Reference>();
+            var referenceProperties = new List<ReferenceFieldInfo>();
             
             // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
             switch (fieldInfo.Type)
             {
                 case FieldType.reference:
-                    referenceProperties.Add(fieldInfo as Reference);
+                    referenceProperties.Add(fieldInfo as ReferenceFieldInfo);
                     break;
                 case FieldType.@object when fieldInfo is ObjectFieldInfo objectFieldInfo:
                 {
@@ -157,7 +169,11 @@ namespace Ertis.Schema.Extensions
 
             return referenceProperties;
         }
+
+        #endregion
         
+        #region DefaultValue Methods
+
         public static void SetDefaultValues(this ISchema schema, DynamicObject model)
         {
             SetDefaultValues(schema.Properties, model);
@@ -193,6 +209,38 @@ namespace Ertis.Schema.Extensions
             }
         }
 
+        #endregion
+        
+        #region Constant Methods
+
+        public static void SetConstants(this ISchema schema, DynamicObject model)
+        {
+            SetConstants(schema.Properties, model);
+        }
+
+        private static void SetConstants(IEnumerable<IFieldInfo> properties, DynamicObject model)
+        {
+            foreach (var fieldInfo in properties)
+            {
+                SetConstants(fieldInfo, model);
+            }
+        }
+        
+        private static void SetConstants(IFieldInfo fieldInfo, DynamicObject model)
+        {
+            if (fieldInfo is ConstantFieldInfo constantFieldInfo)
+            {
+                var path = fieldInfo.Path;
+                var segments = path.Split('.');
+                if (segments.Length > 1)
+                {
+                    path = string.Join(".", segments.Skip(1));
+                }
+
+                model.TrySetValue(path, constantFieldInfo.Value, out _, true);
+            }
+        }
+        
         #endregion
     }
 }

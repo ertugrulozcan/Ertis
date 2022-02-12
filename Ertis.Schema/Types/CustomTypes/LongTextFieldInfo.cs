@@ -4,7 +4,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.CustomTypes
 {
-    public class LongText : StringFieldInfo
+    public class LongTextFieldInfo : StringFieldInfo
     {
         #region Properties
 
@@ -18,7 +18,7 @@ namespace Ertis.Schema.Types.CustomTypes
         
         public override object Clone()
         {
-            return new LongText
+            return new LongTextFieldInfo
             {
                 Name = this.Name,
                 Description = this.Description,

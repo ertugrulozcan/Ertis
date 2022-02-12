@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
 using Newtonsoft.Json;
@@ -6,7 +7,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.CustomTypes
 {
-    public class Reference : FieldInfo
+    public class ReferenceFieldInfo : FieldInfo
     {
         #region Enums
 
@@ -51,14 +52,14 @@ namespace Ertis.Schema.Types.CustomTypes
             {
                 
             }
-            else if (this.ReferenceType == ReferenceTypes.multiple && obj is string[] array)
+            else if (this.ReferenceType == ReferenceTypes.multiple && obj is object[] objectArray && objectArray.All(x => x is string))
             {
                 
             }
             else
             {
                 isValid = false;
-                validationContext.Errors.Add(new FieldValidationException($"Invalid reference value {this.Name}", this));
+                validationContext.Errors.Add(new FieldValidationException($"Invalid reference value on '{this.Name}' field", this));
             }
             
             return isValid;
@@ -71,7 +72,7 @@ namespace Ertis.Schema.Types.CustomTypes
 
         public override object Clone()
         {
-            return new Reference
+            return new ReferenceFieldInfo
             {
                 Name = this.Name,
                 Description = this.Description,

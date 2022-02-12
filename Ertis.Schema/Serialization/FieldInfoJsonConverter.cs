@@ -5,8 +5,6 @@ using Ertis.Schema.Types.CustomTypes;
 using Ertis.Schema.Types.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using DateTime = Ertis.Schema.Types.CustomTypes.DateTime;
-using Uri = Ertis.Schema.Types.CustomTypes.Uri;
 
 namespace Ertis.Schema.Serialization
 {
@@ -44,18 +42,19 @@ namespace Ertis.Schema.Serialization
                             FieldType.boolean => JsonConvert.DeserializeObject<BooleanFieldInfo>(json),
                             FieldType.array => JsonConvert.DeserializeObject<ArrayFieldInfo>(json),
                             FieldType.@enum => JsonConvert.DeserializeObject<EnumFieldInfo>(json),
-                            
+                            FieldType.@const => JsonConvert.DeserializeObject<ConstantFieldInfo>(json),
+
                             // Custom Types
-                            FieldType.date => JsonConvert.DeserializeObject<Date>(json),
-                            FieldType.datetime => JsonConvert.DeserializeObject<DateTime>(json),
-                            FieldType.longtext => JsonConvert.DeserializeObject<LongText>(json),
-                            FieldType.richtext => JsonConvert.DeserializeObject<RichText>(json),
-                            FieldType.email => JsonConvert.DeserializeObject<EmailAddress>(json),
-                            FieldType.uri => JsonConvert.DeserializeObject<Uri>(json),
-                            FieldType.hostname => JsonConvert.DeserializeObject<HostName>(json),
-                            FieldType.color => JsonConvert.DeserializeObject<Color>(json),
-                            FieldType.location => JsonConvert.DeserializeObject<Location>(json),
-                            FieldType.reference => JsonConvert.DeserializeObject<Reference>(json),
+                            FieldType.date => JsonConvert.DeserializeObject<DateFieldInfo>(json),
+                            FieldType.datetime => JsonConvert.DeserializeObject<DateTimeFieldInfo>(json),
+                            FieldType.longtext => JsonConvert.DeserializeObject<LongTextFieldInfo>(json),
+                            FieldType.richtext => JsonConvert.DeserializeObject<RichTextFieldInfo>(json),
+                            FieldType.email => JsonConvert.DeserializeObject<EmailAddressFieldInfo>(json),
+                            FieldType.uri => JsonConvert.DeserializeObject<UriFieldInfo>(json),
+                            FieldType.hostname => JsonConvert.DeserializeObject<HostNameFieldInfo>(json),
+                            FieldType.color => JsonConvert.DeserializeObject<ColorFieldInfo>(json),
+                            FieldType.location => JsonConvert.DeserializeObject<LocationFieldInfo>(json),
+                            FieldType.reference => JsonConvert.DeserializeObject<ReferenceFieldInfo>(json),
 
                             // Unknown Type
                             _ => throw new SchemaValidationException($"Unknown field type : '{fieldTypeName}' ({fieldName})")

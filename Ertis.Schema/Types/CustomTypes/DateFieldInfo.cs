@@ -1,4 +1,4 @@
-using System;
+using System.Globalization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
@@ -7,13 +7,19 @@ using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.CustomTypes
 {
-    public class HostName : StringFieldInfo
+    public class DateFieldInfo : StringFieldInfo
     {
+        #region Constants
+
+        private const string StringFormat = "yyyy-MM-dd";
+
+        #endregion
+        
         #region Properties
 
         [JsonProperty("type")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public override FieldType Type => FieldType.hostname;
+        public override FieldType Type => FieldType.date;
 
         #endregion
 
@@ -22,38 +28,34 @@ namespace Ertis.Schema.Types.CustomTypes
         public override bool Validate(object obj, IValidationContext validationContext)
         {
             var isValid = base.Validate(obj, validationContext);
-            
-            if (obj is string hostName)
+
+            if (obj is not System.DateTime)
             {
-                if (!IsValidHostName(hostName))
+                if (obj is string dateStr)
                 {
-                    isValid = false;
-                    validationContext.Errors.Add(new FieldValidationException($"Hostname is not valid", this));
+                    if (!IsValidDate(dateStr))
+                    {
+                        isValid = false;
+                        validationContext.Errors.Add(new FieldValidationException($"Date is not valid. Datetime values must be '{StringFormat}' format.", this));
+                    }
                 }
             }
 
             return isValid;
         }
         
-        private static bool IsValidHostName(string hostName)
+        private static bool IsValidDate(string dateString)
         {
-            if (string.IsNullOrWhiteSpace(hostName))
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            if (string.IsNullOrWhiteSpace(dateString))
                 return false;
-
-            try
-            {
-                var hostNameType = System.Uri.CheckHostName(hostName);
-                return hostNameType != UriHostNameType.Unknown;
-            }
-            catch
-            {
-                return false;
-            }
+            
+            return System.DateTime.TryParseExact(dateString, StringFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
         }
 
         public override object Clone()
         {
-            return new HostName
+            return new DateFieldInfo
             {
                 Name = this.Name,
                 Description = this.Description,

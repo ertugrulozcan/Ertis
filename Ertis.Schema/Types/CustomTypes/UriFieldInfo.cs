@@ -1,4 +1,4 @@
-using System.Globalization;
+using System;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
@@ -7,19 +7,13 @@ using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.CustomTypes
 {
-    public class Date : StringFieldInfo
+    public class UriFieldInfo : StringFieldInfo
     {
-        #region Constants
-
-        private const string StringFormat = "yyyy-MM-dd";
-
-        #endregion
-        
         #region Properties
 
         [JsonProperty("type")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public override FieldType Type => FieldType.date;
+        public override FieldType Type => FieldType.uri;
 
         #endregion
 
@@ -28,34 +22,31 @@ namespace Ertis.Schema.Types.CustomTypes
         public override bool Validate(object obj, IValidationContext validationContext)
         {
             var isValid = base.Validate(obj, validationContext);
-
-            if (obj is not System.DateTime)
+            
+            if (obj is string uri)
             {
-                if (obj is string dateStr)
+                if (!IsValidUri(uri))
                 {
-                    if (!IsValidDate(dateStr))
-                    {
-                        isValid = false;
-                        validationContext.Errors.Add(new FieldValidationException($"Date is not valid. Datetime values must be '{StringFormat}' format.", this));
-                    }
+                    isValid = false;
+                    validationContext.Errors.Add(new FieldValidationException($"Uri is not valid", this));
                 }
             }
 
             return isValid;
         }
         
-        private static bool IsValidDate(string dateString)
+        private static bool IsValidUri(string uri)
         {
-            // ReSharper disable once ConvertIfStatementToReturnStatement
-            if (string.IsNullOrWhiteSpace(dateString))
+            if (string.IsNullOrWhiteSpace(uri))
                 return false;
-            
-            return System.DateTime.TryParseExact(dateString, StringFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
-        }
 
+            return System.Uri.IsWellFormedUriString(uri, UriKind.Absolute) &&
+                   System.Uri.TryCreate(uri, UriKind.Absolute, out _);
+        }
+        
         public override object Clone()
         {
-            return new Date
+            return new UriFieldInfo
             {
                 Name = this.Name,
                 Description = this.Description,

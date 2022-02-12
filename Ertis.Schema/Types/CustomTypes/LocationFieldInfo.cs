@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.CustomTypes
 {
-    public sealed class Location : ObjectFieldInfoBase
+    public sealed class LocationFieldInfo : ObjectFieldInfoBase
     {
         #region Properties
 
@@ -23,7 +23,7 @@ namespace Ertis.Schema.Types.CustomTypes
         /// <summary>
         /// Constructor
         /// </summary>
-        public Location()
+        public LocationFieldInfo()
         {
             this.Properties = new[]
             {
@@ -50,7 +50,7 @@ namespace Ertis.Schema.Types.CustomTypes
 
         public override object Clone()
         {
-            return new Location
+            return new LocationFieldInfo
             {
                 Name = this.Name,
                 Description = this.Description,

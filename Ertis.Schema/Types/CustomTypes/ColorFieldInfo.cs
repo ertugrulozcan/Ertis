@@ -6,7 +6,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.CustomTypes
 {
-    public class Color : StringFieldInfo
+    public class ColorFieldInfo : StringFieldInfo
     {
         #region Properties
 
@@ -21,7 +21,7 @@ namespace Ertis.Schema.Types.CustomTypes
         /// <summary>
         /// Constructor
         /// </summary>
-        public Color()
+        public ColorFieldInfo()
         {
             this.RegexPattern = "(?:#|0x)(?:[a-f0-9]{3}|[a-f0-9]{6})\\b|(?:rgb|hsl)a?\\([^\\)]*\\)";
         }
@@ -49,7 +49,7 @@ namespace Ertis.Schema.Types.CustomTypes
 
         public override object Clone()
         {
-            return new Color
+            return new ColorFieldInfo
             {
                 Name = this.Name,
                 Description = this.Description,

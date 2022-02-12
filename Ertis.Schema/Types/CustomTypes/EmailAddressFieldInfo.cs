@@ -9,7 +9,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.CustomTypes
 {
-    public class EmailAddress : StringFieldInfo
+    public class EmailAddressFieldInfo : StringFieldInfo
     {
         #region Properties
 
@@ -80,7 +80,7 @@ namespace Ertis.Schema.Types.CustomTypes
 
         public override object Clone()
         {
-            return new EmailAddress
+            return new EmailAddressFieldInfo
             {
                 Name = this.Name,
                 Description = this.Description,

@@ -242,5 +242,44 @@ namespace Ertis.Schema.Extensions
         }
         
         #endregion
+        
+        #region FormatPattern Methods
+
+        public static void SetFormatPatterns(this ISchema schema, DynamicObject model)
+        {
+            SetFormatPatterns(schema.Properties, model);
+        }
+
+        private static void SetFormatPatterns(IEnumerable<IFieldInfo> properties, DynamicObject model)
+        {
+            foreach (var fieldInfo in properties)
+            {
+                SetFormatPatterns(fieldInfo, model);
+            }
+        }
+        
+        private static void SetFormatPatterns(IFieldInfo fieldInfo, DynamicObject model)
+        {
+            if (fieldInfo is StringFieldInfo stringFieldInfo)
+            {
+                if (!string.IsNullOrEmpty(stringFieldInfo.FormatPattern))
+                {
+                    var formattedValue = stringFieldInfo.Format(model);
+                    if (!string.IsNullOrEmpty(formattedValue))
+                    {
+                        var path = fieldInfo.Path;
+                        var segments = path.Split('.');
+                        if (segments.Length > 1)
+                        {
+                            path = string.Join(".", segments.Skip(1));
+                        }
+
+                        model.TrySetValue(path, formattedValue, out _, true);
+                    }
+                }
+            }
+        }
+        
+        #endregion
     }
 }

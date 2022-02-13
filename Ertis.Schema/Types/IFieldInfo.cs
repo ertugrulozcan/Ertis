@@ -31,6 +31,9 @@ namespace Ertis.Schema.Types
         [JsonProperty("isRequired", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
         bool IsRequired { get; }
 
+        [JsonProperty("isVirtual", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        bool IsVirtual { get; init; }
+        
         #endregion
         
         #region Methods

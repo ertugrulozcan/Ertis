@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
+using Ertis.Schema.Dynamics;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
 using Newtonsoft.Json;
@@ -9,10 +12,18 @@ namespace Ertis.Schema.Types.Primitives
 {
     public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
     {
+        #region Constants
+
+        private const string OPEN_FORMAT_BRACKETS = "{";
+        private const string CLOSE_FORMAT_BRACKETS = "}";
+
+        #endregion
+        
         #region Fields
 
         private readonly int? minLength;
         private readonly int? maxLength;
+        private readonly string formatPattern;
         
         #endregion
         
@@ -51,6 +62,21 @@ namespace Ertis.Schema.Types.Primitives
                 }
             }
         }
+        
+        [JsonProperty("formatPattern", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string FormatPattern
+        {
+            get => this.formatPattern;
+            init
+            {
+                this.formatPattern = value;
+                
+                if (!this.ValidateFormatPattern(out var exception))
+                {
+                    throw exception;
+                }
+            }
+        }
 
         [JsonProperty("regexPattern", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string RegexPattern { get; init; }
@@ -67,12 +93,18 @@ namespace Ertis.Schema.Types.Primitives
             base.ValidateSchema(out exception);
             this.ValidateMinLength(out exception);
             this.ValidateMaxLength(out exception);
+            this.ValidateFormatPattern(out exception);
 
             return exception == null;
         }
 
         public override bool Validate(object obj, IValidationContext validationContext)
         {
+            if (string.IsNullOrEmpty(obj?.ToString()) && !string.IsNullOrEmpty(this.FormatPattern))
+            {
+                obj = this.Format(validationContext.Content);
+            }
+            
             var isValid = base.Validate(obj, validationContext);
             
             if (obj is string text)
@@ -138,7 +170,62 @@ namespace Ertis.Schema.Types.Primitives
             exception = null;
             return true;
         }
+        
+        private bool ValidateFormatPattern(out Exception exception)
+        {
+            if (this.FormatPattern != null)
+            {
+                var segments = GetFormatSegments();
+                if (segments.Any(x => x.Contains(' ')))
+                {
+                    exception = new FieldValidationException("The 'formatPattern' segments can not be contains whitespace", this);
+                    return false;   
+                }
+            }
+            
+            exception = null;
+            return true;
+        }
 
+        public string Format(DynamicObject content)
+        {
+            if (!string.IsNullOrEmpty(this.FormatPattern) && content != null)
+            {
+                var text = new string(this.FormatPattern.Trim());
+                while (text.Contains(OPEN_FORMAT_BRACKETS) && text.Contains(CLOSE_FORMAT_BRACKETS))
+                {
+                    var openIndex = text.IndexOf(OPEN_FORMAT_BRACKETS, StringComparison.Ordinal);
+                    var closeIndex = text.IndexOf(CLOSE_FORMAT_BRACKETS, StringComparison.Ordinal);
+                    var segment = text.Substring(openIndex + OPEN_FORMAT_BRACKETS.Length, closeIndex - openIndex - OPEN_FORMAT_BRACKETS.Length);
+                    text = content.TryGetValue(segment.Trim(), out var value, out _) ? 
+                        text.Replace($"{OPEN_FORMAT_BRACKETS}{segment}{CLOSE_FORMAT_BRACKETS}", value != null ? value.ToString() : "null") : 
+                        text.Replace($"{OPEN_FORMAT_BRACKETS}{segment}{CLOSE_FORMAT_BRACKETS}", "undefined");
+                }
+
+                return text;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        
+        private IEnumerable<string> GetFormatSegments()
+        {
+            if (!string.IsNullOrEmpty(this.FormatPattern))
+            {
+                var text = new string(this.FormatPattern.Trim());
+                while (text.Contains(OPEN_FORMAT_BRACKETS) && text.Contains(CLOSE_FORMAT_BRACKETS))
+                {
+                    var openIndex = text.IndexOf(OPEN_FORMAT_BRACKETS, StringComparison.Ordinal);
+                    var closeIndex = text.IndexOf(CLOSE_FORMAT_BRACKETS, StringComparison.Ordinal);
+                    var segment = text.Substring(openIndex + OPEN_FORMAT_BRACKETS.Length, closeIndex - openIndex - OPEN_FORMAT_BRACKETS.Length);
+                    text = text.Replace($"{OPEN_FORMAT_BRACKETS}{segment}{CLOSE_FORMAT_BRACKETS}", string.Empty);
+                    yield return segment;
+                }
+            }
+        }
+        
         public override object Clone()
         {
             return new StringFieldInfo

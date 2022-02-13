@@ -62,6 +62,9 @@ namespace Ertis.Schema.Types
         [JsonProperty("isRequired", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool IsRequired { get; init; }
         
+        [JsonProperty("isVirtual", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool IsVirtual { get; init; }
+        
         [JsonIgnore]
         protected internal object CurrentObject { get; private set; }
 
@@ -228,7 +231,7 @@ namespace Ertis.Schema.Types
         {
             if (this.DefaultValue != null)
             {
-                var validationContext = new FieldValidationContext();
+                var validationContext = new FieldValidationContext(null);
                 this.Validate(this.DefaultValue, validationContext);
                 var isValidated = !validationContext.Errors.Any();
                 exception = !isValidated ? validationContext.Errors.First() : null;

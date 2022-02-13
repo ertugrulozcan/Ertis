@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Ertis.Schema.Dynamics;
 using Ertis.Schema.Exceptions;
 
 namespace Ertis.Schema.Validation
@@ -7,6 +8,8 @@ namespace Ertis.Schema.Validation
     {
         #region Properties
 
+        public DynamicObject Content { get; }
+        
         public IList<FieldValidationException> Errors { get; }
 
         #endregion
@@ -16,8 +19,10 @@ namespace Ertis.Schema.Validation
         /// <summary>
         /// Constructor
         /// </summary>
-        public FieldValidationContext()
+        /// <param name="content"></param>
+        public FieldValidationContext(DynamicObject content)
         {
+            this.Content = content;
             this.Errors = new List<FieldValidationException>();
         }
 

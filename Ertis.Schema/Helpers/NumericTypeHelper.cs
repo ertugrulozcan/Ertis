@@ -6,8 +6,23 @@ namespace Ertis.Schema.Helpers
     {
         #region Methods
 
-        internal static bool? IsAssignableTo(this Type type1, Type type2)
+        internal static bool? IsAssignableTo(this Type type1, Type type2, bool allowNullableTypes)
         {
+            if (allowNullableTypes)
+            {
+                var type1UnderlyingType = Nullable.GetUnderlyingType(type1);
+                if (type1UnderlyingType != null)
+                {
+                    type1 = type1UnderlyingType;
+                }
+                
+                var type2UnderlyingType = Nullable.GetUnderlyingType(type2);
+                if (type2UnderlyingType != null)
+                {
+                    type2 = type2UnderlyingType;
+                }
+            }
+            
             if (!IsNumericType(type1) || !IsNumericType(type2))
             {
                 return null;

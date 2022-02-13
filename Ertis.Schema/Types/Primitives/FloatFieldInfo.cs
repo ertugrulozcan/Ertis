@@ -6,7 +6,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.Primitives
 {
-    public class FloatFieldInfo : FieldInfo<double>, IPrimitiveType
+    public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
     {
         #region Fields
 

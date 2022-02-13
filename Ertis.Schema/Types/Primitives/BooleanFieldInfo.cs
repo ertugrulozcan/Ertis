@@ -4,7 +4,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.Primitives
 {
-    public class BooleanFieldInfo : FieldInfo<bool>, IPrimitiveType
+    public class BooleanFieldInfo : FieldInfo<bool?>, IPrimitiveType
     {
         #region Properties
 

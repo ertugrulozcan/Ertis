@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Ertis.Schema.Dynamics
 {
-    public class DynamicObject
+    public class DynamicObject : ICloneable
     {
         #region Properties
 
@@ -83,6 +83,18 @@ namespace Ertis.Schema.Dynamics
             return Newtonsoft.Json.JsonConvert.SerializeObject(dynamicObject);
         }
         
+        // ReSharper disable once MemberCanBePrivate.Global
+        public string Serialize()
+        {
+            return this.ToJson();
+        }
+        
+        // ReSharper disable once MemberCanBePrivate.Global
+        public T Deserialize<T>()
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(this.ToJson());
+        }
+        
         public dynamic ToDynamic()
         {
             IDictionary<string, object> expandoDictionary = new ExpandoObject();
@@ -112,7 +124,14 @@ namespace Ertis.Schema.Dynamics
         public T GetValue<T>(string path)
         {
             var value = GetValueCore(path, this.PropertyDictionary);
-            return (T) value;
+            if (value is IDictionary<string, object> dictionary)
+            {
+                return Create(dictionary).Deserialize<T>();
+            }
+            else
+            {
+                return (T) value;   
+            }
         }
         
         // ReSharper disable once MemberCanBePrivate.Global
@@ -350,6 +369,38 @@ namespace Ertis.Schema.Dynamics
             return false;
         }
         
+        public void RemoveProperty(string path)
+        {
+            RemovePropertyCore(path, this.PropertyDictionary);
+        }
+        
+        private static void RemovePropertyCore(string path, IDictionary<string, object> dictionary)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                throw new ArgumentException("Path can not be null or empty!");
+            }
+            
+            var segments = path.Split('.');
+            var key = segments[0];
+            if (dictionary.ContainsKey(key))
+            {
+                var value = dictionary[key];
+                if (segments.Length > 1)
+                {
+                    if (value is IDictionary<string, object> subDictionary)
+                    {
+                        var subPath = string.Join(".", segments.Skip(1));
+                        RemovePropertyCore(subPath, subDictionary);
+                    }
+                }
+                else
+                {
+                    dictionary.Remove(key);
+                }
+            }
+        }
+        
         public bool ContainsProperty(string path)
         {
             if (!this.TryGetValue(path, out _, out var exception))
@@ -365,6 +416,15 @@ namespace Ertis.Schema.Dynamics
             }
 
             return true;
+        }
+
+        #endregion
+
+        #region ICloneable
+
+        public object Clone()
+        {
+            return Parse(this.ToJson());
         }
 
         #endregion

@@ -10,6 +10,7 @@ namespace Ertis.Schema.Types
         array,
         @enum,
         @const,
+        json,
         date,
         datetime,
         longtext,

@@ -80,6 +80,9 @@ namespace Ertis.Schema.Types.Primitives
 
         [JsonProperty("regexPattern", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
         public string RegexPattern { get; init; }
+        
+        [JsonProperty("restrictRegexPattern", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string RestrictRegexPattern { get; init; }
 
         [JsonProperty("isUnique", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool IsUnique { get; set; }
@@ -128,6 +131,16 @@ namespace Ertis.Schema.Types.Primitives
                     {
                         isValid = false;
                         validationContext.Errors.Add(new FieldValidationException($"String value is not valid by the regular expression rule. ('{this.RegexPattern}')", this));
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(this.RestrictRegexPattern))
+                {
+                    var match = Regex.Match(text, this.RestrictRegexPattern);
+                    if (match.Success)
+                    {
+                        isValid = false;
+                        validationContext.Errors.Add(new FieldValidationException($"String value is not valid by the restrict regular expression rule. ('{this.RestrictRegexPattern}')", this));
                     }
                 }
             }
@@ -238,7 +251,8 @@ namespace Ertis.Schema.Types.Primitives
                 DefaultValue = this.DefaultValue,
                 MinLength = this.MinLength,
                 MaxLength = this.MaxLength,
-                RegexPattern = this.RegexPattern
+                RegexPattern = this.RegexPattern,
+                RestrictRegexPattern = this.RestrictRegexPattern
             };
         }
         

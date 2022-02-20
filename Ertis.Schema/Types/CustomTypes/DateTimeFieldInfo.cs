@@ -65,7 +65,8 @@ namespace Ertis.Schema.Types.CustomTypes
                 DefaultValue = this.DefaultValue,
                 MinLength = this.MinLength,
                 MaxLength = this.MaxLength,
-                RegexPattern = this.RegexPattern
+                RegexPattern = this.RegexPattern,
+                RestrictRegexPattern = this.RestrictRegexPattern
             };
         }
 

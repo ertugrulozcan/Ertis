@@ -1,3 +1,4 @@
+/*
 using System;
 using System.Collections.Generic;
 using Ertis.Schema.Types;
@@ -124,3 +125,4 @@ namespace Ertis.Tests.Ertis.Schema.Tests
         #endregion
     }
 }
+*/

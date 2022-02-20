@@ -45,6 +45,7 @@ namespace Ertis.Schema.Serialization
                             FieldType.@const => JsonConvert.DeserializeObject<ConstantFieldInfo>(json),
 
                             // Custom Types
+                            FieldType.json => JsonConvert.DeserializeObject<JsonFieldInfo>(json),
                             FieldType.date => JsonConvert.DeserializeObject<DateFieldInfo>(json),
                             FieldType.datetime => JsonConvert.DeserializeObject<DateTimeFieldInfo>(json),
                             FieldType.longtext => JsonConvert.DeserializeObject<LongTextFieldInfo>(json),

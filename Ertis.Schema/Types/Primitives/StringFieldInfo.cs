@@ -248,11 +248,14 @@ namespace Ertis.Schema.Types.Primitives
                 DisplayName = this.DisplayName,
                 Parent = this.Parent,
                 IsRequired = this.IsRequired,
+                IsUnique = this.IsUnique,
+                IsVirtual = this.IsVirtual,
                 DefaultValue = this.DefaultValue,
                 MinLength = this.MinLength,
                 MaxLength = this.MaxLength,
+                FormatPattern = this.FormatPattern,
                 RegexPattern = this.RegexPattern,
-                RestrictRegexPattern = this.RestrictRegexPattern
+                RestrictRegexPattern = this.RestrictRegexPattern,
             };
         }
         

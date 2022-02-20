@@ -265,12 +265,14 @@ namespace Ertis.Schema.Types.Primitives
                 DisplayName = this.DisplayName,
                 Parent = this.Parent,
                 IsRequired = this.IsRequired,
+                IsUnique = this.IsUnique,
+                IsVirtual = this.IsVirtual,
                 DefaultValue = this.DefaultValue,
                 Minimum = this.Minimum,
                 Maximum = this.Maximum,
                 ExclusiveMinimum = this.ExclusiveMinimum,
                 ExclusiveMaximum = this.ExclusiveMaximum,
-                MultipleOf = this.MultipleOf
+                MultipleOf = this.MultipleOf,
             };
         }
 

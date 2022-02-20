@@ -189,8 +189,10 @@ namespace Ertis.Schema.Types.Primitives
                 DisplayName = this.DisplayName,
                 Parent = this.Parent,
                 IsRequired = this.IsRequired,
+                IsVirtual = this.IsVirtual,
                 DefaultValue = this.DefaultValue,
-                AllowAdditionalProperties = this.AllowAdditionalProperties
+                AllowAdditionalProperties = this.AllowAdditionalProperties,
+                // Properties ** From Constructor 
             };
         }
 

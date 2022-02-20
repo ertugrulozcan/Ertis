@@ -57,8 +57,9 @@ namespace Ertis.Schema.Types.CustomTypes
                 DisplayName = this.DisplayName,
                 Parent = this.Parent,
                 IsRequired = this.IsRequired,
+                IsVirtual = this.IsVirtual,
                 DefaultValue = this.DefaultValue,
-                Properties = this.Properties
+                Properties = this.Properties,
             };
         }
 

@@ -78,8 +78,10 @@ namespace Ertis.Schema.Types.CustomTypes
                 Description = this.Description,
                 DisplayName = this.DisplayName,
                 Parent = this.Parent,
+                ContentType = this.ContentType,
                 IsRequired = this.IsRequired,
-                ReferenceType = this.ReferenceType
+                IsVirtual = this.IsVirtual,
+                ReferenceType = this.ReferenceType,
             };
         }
 

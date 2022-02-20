@@ -291,11 +291,13 @@ namespace Ertis.Schema.Types.Primitives
                 DisplayName = this.DisplayName,
                 Parent = this.Parent,
                 IsRequired = this.IsRequired,
+                IsVirtual = this.IsVirtual,
                 DefaultValue = this.DefaultValue,
                 MinCount = this.MinCount,
                 MaxCount = this.MaxCount,
                 UniqueItems = this.UniqueItems,
-                ItemSchema = this.ItemSchema.Clone() as IFieldInfo
+                ItemSchema = this.ItemSchema.Clone() as IFieldInfo,
+                UniqueBy = this.UniqueBy,
             };
         }
 

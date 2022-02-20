@@ -34,7 +34,9 @@ namespace Ertis.Schema.Types.Primitives
                 DisplayName = this.DisplayName,
                 Parent = this.Parent,
                 IsRequired = this.IsRequired,
-                DefaultValue = this.DefaultValue
+                IsUnique = this.IsUnique,
+                IsVirtual = this.IsVirtual,
+                DefaultValue = this.DefaultValue,
             };
         }
         

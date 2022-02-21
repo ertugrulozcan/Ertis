@@ -151,7 +151,7 @@ namespace Ertis.Schema.Types
             return exception == null;
         }
         
-        public virtual bool Validate(object obj, IValidationContext validationContext)
+        protected internal virtual bool Validate(object obj, IValidationContext validationContext)
         {
             this.CurrentObject = obj;
             

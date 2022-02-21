@@ -6,11 +6,85 @@ using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types;
 using Ertis.Schema.Types.CustomTypes;
 using Ertis.Schema.Types.Primitives;
+using Ertis.Schema.Validation;
 
 namespace Ertis.Schema.Extensions
 {
     public static class SchemaExtensions
     {
+        #region Validation Methods
+
+        public static void Validate(this ISchema schema, out Exception exception)
+        {
+            schema.ValidateProperties(out exception);
+        }
+
+        internal static bool ValidateProperties(this ISchema schema, out Exception exception)
+        {
+            if (schema.Properties == null)
+            {
+                exception = new SchemaValidationException($"Properties field is required for schema objects ({schema.Slug})");
+                return false;
+            }
+
+            foreach (var fieldInfo in schema.Properties)
+            {
+                if (!fieldInfo.ValidateSchema(out exception))
+                {
+                    return false;
+                }
+            }
+            
+            schema.CheckPropertiesUniqueness(out exception);
+            
+            var uniqueProperties = schema.GetUniqueProperties();
+            foreach (var uniqueProperty in uniqueProperties)
+            {
+                if (uniqueProperty.IsAnArrayItem(out _))
+                {
+                    exception = new SchemaValidationException($"The unique constraints could not use in arrays. Use the 'uniqueBy' feature instead of. ('{uniqueProperty.Name}')");
+                    
+                    return false;
+                }
+            }
+            
+            return exception == null;
+        }
+
+        public static bool ValidateData(this ISchema schema, DynamicObject model, IValidationContext validationContext)
+        {
+            try
+            {
+                ObjectFieldInfo rootObjectFieldInfo;
+                if (schema is ObjectFieldInfo objectFieldInfo)
+                {
+                    rootObjectFieldInfo = objectFieldInfo;
+                }
+                else
+                {
+                    rootObjectFieldInfo = new ObjectFieldInfo(schema.Properties)
+                    {
+                        Name = schema.Slug
+                    };
+                }
+                
+                var isValidContent = rootObjectFieldInfo.ValidateContent(model, validationContext);
+
+                schema.SetDefaultValues(model);
+                schema.SetConstants(model);
+                schema.SetFormatPatterns(model);
+                
+                return isValidContent;
+            }
+            catch (FieldValidationException ex)
+            {
+                validationContext.Errors.Add(ex);
+                return false;
+            }
+        }
+
+        #endregion
+        
         #region Schema Tree Methods
         
         public static IFieldInfo FindField(this ISchema schema, string path)
@@ -52,7 +126,7 @@ namespace Ertis.Schema.Extensions
 
         #region Uniqueness Methods
 
-        public static bool CheckPropertiesUniqueness(this ISchema schema, out Exception exception)
+        private static bool CheckPropertiesUniqueness(this ISchema schema, out Exception exception)
         {
             var fieldInfos = schema.Properties;
             var distinctCount = fieldInfos.Select(x => x.Name).Distinct().Count();
@@ -174,7 +248,7 @@ namespace Ertis.Schema.Extensions
         
         #region DefaultValue Methods
 
-        public static void SetDefaultValues(this ISchema schema, DynamicObject model)
+        private static void SetDefaultValues(this ISchema schema, DynamicObject model)
         {
             SetDefaultValues(schema.Properties, model);
         }
@@ -213,7 +287,7 @@ namespace Ertis.Schema.Extensions
         
         #region Constant Methods
 
-        public static void SetConstants(this ISchema schema, DynamicObject model)
+        private static void SetConstants(this ISchema schema, DynamicObject model)
         {
             SetConstants(schema.Properties, model);
         }
@@ -245,7 +319,7 @@ namespace Ertis.Schema.Extensions
         
         #region FormatPattern Methods
 
-        public static void SetFormatPatterns(this ISchema schema, DynamicObject model)
+        private static void SetFormatPatterns(this ISchema schema, DynamicObject model)
         {
             SetFormatPatterns(schema.Properties, model);
         }

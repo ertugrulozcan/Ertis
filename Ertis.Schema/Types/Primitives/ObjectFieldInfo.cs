@@ -28,11 +28,11 @@ namespace Ertis.Schema.Types.Primitives
 
         #endregion
 
-        #region Abstract Methods
+        #region Methods
 
-        public bool ValidateContent(object obj, IValidationContext validationContext)
+        public bool ValidateContent(DynamicObject obj, IValidationContext validationContext)
         {
-            return this.Validate(obj, validationContext);
+            return this.Validate(obj.ToDynamic(), validationContext);
         }
 
         #endregion
@@ -98,12 +98,12 @@ namespace Ertis.Schema.Types.Primitives
         public override bool ValidateSchema(out Exception exception)
         {
             base.ValidateSchema(out exception);
-            this.ValidateProperties(out exception);
+            this.Validate(out exception);
             
             return exception == null;
         }
         
-        public override bool Validate(object obj, IValidationContext validationContext)
+        protected internal override bool Validate(object obj, IValidationContext validationContext)
         {
             var isValid = base.Validate(obj, validationContext);
 
@@ -148,38 +148,6 @@ namespace Ertis.Schema.Types.Primitives
             return isValid;
         }
         
-        private bool ValidateProperties(out Exception exception)
-        {
-            if (this.Properties == null)
-            {
-                exception = new FieldValidationException($"Schema properties is required for nested objects ('{this.Name}')", this);
-                return false;
-            }
-
-            foreach (var fieldInfo in this.Properties)
-            {
-                if (!fieldInfo.ValidateSchema(out exception))
-                {
-                    return false;
-                }
-            }
-            
-            this.CheckPropertiesUniqueness(out exception);
-            
-            var uniqueProperties = this.GetUniqueProperties();
-            foreach (var uniqueProperty in uniqueProperties)
-            {
-                if (uniqueProperty.IsAnArrayItem(out _))
-                {
-                    exception = new SchemaValidationException($"The unique constraints could not use in arrays. Use the 'uniqueBy' feature instead of. ('{uniqueProperty.Name}')");
-                    
-                    return false;
-                }
-            }
-            
-            return exception == null;
-        }
-
         public override object Clone()
         {
             return new ObjectFieldInfo(this.Properties.Select(x => x.Clone() as IFieldInfo))

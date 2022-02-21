@@ -19,7 +19,7 @@ namespace Ertis.Schema.Types.CustomTypes
 
         #region Methods
 
-        public override bool Validate(object obj, IValidationContext validationContext)
+        protected internal override bool Validate(object obj, IValidationContext validationContext)
         {
             var isValid = base.Validate(obj, validationContext);
             
@@ -42,7 +42,7 @@ namespace Ertis.Schema.Types.CustomTypes
 
             try
             {
-                var hostNameType = System.Uri.CheckHostName(hostName);
+                var hostNameType = Uri.CheckHostName(hostName);
                 return hostNameType != UriHostNameType.Unknown;
             }
             catch

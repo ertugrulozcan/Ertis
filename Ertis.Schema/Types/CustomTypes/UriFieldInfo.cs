@@ -19,7 +19,7 @@ namespace Ertis.Schema.Types.CustomTypes
 
         #region Methods
 
-        public override bool Validate(object obj, IValidationContext validationContext)
+        protected internal override bool Validate(object obj, IValidationContext validationContext)
         {
             var isValid = base.Validate(obj, validationContext);
             
@@ -40,8 +40,8 @@ namespace Ertis.Schema.Types.CustomTypes
             if (string.IsNullOrWhiteSpace(uri))
                 return false;
 
-            return System.Uri.IsWellFormedUriString(uri, UriKind.Absolute) &&
-                   System.Uri.TryCreate(uri, UriKind.Absolute, out _);
+            return Uri.IsWellFormedUriString(uri, UriKind.Absolute) &&
+                   Uri.TryCreate(uri, UriKind.Absolute, out _);
         }
         
         public override object Clone()

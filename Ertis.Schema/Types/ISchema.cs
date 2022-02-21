@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Ertis.Schema.Dynamics;
 using Ertis.Schema.Serialization;
 using Ertis.Schema.Validation;
 using Newtonsoft.Json;
@@ -23,7 +24,7 @@ namespace Ertis.Schema.Types
 
         bool ValidateSchema(out Exception exception);
         
-        bool ValidateContent(object obj, IValidationContext validationContext);
+        bool ValidateContent(DynamicObject obj, IValidationContext validationContext);
 
         #endregion
     }

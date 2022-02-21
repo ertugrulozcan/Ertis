@@ -21,7 +21,7 @@ namespace Ertis.Schema.Types.CustomTypes
 
         #region Methods
 
-        public override bool Validate(object obj, IValidationContext validationContext)
+        protected internal override bool Validate(object obj, IValidationContext validationContext)
         {
             var isValid = base.Validate(obj, validationContext);
             

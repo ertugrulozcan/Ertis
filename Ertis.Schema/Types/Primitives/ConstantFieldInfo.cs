@@ -28,6 +28,7 @@ namespace Ertis.Schema.Types.Primitives
                 Parent = this.Parent,
                 IsRequired = this.IsRequired,
                 IsVirtual = this.IsVirtual,
+                IsHidden = this.IsHidden,
                 DefaultValue = this.DefaultValue,
                 Value = this.Value,
             };

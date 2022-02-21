@@ -190,6 +190,7 @@ namespace Ertis.Schema.Types.Primitives
                 Parent = this.Parent,
                 IsRequired = this.IsRequired,
                 IsVirtual = this.IsVirtual,
+                IsHidden = this.IsHidden,
                 DefaultValue = this.DefaultValue,
                 AllowAdditionalProperties = this.AllowAdditionalProperties,
                 // Properties ** From Constructor 

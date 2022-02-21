@@ -14,6 +14,12 @@ namespace Ertis.Schema.Types
         #region Fields
 
         private string name;
+        private IFieldInfo parent;
+        private string displayName;
+        private readonly string description;
+        private readonly bool isRequired;
+        private readonly bool isVirtual;
+        private readonly bool isHidden;
 
         #endregion
         
@@ -26,13 +32,20 @@ namespace Ertis.Schema.Types
             set
             {
                 this.name = value;
-
-                this.OnReady();
+                this.OnPropertyChanged(nameof(this.Name));
             }
         }
-        
+
         [JsonIgnore]
-        public IFieldInfo Parent { get; set; }
+        public IFieldInfo Parent
+        {
+            get => this.parent;
+            set
+            {
+                this.parent = value;
+                this.OnPropertyChanged(nameof(this.Parent));
+            }
+        }
 
         [JsonIgnore]
         public string Path
@@ -50,20 +63,63 @@ namespace Ertis.Schema.Types
         }
 
         [JsonProperty("displayName", NullValueHandling = NullValueHandling.Ignore)]
-        public string DisplayName { get; set; }
+        public string DisplayName
+        {
+            get => this.displayName;
+            set
+            {
+                this.displayName = value;
+                this.OnPropertyChanged(nameof(this.DisplayName));
+            }
+        }
 
         [JsonProperty("description", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public string Description { get; init; }
+        public string Description
+        {
+            get => this.description;
+            init
+            {
+                this.description = value;
+                this.OnPropertyChanged(nameof(this.Description));
+            }
+        }
 
         [JsonProperty("type")]
         [JsonConverter(typeof(StringEnumConverter))]
         public abstract FieldType Type { get; }
 
         [JsonProperty("isRequired", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public bool IsRequired { get; init; }
-        
+        public bool IsRequired
+        {
+            get => this.isRequired;
+            init
+            {
+                this.isRequired = value;
+                this.OnPropertyChanged(nameof(this.IsRequired));
+            }
+        }
+
         [JsonProperty("isVirtual", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public bool IsVirtual { get; init; }
+        public bool IsVirtual
+        {
+            get => this.isVirtual;
+            init
+            {
+                this.isVirtual = value;
+                this.OnPropertyChanged(nameof(this.IsVirtual));
+            }
+        }
+
+        [JsonProperty("isHidden", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool IsHidden
+        {
+            get => this.isHidden;
+            init
+            {
+                this.isHidden = value;
+                this.OnPropertyChanged(nameof(this.IsHidden));
+            }
+        }
         
         [JsonIgnore]
         protected internal object CurrentObject { get; private set; }
@@ -72,7 +128,7 @@ namespace Ertis.Schema.Types
 
         #region Abstract Methods
 
-        protected abstract bool ValidateSchemaCore(out Exception exception);
+        protected abstract void ValidateSchemaCore(out Exception exception);
         
         protected abstract bool ValidateCore(object obj, IValidationContext validationContext);
         
@@ -84,7 +140,7 @@ namespace Ertis.Schema.Types
 
         #region Methods
 
-        protected virtual void OnReady()
+        protected virtual void OnPropertyChanged(string propertyName)
         { }
 
         public virtual bool ValidateSchema(out Exception exception)
@@ -174,10 +230,24 @@ namespace Ertis.Schema.Types
     
     public abstract class FieldInfo<T> : FieldInfo, IHasDefault<T>
     {
-        #region Properties
+        #region Fields
+
+        private readonly T defaultValue;
         
+        #endregion
+        
+        #region Properties
+
         [JsonProperty("defaultValue", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public T DefaultValue { get; init; }
+        public T DefaultValue
+        {
+            get => this.defaultValue;
+            init
+            {
+                this.defaultValue = value;
+                this.OnPropertyChanged(nameof(this.DefaultValue));
+            }
+        }
         
         #endregion
 
@@ -209,16 +279,23 @@ namespace Ertis.Schema.Types
             {
                 isValid = false;
                 validationContext.Errors.Add(
-                    new FieldValidationException($"Type mismatch error. '{this.Name}' is must be 'object'",
-                        this));
+                    new FieldValidationException($"Type mismatch error. '{this.Name}' is must be 'object'", this));
             }
 
             return isValid;
         }
 
-        protected override bool ValidateSchemaCore(out Exception exception)
+        protected override void ValidateSchemaCore(out Exception exception)
         {
-            return ValidateDefaultValue(out exception);
+            this.ValidateDefaultValue(out exception);
+        }
+        
+        protected override void OnPropertyChanged(string propertyName)
+        {
+            if (propertyName is nameof(this.IsRequired) or nameof(this.IsHidden) or nameof(this.DefaultValue))
+            {
+                this.ValidateHiddenRules();
+            }
         }
 
         public override object GetDefaultValue()
@@ -290,6 +367,14 @@ namespace Ertis.Schema.Types
             }
 
             return primitiveTypeName;
+        }
+
+        protected virtual void ValidateHiddenRules()
+        {
+            if (this.IsHidden && this.IsRequired && this.DefaultValue == null)
+            {
+                throw new FieldValidationException("A field with a default value of null cannot be both hidden and required.", this);
+            }
         }
         
         #endregion

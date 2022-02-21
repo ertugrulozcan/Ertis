@@ -75,6 +75,8 @@ namespace Ertis.Schema.Types.Primitives
                 {
                     throw exception;
                 }
+                
+                this.OnPropertyChanged(nameof(this.FormatPattern));
             }
         }
 
@@ -239,6 +241,23 @@ namespace Ertis.Schema.Types.Primitives
             }
         }
         
+        protected override void OnPropertyChanged(string propertyName)
+        {
+            base.OnPropertyChanged(propertyName);
+            if (propertyName == nameof(this.FormatPattern))
+            {
+                this.ValidateHiddenRules();
+            }
+        }
+        
+        protected override void ValidateHiddenRules()
+        {
+            if (this.IsHidden && this.IsRequired && this.DefaultValue == null && string.IsNullOrEmpty(this.FormatPattern))
+            {
+                throw new FieldValidationException("A field with a default value of null cannot be both hidden and required.", this);
+            }
+        }
+        
         public override object Clone()
         {
             return new StringFieldInfo
@@ -250,6 +269,7 @@ namespace Ertis.Schema.Types.Primitives
                 IsRequired = this.IsRequired,
                 IsUnique = this.IsUnique,
                 IsVirtual = this.IsVirtual,
+                IsHidden = this.IsHidden,
                 DefaultValue = this.DefaultValue,
                 MinLength = this.MinLength,
                 MaxLength = this.MaxLength,

@@ -267,6 +267,7 @@ namespace Ertis.Schema.Types.Primitives
                 IsRequired = this.IsRequired,
                 IsUnique = this.IsUnique,
                 IsVirtual = this.IsVirtual,
+                IsHidden = this.IsHidden,
                 DefaultValue = this.DefaultValue,
                 Minimum = this.Minimum,
                 Maximum = this.Maximum,

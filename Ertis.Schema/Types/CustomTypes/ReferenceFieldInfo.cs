@@ -38,16 +38,16 @@ namespace Ertis.Schema.Types.CustomTypes
 
         #region Methods
 
-        protected override bool ValidateSchemaCore(out Exception exception)
+        protected override void ValidateSchemaCore(out Exception exception)
         {
             exception = null;
-            return true;
         }
 
         protected override bool ValidateCore(object obj, IValidationContext validationContext)
         {
             var isValid = true;
             
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (this.ReferenceType == ReferenceTypes.single && obj is string referenceId)
             {
                 
@@ -81,6 +81,7 @@ namespace Ertis.Schema.Types.CustomTypes
                 ContentType = this.ContentType,
                 IsRequired = this.IsRequired,
                 IsVirtual = this.IsVirtual,
+                IsHidden = this.IsHidden,
                 ReferenceType = this.ReferenceType,
             };
         }

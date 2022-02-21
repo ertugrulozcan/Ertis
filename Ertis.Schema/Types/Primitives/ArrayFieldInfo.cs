@@ -105,11 +105,11 @@ namespace Ertis.Schema.Types.Primitives
 
         #region Methods
 
-        protected override void OnReady()
+        protected override void OnPropertyChanged(string propertyName)
         {
-            if (!this.ValidateUniqueBy(out var exception2))
+            if (propertyName == nameof(this.Name) && !this.ValidateUniqueBy(out var exception))
             {
-                throw exception2;
+                throw exception;
             }
         }
 
@@ -292,6 +292,7 @@ namespace Ertis.Schema.Types.Primitives
                 Parent = this.Parent,
                 IsRequired = this.IsRequired,
                 IsVirtual = this.IsVirtual,
+                IsHidden = this.IsHidden,
                 DefaultValue = this.DefaultValue,
                 MinCount = this.MinCount,
                 MaxCount = this.MaxCount,

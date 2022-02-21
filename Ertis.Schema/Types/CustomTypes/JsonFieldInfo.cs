@@ -25,6 +25,7 @@ namespace Ertis.Schema.Types.CustomTypes
                 Parent = this.Parent,
                 IsRequired = this.IsRequired,
                 IsVirtual = this.IsVirtual,
+                IsHidden = this.IsHidden,
                 DefaultValue = this.DefaultValue,
             };
         }

@@ -121,6 +121,7 @@ namespace Ertis.Schema.Types.Primitives
                 IsRequired = this.IsRequired,
                 IsUnique = this.IsUnique,
                 IsVirtual = this.IsVirtual,
+                IsHidden = this.IsHidden,
                 DefaultValue = this.DefaultValue,
                 Items = this.Items,
             };

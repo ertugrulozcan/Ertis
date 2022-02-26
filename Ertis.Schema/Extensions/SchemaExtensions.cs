@@ -336,20 +336,26 @@ namespace Ertis.Schema.Extensions
         {
             if (fieldInfo is StringFieldInfo stringFieldInfo)
             {
-                if (!string.IsNullOrEmpty(stringFieldInfo.FormatPattern))
+                string value = null;
+                if (stringFieldInfo.CurrentObject != null && !string.IsNullOrEmpty(stringFieldInfo.CurrentObject.ToString()))
                 {
-                    var formattedValue = stringFieldInfo.Format(model);
-                    if (!string.IsNullOrEmpty(formattedValue))
+                    value = stringFieldInfo.CurrentObject.ToString();
+                }
+                else if (!string.IsNullOrEmpty(stringFieldInfo.FormatPattern))
+                {
+                    value = stringFieldInfo.Format(model);
+                }
+                
+                if (!string.IsNullOrEmpty(value))
+                {
+                    var path = fieldInfo.Path;
+                    var segments = path.Split('.');
+                    if (segments.Length > 1)
                     {
-                        var path = fieldInfo.Path;
-                        var segments = path.Split('.');
-                        if (segments.Length > 1)
-                        {
-                            path = string.Join(".", segments.Skip(1));
-                        }
-
-                        model.TrySetValue(path, formattedValue, out _, true);
+                        path = string.Join(".", segments.Skip(1));
                     }
+
+                    model.TrySetValue(path, value, out _, true);
                 }
             }
         }

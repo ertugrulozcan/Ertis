@@ -6,7 +6,7 @@ namespace Ertis.Schema.Helpers
     {
         #region Methods
 
-        internal static bool? IsAssignableTo(this Type type1, Type type2, bool allowNullableTypes)
+        internal static bool? IsAssignableTo(this Type type1, Type type2, bool allowNullableTypes = true)
         {
             if (allowNullableTypes)
             {

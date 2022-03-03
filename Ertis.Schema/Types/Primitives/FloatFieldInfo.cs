@@ -1,5 +1,6 @@
 using System;
 using Ertis.Schema.Exceptions;
+using Ertis.Schema.Helpers;
 using Ertis.Schema.Validation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -116,8 +117,9 @@ namespace Ertis.Schema.Types.Primitives
         protected internal override bool Validate(object obj, IValidationContext validationContext)
         {
             var isValid = base.Validate(obj, validationContext);
-            
-            if (obj is double doubleValue)
+
+            var isCompatibleForDouble = NumericTypeHelper.IsAssignableTo(obj.GetType(), typeof(double));
+            if (isCompatibleForDouble != null && isCompatibleForDouble.Value && double.TryParse(obj.ToString(), out var doubleValue))
             {
                 if (this.Maximum != null && doubleValue > this.Maximum.Value)
                 {

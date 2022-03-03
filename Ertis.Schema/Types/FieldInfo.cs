@@ -334,7 +334,7 @@ namespace Ertis.Schema.Types
                     return true;
                 }
 
-                var isAssignableTo = Helpers.NumericTypeHelper.IsAssignableTo(obj.GetType(), typeof(T), true);
+                var isAssignableTo = Helpers.NumericTypeHelper.IsAssignableTo(obj.GetType(), typeof(T));
                 return isAssignableTo != null && isAssignableTo.Value;
             }
 

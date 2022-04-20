@@ -13,25 +13,25 @@ namespace Ertis.Net.Extensions
 			if (httpMethod != null)
 			{
 				if (httpMethod == HttpMethod.Get)
-					return Method.GET;
+					return Method.Get;
 				else if (httpMethod == HttpMethod.Post)
-					return Method.POST;
+					return Method.Post;
 				else if (httpMethod == HttpMethod.Put)
-					return Method.PUT;
+					return Method.Put;
 				else if (httpMethod == HttpMethod.Delete)
-					return Method.DELETE;
+					return Method.Delete;
 				else if (httpMethod == HttpMethod.Head)
-					return Method.HEAD;
+					return Method.Head;
 				else if (httpMethod == HttpMethod.Options)
-					return Method.OPTIONS;
+					return Method.Options;
 				else if (httpMethod == HttpMethod.Patch)
-					return Method.PATCH;
+					return Method.Patch;
 				else
-					return Method.GET;
+					return Method.Get;
 			}
 			else
 			{
-				return Method.GET;
+				return Method.Get;
 			}
 		}
 		

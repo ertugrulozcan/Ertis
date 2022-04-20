@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <PackageId>Ertis.MongoDB.Queries</PackageId>
-        <PackageVersion>5.0.5</PackageVersion>
+        <PackageVersion>5.0.6</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.MongoDB.Queries</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -13,8 +13,8 @@
         <Title>Ertis.MongoDB.Queries</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>5.0.5</AssemblyVersion>
-        <FileVersion>5.0.5</FileVersion>
+        <AssemblyVersion>5.0.6</AssemblyVersion>
+        <FileVersion>5.0.6</FileVersion>
     </PropertyGroup>
 
 </Project>

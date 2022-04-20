@@ -18,7 +18,7 @@ namespace Ertis.Net.Http
                 if (this.Payload == null)
                     return null;
 				
-                var serializer = new RestSharp.Serializers.DotNetXmlSerializer();
+                var serializer = new RestSharp.Serializers.Xml.DotNetXmlSerializer();
                 return serializer.Serialize(this.Payload);
             }
         }

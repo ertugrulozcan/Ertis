@@ -38,49 +38,7 @@ namespace Ertis.Net.Rest
 			IHeaderCollection headers = null,
 			IRequestBody body = null)
 		{
-			var restSharpMethod = method.ConvertToRestSharpMethod();
-			var dataFormat = body.ConvertToRestSharpDataFormat();
-			var request = new RestRequest(url, restSharpMethod, dataFormat);
-
-			if (body != null)
-			{
-				if (body.Type == BodyTypes.Xml)
-				{
-					request.AddXmlBody(body.Payload);
-				}
-				else
-				{
-					request.AddJsonBody(body.Payload);
-				}
-			}
-
-			if (headers != null)
-			{
-				foreach (var header in headers.ToDictionary())
-				{
-					request.AddHeader(header.Key, header.Value?.ToString() ?? "");
-				}
-			}
-			
-			var response = this.Client.Execute<TResult>(request);
-			if (response.IsSuccessful)
-			{
-				return new ResponseResult<TResult>(response.StatusCode)
-				{
-					Json = response.Content,
-					RawData = response.RawBytes,
-					Data = response.Data
-				};
-			}
-			else
-			{
-				return new ResponseResult<TResult>(response.StatusCode)
-				{
-					Message = response.Content,
-					Json = response.Content,
-					RawData = response.RawBytes
-				};
-			}
+			return this.ExecuteRequestAsync<TResult>(method, url, headers, body).ConfigureAwait(false).GetAwaiter().GetResult();
 		}
 
 		public async Task<IResponseResult<TResult>> ExecuteRequestAsync<TResult>(
@@ -90,9 +48,11 @@ namespace Ertis.Net.Rest
 			IRequestBody body = null)
 		{
 			var restSharpMethod = method.ConvertToRestSharpMethod();
-			var dataFormat = body.ConvertToRestSharpDataFormat();
-			var request = new RestRequest(url, restSharpMethod, dataFormat);
-			
+			var request = new RestRequest(url, restSharpMethod)
+			{
+				RequestFormat = body.ConvertToRestSharpDataFormat()
+			};
+
 			if (body != null)
 			{
 				if (body.Type == BodyTypes.Xml)
@@ -176,48 +136,7 @@ namespace Ertis.Net.Rest
 			IHeaderCollection headers = null,
 			IRequestBody body = null)
 		{
-			var restSharpMethod = method.ConvertToRestSharpMethod();
-			var dataFormat = body.ConvertToRestSharpDataFormat();
-			var request = new RestRequest(url, restSharpMethod, dataFormat);
-			
-			if (body != null)
-			{
-				if (body.Type == BodyTypes.Xml)
-				{
-					request.AddXmlBody(body.Payload);
-				}
-				else
-				{
-					request.AddJsonBody(body.Payload);
-				}
-			}
-			
-			if (headers != null)
-			{
-				foreach (var header in headers.ToDictionary())
-				{
-					request.AddHeader(header.Key, header.Value?.ToString() ?? "");
-				}
-			}
-			
-			var response = this.Client.Execute(request);
-			if (response.IsSuccessful)
-			{
-				return new ResponseResult(response.StatusCode)
-				{
-					Json = response.Content,
-					RawData = response.RawBytes
-				};
-			}
-			else
-			{
-				return new ResponseResult(response.StatusCode)
-				{
-					Message = response.Content,
-					Json = response.Content,
-					RawData = response.RawBytes
-				};
-			}
+			return this.ExecuteRequestAsync(method, url, headers, body).ConfigureAwait(false).GetAwaiter().GetResult();
 		}
 
 		public async Task<IResponseResult> ExecuteRequestAsync(
@@ -227,8 +146,10 @@ namespace Ertis.Net.Rest
 			IRequestBody body = null)
 		{
 			var restSharpMethod = method.ConvertToRestSharpMethod();
-			var dataFormat = body.ConvertToRestSharpDataFormat();
-			var request = new RestRequest(url, restSharpMethod, dataFormat);
+			var request = new RestRequest(url, restSharpMethod)
+			{
+				RequestFormat = body.ConvertToRestSharpDataFormat()
+			};
 			
 			if (body != null)
 			{

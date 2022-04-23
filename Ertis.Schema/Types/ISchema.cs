@@ -18,6 +18,9 @@ namespace Ertis.Schema.Types
         [JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
         IReadOnlyCollection<IFieldInfo> Properties { get; }
         
+        [JsonProperty("allowAdditionalProperties")]
+        bool AllowAdditionalProperties { get; }
+        
         #endregion
 
         #region Methods

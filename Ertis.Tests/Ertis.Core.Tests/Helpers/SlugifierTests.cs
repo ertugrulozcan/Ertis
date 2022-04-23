@@ -55,6 +55,20 @@ namespace Ertis.Tests.Ertis.Core.Tests.Helpers
             var slug = Slugifier.Slugify("Haber Başlığı 1 (Update 1)");
             Assert.AreEqual("haber-basligi-1-update-1", slug);
         }
+        
+        [Test]
+        public void SlugifierTest7()
+        {
+            var slug = Slugifier.Slugify("base_user");
+            Assert.AreEqual("base-user", slug);
+        }
+        
+        [Test]
+        public void SlugifierTest8()
+        {
+            var slug = Slugifier.Slugify("base_user", Slugifier.Options.Ignore('_'));
+            Assert.AreEqual("base_user", slug);
+        }
 
         #endregion
     }

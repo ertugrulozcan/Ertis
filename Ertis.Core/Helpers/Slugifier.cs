@@ -1,10 +1,58 @@
+using System.Linq;
 using System.Text;
 
 namespace Ertis.Core.Helpers
 {
 	public static class Slugifier
 	{
-		public static string Slugify(string input)
+		#region Helper Classes
+
+		// ReSharper disable once ClassNeverInstantiated.Global
+		public sealed class SlugifierOptions
+		{
+			#region Properties
+
+			private char[] IgnoreCharacters { get; set; }
+
+			#endregion
+
+			#region Constructors
+
+			/// <summary>
+			/// Constructor
+			/// </summary>
+			internal SlugifierOptions()
+			{ }
+
+			#endregion
+
+			#region Methods
+
+			public SlugifierOptions Ignore(params char[] chars)
+			{
+				this.IgnoreCharacters = chars;
+				return this;
+			}
+
+			internal bool IsIgnored(char c)
+			{
+				return this.IgnoreCharacters != null && this.IgnoreCharacters.Contains(c);
+			}
+
+			#endregion
+		}
+
+		#endregion
+		
+		#region Statics
+
+		public static SlugifierOptions Options => new SlugifierOptions();
+
+		#endregion
+		
+		#region Methods
+
+		public static string Slugify(string input, SlugifierOptions options = null)
 		{
 			if (string.IsNullOrEmpty(input))
 			{
@@ -38,6 +86,12 @@ namespace Ertis.Core.Helpers
 					case '_':
 					case '=':
 					{
+						if (options != null && options.IsIgnored(c))
+						{
+							slugBuilder.Append(c);
+							break;	
+						}
+						
 						if (!previousDash && slugBuilder.Length > 0)
 						{
 							slugBuilder.Append('-');
@@ -72,5 +126,7 @@ namespace Ertis.Core.Helpers
 
 			return str;
 		}
+
+		#endregion
 	}
 }

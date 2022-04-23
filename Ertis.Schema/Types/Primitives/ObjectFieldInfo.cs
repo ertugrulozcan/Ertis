@@ -20,6 +20,9 @@ namespace Ertis.Schema.Types.Primitives
         [JsonIgnore]
         public string Slug => this.Name;
 
+        [JsonProperty("allowAdditionalProperties", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool AllowAdditionalProperties { get; init; }
+        
         #endregion
 
         #region Abstract Properties
@@ -74,9 +77,6 @@ namespace Ertis.Schema.Types.Primitives
                 }
             }
         }
-
-        [JsonProperty("allowAdditionalProperties", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public bool AllowAdditionalProperties { get; init; }
 
         #endregion
         

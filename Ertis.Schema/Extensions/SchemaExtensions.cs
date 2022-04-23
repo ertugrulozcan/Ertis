@@ -64,7 +64,8 @@ namespace Ertis.Schema.Extensions
                 {
                     rootObjectFieldInfo = new ObjectFieldInfo(schema.Properties)
                     {
-                        Name = schema.Slug
+                        Name = schema.Slug,
+                        AllowAdditionalProperties = schema.AllowAdditionalProperties
                     };
                 }
                 

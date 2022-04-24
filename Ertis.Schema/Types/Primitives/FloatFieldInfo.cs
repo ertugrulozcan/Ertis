@@ -118,31 +118,34 @@ namespace Ertis.Schema.Types.Primitives
         {
             var isValid = base.Validate(obj, validationContext);
 
-            var isCompatibleForDouble = NumericTypeHelper.IsAssignableTo(obj.GetType(), typeof(double));
-            if (isCompatibleForDouble != null && isCompatibleForDouble.Value && double.TryParse(obj.ToString(), out var doubleValue))
+            if (obj != null)
             {
-                if (this.Maximum != null && doubleValue > this.Maximum.Value)
+                var isCompatibleForDouble = NumericTypeHelper.IsAssignableTo(obj.GetType(), typeof(double));
+                if (isCompatibleForDouble != null && isCompatibleForDouble.Value && double.TryParse(obj.ToString(), out var doubleValue))
                 {
-                    isValid = false;
-                    validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be greater than {this.Maximum}", this));
-                }
+                    if (this.Maximum != null && doubleValue > this.Maximum.Value)
+                    {
+                        isValid = false;
+                        validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be greater than {this.Maximum}", this));
+                    }
                 
-                if (this.Minimum != null && doubleValue < this.Minimum.Value)
-                {
-                    isValid = false;
-                    validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be less than {this.Minimum}", this));
-                }
+                    if (this.Minimum != null && doubleValue < this.Minimum.Value)
+                    {
+                        isValid = false;
+                        validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be less than {this.Minimum}", this));
+                    }
                 
-                if (this.ExclusiveMaximum != null && doubleValue >= this.ExclusiveMaximum.Value)
-                {
-                    isValid = false;
-                    validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be greater than or equal {this.ExclusiveMaximum}", this));
-                }
+                    if (this.ExclusiveMaximum != null && doubleValue >= this.ExclusiveMaximum.Value)
+                    {
+                        isValid = false;
+                        validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be greater than or equal {this.ExclusiveMaximum}", this));
+                    }
                 
-                if (this.ExclusiveMinimum != null && doubleValue < this.ExclusiveMinimum.Value)
-                {
-                    isValid = false;
-                    validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be less than or equal {this.ExclusiveMinimum}", this));
+                    if (this.ExclusiveMinimum != null && doubleValue < this.ExclusiveMinimum.Value)
+                    {
+                        isValid = false;
+                        validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be less than or equal {this.ExclusiveMinimum}", this));
+                    }
                 }
             }
             

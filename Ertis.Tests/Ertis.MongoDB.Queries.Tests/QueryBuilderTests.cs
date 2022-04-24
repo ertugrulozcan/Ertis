@@ -209,6 +209,16 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
         }
         
         [Test]
+        public void EqualsTest2()
+        {
+            object value = "ertugrul.ozcan";
+            var query = QueryBuilder.Equals("username", value);
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ \"username\": \"ertugrul.ozcan\" }".Trim(), queryJson.Trim());
+        }
+        
+        [Test]
         public void NotEqualsTest()
         {
             var query = QueryBuilder.NotEquals("username", "ertugrul.ozcan");

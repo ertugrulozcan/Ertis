@@ -31,15 +31,15 @@ namespace Ertis.MongoDB.Queries
             {
                 return query.ToString();
             }
-            else if (typeof(T) == typeof(string))
+            else if (typeof(T) == typeof(string) || this.Value is string)
             {
                 return "\"" + this.Value + "\"";
             }
-            else if (typeof(T) == typeof(bool))
+            else if (typeof(T) == typeof(bool) || this.Value is bool)
             {
                 return this.Value.ToString()?.ToLower();
             }
-            else if (typeof(T) == typeof(DateTime))
+            else if (typeof(T) == typeof(DateTime) || this.Value is DateTime)
             {
                 var dateTime = this.Value is DateTime time ? time : default;
                 return "\"" + dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "\"";

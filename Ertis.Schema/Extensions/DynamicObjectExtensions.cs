@@ -14,7 +14,9 @@ namespace Ertis.Schema.Extensions
         
         private static DynamicObject Merge(IDictionary<string, object> dictionary1, IDictionary<string, object> dictionary2)
         {
-            var dictionary = new Dictionary<string, object>(); 
+            var dictionary = new Dictionary<string, object>();
+
+            var visitedProperties = new List<string>();
             foreach (var (propertyName, propertyValue) in dictionary1)
             {
                 dictionary.Add(propertyName, propertyValue);
@@ -28,6 +30,16 @@ namespace Ertis.Schema.Extensions
                     {
                         dictionary[propertyName] = dictionary2[propertyName];
                     }
+                    
+                    visitedProperties.Add(propertyName);
+                }
+            }
+
+            foreach (var (propertyName, propertyValue) in dictionary2)
+            {
+                if (!visitedProperties.Contains(propertyName))
+                {
+                    dictionary[propertyName] = propertyValue;
                 }
             }
             

@@ -2,6 +2,19 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+        <PackageId>Ertis.Schema</PackageId>
+        <PackageVersion>5.0.0</PackageVersion>
+        <Authors>Ertuğrul Özcan</Authors>
+        <Description>Ertis.Schema</Description>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <Copyright>Ertuğrul Özcan | Copyright 2022 (c)</Copyright>
+        <PackageReleaseNotes>.Net 5</PackageReleaseNotes>
+        <PackageTags>Ertis.Schema</PackageTags>
+        <Title>Ertis.Schema</Title>
+        <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
+        <AssemblyVersion>5.0.0</AssemblyVersion>
+        <FileVersion>5.0.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

@@ -47,7 +47,7 @@ namespace Ertis.Schema.Types
             }
         }
 
-        [JsonIgnore]
+        [JsonProperty("path")]
         public string Path
         {
             get

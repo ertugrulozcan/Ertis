@@ -34,6 +34,12 @@ namespace Ertis.Schema.Types
         [JsonProperty("isVirtual", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
         bool IsVirtual { get; init; }
         
+        [JsonProperty("isHidden", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        bool IsHidden { get; init; }
+        
+        [JsonProperty("isReadonly", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        bool IsReadonly { get; init; }
+        
         #endregion
         
         #region Methods

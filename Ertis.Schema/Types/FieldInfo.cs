@@ -20,7 +20,8 @@ namespace Ertis.Schema.Types
         private readonly bool isRequired;
         private readonly bool isVirtual;
         private readonly bool isHidden;
-
+        private readonly bool isReadonly;
+        
         #endregion
         
         #region Properties
@@ -118,6 +119,17 @@ namespace Ertis.Schema.Types
             {
                 this.isHidden = value;
                 this.OnPropertyChanged(nameof(this.IsHidden));
+            }
+        }
+        
+        [JsonProperty("isReadonly", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool IsReadonly
+        {
+            get => this.isReadonly;
+            init
+            {
+                this.isReadonly = value;
+                this.OnPropertyChanged(nameof(this.IsReadonly));
             }
         }
         
@@ -292,7 +304,7 @@ namespace Ertis.Schema.Types
         
         protected override void OnPropertyChanged(string propertyName)
         {
-            if (propertyName is nameof(this.IsRequired) or nameof(this.IsHidden) or nameof(this.DefaultValue))
+            if (propertyName is nameof(this.IsRequired) or nameof(this.IsHidden) or nameof(this.IsReadonly) or nameof(this.DefaultValue))
             {
                 this.ValidateHiddenRules();
             }

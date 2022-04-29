@@ -90,6 +90,7 @@ namespace Ertis.Schema.Types.CustomTypes
                 IsUnique = this.IsUnique,
                 IsVirtual = this.IsVirtual,
                 IsHidden = this.IsHidden,
+                IsReadonly = this.IsReadonly,
                 DefaultValue = this.DefaultValue,
                 MinLength = this.MinLength,
                 MaxLength = this.MaxLength,

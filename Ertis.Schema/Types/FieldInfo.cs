@@ -24,7 +24,7 @@ namespace Ertis.Schema.Types
         #endregion
         
         #region Properties
-
+        
         [JsonIgnore]
         public string Name
         {
@@ -47,7 +47,7 @@ namespace Ertis.Schema.Types
             }
         }
 
-        [JsonProperty("path")]
+        [JsonIgnore]
         public string Path
         {
             get

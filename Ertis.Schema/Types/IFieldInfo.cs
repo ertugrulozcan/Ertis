@@ -12,7 +12,7 @@ namespace Ertis.Schema.Types
         [JsonIgnore]
         string Name { get; set; }
 
-        [JsonProperty("path")]
+        [JsonIgnore]
         string Path { get; }
         
         [JsonIgnore]

@@ -86,6 +86,41 @@ namespace Ertis.Schema.Extensions
 
         #endregion
         
+        #region MergeMethods
+
+        public static IEnumerable<IFieldInfo> MergeTypeProperties(this ISchema contentType1, ISchema contentType2, bool allowDuplicateFieldWithBaseType = false)
+        {
+            var properties = new List<IFieldInfo>();
+            properties.AddRange(contentType1.Properties);
+
+            foreach (var fieldInfo in contentType2.Properties)
+            {
+                var currentFieldInfo = properties.FirstOrDefault(x => x.Name == fieldInfo.Name);
+                if (currentFieldInfo != null)
+                {
+                    if (fieldInfo.IsVirtual)
+                    {
+                        if (currentFieldInfo.Type != fieldInfo.Type)
+                        {
+                            throw new SchemaValidationException($"The field type cannot be overwritten on virtual fields. ({fieldInfo.Name})");
+                        }
+                    }
+                    else if (!allowDuplicateFieldWithBaseType)
+                    {
+                        throw new SchemaValidationException($"'{fieldInfo.Name}' field is already exist in base type.");   
+                    }
+                }
+                else
+                {
+                    properties.Add(fieldInfo);
+                }
+            }
+
+            return properties;
+        }
+
+        #endregion
+        
         #region Schema Tree Methods
         
         public static IFieldInfo FindField(this ISchema schema, string path)

@@ -11,7 +11,7 @@ namespace Ertis.Schema.Types.Primitives
     {
         #region Fields
 
-        private object[] items;
+        private EnumItem[] items;
 
         #endregion
         
@@ -22,7 +22,7 @@ namespace Ertis.Schema.Types.Primitives
         public override FieldType Type => FieldType.@enum;
         
         [JsonProperty("items")]
-        public object[] Items
+        public EnumItem[] Items
         {
             get => this.items;
             set
@@ -65,17 +65,17 @@ namespace Ertis.Schema.Types.Primitives
                     validationContext.Errors.Add(new FieldValidationException($"Enum value is must be primitive type ({this.Name})", this));   
                 }
 
-                isExistInEnums = this.Items.Any(x => x != null && x.Equals(obj));
+                isExistInEnums = this.Items.Any(x => x?.Value != null && x.Value.Equals(obj));
             }
             else
             {
-                isExistInEnums = this.Items.Any(x => x == null);
+                isExistInEnums = this.Items.Any(x => x?.Value == null);
             }
 
             if (!isExistInEnums)
             {
                 isValid = false;
-                var enumValues = string.Join(", ", this.Items.Select(x => x == null ? "null" : (x is string ? $"'{x}'" : x.ToString())));
+                var enumValues = string.Join(", ", this.Items.Select(x => x?.Value == null ? "null" : $"'{x.Value}'"));
                 validationContext.Errors.Add(new FieldValidationException($"The value does not exist in the enum items. The '{this.Name}' value must be one of them [{enumValues}]", this));   
             }
             
@@ -95,12 +95,12 @@ namespace Ertis.Schema.Types.Primitives
                 throw new FieldValidationException("Enum items can not be empty", this);
             }
             
-            if (this.Items.Any(x => x != null && !x.GetType().IsPrimitive && x.GetType() != typeof(string)))
+            if (this.Items.Any(x => x?.Value != null && !x.Value.GetType().IsPrimitive && x.Value.GetType() != typeof(string)))
             {
                 throw new FieldValidationException("Enum items must be primitive type", this);
             }
             
-            var uniqueCount = this.Items.Distinct().Count();
+            var uniqueCount = this.Items.Select(x => x.Value).Distinct().Count();
             if (this.Items.Length != uniqueCount)
             {
                 throw new FieldValidationException("Enum items must be unique", this);
@@ -126,6 +126,23 @@ namespace Ertis.Schema.Types.Primitives
                 DefaultValue = this.DefaultValue,
                 Items = this.Items,
             };
+        }
+
+        #endregion
+
+        #region Helper Classes
+
+        public class EnumItem
+        {
+            #region Properties
+
+            [JsonProperty("displayName")]
+            public string DisplayName { get; set; }
+            
+            [JsonProperty("value")]
+            public string Value { get; set; }
+
+            #endregion
         }
 
         #endregion

@@ -109,6 +109,12 @@ namespace Ertis.Schema.Extensions
                     {
                         throw new SchemaValidationException($"'{fieldInfo.Name}' field is already exist in base type.");   
                     }
+                    else
+                    {
+                        var index = properties.IndexOf(currentFieldInfo);
+                        properties.RemoveAt(index);
+                        properties.Insert(index, fieldInfo);
+                    }
                 }
                 else
                 {

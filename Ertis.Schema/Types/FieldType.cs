@@ -9,6 +9,7 @@ namespace Ertis.Schema.Types
         boolean,
         array,
         @enum,
+        tags,
         @const,
         json,
         date,

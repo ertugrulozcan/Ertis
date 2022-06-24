@@ -13,6 +13,8 @@ namespace Ertis.Schema.Types.CustomTypes
 
 		private readonly int? minCount;
 		private readonly int? maxCount;
+        private readonly int? minLength;
+        private readonly int? maxLength;
 
 		#endregion
 		
@@ -51,6 +53,36 @@ namespace Ertis.Schema.Types.CustomTypes
                 }
             }
         }
+        
+        [JsonProperty("minLength", NullValueHandling = NullValueHandling.Ignore)]
+        public int? MinLength
+        {
+            get => this.minLength;
+            init
+            {
+                this.minLength = value;
+                
+                if (!this.ValidateMinLength(out var exception))
+                {
+                    throw exception;
+                }
+            }
+        }
+        
+        [JsonProperty("maxLength", NullValueHandling = NullValueHandling.Ignore)]
+        public int? MaxLength
+        {
+            get => this.maxLength;
+            init
+            {
+                this.maxLength = value;
+                
+                if (!this.ValidateMaxLength(out var exception))
+                {
+                    throw exception;
+                }
+            }
+        }
 
         #endregion
         
@@ -61,6 +93,8 @@ namespace Ertis.Schema.Types.CustomTypes
             base.ValidateSchema(out exception);
             this.ValidateMinCount(out exception);
             this.ValidateMaxCount(out exception);
+            this.ValidateMinLength(out exception);
+            this.ValidateMaxLength(out exception);
 
             return exception == null;
         }
@@ -95,6 +129,18 @@ namespace Ertis.Schema.Types.CustomTypes
                 {
                     isValid = false;
                     validationContext.Errors.Add(new FieldValidationException("Tags items can not be empty", this));
+                }
+                
+                if (this.MaxLength != null && array.Any(x => x.Length > this.MaxLength.Value))
+                {
+                    isValid = false;
+                    validationContext.Errors.Add(new FieldValidationException($"The length of tag items can not be greater than {this.MaxLength} character", this));
+                }
+                
+                if (this.MinLength != null && array.Any(x => x.Length < this.MinLength.Value))
+                {
+                    isValid = false;
+                    validationContext.Errors.Add(new FieldValidationException($"The length of tag items can not be less than {this.MinLength} character", this));
                 }
             }
             
@@ -143,6 +189,42 @@ namespace Ertis.Schema.Types.CustomTypes
             return true;
         }
 
+        private bool ValidateMinLength(out Exception exception)
+        {
+            if (this.MinLength < 0)
+            {
+                exception = new FieldValidationException("MinLength can not be less than zero", this);
+                return false;
+            }
+
+            if (this.MaxLength != null && this.MinLength != null && this.MaxLength < this.MinLength)
+            {
+                exception = new FieldValidationException("MinLength can not be greater than MaxLength", this);
+                return false;
+            }
+            
+            exception = null;
+            return true;
+        }
+        
+        private bool ValidateMaxLength(out Exception exception)
+        {
+            if (this.MaxLength < 0)
+            {
+                exception = new FieldValidationException("MaxLength can not be less than zero", this);
+                return false;
+            }
+
+            if (this.MinLength != null && this.MaxLength != null && this.MinLength > this.MaxLength)
+            {
+                exception = new FieldValidationException("MinLength can not be greater than MaxLength", this);
+                return false;
+            }
+            
+            exception = null;
+            return true;
+        }
+        
         public override object Clone()
         {
             return new TagsFieldInfo
@@ -158,6 +240,8 @@ namespace Ertis.Schema.Types.CustomTypes
                 DefaultValue = this.DefaultValue,
                 MinCount = this.MinCount,
                 MaxCount = this.MaxCount,
+                MinLength = this.MinLength,
+                MaxLength = this.MaxLength,
             };
         }
 

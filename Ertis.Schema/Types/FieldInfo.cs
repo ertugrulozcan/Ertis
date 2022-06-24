@@ -17,6 +17,7 @@ namespace Ertis.Schema.Types
         private IFieldInfo parent;
         private string displayName;
         private readonly string description;
+        private readonly string appearance;
         private readonly bool isRequired;
         private readonly bool isVirtual;
         private readonly bool isHidden;
@@ -130,6 +131,17 @@ namespace Ertis.Schema.Types
             {
                 this.isReadonly = value;
                 this.OnPropertyChanged(nameof(this.IsReadonly));
+            }
+        }
+        
+        [JsonProperty("appearance", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public string Appearance
+        {
+            get => this.appearance;
+            init
+            {
+                this.appearance = value;
+                this.OnPropertyChanged(nameof(this.Appearance));
             }
         }
         

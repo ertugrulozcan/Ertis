@@ -69,8 +69,9 @@ namespace Ertis.TemplateEngine
                 {
                     var rawText = template.Substring(0, placeHolder.StartIndex);
                     yield return new RawPart { RawValue = rawText };
-                    template = template.Substring(placeHolder.StartIndex + placeHolder.Outer.Length);
                 }
+                
+                template = template.Substring(placeHolder.StartIndex + placeHolder.Outer.Length);
                 
                 yield return placeHolder;
             }

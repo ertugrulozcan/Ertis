@@ -570,6 +570,62 @@ namespace Ertis.MongoDB.Repository
 
 		#endregion
 
+		#region Aggregation Methods
+
+		public dynamic Aggregate(string aggregationStagesJson)
+		{
+			try
+			{
+				var jArray = Newtonsoft.Json.Linq.JArray.Parse(aggregationStagesJson);
+				var bsonDocuments = jArray.Select(x => BsonDocument.Parse(x.ToString()));
+				var pipelineDefinition = PipelineDefinition<TEntity, BsonDocument>.Create(bsonDocuments);
+				var aggregationResultCursor = this.Collection.Aggregate(pipelineDefinition);
+				var documents = aggregationResultCursor.ToList();
+				var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
+				return objects;
+			}
+			catch (MongoCommandException ex)
+			{
+				switch (ex.Code)
+				{
+					case 31249:
+						throw new SelectQueryPathCollisionException(ex);
+					case 31254:
+						throw new SelectQueryInclusionException(ex);
+					default:
+						throw;
+				}
+			}
+		}
+		
+		public async ValueTask<dynamic> AggregateAsync(string aggregationStagesJson)
+		{
+			try
+			{
+				var jArray = Newtonsoft.Json.Linq.JArray.Parse(aggregationStagesJson);
+				var bsonDocuments = jArray.Select(x => BsonDocument.Parse(x.ToString()));
+				var pipelineDefinition = PipelineDefinition<TEntity, BsonDocument>.Create(bsonDocuments);
+				var aggregationResultCursor = await this.Collection.AggregateAsync(pipelineDefinition);
+				var documents = await aggregationResultCursor.ToListAsync();
+				var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
+				return objects;
+			}
+			catch (MongoCommandException ex)
+			{
+				switch (ex.Code)
+				{
+					case 31249:
+						throw new SelectQueryPathCollisionException(ex);
+					case 31254:
+						throw new SelectQueryInclusionException(ex);
+					default:
+						throw;
+				}
+			}
+		}
+
+		#endregion
+
 		#region Search Methods
 
 		public IPaginationCollection<TEntity> Search(

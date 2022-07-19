@@ -22,5 +22,9 @@ namespace Ertis.MongoDB.Repository
 		IPaginationCollection<TEntity> Search(string keyword, TextSearchOptions options = null, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
 		
 		ValueTask<IPaginationCollection<TEntity>> SearchAsync(string keyword, TextSearchOptions options = null, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
+
+		dynamic Aggregate(string aggregationStagesJson);
+		
+		ValueTask<dynamic> AggregateAsync(string aggregationStagesJson);
 	}
 }

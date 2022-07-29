@@ -74,6 +74,7 @@ namespace Ertis.Schema.Extensions
                 schema.SetDefaultValues(model);
                 schema.SetConstants(model);
                 schema.SetFormatPatterns(model);
+                schema.SetDateTimes(model);
                 
                 return isValidContent;
             }
@@ -354,6 +355,41 @@ namespace Ertis.Schema.Extensions
                 }
 
                 model.TrySetValue(path, constantFieldInfo.Value, out _, true);
+            }
+        }
+        
+        #endregion
+        
+        #region FormatPattern Methods
+
+        private static void SetDateTimes(this ISchema schema, DynamicObject model)
+        {
+            SetDateTimes(schema.Properties, model);
+        }
+
+        private static void SetDateTimes(IEnumerable<IFieldInfo> properties, DynamicObject model)
+        {
+            foreach (var fieldInfo in properties)
+            {
+                SetDateTimes(fieldInfo, model);
+            }
+        }
+        
+        private static void SetDateTimes(IFieldInfo fieldInfo, DynamicObject model)
+        {
+            if (fieldInfo is IDateTimeFieldInfo)
+            {
+                if (model.TryGetValue<string>(fieldInfo.Path, out var stringValue, out _) && DateTime.TryParse(stringValue, out var dateValue))
+                {
+                    var path = fieldInfo.Path;
+                    var segments = path.Split('.');
+                    if (segments.Length > 1)
+                    {
+                        path = string.Join(".", segments.Skip(1));
+                    }
+
+                    model.TrySetValue(path, dateValue, out _, true);
+                }
             }
         }
         

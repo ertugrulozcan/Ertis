@@ -39,11 +39,42 @@ namespace Ertis.Schema.Types.CustomTypes
         {
             if (string.IsNullOrWhiteSpace(hostName))
                 return false;
+            
+            if (!hostName.Contains('.'))
+                return false;
 
             try
             {
-                var hostNameType = Uri.CheckHostName(hostName);
-                return hostNameType != UriHostNameType.Unknown;
+                var testScheme = "http";
+                if (Uri.TryCreate(hostName, UriKind.Absolute, out var uriResult))
+                {
+                    if (HasScheme(uriResult))
+                    {
+                        testScheme = uriResult.Scheme;
+                    }
+                    
+                    return Uri.IsWellFormedUriString($"{testScheme}://{uriResult}", UriKind.Absolute);
+                }
+                else if (!hostName.Contains("://")) 
+                {
+                    return IsValidHostName($"{testScheme}://{hostName}");
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool HasScheme(Uri uri)
+        {
+            try
+            {
+                return !string.IsNullOrEmpty(uri.Scheme);
             }
             catch
             {

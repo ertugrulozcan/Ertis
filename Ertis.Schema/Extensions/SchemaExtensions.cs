@@ -12,6 +12,28 @@ namespace Ertis.Schema.Extensions
 {
     public static class SchemaExtensions
     {
+        #region Schema & Field Methods
+
+        /// <summary>
+        /// Return field path without schema segment
+        /// </summary>
+        /// <param name="fieldInfo"></param>
+        /// <param name="schema"></param>
+        /// <returns></returns>
+        public static string GetSelfPath(this IFieldInfo fieldInfo, ISchema schema)
+        {
+            var path = fieldInfo.Path;
+            var segments = path.Split('.');
+            if (segments.Length > 1 && segments[0] == schema.Slug)
+            {
+                path = string.Join(".", segments.Skip(1));
+            }
+
+            return path;
+        }
+
+        #endregion
+        
         #region Validation Methods
 
         public static void Validate(this ISchema schema, out Exception exception)
@@ -293,31 +315,25 @@ namespace Ertis.Schema.Extensions
 
         private static void SetDefaultValues(this ISchema schema, DynamicObject model)
         {
-            SetDefaultValues(schema.Properties, model);
+            SetDefaultValues(schema, schema.Properties, model);
         }
         
-        private static void SetDefaultValues(IEnumerable<IFieldInfo> properties, DynamicObject model)
+        private static void SetDefaultValues(ISchema schema, IEnumerable<IFieldInfo> properties, DynamicObject model)
         {
             foreach (var fieldInfo in properties)
             {
-                SetDefaultValues(fieldInfo, model);
+                SetDefaultValues(schema, fieldInfo, model);
             }
         }
         
-        private static void SetDefaultValues(IFieldInfo fieldInfo, DynamicObject model)
+        private static void SetDefaultValues(ISchema schema, IFieldInfo fieldInfo, DynamicObject model)
         {
             if (fieldInfo is IHasDefault hasDefault)
             {
                 var defaultValue = hasDefault.GetDefaultValue();
                 if (defaultValue != null)
                 {
-                    var path = fieldInfo.Path;
-                    var segments = path.Split('.');
-                    if (segments.Length > 1)
-                    {
-                        path = string.Join(".", segments.Skip(1));
-                    }
-
+                    var path = fieldInfo.GetSelfPath(schema);
                     if (!model.TryGetValue(path, out var currentValue, out _) || currentValue == null)
                     {
                         model.TrySetValue(path, defaultValue, out _, true);
@@ -332,62 +348,50 @@ namespace Ertis.Schema.Extensions
 
         private static void SetConstants(this ISchema schema, DynamicObject model)
         {
-            SetConstants(schema.Properties, model);
+            SetConstants(schema, schema.Properties, model);
         }
 
-        private static void SetConstants(IEnumerable<IFieldInfo> properties, DynamicObject model)
+        private static void SetConstants(ISchema schema, IEnumerable<IFieldInfo> properties, DynamicObject model)
         {
             foreach (var fieldInfo in properties)
             {
-                SetConstants(fieldInfo, model);
+                SetConstants(schema, fieldInfo, model);
             }
         }
         
-        private static void SetConstants(IFieldInfo fieldInfo, DynamicObject model)
+        private static void SetConstants(ISchema schema, IFieldInfo fieldInfo, DynamicObject model)
         {
             if (fieldInfo is ConstantFieldInfo constantFieldInfo)
             {
-                var path = fieldInfo.Path;
-                var segments = path.Split('.');
-                if (segments.Length > 1)
-                {
-                    path = string.Join(".", segments.Skip(1));
-                }
-
+                var path = fieldInfo.GetSelfPath(schema);
                 model.TrySetValue(path, constantFieldInfo.Value, out _, true);
             }
         }
         
         #endregion
         
-        #region FormatPattern Methods
+        #region DateTime Methods
 
         private static void SetDateTimes(this ISchema schema, DynamicObject model)
         {
-            SetDateTimes(schema.Properties, model);
+            SetDateTimes(schema, schema.Properties, model);
         }
 
-        private static void SetDateTimes(IEnumerable<IFieldInfo> properties, DynamicObject model)
+        private static void SetDateTimes(ISchema schema, IEnumerable<IFieldInfo> properties, DynamicObject model)
         {
             foreach (var fieldInfo in properties)
             {
-                SetDateTimes(fieldInfo, model);
+                SetDateTimes(schema, fieldInfo, model);
             }
         }
         
-        private static void SetDateTimes(IFieldInfo fieldInfo, DynamicObject model)
+        private static void SetDateTimes(ISchema schema, IFieldInfo fieldInfo, DynamicObject model)
         {
             if (fieldInfo is IDateTimeFieldInfo)
             {
-                if (model.TryGetValue<string>(fieldInfo.Path, out var stringValue, out _) && DateTime.TryParse(stringValue, out var dateValue))
+                var path = fieldInfo.GetSelfPath(schema);
+                if (model.TryGetValue<string>(path, out var stringValue, out _) && DateTime.TryParse(stringValue, out var dateValue))
                 {
-                    var path = fieldInfo.Path;
-                    var segments = path.Split('.');
-                    if (segments.Length > 1)
-                    {
-                        path = string.Join(".", segments.Skip(1));
-                    }
-
                     model.TrySetValue(path, dateValue, out _, true);
                 }
             }
@@ -399,18 +403,18 @@ namespace Ertis.Schema.Extensions
 
         private static void SetFormatPatterns(this ISchema schema, DynamicObject model)
         {
-            SetFormatPatterns(schema.Properties, model);
+            SetFormatPatterns(schema, schema.Properties, model);
         }
 
-        private static void SetFormatPatterns(IEnumerable<IFieldInfo> properties, DynamicObject model)
+        private static void SetFormatPatterns(ISchema schema, IEnumerable<IFieldInfo> properties, DynamicObject model)
         {
             foreach (var fieldInfo in properties)
             {
-                SetFormatPatterns(fieldInfo, model);
+                SetFormatPatterns(schema, fieldInfo, model);
             }
         }
         
-        private static void SetFormatPatterns(IFieldInfo fieldInfo, DynamicObject model)
+        private static void SetFormatPatterns(ISchema schema, IFieldInfo fieldInfo, DynamicObject model)
         {
             if (fieldInfo is StringFieldInfo stringFieldInfo)
             {
@@ -426,13 +430,7 @@ namespace Ertis.Schema.Extensions
                 
                 if (!string.IsNullOrEmpty(value))
                 {
-                    var path = fieldInfo.Path;
-                    var segments = path.Split('.');
-                    if (segments.Length > 1)
-                    {
-                        path = string.Join(".", segments.Skip(1));
-                    }
-
+                    var path = fieldInfo.GetSelfPath(schema);
                     model.TrySetValue(path, value, out _, true);
                 }
             }

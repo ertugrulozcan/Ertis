@@ -109,7 +109,7 @@ namespace Ertis.Schema.Extensions
 
         #endregion
         
-        #region MergeMethods
+        #region Merge Methods
 
         public static IEnumerable<IFieldInfo> MergeTypeProperties(this ISchema contentType1, ISchema contentType2, bool allowDuplicateFieldWithBaseType = false)
         {

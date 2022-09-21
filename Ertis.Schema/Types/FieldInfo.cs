@@ -358,6 +358,12 @@ namespace Ertis.Schema.Types
                     return true;
                 }
 
+                if (this.Type is FieldType.array or FieldType.tags && obj is object[] objectArray && (objectArray.Length == 0 || objectArray.All(x => x is string)))
+                {
+                    // If array is empty, it's handled as an object array, it's valid.
+                    return true;
+                }
+
                 var isAssignableTo = Helpers.NumericTypeHelper.IsAssignableTo(obj.GetType(), typeof(T));
                 return isAssignableTo != null && isAssignableTo.Value;
             }

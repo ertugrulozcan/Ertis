@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Models;
@@ -57,13 +58,13 @@ namespace Ertis.Schema.Types.CustomTypes
             var isValid = true;
             
             // ReSharper disable once ConvertIfStatementToSwitchStatement
-            if (this.ReferenceType == ReferenceTypes.single && obj is string referenceId)
+            if (this.ReferenceType == ReferenceTypes.single)
             {
-                
+                isValid = EnsureReferenceId(obj) != null;
             }
-            else if (this.ReferenceType == ReferenceTypes.multiple && obj is object[] objectArray && objectArray.All(x => x is string))
+            else if (this.ReferenceType == ReferenceTypes.multiple && obj is object[] objectArray)
             {
-                
+                isValid = objectArray.All(x => EnsureReferenceId(x) != null);
             }
             else if (this.ReferenceType == ReferenceTypes.collection)
             {
@@ -76,6 +77,17 @@ namespace Ertis.Schema.Types.CustomTypes
             }
             
             return isValid;
+        }
+
+        private static string EnsureReferenceId(object obj)
+        {
+            return obj switch
+            {
+                string referenceId => referenceId,
+                Dictionary<string, object> objectDictionary when objectDictionary.ContainsKey("_id") =>
+                    objectDictionary["_id"].ToString(),
+                _ => null
+            };
         }
         
         public override object GetDefaultValue()
@@ -205,7 +217,7 @@ namespace Ertis.Schema.Types.CustomTypes
     
     public class CollectionReferenceOptions
     {
-         #region Fields
+        #region Fields
 
         private readonly int? skip;
         private readonly int? limit;

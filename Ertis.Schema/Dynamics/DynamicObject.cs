@@ -71,6 +71,17 @@ namespace Ertis.Schema.Dynamics
                 PropertyDictionary = jToken.ToDictionary()
             };
         }
+        
+        public static T Cast<T>(dynamic obj) where T : class
+        {
+            if (obj == null)
+            {
+                return null;
+            }
+
+            var dynamicObject = new DynamicObject(obj);
+            return dynamicObject.Deserialize<T>();
+        }
 
         public IDictionary<string, object> ToDictionary()
         {
@@ -198,7 +209,22 @@ namespace Ertis.Schema.Dynamics
             }
             else if (TryGetValueFromArray(key, dictionary, out var foundValue))
             {
-                return foundValue;
+                if (segments.Length > 1)
+                {
+                    if (foundValue is IDictionary<string, object> subDictionary)
+                    {
+                        var subPath = string.Join(".", segments.Skip(1));
+                        return GetValueCore(subPath, subDictionary);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("Undefined");
+                    }
+                }
+                else
+                {
+                    return foundValue;
+                }
             }
             else
             {
@@ -302,7 +328,7 @@ namespace Ertis.Schema.Dynamics
                     dictionary[key] = obj;
                 }
             }
-            else if (TrySetValueOnArray(key, dictionary, obj))
+            else if (TrySetValueOnArray(path, dictionary, obj))
             {
                 // NOP
             }
@@ -326,11 +352,11 @@ namespace Ertis.Schema.Dynamics
 
         private static bool TrySetValueOnArray(string key, IDictionary<string, object> dictionary, object setValue)
         {
-            if (key.Contains('[') && key.EndsWith(']'))
+            var indexerStartIndex = key.IndexOf('[');
+            var indexerCloseIndex = key.IndexOf(']');
+            
+            if (indexerStartIndex > 0 && indexerCloseIndex > 0 && indexerStartIndex < indexerCloseIndex)
             {
-                var indexerStartIndex = key.IndexOf('[');
-                var indexerCloseIndex = key.IndexOf(']');
-
                 var originalKey = key.Substring(0, indexerStartIndex);
                 if (dictionary.ContainsKey(originalKey))
                 {
@@ -342,8 +368,18 @@ namespace Ertis.Schema.Dynamics
                         {
                             if (index < array.Length)
                             {
-                                array.SetValue(setValue, index);
-                                return true;
+                                var indexerPath = $"{originalKey}[{index}]";
+                                var arrayItem = array.GetValue(index);
+                                if (key.Length > indexerPath.Length && arrayItem is IDictionary<string, object> subDictionary)
+                                {
+                                    SetValueCore(key[indexerPath.Length..].TrimStart('.'), setValue, subDictionary, false);
+                                    return true;
+                                }
+                                else
+                                {
+                                    array.SetValue(setValue, index);
+                                    return true;   
+                                }
                             }
                             else
                             {

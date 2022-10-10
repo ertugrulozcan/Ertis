@@ -301,7 +301,7 @@ namespace Ertis.Schema.Extensions
 
                     break;
                 }
-                case FieldType.@object when fieldInfo is ArrayFieldInfo arrayFieldInfo:
+                case FieldType.array when fieldInfo is ArrayFieldInfo arrayFieldInfo:
                     referenceProperties.AddRange(GetReferenceProperties(arrayFieldInfo.ItemSchema));
                     break;
             }

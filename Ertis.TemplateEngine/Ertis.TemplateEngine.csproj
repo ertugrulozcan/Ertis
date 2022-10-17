@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <PackageId>Ertis.TemplateEngine</PackageId>
-        <PackageVersion>5.0.2</PackageVersion>
+        <PackageVersion>5.0.3</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.TemplateEngine</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -13,8 +13,8 @@
         <Title>Ertis.TemplateEngine</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>5.0.2</AssemblyVersion>
-        <FileVersion>5.0.2</FileVersion>
+        <AssemblyVersion>5.0.3</AssemblyVersion>
+        <FileVersion>5.0.3</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

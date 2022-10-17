@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <PackageId>Ertis.PostgreSQL</PackageId>
-        <PackageVersion>5.1.6</PackageVersion>
+        <PackageVersion>5.1.7</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.PostgreSQL</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -13,8 +13,8 @@
         <Title>Ertis.PostgreSQL</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>5.1.6</AssemblyVersion>
-        <FileVersion>5.1.6</FileVersion>
+        <AssemblyVersion>5.1.7</AssemblyVersion>
+        <FileVersion>5.1.7</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

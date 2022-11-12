@@ -58,6 +58,8 @@ namespace Ertis.Schema.Serialization
                             FieldType.location => JsonConvert.DeserializeObject<LocationFieldInfo>(json),
                             FieldType.reference => JsonConvert.DeserializeObject<ReferenceFieldInfo>(json),
                             FieldType.code => JsonConvert.DeserializeObject<CodeFieldInfo>(json),
+                            FieldType.image => JsonConvert.DeserializeObject<ImageFieldInfo>(json),
+                            FieldType.video => JsonConvert.DeserializeObject<VideoFieldInfo>(json),
 
                             // Unknown Type
                             _ => throw new SchemaValidationException($"Unknown field type : '{fieldTypeName}' ({fieldName})")

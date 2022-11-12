@@ -22,6 +22,8 @@ namespace Ertis.Schema.Types
         color,
         location,
         reference,
-        code
+        code,
+        image,
+        video
     }
 }

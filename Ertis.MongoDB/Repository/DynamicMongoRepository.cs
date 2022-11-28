@@ -728,13 +728,13 @@ namespace Ertis.MongoDB.Repository
 
 		public dynamic Upsert(dynamic entity)
 		{
-			var item = this.Find(entity._id);
+			var item = this.FindOne(entity._id);
 			return item == null ? this.Insert(entity) : this.Update(entity);
 		}
 		
 		public async ValueTask<dynamic> UpsertAsync(dynamic entity)
 		{
-			var item = await this.FindAsync(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(entity._id)));
+			var item = await this.FindOneAsync(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(entity._id)));
 			if (item == null)
 			{
 				return await this.InsertAsync(entity);

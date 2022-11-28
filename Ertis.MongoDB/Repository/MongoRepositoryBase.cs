@@ -780,7 +780,7 @@ namespace Ertis.MongoDB.Repository
 
 		public TEntity Upsert(TEntity entity)
 		{
-			var item = this.Find(entity.Id);
+			var item = this.FindOne(entity.Id);
 			if (item == null)
 			{
 				return this.Insert(entity);
@@ -793,7 +793,7 @@ namespace Ertis.MongoDB.Repository
 		
 		public async ValueTask<TEntity> UpsertAsync(TEntity entity)
 		{
-			var item = await this.FindAsync(entity.Id);
+			var item = await this.FindOneAsync(entity.Id);
 			if (item == null)
 			{
 				return await this.InsertAsync(entity);

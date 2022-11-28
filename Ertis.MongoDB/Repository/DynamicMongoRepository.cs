@@ -61,9 +61,19 @@ namespace Ertis.MongoDB.Repository
 			return this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id))).FirstOrDefault();
 		}
 		
+		private dynamic FindOne(ObjectId objectId)
+		{
+			return this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", objectId)).FirstOrDefault();
+		}
+		
 		public async ValueTask<dynamic> FindOneAsync(string id)
 		{
 			return await this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id))).FirstOrDefaultAsync();
+		}
+		
+		private async ValueTask<dynamic> FindOneAsync(ObjectId objectId)
+		{
+			return await this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", objectId)).FirstOrDefaultAsync();
 		}
 
 		public dynamic FindOne(Expression<Func<dynamic, bool>> expression)
@@ -726,23 +736,71 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 
+		[SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
 		public dynamic Upsert(dynamic entity)
 		{
-			var id = entity._id as string;
-			var item = this.FindOne(id);
-			return item == null ? this.Insert(entity) : this.Update(entity);
+			ObjectId _id = ObjectId.Empty;
+			switch (entity._id)
+			{
+				case string id:
+					_id = ObjectId.Parse(id);
+					break;
+				case ObjectId objectId1:
+					_id = objectId1;
+					break;
+				default:
+				{
+					if (ObjectId.TryParse(entity._id as string, out var objectId2))
+					{
+						_id = objectId2;
+					}
+
+					break;
+				}
+			}
+
+			if (_id == ObjectId.Empty)
+			{
+				return this.Insert(entity);
+			}
+			else
+			{
+				var item = this.FindOne(_id);
+				return item == null ? this.Insert(entity) : this.Update(entity);	
+			}
 		}
 		
+		[SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
 		public async ValueTask<dynamic> UpsertAsync(dynamic entity)
 		{
-			var item = await this.FindOneAsync(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(entity._id)));
-			if (item == null)
+			ObjectId _id = ObjectId.Empty;
+			switch (entity._id)
+			{
+				case string id:
+					_id = ObjectId.Parse(id);
+					break;
+				case ObjectId objectId1:
+					_id = objectId1;
+					break;
+				default:
+				{
+					if (ObjectId.TryParse(entity._id as string, out var objectId2))
+					{
+						_id = objectId2;
+					}
+
+					break;
+				}
+			}
+
+			if (_id == ObjectId.Empty)
 			{
 				return await this.InsertAsync(entity);
 			}
 			else
 			{
-				return await this.UpdateAsync(entity);
+				var item = await this.FindOneAsync(_id);
+				return item == null ? await this.InsertAsync(entity) : await this.UpdateAsync(entity);	
 			}
 		}
 

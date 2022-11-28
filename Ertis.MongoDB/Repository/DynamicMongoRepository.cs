@@ -728,7 +728,8 @@ namespace Ertis.MongoDB.Repository
 
 		public dynamic Upsert(dynamic entity)
 		{
-			var item = this.FindOne(entity._id);
+			var id = entity._id as string;
+			var item = this.FindOne(id);
 			return item == null ? this.Insert(entity) : this.Update(entity);
 		}
 		

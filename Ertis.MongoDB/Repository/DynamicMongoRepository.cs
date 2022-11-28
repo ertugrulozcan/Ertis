@@ -737,69 +737,29 @@ namespace Ertis.MongoDB.Repository
 		}
 
 		[SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
-		public dynamic Upsert(dynamic entity)
+		public dynamic Upsert(dynamic entity, string id = default)
 		{
-			ObjectId _id = ObjectId.Empty;
-			switch (entity._id)
-			{
-				case string id:
-					_id = ObjectId.Parse(id);
-					break;
-				case ObjectId objectId1:
-					_id = objectId1;
-					break;
-				default:
-				{
-					if (ObjectId.TryParse(entity._id as string, out var objectId2))
-					{
-						_id = objectId2;
-					}
-
-					break;
-				}
-			}
-
-			if (_id == ObjectId.Empty)
+			if (string.IsNullOrEmpty(id))
 			{
 				return this.Insert(entity);
 			}
 			else
 			{
-				var item = this.FindOne(_id);
+				var item = this.FindOne(id);
 				return item == null ? this.Insert(entity) : this.Update(entity);	
 			}
 		}
 		
 		[SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
-		public async ValueTask<dynamic> UpsertAsync(dynamic entity)
+		public async ValueTask<dynamic> UpsertAsync(dynamic entity, string id = default)
 		{
-			ObjectId _id = ObjectId.Empty;
-			switch (entity._id)
-			{
-				case string id:
-					_id = ObjectId.Parse(id);
-					break;
-				case ObjectId objectId1:
-					_id = objectId1;
-					break;
-				default:
-				{
-					if (ObjectId.TryParse(entity._id as string, out var objectId2))
-					{
-						_id = objectId2;
-					}
-
-					break;
-				}
-			}
-
-			if (_id == ObjectId.Empty)
+			if (string.IsNullOrEmpty(id))
 			{
 				return await this.InsertAsync(entity);
 			}
 			else
 			{
-				var item = await this.FindOneAsync(_id);
+				var item = await this.FindOneAsync(id);
 				return item == null ? await this.InsertAsync(entity) : await this.UpdateAsync(entity);	
 			}
 		}

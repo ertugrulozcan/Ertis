@@ -778,9 +778,9 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 
-		public TEntity Upsert(TEntity entity)
+		public TEntity Upsert(TEntity entity, string id = default)
 		{
-			var item = this.FindOne(entity.Id);
+			var item = this.FindOne(id ?? entity.Id);
 			if (item == null)
 			{
 				return this.Insert(entity);
@@ -791,9 +791,9 @@ namespace Ertis.MongoDB.Repository
 			}
 		}
 		
-		public async ValueTask<TEntity> UpsertAsync(TEntity entity)
+		public async ValueTask<TEntity> UpsertAsync(TEntity entity, string id = default)
 		{
-			var item = await this.FindOneAsync(entity.Id);
+			var item = await this.FindOneAsync(id ?? entity.Id);
 			if (item == null)
 			{
 				return await this.InsertAsync(entity);

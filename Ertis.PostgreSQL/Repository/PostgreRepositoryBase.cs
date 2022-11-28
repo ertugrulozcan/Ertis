@@ -583,9 +583,9 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public virtual TEntity Upsert(TEntity entity)
+		public virtual TEntity Upsert(TEntity entity, int id)
 		{
-			var current = this.FindOne(entity.Id);
+			var current = this.FindOne(id > 0 ? id : entity.Id);
 			if (current == null)
 			{
 				return this.Insert(entity);
@@ -596,9 +596,9 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public virtual async ValueTask<TEntity> UpsertAsync(TEntity entity)
+		public virtual async ValueTask<TEntity> UpsertAsync(TEntity entity, int id)
 		{
-			var current = await this.FindOneAsync(entity.Id);
+			var current = await this.FindOneAsync(id > 0 ? id : entity.Id);
 			if (current == null)
 			{
 				return await this.InsertAsync(entity);

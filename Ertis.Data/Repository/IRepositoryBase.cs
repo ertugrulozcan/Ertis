@@ -50,9 +50,9 @@ namespace Ertis.Data.Repository
 		
 		ValueTask<TEntity> UpdateAsync(TEntity entity, TIdentifier id = default);
 
-		TEntity Upsert(TEntity entity);
+		TEntity Upsert(TEntity entity, TIdentifier id = default);
 		
-		ValueTask<TEntity> UpsertAsync(TEntity entity);
+		ValueTask<TEntity> UpsertAsync(TEntity entity, TIdentifier id = default);
 
 		#endregion
 		

@@ -340,9 +340,6 @@ namespace Ertis.MongoDB.Repository
 			try
 			{
 				query = ISODateHelper.EnsureDatetimeFieldsToISODate(query);
-				Console.WriteLine("Executing query:");
-				Console.WriteLine(query);
-				
 				var filterDefinition = new JsonFilterDefinition<TEntity>(query);
 				return this.ExecuteQuery(
 					filterDefinition,
@@ -414,9 +411,6 @@ namespace Ertis.MongoDB.Repository
 			try
 			{
 				query = ISODateHelper.EnsureDatetimeFieldsToISODate(query);
-				Console.WriteLine("Executing query:");
-				Console.WriteLine(query);
-				
 				var filterDefinition = new JsonFilterDefinition<TEntity>(query);
 				return await this.ExecuteQueryAsync(
 					filterDefinition,

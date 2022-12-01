@@ -126,7 +126,7 @@ namespace Ertis.Schema.Types.Primitives
                     validationContext.Errors.Add(new FieldValidationException($"String length can not be less than {this.MinLength}", this));
                 }
 
-                if (!string.IsNullOrEmpty(this.RegexPattern))
+                if (!string.IsNullOrEmpty(text) && !string.IsNullOrEmpty(this.RegexPattern))
                 {
                     var match = Regex.Match(text, this.RegexPattern);
                     if (!match.Success)
@@ -136,7 +136,7 @@ namespace Ertis.Schema.Types.Primitives
                     }
                 }
 
-                if (!string.IsNullOrEmpty(this.RestrictRegexPattern))
+                if (!string.IsNullOrEmpty(text) && !string.IsNullOrEmpty(this.RestrictRegexPattern))
                 {
                     var match = Regex.Match(text, this.RestrictRegexPattern);
                     if (match.Success)

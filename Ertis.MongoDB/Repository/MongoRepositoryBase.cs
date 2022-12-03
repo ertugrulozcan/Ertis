@@ -781,7 +781,7 @@ namespace Ertis.MongoDB.Repository
 			}
 			else
 			{
-				return this.Update(entity);
+				return this.Update(entity, id);
 			}
 		}
 		
@@ -794,7 +794,7 @@ namespace Ertis.MongoDB.Repository
 			}
 			else
 			{
-				return await this.UpdateAsync(entity);
+				return await this.UpdateAsync(entity, id);
 			}
 		}
 

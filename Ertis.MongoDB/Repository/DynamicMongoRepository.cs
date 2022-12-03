@@ -740,7 +740,7 @@ namespace Ertis.MongoDB.Repository
 			else
 			{
 				var item = this.FindOne(id);
-				return item == null ? this.Insert(entity) : this.Update(entity);	
+				return item == null ? this.Insert(entity) : this.Update(entity, id);
 			}
 		}
 		
@@ -754,7 +754,7 @@ namespace Ertis.MongoDB.Repository
 			else
 			{
 				var item = await this.FindOneAsync(id);
-				return item == null ? await this.InsertAsync(entity) : await this.UpdateAsync(entity);	
+				return item == null ? await this.InsertAsync(entity) : await this.UpdateAsync(entity, id);
 			}
 		}
 

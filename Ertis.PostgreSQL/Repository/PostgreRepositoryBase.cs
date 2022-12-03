@@ -592,7 +592,7 @@ namespace Ertis.PostgreSQL.Repository
 			}
 			else
 			{
-				return this.Update(entity);
+				return this.Update(entity, id);
 			}
 		}
 
@@ -605,7 +605,7 @@ namespace Ertis.PostgreSQL.Repository
 			}
 			else
 			{
-				return await this.UpdateAsync(entity);
+				return await this.UpdateAsync(entity, id);
 			}
 		}
 

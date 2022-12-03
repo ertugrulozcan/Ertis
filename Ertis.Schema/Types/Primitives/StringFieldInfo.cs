@@ -105,7 +105,7 @@ namespace Ertis.Schema.Types.Primitives
 
         protected internal override bool Validate(object obj, IValidationContext validationContext)
         {
-            if (string.IsNullOrEmpty(obj?.ToString()) && !string.IsNullOrEmpty(this.FormatPattern))
+            if (!string.IsNullOrEmpty(this.FormatPattern))
             {
                 obj = this.Format(validationContext.Content);
             }

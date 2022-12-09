@@ -423,9 +423,9 @@ namespace Ertis.Schema.Extensions
                 {
                     value = stringFieldInfo.CurrentObject.ToString();
                 }
-                else if (!string.IsNullOrEmpty(stringFieldInfo.FormatPattern))
+                else if (!string.IsNullOrEmpty(stringFieldInfo.FormatPattern) && stringFieldInfo.TryFormat(model, out var formattedString))
                 {
-                    value = stringFieldInfo.Format(model);
+                    value = formattedString;
                 }
                 
                 if (!string.IsNullOrEmpty(value))

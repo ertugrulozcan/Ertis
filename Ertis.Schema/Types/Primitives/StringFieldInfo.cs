@@ -107,7 +107,10 @@ namespace Ertis.Schema.Types.Primitives
         {
             if (!string.IsNullOrEmpty(this.FormatPattern))
             {
-                obj = this.Format(validationContext.Content);
+                if (this.TryFormat(validationContext.Content, out var formattedString))
+                {
+                    obj = formattedString;
+                }
             }
             
             var isValid = base.Validate(obj, validationContext);
@@ -212,9 +215,14 @@ namespace Ertis.Schema.Types.Primitives
                     var openIndex = text.IndexOf(OPEN_FORMAT_BRACKETS, StringComparison.Ordinal);
                     var closeIndex = text.IndexOf(CLOSE_FORMAT_BRACKETS, StringComparison.Ordinal);
                     var segment = text.Substring(openIndex + OPEN_FORMAT_BRACKETS.Length, closeIndex - openIndex - OPEN_FORMAT_BRACKETS.Length);
-                    text = content.TryGetValue(segment.Trim(), out var value, out _) ? 
-                        text.Replace($"{OPEN_FORMAT_BRACKETS}{segment}{CLOSE_FORMAT_BRACKETS}", value != null ? value.ToString() : "null") : 
-                        text.Replace($"{OPEN_FORMAT_BRACKETS}{segment}{CLOSE_FORMAT_BRACKETS}", "undefined");
+                    if (content.TryGetValue(segment.Trim(), out var value, out _))
+                    {
+                        text = text.Replace($"{OPEN_FORMAT_BRACKETS}{segment}{CLOSE_FORMAT_BRACKETS}", value != null ? value.ToString() : "null");
+                    }
+                    else
+                    {
+                        throw new FormatException("Format parameter value could not be retrieved");
+                    }
                 }
 
                 return text;
@@ -222,6 +230,20 @@ namespace Ertis.Schema.Types.Primitives
             else
             {
                 return null;
+            }
+        }
+
+        public bool TryFormat(DynamicObject content, out string value)
+        {
+            try
+            {
+                value = this.Format(content);
+                return true;
+            }
+            catch (FormatException)
+            {
+                value = null;
+                return false;
             }
         }
         

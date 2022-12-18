@@ -32,23 +32,23 @@ namespace Ertis.Security.Cryptography
 			switch (algorithm)
 			{
 				case HashAlgorithms.MD5:
-					hashAlgorithm = new MD5CryptoServiceProvider();
+					hashAlgorithm = MD5.Create();
 					break;
 				case HashAlgorithms.SHA0:
 					throw new NotSupportedException("Not supported hash algorithm :(");
 				case HashAlgorithms.SHA1:
-					hashAlgorithm = new SHA1Managed();
+					hashAlgorithm = SHA1.Create();
 					break;
 				case HashAlgorithms.SHA2_224:
 					throw new NotSupportedException("Not supported hash algorithm :(");
 				case HashAlgorithms.SHA2_256:
-					hashAlgorithm = new SHA256Managed();
+					hashAlgorithm = SHA256.Create();
 					break;
 				case HashAlgorithms.SHA2_384:
-					hashAlgorithm = new SHA384Managed();
+					hashAlgorithm = SHA384.Create();
 					break;
 				case HashAlgorithms.SHA2_512:
-					hashAlgorithm = new SHA512Managed();
+					hashAlgorithm = SHA512.Create();
 					break;
 				case HashAlgorithms.SHA2_512_224:
 					throw new NotSupportedException("Not supported hash algorithm :(");

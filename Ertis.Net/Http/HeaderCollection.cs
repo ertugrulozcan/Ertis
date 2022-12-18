@@ -128,7 +128,7 @@ namespace Ertis.Net.Http
 			return string.Join("&", 
 				this.HeadersDictionary
 					.Where(x => !string.IsNullOrEmpty(x.Key) && x.Value != null)
-					.Select(x => $"{x.Key}={Uri.EscapeUriString(x.Value?.ToString() ?? "")}"));
+					.Select(x => $"{x.Key}={Uri.EscapeDataString(x.Value?.ToString() ?? "")}"));
 		}
 
 		public IEnumerator GetEnumerator()

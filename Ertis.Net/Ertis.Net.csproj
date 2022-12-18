@@ -1,25 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <PackageId>Ertis.Net</PackageId>
-        <PackageVersion>5.1.8</PackageVersion>
+        <PackageVersion>7.0.0</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.Net</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <Copyright>Ertuğrul Özcan | Copyright 2021 (c)</Copyright>
-        <PackageReleaseNotes>.Net 5</PackageReleaseNotes>
+        <PackageReleaseNotes>.Net 7</PackageReleaseNotes>
         <PackageTags>Ertis.Net</PackageTags>
         <Title>Ertis.Net</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>5.1.8</AssemblyVersion>
-        <FileVersion>5.1.8</FileVersion>
+        <AssemblyVersion>7.0.0</AssemblyVersion>
+        <FileVersion>7.0.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-      <PackageReference Include="RestSharp" Version="107.3.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+      <PackageReference Include="RestSharp" Version="108.0.3" />
     </ItemGroup>
 
     <ItemGroup>

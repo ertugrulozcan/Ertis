@@ -1,20 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <PackageId>Ertis.Security</PackageId>
-        <PackageVersion>5.1.5</PackageVersion>
+        <PackageVersion>7.0.0</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.Security</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <Copyright>Ertuğrul Özcan | Copyright 2021 (c)</Copyright>
-        <PackageReleaseNotes>.Net 5</PackageReleaseNotes>
+        <PackageReleaseNotes>.Net 7</PackageReleaseNotes>
         <PackageTags>Ertis.Security</PackageTags>
         <Title>Ertis.Security</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>5.1.5</AssemblyVersion>
-        <FileVersion>5.1.5</FileVersion>
+        <AssemblyVersion>7.0.0</AssemblyVersion>
+        <FileVersion>7.0.0</FileVersion>
     </PropertyGroup>
 
 </Project>

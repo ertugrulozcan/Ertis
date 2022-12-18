@@ -1,20 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <PackageId>Ertis.Data</PackageId>
-        <PackageVersion>5.2.0</PackageVersion>
+        <PackageVersion>7.0.0</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.Data</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <Copyright>Ertuğrul Özcan | Copyright 2021 (c)</Copyright>
-        <PackageReleaseNotes>.Net 5</PackageReleaseNotes>
+        <PackageReleaseNotes>.Net 7</PackageReleaseNotes>
         <PackageTags>Ertis.Data</PackageTags>
         <Title>Ertis.Data</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>5.2.0</AssemblyVersion>
-        <FileVersion>5.2.0</FileVersion>
+        <AssemblyVersion>7.0.0</AssemblyVersion>
+        <FileVersion>7.0.0</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

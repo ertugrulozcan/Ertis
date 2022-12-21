@@ -40,6 +40,9 @@ namespace Ertis.Schema.Types
         [JsonProperty("isReadonly", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
         bool IsReadonly { get; init; }
         
+        [JsonProperty("isSearchable", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        bool IsSearchable { get; init; }
+
         #endregion
         
         #region Methods

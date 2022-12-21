@@ -22,7 +22,8 @@ namespace Ertis.Schema.Types
         private readonly bool isVirtual;
         private readonly bool isHidden;
         private readonly bool isReadonly;
-        
+        private readonly bool isSearchable;
+
         #endregion
         
         #region Properties
@@ -148,6 +149,17 @@ namespace Ertis.Schema.Types
         [JsonIgnore]
         protected internal object CurrentObject { get; private set; }
 
+        [JsonProperty("isSearchable", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool IsSearchable
+        {
+            get => this.isSearchable;
+            init
+            {
+                this.isSearchable = value;
+                this.OnPropertyChanged(nameof(this.IsSearchable));
+            }
+        }
+        
         #endregion
 
         #region Abstract Methods

@@ -40,7 +40,14 @@ namespace Ertis.Schema.Dynamics
         /// </summary>
         public DynamicObject(object obj)
         {
-            this.PropertyDictionary = obj.ToDictionary();
+            if (obj is DynamicObject dynamicObject)
+            {
+                this.PropertyDictionary = dynamicObject.PropertyDictionary;
+            }
+            else
+            {
+                this.PropertyDictionary = obj.ToDictionary();   
+            }
         }
 
         #endregion

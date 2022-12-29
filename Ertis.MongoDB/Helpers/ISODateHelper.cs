@@ -1,6 +1,8 @@
 using System;
+using System.Globalization;
 using Newtonsoft.Json.Linq;
 
+// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.MongoDB.Helpers
 {
 	public static class ISODateHelper
@@ -43,7 +45,7 @@ namespace Ertis.MongoDB.Helpers
 				{
 					if (node.Type == JTokenType.String || node.Type == JTokenType.Date)
 					{
-						if (DateTime.TryParse(node.Value<string>(), out var dateTime))
+						if (TryParseDateTime(node.Value<string>(), out var dateTime))
 						{
 							jValue.Replace(new JRaw($"ISODate(\"{dateTime:yyyy-MM-ddTHH:mm:ssZ}\")"));
 						}
@@ -60,6 +62,33 @@ namespace Ertis.MongoDB.Helpers
 			catch
 			{
 				return node;
+			}
+		}
+
+		internal static bool TryParseDateTime(string dateTimeString, out DateTime dateTime)
+		{
+			if (DateTime.TryParse(dateTimeString, out dateTime))
+			{
+				return true;
+			}
+			else
+			{
+				var availableFormats = new[]
+				{
+					"yyyy-MM-ddTHH:mm:ssZ",
+					"dd/MM/yyyy HH:mm:ssZ"
+				};
+
+				foreach (var pattern in availableFormats)
+				{
+					if (DateTime.TryParse(dateTimeString, new DateTimeFormatInfo { LongTimePattern = pattern }, out dateTime))
+					{
+						return true;
+					}
+				}
+
+				dateTime = new DateTime();
+				return false;
 			}
 		}
 

@@ -61,6 +61,7 @@ namespace Ertis.MongoDB.Repository
 			return this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id))).FirstOrDefault();
 		}
 		
+		// ReSharper disable once UnusedMember.Local
 		private dynamic FindOne(ObjectId objectId)
 		{
 			return this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", objectId)).FirstOrDefault();
@@ -71,6 +72,7 @@ namespace Ertis.MongoDB.Repository
 			return await this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id))).FirstOrDefaultAsync();
 		}
 		
+		// ReSharper disable once UnusedMember.Local
 		private async ValueTask<dynamic> FindOneAsync(ObjectId objectId)
 		{
 			return await this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", objectId)).FirstOrDefaultAsync();
@@ -176,8 +178,7 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null, 
 			SortDirection? sortDirection = null)
 		{
-			var collection =
-				this.ExecuteFilter(predicate, skip, limit, orderBy, sortDirection);
+			var collection = this.ExecuteFilter(predicate, skip, limit, orderBy, sortDirection);
 
 			long totalCount = 0;
 			if (withCount != null && withCount.Value)
@@ -200,8 +201,7 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null, 
 			SortDirection? sortDirection = null)
 		{
-			var collection =
-				this.ExecuteFilter(predicate, skip, limit, orderBy, sortDirection);
+			var collection = this.ExecuteFilter(predicate, skip, limit, orderBy, sortDirection);
 
 			long totalCount = 0;
 			if (withCount != null && withCount.Value)
@@ -291,7 +291,7 @@ namespace Ertis.MongoDB.Repository
 		{
 			try
 			{
-				query = ISODateHelper.EnsureDatetimeFieldsToISODate(query);
+				query = QueryHelper.EnsureObjectIdsAndISODates(query);
 				var filterDefinition = new JsonFilterDefinition<dynamic>(query);
 				return this.ExecuteQuery(
 					filterDefinition,
@@ -362,7 +362,7 @@ namespace Ertis.MongoDB.Repository
 		{
 			try
 			{
-				query = ISODateHelper.EnsureDatetimeFieldsToISODate(query);
+				query = QueryHelper.EnsureObjectIdsAndISODates(query);
 				var filterDefinition = new JsonFilterDefinition<dynamic>(query);
 				return await this.ExecuteQueryAsync(
 					filterDefinition,
@@ -433,9 +433,7 @@ namespace Ertis.MongoDB.Repository
 		{
 			try
 			{
-				var filterResult =
-					this.ExecuteFilter(filterDefinition, skip, limit, sortField, sortDirection);
-
+				var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sortField, sortDirection);
 				var projectionDefinition = ExecuteSelectQuery<dynamic>(selectFields);
 				var collection = filterResult.Project(projectionDefinition);
 			
@@ -479,9 +477,7 @@ namespace Ertis.MongoDB.Repository
 		{
 			try
 			{
-				var filterResult =
-					this.ExecuteFilter(filterDefinition, skip, limit, sortField, sortDirection);
-
+				var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sortField, sortDirection);
 				var projectionDefinition = ExecuteSelectQuery<dynamic>(selectFields);
 				var collection = filterResult.Project(projectionDefinition);
 			

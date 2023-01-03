@@ -65,9 +65,9 @@ namespace Ertis.MongoDB.Helpers
 			}
 		}
 
-		internal static bool TryParseDateTime(string dateTimeString, out DateTime dateTime)
+		public static bool TryParseDateTime(string dateTimeString, out DateTime dateTime)
 		{
-			if (DateTime.TryParse(dateTimeString, out dateTime))
+			if (DateTime.TryParseExact(dateTimeString, "yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out dateTime))
 			{
 				return true;
 			}
@@ -75,6 +75,7 @@ namespace Ertis.MongoDB.Helpers
 			{
 				var availableFormats = new[]
 				{
+					"yyyy-MM-ddTHH:mm:ss.fffZ",
 					"yyyy-MM-ddTHH:mm:ssZ",
 					"dd/MM/yyyy HH:mm:ssZ"
 				};

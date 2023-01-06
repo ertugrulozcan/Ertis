@@ -11,6 +11,7 @@ using Ertis.MongoDB.Attributes;
 using Ertis.MongoDB.Configuration;
 using Ertis.MongoDB.Exceptions;
 using Ertis.MongoDB.Helpers;
+using Ertis.MongoDB.Models;
 using Ertis.MongoDB.Queries;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -58,6 +59,147 @@ namespace Ertis.MongoDB.Repository
 		#endregion
 
 		#region Index Methods
+		
+		public async Task<IEnumerable<IIndexDefinition>> GetIndexesAsync()
+		{
+			var indexesCursor = await this.Collection.Indexes.ListAsync();
+			var indexes = await indexesCursor.ToListAsync();
+			var indexDefinitions = new List<IIndexDefinition>();
+			foreach (var index in indexes)
+			{
+				if (index.Contains("key") && index["key"].IsBsonDocument)
+				{
+					var nodes = index["key"].AsBsonDocument.Elements.ToArray();
+					if (nodes.Any())
+					{
+						if (nodes.Length == 1)
+						{
+							// Single
+							var node = nodes[0];
+							indexDefinitions.Add(new SingleIndexDefinition(node.Name,
+								node.Value.IsInt32
+									? (node.Value.AsInt32 == -1
+										? SortDirection.Descending
+										: SortDirection.Ascending)
+									: null));
+						}
+						else
+						{
+							// Compound
+							var subIndexDefinitions = new List<SingleIndexDefinition>();
+							foreach (var node in nodes)
+							{
+								subIndexDefinitions.Add(new SingleIndexDefinition(node.Name,
+									node.Value.IsInt32
+										? (node.Value.AsInt32 == -1
+											? SortDirection.Descending
+											: SortDirection.Ascending)
+										: null));
+							}
+							
+							indexDefinitions.Add(new CompoundIndexDefinition(subIndexDefinitions.ToArray()));
+						}
+					}
+					else
+					{
+						return Enumerable.Empty<IIndexDefinition>();
+					}
+				}
+			}
+			
+			return indexDefinitions;
+		}
+
+		public async Task<string> CreateIndexAsync(IIndexDefinition indexDefinition)
+		{
+			// ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+			// ReSharper disable once ConvertSwitchStatementToSwitchExpression
+			switch (indexDefinition.Type)
+			{
+				case IndexType.Single:
+					return await this.CreateSingleIndexAsync(indexDefinition as SingleIndexDefinition);
+				case IndexType.Compound:
+					return await this.CreateCompoundIndexAsync(indexDefinition as CompoundIndexDefinition);
+				default:
+					throw new NotImplementedException("Not implemented yet for this index type");
+			}
+		}
+
+		public async Task<string[]> CreateManyIndexAsync(IEnumerable<IIndexDefinition> indexDefinitions)
+		{
+			var results = new List<string>();
+			foreach (var indexDefinition in indexDefinitions)
+			{
+				results.Add(await this.CreateIndexAsync(indexDefinition));
+			}
+
+			return results.ToArray();
+		}
+		
+		public async Task<string> CreateSingleIndexAsync(string fieldName, SortDirection? direction = null)
+		{
+			var indexKeysDefinition = direction is SortDirection.Descending ?
+				Builders<TEntity>.IndexKeys.Descending(fieldName) :
+				Builders<TEntity>.IndexKeys.Ascending(fieldName);
+			
+			return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<TEntity>(indexKeysDefinition));
+		}
+		
+		public async Task<string> CreateSingleIndexAsync(Expression<Func<TEntity, object>> expression, SortDirection? direction = null)
+		{
+			var indexKeysDefinition = direction is SortDirection.Descending ?
+				Builders<TEntity>.IndexKeys.Descending(expression) :
+				Builders<TEntity>.IndexKeys.Ascending(expression);
+			
+			return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<TEntity>(indexKeysDefinition));
+		}
+
+		public async Task<string> CreateSingleIndexAsync(SingleIndexDefinition indexDefinition)
+		{
+			return await this.CreateSingleIndexAsync(indexDefinition.Field, indexDefinition.Direction);
+		}
+		
+		public async Task<string> CreateCompoundIndexAsync(IDictionary<string, SortDirection> indexFieldDefinitions)
+		{
+			var indexKeyDefinitions = new List<IndexKeysDefinition<TEntity>>();
+			foreach (var (fieldName, direction) in indexFieldDefinitions)
+			{
+				indexKeyDefinitions.Add(direction is SortDirection.Descending ?
+					Builders<TEntity>.IndexKeys.Descending(fieldName) :
+					Builders<TEntity>.IndexKeys.Ascending(fieldName));
+			}
+			
+			var combinedIndexDefinition = Builders<TEntity>.IndexKeys.Combine(indexKeyDefinitions);
+			return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<TEntity>(combinedIndexDefinition));
+		}
+		
+		public async Task<string> CreateCompoundIndexAsync(IDictionary<Expression<Func<TEntity, object>>, SortDirection> indexFieldDefinitions)
+		{
+			var indexKeyDefinitions = new List<IndexKeysDefinition<TEntity>>();
+			foreach (var (expression, direction) in indexFieldDefinitions)
+			{
+				indexKeyDefinitions.Add(direction is SortDirection.Descending ?
+					Builders<TEntity>.IndexKeys.Descending(expression) :
+					Builders<TEntity>.IndexKeys.Ascending(expression));
+			}
+			
+			var combinedIndexDefinition = Builders<TEntity>.IndexKeys.Combine(indexKeyDefinitions);
+			return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<TEntity>(combinedIndexDefinition));
+		}
+
+		public async Task<string> CreateCompoundIndexAsync(CompoundIndexDefinition indexDefinition)
+		{
+			var indexKeyDefinitions = new List<IndexKeysDefinition<TEntity>>();
+			foreach (var index in indexDefinition.Indexes)
+			{
+				indexKeyDefinitions.Add(index.Direction is SortDirection.Descending ?
+					Builders<TEntity>.IndexKeys.Descending(index.Field) :
+					Builders<TEntity>.IndexKeys.Ascending(index.Field));
+			}
+			
+			var combinedIndexDefinition = Builders<TEntity>.IndexKeys.Combine(indexKeyDefinitions);
+			return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<TEntity>(combinedIndexDefinition));
+		}
 
 		private async Task CreateSearchIndexesAsync()
 		{

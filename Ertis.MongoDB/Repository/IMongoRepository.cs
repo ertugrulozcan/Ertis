@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Ertis.Core.Collections;
 using Ertis.Data.Models;
 using Ertis.Data.Repository;
+using Ertis.MongoDB.Models;
 using Ertis.MongoDB.Queries;
 
 namespace Ertis.MongoDB.Repository
@@ -26,5 +27,23 @@ namespace Ertis.MongoDB.Repository
 		dynamic Aggregate(string aggregationStagesJson);
 		
 		ValueTask<dynamic> AggregateAsync(string aggregationStagesJson);
+		
+		Task<IEnumerable<IIndexDefinition>> GetIndexesAsync();
+
+		Task<string> CreateIndexAsync(IIndexDefinition indexDefinition);
+		
+		Task<string[]> CreateManyIndexAsync(IEnumerable<IIndexDefinition> indexDefinitions);
+
+		Task<string> CreateSingleIndexAsync(string fieldName, SortDirection? direction = null);
+		
+		Task<string> CreateSingleIndexAsync(Expression<Func<TEntity, object>> expression, SortDirection? direction = null);
+
+		Task<string> CreateSingleIndexAsync(SingleIndexDefinition indexDefinition);
+
+		Task<string> CreateCompoundIndexAsync(IDictionary<string, SortDirection> indexFieldDefinitions);
+		
+		Task<string> CreateCompoundIndexAsync(IDictionary<Expression<Func<TEntity, object>>, SortDirection> indexFieldDefinitions);
+		
+		Task<string> CreateCompoundIndexAsync(CompoundIndexDefinition indexDefinition);
 	}
 }

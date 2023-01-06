@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ertis.Core.Collections;
 using Ertis.Data.Repository;
+using Ertis.MongoDB.Models;
 
 namespace Ertis.MongoDB.Repository
 {
@@ -44,5 +45,19 @@ namespace Ertis.MongoDB.Repository
             string sortField = null,
             SortDirection? sortDirection = null,
             IDictionary<string, bool> selectFields = null);
+
+        Task<IEnumerable<IIndexDefinition>> GetIndexesAsync();
+        
+        Task<string> CreateIndexAsync(IIndexDefinition indexDefinition);
+		
+        Task<string[]> CreateManyIndexAsync(IEnumerable<IIndexDefinition> indexDefinitions);
+
+        Task<string> CreateSingleIndexAsync(string fieldName, SortDirection? direction = null);
+        
+        Task<string> CreateSingleIndexAsync(SingleIndexDefinition indexDefinition);
+
+        Task<string> CreateCompoundIndexAsync(IDictionary<string, SortDirection> indexFieldDefinitions);
+        
+        Task<string> CreateCompoundIndexAsync(CompoundIndexDefinition indexDefinition);
     }
 }

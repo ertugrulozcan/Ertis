@@ -7,11 +7,11 @@ using Newtonsoft.Json.Linq;
 
 namespace Ertis.Schema.Dynamics
 {
-    public class DynamicObject : ICloneable
+    public class DynamicObject : ICloneable, IDisposable
     {
         #region Properties
 
-        private IDictionary<string, object> PropertyDictionary { get; init; }
+        private IDictionary<string, object> PropertyDictionary { get; set; }
 
         #endregion
 
@@ -470,6 +470,35 @@ namespace Ertis.Schema.Dynamics
             return Parse(this.ToJson());
         }
 
+        #endregion
+        
+        #region Disposing
+
+        private bool _disposedValue;
+
+        ~DynamicObject() => this.Dispose(false);
+		
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    this.PropertyDictionary.Clear();
+                    this.PropertyDictionary = null;
+                }
+
+                // Free unmanaged resources (unmanaged objects) and override finalizer, set large fields to null
+                _disposedValue = true;
+            }
+        }
+		
         #endregion
     }
 }

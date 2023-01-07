@@ -45,6 +45,10 @@ namespace Ertis.MongoDB.Repository
             string sortField = null,
             SortDirection? sortDirection = null,
             IDictionary<string, bool> selectFields = null);
+        
+        dynamic Aggregate(string query);
+		
+        ValueTask<dynamic> AggregateAsync(string query);
 
         Task<IEnumerable<IIndexDefinition>> GetIndexesAsync();
         

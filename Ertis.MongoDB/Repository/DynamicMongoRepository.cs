@@ -11,6 +11,9 @@ using Ertis.MongoDB.Exceptions;
 using Ertis.MongoDB.Helpers;
 using Ertis.MongoDB.Models;
 using MongoDB.Bson;
+using MongoDB.Bson.IO;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using SortDirection = Ertis.Core.Collections.SortDirection;
 using MongoDriver = MongoDB.Driver;
@@ -828,6 +831,74 @@ namespace Ertis.MongoDB.Repository
 		
 		#endregion
 
+		#region Aggregation Methods
+
+		public dynamic Aggregate(string query)
+		{
+			try
+			{
+				query = QueryHelper.EnsureObjectIdsAndISODates(query);
+				
+				using (var jsonReader = new JsonReader(query))
+				{
+					var serializer = new BsonArraySerializer();
+					var bsonArray = serializer.Deserialize(BsonDeserializationContext.CreateRoot(jsonReader));
+					var bsonDocuments = bsonArray.Select(x => BsonDocument.Parse(x.ToString()));
+					var pipelineDefinition = PipelineDefinition<dynamic, BsonDocument>.Create(bsonDocuments);
+					var aggregationResultCursor = this.Collection.Aggregate(pipelineDefinition);
+					var documents = aggregationResultCursor.ToList();
+					var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
+					return objects;
+				}
+			}
+			catch (MongoCommandException ex)
+			{
+				switch (ex.Code)
+				{
+					case 31249:
+						throw new SelectQueryPathCollisionException(ex);
+					case 31254:
+						throw new SelectQueryInclusionException(ex);
+					default:
+						throw;
+				}
+			}
+		}
+		
+		public async ValueTask<dynamic> AggregateAsync(string query)
+		{
+			try
+			{
+				query = QueryHelper.EnsureObjectIdsAndISODates(query);
+				
+				using (var jsonReader = new JsonReader(query))
+				{
+					var serializer = new BsonArraySerializer();
+					var bsonArray = serializer.Deserialize(BsonDeserializationContext.CreateRoot(jsonReader));
+					var bsonDocuments = bsonArray.Select(x => BsonDocument.Parse(x.ToString()));
+					var pipelineDefinition = PipelineDefinition<dynamic, BsonDocument>.Create(bsonDocuments);
+					var aggregationResultCursor = await this.Collection.AggregateAsync(pipelineDefinition);
+					var documents = await aggregationResultCursor.ToListAsync();
+					var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
+					return objects;
+				}
+			}
+			catch (MongoCommandException ex)
+			{
+				switch (ex.Code)
+				{
+					case 31249:
+						throw new SelectQueryPathCollisionException(ex);
+					case 31254:
+						throw new SelectQueryInclusionException(ex);
+					default:
+						throw;
+				}
+			}
+		}
+
+		#endregion
+		
 		#region Index Methods
 
 		public async Task<IEnumerable<IIndexDefinition>> GetIndexesAsync()

@@ -146,9 +146,13 @@ namespace Ertis.Schema.Dynamics
             {
                 return Create(dictionary).Deserialize<T>();
             }
+            else if (typeof(T).IsEnum && Enum.TryParse(typeof(T), value.ToString(), false, out var enumValue))
+            {
+                return (T) enumValue;
+            }
             else
             {
-                return (T) value;   
+                return (T) value;
             }
         }
         

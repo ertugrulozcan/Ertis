@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Ertis.Core.Collections;
 using Ertis.Data.Models;
@@ -16,34 +17,34 @@ namespace Ertis.MongoDB.Repository
 
 		IPaginationCollection<dynamic> Query(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null, IDictionary<string, bool> selectFields = null);
 		
-		ValueTask<IPaginationCollection<dynamic>> QueryAsync(string query, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null, IDictionary<string, bool> selectFields = null);
+		ValueTask<IPaginationCollection<dynamic>> QueryAsync(string query, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null, IDictionary<string, bool> selectFields = null, CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<dynamic>> QueryAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null, IDictionary<string, bool> selectFields = null);
+		ValueTask<IPaginationCollection<dynamic>> QueryAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null, IDictionary<string, bool> selectFields = null, CancellationToken cancellationToken = default);
 		
 		IPaginationCollection<TEntity> Search(string keyword, TextSearchOptions options = null, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
 		
-		ValueTask<IPaginationCollection<TEntity>> SearchAsync(string keyword, TextSearchOptions options = null, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
+		ValueTask<IPaginationCollection<TEntity>> SearchAsync(string keyword, TextSearchOptions options = null, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null, CancellationToken cancellationToken = default);
 
 		dynamic Aggregate(string aggregationStagesJson);
 		
-		ValueTask<dynamic> AggregateAsync(string aggregationStagesJson);
+		ValueTask<dynamic> AggregateAsync(string aggregationStagesJson, CancellationToken cancellationToken = default);
 		
-		Task<IEnumerable<IIndexDefinition>> GetIndexesAsync();
+		Task<IEnumerable<IIndexDefinition>> GetIndexesAsync(CancellationToken cancellationToken = default);
 
-		Task<string> CreateIndexAsync(IIndexDefinition indexDefinition);
+		Task<string> CreateIndexAsync(IIndexDefinition indexDefinition, CancellationToken cancellationToken = default);
 		
-		Task<string[]> CreateManyIndexAsync(IEnumerable<IIndexDefinition> indexDefinitions);
+		Task<string[]> CreateManyIndexAsync(IEnumerable<IIndexDefinition> indexDefinitions, CancellationToken cancellationToken = default);
 
-		Task<string> CreateSingleIndexAsync(string fieldName, SortDirection? direction = null);
+		Task<string> CreateSingleIndexAsync(string fieldName, SortDirection? direction = null, CancellationToken cancellationToken = default);
 		
-		Task<string> CreateSingleIndexAsync(Expression<Func<TEntity, object>> expression, SortDirection? direction = null);
+		Task<string> CreateSingleIndexAsync(Expression<Func<TEntity, object>> expression, SortDirection? direction = null, CancellationToken cancellationToken = default);
 
-		Task<string> CreateSingleIndexAsync(SingleIndexDefinition indexDefinition);
+		Task<string> CreateSingleIndexAsync(SingleIndexDefinition indexDefinition, CancellationToken cancellationToken = default);
 
-		Task<string> CreateCompoundIndexAsync(IDictionary<string, SortDirection> indexFieldDefinitions);
+		Task<string> CreateCompoundIndexAsync(IDictionary<string, SortDirection> indexFieldDefinitions, CancellationToken cancellationToken = default);
 		
-		Task<string> CreateCompoundIndexAsync(IDictionary<Expression<Func<TEntity, object>>, SortDirection> indexFieldDefinitions);
+		Task<string> CreateCompoundIndexAsync(IDictionary<Expression<Func<TEntity, object>>, SortDirection> indexFieldDefinitions, CancellationToken cancellationToken = default);
 		
-		Task<string> CreateCompoundIndexAsync(CompoundIndexDefinition indexDefinition);
+		Task<string> CreateCompoundIndexAsync(CompoundIndexDefinition indexDefinition, CancellationToken cancellationToken = default);
 	}
 }

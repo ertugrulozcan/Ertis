@@ -2,11 +2,13 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Ertis.Core.Collections;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
+// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.Extensions.AspNetCore.Extensions
 {
 	public static class ControllerExtensions
@@ -32,16 +34,16 @@ namespace Ertis.Extensions.AspNetCore.Extensions
 			}
 		}
 		
-		public static async Task<string> ExtractRequestBodyAsync(this ControllerBase controller)
+		public static async Task<string> ExtractRequestBodyAsync(this ControllerBase controller, CancellationToken cancellationToken = default)
 		{
 			var requestBodyStream = new MemoryStream();
 			
 			try
 			{
 				controller.Request.EnableBuffering();
-				await controller.Request.Body.CopyToAsync(requestBodyStream);
+				await controller.Request.Body.CopyToAsync(requestBodyStream, cancellationToken);
 				requestBodyStream.Seek(0, SeekOrigin.Begin);
-				var body = await new StreamReader(requestBodyStream).ReadToEndAsync();
+				var body = await new StreamReader(requestBodyStream).ReadToEndAsync(cancellationToken);
 				return body;
 			}
 			finally
@@ -68,9 +70,9 @@ namespace Ertis.Extensions.AspNetCore.Extensions
 			return controller.ExtractWhereQuery(query);
 		}
 		
-		public static async Task<string> ExtractWhereQueryAsync(this ControllerBase controller)
+		public static async Task<string> ExtractWhereQueryAsync(this ControllerBase controller, CancellationToken cancellationToken = default)
 		{
-			string query = await controller.ExtractRequestBodyAsync();
+			string query = await controller.ExtractRequestBodyAsync(cancellationToken);
 			return controller.ExtractWhereQuery(query);
 		}
 		

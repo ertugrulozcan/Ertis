@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Ertis.Core.Collections;
 using Ertis.Data.Models;
@@ -39,6 +40,7 @@ namespace Ertis.PostgreSQL.Repository
 		
 		#region Find Methods
 
+		// ReSharper disable once MemberCanBePrivate.Global
 		protected DbSet<TEntity> GetDbSet()
 		{
 			return this.database.Set<TEntity>();
@@ -52,26 +54,21 @@ namespace Ertis.PostgreSQL.Repository
 		public virtual TEntity FindOne(int id)
 		{
 			var dbSet = this.ConfigureDbSet(this.database);
-			if (this.TrackingEnabled)
-			{
-				return dbSet.FirstOrDefault(x => x.Id == id);
-			}
-			else
-			{
-				return dbSet.AsNoTracking().FirstOrDefault(x => x.Id == id);
-			}
+			return this.TrackingEnabled ? 
+				dbSet.FirstOrDefault(x => x.Id == id) : 
+				dbSet.AsNoTracking().FirstOrDefault(x => x.Id == id);
 		}
 
-		public virtual async ValueTask<TEntity> FindOneAsync(int id)
+		public virtual async ValueTask<TEntity> FindOneAsync(int id, CancellationToken cancellationToken = default)
 		{
 			var dbSet = this.ConfigureDbSet(this.database);
 			if (this.TrackingEnabled)
 			{
-				return await dbSet.FirstOrDefaultAsync(x => x.Id == id);
+				return await dbSet.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 			}
 			else
 			{
-				return await dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+				return await dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 			}
 		}
 
@@ -88,52 +85,95 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public virtual async ValueTask<TEntity> FindOneAsync(Expression<Func<TEntity, bool>> expression)
+		public virtual async ValueTask<TEntity> FindOneAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default)
 		{
 			var dbSet = this.ConfigureDbSet(this.database);
 			if (this.TrackingEnabled)
 			{
-				return await dbSet.FirstOrDefaultAsync(expression);
+				return await dbSet.FirstOrDefaultAsync(expression, cancellationToken);
 			}
 			else
 			{
-				return await dbSet.AsNoTracking().FirstOrDefaultAsync(expression);	
+				return await dbSet.AsNoTracking().FirstOrDefaultAsync(expression, cancellationToken);	
 			}
 		}
 
-		public virtual IPaginationCollection<TEntity> Find(int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
+		public virtual IPaginationCollection<TEntity> Find(
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null)
 		{
 			return this.ExecuteWhere(null, skip, limit, withCount, sortField, sortDirection);
 		}
 
-		public virtual async ValueTask<IPaginationCollection<TEntity>> FindAsync(int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
+		public virtual async ValueTask<IPaginationCollection<TEntity>> FindAsync(
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null, 
+			CancellationToken cancellationToken = default)
 		{
-			return await this.ExecuteWhereAsync(null, skip, limit, withCount, sortField, sortDirection);
+			return await this.ExecuteWhereAsync(null, skip, limit, withCount, sortField, sortDirection, cancellationToken);
 		}
 
-		public virtual IPaginationCollection<TEntity> Find(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
+		public virtual IPaginationCollection<TEntity> Find(
+			Expression<Func<TEntity, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null)
 		{
 			return this.ExecuteWhere(expression, skip, limit, withCount, sortField, sortDirection);
 		}
 
-		public virtual async ValueTask<IPaginationCollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
+		public virtual async ValueTask<IPaginationCollection<TEntity>> FindAsync(
+			Expression<Func<TEntity, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null, 
+			CancellationToken cancellationToken = default)
 		{
-			return await this.ExecuteWhereAsync(expression, skip, limit, withCount, sortField, sortDirection);
+			return await this.ExecuteWhereAsync(expression, skip, limit, withCount, sortField, sortDirection, cancellationToken);
 		}
 
-		public virtual IPaginationCollection<TEntity> Find(string query, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
+		public virtual IPaginationCollection<TEntity> Find(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null)
 		{
 			var expression = ExpressionHelper.ParseExpression<TEntity>(query);
 			return this.ExecuteWhere(expression, skip, limit, withCount, sortField, sortDirection);
 		}
 
-		public virtual async ValueTask<IPaginationCollection<TEntity>> FindAsync(string query, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
+		public virtual async ValueTask<IPaginationCollection<TEntity>> FindAsync(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null, 
+			CancellationToken cancellationToken = default)
 		{
 			var expression = await ExpressionHelper.ParseExpressionAsync<TEntity>(query);
-			return await this.ExecuteWhereAsync(expression, skip, limit, withCount, sortField, sortDirection);
+			return await this.ExecuteWhereAsync(expression, skip, limit, withCount, sortField, sortDirection, cancellationToken);
 		}
 
-		private IPaginationCollection<TEntity> ExecuteWhere(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
+		private IPaginationCollection<TEntity> ExecuteWhere(
+			Expression<Func<TEntity, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null)
 		{
 			IQueryable<TEntity> queryable;
 			long? totalCount = null;
@@ -147,14 +187,9 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					if (sortExpression != null)
 					{
-						if (sortDirection == SortDirection.Descending)
-						{
-							queryable = dbSet.Where(expression).OrderByDescending(sortExpression).Skip(skip.Value).Take(limit.Value);
-						}
-						else
-						{
-							queryable = dbSet.Where(expression).OrderBy(sortExpression).Skip(skip.Value).Take(limit.Value);
-						}
+						queryable = sortDirection == SortDirection.Descending ? 
+							dbSet.Where(expression).OrderByDescending(sortExpression).Skip(skip.Value).Take(limit.Value) : 
+							dbSet.Where(expression).OrderBy(sortExpression).Skip(skip.Value).Take(limit.Value);
 					}
 					else
 					{
@@ -165,14 +200,9 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					if (sortExpression != null)
 					{
-						if (sortDirection == SortDirection.Descending)
-						{
-							queryable = dbSet.Where(expression).OrderByDescending(sortExpression).Skip(skip.Value);	
-						}
-						else
-						{
-							queryable = dbSet.Where(expression).OrderBy(sortExpression).Skip(skip.Value);
-						}
+						queryable = sortDirection == SortDirection.Descending ? 
+							dbSet.Where(expression).OrderByDescending(sortExpression).Skip(skip.Value) : 
+							dbSet.Where(expression).OrderBy(sortExpression).Skip(skip.Value);
 					}
 					else
 					{
@@ -183,14 +213,9 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					if (sortExpression != null)
 					{
-						if (sortDirection == SortDirection.Descending)
-						{
-							queryable = dbSet.Where(expression).OrderByDescending(sortExpression).Take(limit.Value);
-						}
-						else
-						{
-							queryable = dbSet.Where(expression).OrderBy(sortExpression).Take(limit.Value);
-						}
+						queryable = sortDirection == SortDirection.Descending ? 
+							dbSet.Where(expression).OrderByDescending(sortExpression).Take(limit.Value) : 
+							dbSet.Where(expression).OrderBy(sortExpression).Take(limit.Value);
 					}
 					else
 					{
@@ -201,14 +226,9 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					if (sortExpression != null)
 					{
-						if (sortDirection == SortDirection.Descending)
-						{
-							queryable = dbSet.Where(expression).OrderByDescending(sortExpression);
-						}
-						else
-						{
-							queryable = dbSet.Where(expression).OrderBy(sortExpression);
-						}
+						queryable = sortDirection == SortDirection.Descending ? 
+							dbSet.Where(expression).OrderByDescending(sortExpression) : 
+							dbSet.Where(expression).OrderBy(sortExpression);
 					}
 					else
 					{
@@ -227,14 +247,9 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					if (sortExpression != null)
 					{
-						if (sortDirection == SortDirection.Descending)
-						{
-							queryable = dbSet.OrderByDescending(sortExpression).Skip(skip.Value).Take(limit.Value);
-						}
-						else
-						{
-							queryable = dbSet.OrderBy(sortExpression).Skip(skip.Value).Take(limit.Value);
-						}
+						queryable = sortDirection == SortDirection.Descending ? 
+							dbSet.OrderByDescending(sortExpression).Skip(skip.Value).Take(limit.Value) : 
+							dbSet.OrderBy(sortExpression).Skip(skip.Value).Take(limit.Value);
 					}
 					else
 					{
@@ -245,14 +260,9 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					if (sortExpression != null)
 					{
-						if (sortDirection == SortDirection.Descending)
-						{
-							queryable = dbSet.OrderByDescending(sortExpression).Skip(skip.Value);
-						}
-						else
-						{
-							queryable = dbSet.OrderBy(sortExpression).Skip(skip.Value);		
-						}
+						queryable = sortDirection == SortDirection.Descending ? 
+							dbSet.OrderByDescending(sortExpression).Skip(skip.Value) : 
+							dbSet.OrderBy(sortExpression).Skip(skip.Value);
 					}
 					else
 					{
@@ -263,14 +273,9 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					if (sortExpression != null)
 					{
-						if (sortDirection == SortDirection.Descending)
-						{
-							queryable = dbSet.OrderByDescending(sortExpression).Take(limit.Value);
-						}
-						else
-						{
-							queryable = dbSet.OrderBy(sortExpression).Take(limit.Value);
-						}
+						queryable = sortDirection == SortDirection.Descending ? 
+							dbSet.OrderByDescending(sortExpression).Take(limit.Value) : 
+							dbSet.OrderBy(sortExpression).Take(limit.Value);
 					}
 					else
 					{
@@ -281,14 +286,9 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					if (sortExpression != null)
 					{
-						if (sortDirection == SortDirection.Descending)
-						{
-							queryable = dbSet.OrderByDescending(sortExpression);
-						}
-						else
-						{
-							queryable = dbSet.OrderBy(sortExpression);
-						}
+						queryable = sortDirection == SortDirection.Descending ? 
+							dbSet.OrderByDescending(sortExpression) : 
+							dbSet.OrderBy(sortExpression);
 					}
 					else
 					{
@@ -309,7 +309,14 @@ namespace Ertis.PostgreSQL.Repository
 			};
 		}
 		
-		private async ValueTask<IPaginationCollection<TEntity>> ExecuteWhereAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null)
+		private async ValueTask<IPaginationCollection<TEntity>> ExecuteWhereAsync(
+			Expression<Func<TEntity, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null, 
+			CancellationToken cancellationToken = default)
 		{
 			IQueryable<TEntity> queryable;
 			long? totalCount = null;
@@ -323,14 +330,9 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					if (sortExpression != null)
 					{
-						if (sortDirection == SortDirection.Descending)
-						{
-							queryable = dbSet.Where(expression).OrderByDescending(sortExpression).Skip(skip.Value).Take(limit.Value);
-						}
-						else
-						{
-							queryable = dbSet.Where(expression).OrderBy(sortExpression).Skip(skip.Value).Take(limit.Value);	
-						}
+						queryable = sortDirection == SortDirection.Descending ? 
+							dbSet.Where(expression).OrderByDescending(sortExpression).Skip(skip.Value).Take(limit.Value) : 
+							dbSet.Where(expression).OrderBy(sortExpression).Skip(skip.Value).Take(limit.Value);
 					}
 					else
 					{
@@ -341,14 +343,9 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					if (sortExpression != null)
 					{
-						if (sortDirection == SortDirection.Descending)
-						{
-							queryable = dbSet.Where(expression).OrderByDescending(sortExpression).Skip(skip.Value);
-						}
-						else
-						{
-							queryable = dbSet.Where(expression).OrderBy(sortExpression).Skip(skip.Value);
-						}
+						queryable = sortDirection == SortDirection.Descending ? 
+							dbSet.Where(expression).OrderByDescending(sortExpression).Skip(skip.Value) : 
+							dbSet.Where(expression).OrderBy(sortExpression).Skip(skip.Value);
 					}
 					else
 					{
@@ -359,14 +356,9 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					if (sortExpression != null)
 					{
-						if (sortDirection == SortDirection.Descending)
-						{
-							queryable = dbSet.Where(expression).OrderByDescending(sortExpression).Take(limit.Value);
-						}
-						else
-						{
-							queryable = dbSet.Where(expression).OrderBy(sortExpression).Take(limit.Value);
-						}
+						queryable = sortDirection == SortDirection.Descending ? 
+							dbSet.Where(expression).OrderByDescending(sortExpression).Take(limit.Value) : 
+							dbSet.Where(expression).OrderBy(sortExpression).Take(limit.Value);
 					}
 					else
 					{
@@ -377,14 +369,9 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					if (sortExpression != null)
 					{
-						if (sortDirection == SortDirection.Descending)
-						{
-							queryable = dbSet.Where(expression).OrderByDescending(sortExpression);
-						}
-						else
-						{
-							queryable = dbSet.Where(expression).OrderBy(sortExpression);
-						}
+						queryable = sortDirection == SortDirection.Descending ? 
+							dbSet.Where(expression).OrderByDescending(sortExpression) : 
+							dbSet.Where(expression).OrderBy(sortExpression);
 					}
 					else
 					{
@@ -394,7 +381,7 @@ namespace Ertis.PostgreSQL.Repository
 
 				if (withCount != null && withCount.Value)
 				{
-					totalCount = await dbSet.LongCountAsync(expression);
+					totalCount = await dbSet.LongCountAsync(expression, cancellationToken);
 				}
 			}
 			else
@@ -403,14 +390,9 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					if (sortExpression != null)
 					{
-						if (sortDirection == SortDirection.Descending)
-						{
-							queryable = dbSet.OrderByDescending(sortExpression).Skip(skip.Value).Take(limit.Value);
-						}
-						else
-						{
-							queryable = dbSet.OrderBy(sortExpression).Skip(skip.Value).Take(limit.Value);
-						}
+						queryable = sortDirection == SortDirection.Descending ? 
+							dbSet.OrderByDescending(sortExpression).Skip(skip.Value).Take(limit.Value) : 
+							dbSet.OrderBy(sortExpression).Skip(skip.Value).Take(limit.Value);
 					}
 					else
 					{
@@ -421,14 +403,9 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					if (sortExpression != null)
 					{
-						if (sortDirection == SortDirection.Descending)
-						{
-							queryable = dbSet.OrderByDescending(sortExpression).Skip(skip.Value);
-						}
-						else
-						{
-							queryable = dbSet.OrderBy(sortExpression).Skip(skip.Value);
-						}
+						queryable = sortDirection == SortDirection.Descending ? 
+							dbSet.OrderByDescending(sortExpression).Skip(skip.Value) : 
+							dbSet.OrderBy(sortExpression).Skip(skip.Value);
 					}
 					else
 					{
@@ -439,14 +416,9 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					if (sortExpression != null)
 					{
-						if (sortDirection == SortDirection.Descending)
-						{
-							queryable = dbSet.OrderByDescending(sortExpression).Take(limit.Value);
-						}
-						else
-						{
-							queryable = dbSet.OrderBy(sortExpression).Take(limit.Value);
-						}
+						queryable = sortDirection == SortDirection.Descending ? 
+							dbSet.OrderByDescending(sortExpression).Take(limit.Value) : 
+							dbSet.OrderBy(sortExpression).Take(limit.Value);
 					}
 					else
 					{
@@ -457,14 +429,9 @@ namespace Ertis.PostgreSQL.Repository
 				{
 					if (sortExpression != null)
 					{
-						if (sortDirection == SortDirection.Descending)
-						{
-							queryable = dbSet.OrderByDescending(sortExpression);
-						}
-						else
-						{
-							queryable = dbSet.OrderBy(sortExpression);
-						}
+						queryable = sortDirection == SortDirection.Descending ? 
+							dbSet.OrderByDescending(sortExpression) : 
+							dbSet.OrderBy(sortExpression);
 					}
 					else
 					{
@@ -474,13 +441,13 @@ namespace Ertis.PostgreSQL.Repository
 				
 				if (withCount != null && withCount.Value)
 				{
-					totalCount = await dbSet.LongCountAsync();
+					totalCount = await dbSet.LongCountAsync(cancellationToken);
 				}
 			}
 
 			return new PaginationCollection<TEntity>
 			{
-				Items = await queryable.ToListAsync(),
+				Items = await queryable.ToListAsync(cancellationToken),
 				Count = totalCount ?? 0
 			};
 		}
@@ -493,24 +460,14 @@ namespace Ertis.PostgreSQL.Repository
 		{
 			var cursor = this.GetDbSet().Add(entity);
 			this.database.SaveChanges();
-			if (cursor == null)
-			{
-				return null;
-			}
-			
 			return this.FindOne(cursor.Entity.Id);
 		}
 
-		public virtual async ValueTask<TEntity> InsertAsync(TEntity entity)
+		public virtual async ValueTask<TEntity> InsertAsync(TEntity entity, CancellationToken cancellationToken = default)
 		{
-			var cursor = (await this.GetDbSet().AddAsync(entity));
-			await this.database.SaveChangesAsync();
-			if (cursor == null)
-			{
-				return null;
-			}
-			
-			return await this.FindOneAsync(cursor.Entity.Id);
+			var cursor = (await this.GetDbSet().AddAsync(entity, cancellationToken));
+			await this.database.SaveChangesAsync(cancellationToken);
+			return await this.FindOneAsync(cursor.Entity.Id, cancellationToken);
 		}
 		
 		public void BulkInsert(IEnumerable<TEntity> entities)
@@ -519,10 +476,10 @@ namespace Ertis.PostgreSQL.Repository
 			this.database.SaveChanges();
 		}
 
-		public async ValueTask BulkInsertAsync(IEnumerable<TEntity> entities)
+		public async ValueTask BulkInsertAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
 		{
-			await this.GetDbSet().AddRangeAsync(entities);
-			await this.database.SaveChangesAsync();
+			await this.GetDbSet().AddRangeAsync(entities, cancellationToken);
+			await this.database.SaveChangesAsync(cancellationToken);
 		}
 
 		#endregion
@@ -535,12 +492,6 @@ namespace Ertis.PostgreSQL.Repository
 			{
 				var cursor = this.GetDbSet().Update(entity);
 				this.database.SaveChanges();
-				
-				if (cursor == null)
-				{
-					return null;
-				}
-			
 				return this.FindOne(cursor.Entity.Id);
 			}
 			else
@@ -559,17 +510,17 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public virtual async ValueTask<TEntity> UpdateAsync(TEntity entity, int id = default)
+		public virtual async ValueTask<TEntity> UpdateAsync(TEntity entity, int id = default, CancellationToken cancellationToken = default)
 		{
 			if (this.TrackingEnabled)
 			{
 				var cursor = this.GetDbSet().Update(entity);
-				await this.database.SaveChangesAsync();
-				return cursor?.Entity;	
+				await this.database.SaveChangesAsync(cancellationToken);
+				return cursor.Entity;	
 			}
 			else
 			{
-				var current = await this.GetDbSet().AsNoTracking().FirstOrDefaultAsync(x => x.Id == entity.Id);
+				var current = await this.GetDbSet().AsNoTracking().FirstOrDefaultAsync(x => x.Id == entity.Id, cancellationToken);
 				if (current == null)
 				{
 					return null;
@@ -578,7 +529,7 @@ namespace Ertis.PostgreSQL.Repository
 				var entry = this.database.Entry(current);
 				entry.State = EntityState.Modified;
 				entry.CurrentValues.SetValues(entity);
-				await this.database.SaveChangesAsync();
+				await this.database.SaveChangesAsync(cancellationToken);
 				return entity;
 			}
 		}
@@ -596,16 +547,16 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public virtual async ValueTask<TEntity> UpsertAsync(TEntity entity, int id)
+		public virtual async ValueTask<TEntity> UpsertAsync(TEntity entity, int id, CancellationToken cancellationToken = default)
 		{
-			var current = await this.FindOneAsync(id > 0 ? id : entity.Id);
+			var current = await this.FindOneAsync(id > 0 ? id : entity.Id, cancellationToken);
 			if (current == null)
 			{
-				return await this.InsertAsync(entity);
+				return await this.InsertAsync(entity, cancellationToken);
 			}
 			else
 			{
-				return await this.UpdateAsync(entity, id);
+				return await this.UpdateAsync(entity, id, cancellationToken);
 			}
 		}
 
@@ -613,7 +564,7 @@ namespace Ertis.PostgreSQL.Repository
 		
 		#region Delete Methods
 
-		public bool Delete(TEntity entity)
+		private bool Delete(TEntity entity)
 		{
 			if (this.TrackingEnabled)
 			{
@@ -639,30 +590,30 @@ namespace Ertis.PostgreSQL.Repository
 			return this.Delete(entity);
 		}
 
-		public async ValueTask<bool> DeleteAsync(TEntity entity)
+		private async ValueTask<bool> DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
 		{
 			if (this.TrackingEnabled)
 			{
 				this.GetDbSet().Remove(entity);
-				await this.database.SaveChangesAsync();
+				await this.database.SaveChangesAsync(cancellationToken);
 				return true;
 			}
 			else
 			{
 				this.database.Entry(entity).State = EntityState.Deleted;
 				this.GetDbSet().Remove(entity);
-				await this.database.SaveChangesAsync();
+				await this.database.SaveChangesAsync(cancellationToken);
 				return true;	
 			}
 		}
 		
-		public virtual async ValueTask<bool> DeleteAsync(int id)
+		public virtual async ValueTask<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
 		{
-			var entity = await this.FindOneAsync(id);
+			var entity = await this.FindOneAsync(id, cancellationToken);
 			if (entity == null)
 				return false;
 			
-			return await this.DeleteAsync(entity);
+			return await this.DeleteAsync(entity, cancellationToken);
 		}
 		
 		public bool BulkDelete(IEnumerable<TEntity> entities)
@@ -683,12 +634,12 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public async ValueTask<bool> BulkDeleteAsync(IEnumerable<TEntity> entities)
+		public async ValueTask<bool> BulkDeleteAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
 		{
 			if (this.TrackingEnabled)
 			{
 				this.GetDbSet().RemoveRange(entities);
-				await this.database.SaveChangesAsync();
+				await this.database.SaveChangesAsync(cancellationToken);
 				return true;
 			}
 			else
@@ -696,7 +647,7 @@ namespace Ertis.PostgreSQL.Repository
 				var table = this.GetDbSet();
 				var noTrackingEntities = entities.Select(x => table.First(y => y.Id == x.Id));
 				table.RemoveRange(noTrackingEntities);
-				await this.database.SaveChangesAsync();
+				await this.database.SaveChangesAsync(cancellationToken);
 				return true;	
 			}
 		}
@@ -717,15 +668,15 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public virtual async ValueTask<long> CountAsync()
+		public virtual async ValueTask<long> CountAsync(CancellationToken cancellationToken = default)
 		{
 			if (this.TrackingEnabled)
 			{
-				return await this.GetDbSet().LongCountAsync();
+				return await this.GetDbSet().LongCountAsync(cancellationToken);
 			}
 			else
 			{
-				return await this.GetDbSet().AsNoTracking().LongCountAsync();	
+				return await this.GetDbSet().AsNoTracking().LongCountAsync(cancellationToken);	
 			}
 		}
 
@@ -735,10 +686,10 @@ namespace Ertis.PostgreSQL.Repository
 			return this.Count(expression);
 		}
 
-		public virtual async ValueTask<long> CountAsync(string query)
+		public virtual async ValueTask<long> CountAsync(string query, CancellationToken cancellationToken = default)
 		{
 			var expression = await ExpressionHelper.ParseExpressionAsync<TEntity>(query);
-			return await this.CountAsync(expression);
+			return await this.CountAsync(expression, cancellationToken);
 		}
 
 		public virtual long Count(Expression<Func<TEntity, bool>> expression)
@@ -753,15 +704,15 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public virtual async ValueTask<long> CountAsync(Expression<Func<TEntity, bool>> expression)
+		public virtual async ValueTask<long> CountAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default)
 		{
 			if (this.TrackingEnabled)
 			{
-				return await this.GetDbSet().CountAsync(expression);
+				return await this.GetDbSet().CountAsync(expression, cancellationToken);
 			}
 			else
 			{
-				return await this.GetDbSet().AsNoTracking().CountAsync(expression);	
+				return await this.GetDbSet().AsNoTracking().CountAsync(expression, cancellationToken);	
 			}
 		}
 
@@ -774,9 +725,9 @@ namespace Ertis.PostgreSQL.Repository
 			return this.database.SaveChanges();
 		}
 		
-		protected async ValueTask<int> SaveChangesAsync()
+		protected async ValueTask<int> SaveChangesAsync(CancellationToken cancellationToken = default)
 		{
-			return await this.database.SaveChangesAsync();
+			return await this.database.SaveChangesAsync(cancellationToken);
 		}
 
 		#endregion

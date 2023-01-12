@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Ertis.Core.Collections;
 using Ertis.Data.Repository;
@@ -35,7 +36,8 @@ namespace Ertis.MongoDB.Repository
             bool? withCount = null,
             string sortField = null,
             SortDirection? sortDirection = null,
-            IDictionary<string, bool> selectFields = null);
+            IDictionary<string, bool> selectFields = null,
+            CancellationToken cancellationToken = default);
 
         ValueTask<IPaginationCollection<dynamic>> QueryAsync(
             Expression<Func<dynamic, bool>> expression,
@@ -44,24 +46,25 @@ namespace Ertis.MongoDB.Repository
             bool? withCount = null,
             string sortField = null,
             SortDirection? sortDirection = null,
-            IDictionary<string, bool> selectFields = null);
+            IDictionary<string, bool> selectFields = null,
+            CancellationToken cancellationToken = default);
         
         dynamic Aggregate(string query);
 		
-        ValueTask<dynamic> AggregateAsync(string query);
+        ValueTask<dynamic> AggregateAsync(string query, CancellationToken cancellationToken = default);
 
-        Task<IEnumerable<IIndexDefinition>> GetIndexesAsync();
+        Task<IEnumerable<IIndexDefinition>> GetIndexesAsync(CancellationToken cancellationToken = default);
         
-        Task<string> CreateIndexAsync(IIndexDefinition indexDefinition);
+        Task<string> CreateIndexAsync(IIndexDefinition indexDefinition, CancellationToken cancellationToken = default);
 		
-        Task<string[]> CreateManyIndexAsync(IEnumerable<IIndexDefinition> indexDefinitions);
+        Task<string[]> CreateManyIndexAsync(IEnumerable<IIndexDefinition> indexDefinitions, CancellationToken cancellationToken = default);
 
-        Task<string> CreateSingleIndexAsync(string fieldName, SortDirection? direction = null);
+        Task<string> CreateSingleIndexAsync(string fieldName, SortDirection? direction = null, CancellationToken cancellationToken = default);
         
-        Task<string> CreateSingleIndexAsync(SingleIndexDefinition indexDefinition);
+        Task<string> CreateSingleIndexAsync(SingleIndexDefinition indexDefinition, CancellationToken cancellationToken = default);
 
-        Task<string> CreateCompoundIndexAsync(IDictionary<string, SortDirection> indexFieldDefinitions);
+        Task<string> CreateCompoundIndexAsync(IDictionary<string, SortDirection> indexFieldDefinitions, CancellationToken cancellationToken = default);
         
-        Task<string> CreateCompoundIndexAsync(CompoundIndexDefinition indexDefinition);
+        Task<string> CreateCompoundIndexAsync(CompoundIndexDefinition indexDefinition, CancellationToken cancellationToken = default);
     }
 }

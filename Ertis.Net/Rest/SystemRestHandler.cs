@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Ertis.Core.Models.Response;
 using Ertis.Net.Http;
@@ -23,7 +24,8 @@ namespace Ertis.Net.Rest
 			HttpMethod method, 
 			string url, 
 			IHeaderCollection headers = null,
-			IRequestBody body = null)
+			IRequestBody body = null,
+			CancellationToken cancellationToken = default)
 		{
 			using (var httpClient = new HttpClient())
 			{
@@ -42,9 +44,9 @@ namespace Ertis.Net.Rest
 					request.Content = httpContent;
 				}
 
-				var response = await httpClient.SendAsync(request);
-				var rawData = await response.Content.ReadAsByteArrayAsync();
-				var json = await response.Content.ReadAsStringAsync();
+				var response = await httpClient.SendAsync(request, cancellationToken);
+				var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+				var json = await response.Content.ReadAsStringAsync(cancellationToken);
 					
 				if (response.IsSuccessStatusCode)
 				{
@@ -89,16 +91,17 @@ namespace Ertis.Net.Rest
 			string baseUrl, 
 			IQueryString queryString = null,
 			IHeaderCollection headers = null, 
-			IRequestBody body = null)
+			IRequestBody body = null,
+			CancellationToken cancellationToken = default)
 		{
 			if (queryString != null && queryString.Any())
 			{
 				var url = $"{baseUrl}?{queryString}";
-				return await this.ExecuteRequestAsync<TResult>(method, url, headers, body);
+				return await this.ExecuteRequestAsync<TResult>(method, url, headers, body, cancellationToken);
 			}
 			else
 			{
-				return await this.ExecuteRequestAsync<TResult>(method, baseUrl, headers, body);
+				return await this.ExecuteRequestAsync<TResult>(method, baseUrl, headers, body, cancellationToken);
 			}
 		}
 
@@ -115,7 +118,8 @@ namespace Ertis.Net.Rest
 			HttpMethod method, 
 			string url, 
 			IHeaderCollection headers = null, 
-			IRequestBody body = null)
+			IRequestBody body = null,
+			CancellationToken cancellationToken = default)
 		{
 			using (var httpClient = new HttpClient())
 			{
@@ -134,9 +138,9 @@ namespace Ertis.Net.Rest
 					request.Content = httpContent;
 				}
 
-				var response = await httpClient.SendAsync(request);
-				var rawData = await response.Content.ReadAsByteArrayAsync();
-				var json = await response.Content.ReadAsStringAsync();
+				var response = await httpClient.SendAsync(request, cancellationToken);
+				var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken);
+				var json = await response.Content.ReadAsStringAsync(cancellationToken);
 					
 				if (response.IsSuccessStatusCode)
 				{
@@ -180,16 +184,17 @@ namespace Ertis.Net.Rest
 			string baseUrl, 
 			IQueryString queryString = null, 
 			IHeaderCollection headers = null, 
-			IRequestBody body = null)
+			IRequestBody body = null,
+			CancellationToken cancellationToken = default)
 		{
 			if (queryString != null && queryString.Any())
 			{
 				var url = $"{baseUrl}?{queryString}";
-				return await this.ExecuteRequestAsync(method, url, headers, body);
+				return await this.ExecuteRequestAsync(method, url, headers, body, cancellationToken);
 			}
 			else
 			{
-				return await this.ExecuteRequestAsync(method, baseUrl, headers, body);
+				return await this.ExecuteRequestAsync(method, baseUrl, headers, body, cancellationToken);
 			}
 		}
 		

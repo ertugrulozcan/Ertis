@@ -1,4 +1,5 @@
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Ertis.Core.Models.Response;
 using Ertis.Net.Http;
@@ -42,9 +43,10 @@ namespace Ertis.Net.Services
 			string url,
 			IQueryString queryString = null,
 			IHeaderCollection headers = null,
-			IRequestBody body = null)
+			IRequestBody body = null, 
+			CancellationToken cancellationToken = default)
 		{
-			return await this.restHandler.ExecuteRequestAsync(HttpMethod.Get, url, queryString, headers, body);
+			return await this.restHandler.ExecuteRequestAsync(HttpMethod.Get, url, queryString, headers, body, cancellationToken);
 		}
 		
 		protected IResponseResult<TResult> Get<TResult>(
@@ -60,9 +62,10 @@ namespace Ertis.Net.Services
 			string url,
 			IQueryString queryString = null,
 			IHeaderCollection headers = null,
-			IRequestBody body = null)
+			IRequestBody body = null, 
+			CancellationToken cancellationToken = default)
 		{
-			return await this.restHandler.ExecuteRequestAsync<TResult>(HttpMethod.Get, url, queryString, headers, body);
+			return await this.restHandler.ExecuteRequestAsync<TResult>(HttpMethod.Get, url, queryString, headers, body, cancellationToken);
 		}
 		
 		protected IResponseResult Post(
@@ -78,9 +81,10 @@ namespace Ertis.Net.Services
 			string url,
 			IQueryString queryString = null,
 			IHeaderCollection headers = null,
-			IRequestBody body = null)
+			IRequestBody body = null, 
+			CancellationToken cancellationToken = default)
 		{
-			return await this.restHandler.ExecuteRequestAsync(HttpMethod.Post, url, queryString, headers, body);
+			return await this.restHandler.ExecuteRequestAsync(HttpMethod.Post, url, queryString, headers, body, cancellationToken);
 		}
 		
 		protected IResponseResult<TResult> Post<TResult>(
@@ -96,9 +100,10 @@ namespace Ertis.Net.Services
 			string url,
 			IQueryString queryString = null,
 			IHeaderCollection headers = null,
-			IRequestBody body = null)
+			IRequestBody body = null, 
+			CancellationToken cancellationToken = default)
 		{
-			return await this.restHandler.ExecuteRequestAsync<TResult>(HttpMethod.Post, url, queryString, headers, body);
+			return await this.restHandler.ExecuteRequestAsync<TResult>(HttpMethod.Post, url, queryString, headers, body, cancellationToken);
 		}
 		
 		protected IResponseResult Put(
@@ -114,9 +119,10 @@ namespace Ertis.Net.Services
 			string url,
 			IQueryString queryString = null,
 			IHeaderCollection headers = null,
-			IRequestBody body = null)
+			IRequestBody body = null, 
+			CancellationToken cancellationToken = default)
 		{
-			return await this.restHandler.ExecuteRequestAsync(HttpMethod.Put, url, queryString, headers, body);
+			return await this.restHandler.ExecuteRequestAsync(HttpMethod.Put, url, queryString, headers, body, cancellationToken);
 		}
 		
 		protected IResponseResult<TResult> Put<TResult>(
@@ -132,9 +138,10 @@ namespace Ertis.Net.Services
 			string url,
 			IQueryString queryString = null,
 			IHeaderCollection headers = null,
-			IRequestBody body = null)
+			IRequestBody body = null, 
+			CancellationToken cancellationToken = default)
 		{
-			return await this.restHandler.ExecuteRequestAsync<TResult>(HttpMethod.Put, url, queryString, headers, body);
+			return await this.restHandler.ExecuteRequestAsync<TResult>(HttpMethod.Put, url, queryString, headers, body, cancellationToken);
 		}
 		
 		protected IResponseResult Delete(
@@ -150,9 +157,10 @@ namespace Ertis.Net.Services
 			string url,
 			IQueryString queryString = null,
 			IHeaderCollection headers = null,
-			IRequestBody body = null)
+			IRequestBody body = null, 
+			CancellationToken cancellationToken = default)
 		{
-			return await this.restHandler.ExecuteRequestAsync(HttpMethod.Delete, url, queryString, headers, body);
+			return await this.restHandler.ExecuteRequestAsync(HttpMethod.Delete, url, queryString, headers, body, cancellationToken);
 		}
 		
 		protected IResponseResult<TResult> Delete<TResult>(
@@ -168,9 +176,10 @@ namespace Ertis.Net.Services
 			string url,
 			IQueryString queryString = null,
 			IHeaderCollection headers = null,
-			IRequestBody body = null)
+			IRequestBody body = null, 
+			CancellationToken cancellationToken = default)
 		{
-			return await this.restHandler.ExecuteRequestAsync<TResult>(HttpMethod.Delete, url, queryString, headers, body);
+			return await this.restHandler.ExecuteRequestAsync<TResult>(HttpMethod.Delete, url, queryString, headers, body, cancellationToken);
 		}
 
 		#endregion

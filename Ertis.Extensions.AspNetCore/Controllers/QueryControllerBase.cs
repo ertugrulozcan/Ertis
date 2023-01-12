@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Ertis.Core.Collections;
 using Ertis.Core.Exceptions;
@@ -21,10 +22,11 @@ namespace Ertis.Extensions.AspNetCore.Controllers
 			bool? withCount, 
 			string sortField, 
 			SortDirection? sortDirection,
-			IDictionary<string, bool> selectFields);
+			IDictionary<string, bool> selectFields,
+			CancellationToken cancellationToken = default);
 
 		[HttpPost("_query")]
-		public virtual async Task<IActionResult> Query()
+		public virtual async Task<IActionResult> Query(CancellationToken cancellationToken = default)
 		{
 			if (!this.ModelState.IsValid)
 			{
@@ -36,11 +38,11 @@ namespace Ertis.Extensions.AspNetCore.Controllers
 				this.ExtractPaginationParameters(out int? skip, out int? limit, out bool withCount);
 				this.ValidatePaginationParams(skip, limit);
 				
-				var body = await this.ExtractRequestBodyAsync();
+				var body = await this.ExtractRequestBodyAsync(cancellationToken);
 				var whereQuery = this.ExtractWhereQuery(body, body);
 				var selectFields = Helpers.QueryHelper.ExtractSelectFields(body);
 				this.ExtractSortingParameters(out string sortField, out SortDirection? sortDirection);
-				var result = await this.GetDataAsync(whereQuery, skip, limit, withCount, sortField, sortDirection, selectFields);
+				var result = await this.GetDataAsync(whereQuery, skip, limit, withCount, sortField, sortDirection, selectFields, cancellationToken);
 
 				return this.Ok(result);
 			}

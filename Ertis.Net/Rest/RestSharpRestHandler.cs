@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Ertis.Core.Models.Response;
 using Ertis.Net.Extensions;
@@ -45,7 +46,8 @@ namespace Ertis.Net.Rest
 			HttpMethod method, 
 			string url, 
 			IHeaderCollection headers = null,
-			IRequestBody body = null)
+			IRequestBody body = null,
+			CancellationToken cancellationToken = default)
 		{
 			var restSharpMethod = method.ConvertToRestSharpMethod();
 			var request = new RestRequest(url, restSharpMethod)
@@ -73,7 +75,7 @@ namespace Ertis.Net.Rest
 				}
 			}
 			
-			var response = await this.Client.ExecuteAsync<TResult>(request);
+			var response = await this.Client.ExecuteAsync<TResult>(request, cancellationToken);
 			if (response.IsSuccessful)
 			{
 				return new ResponseResult<TResult>(response.StatusCode)
@@ -117,16 +119,17 @@ namespace Ertis.Net.Rest
 			string baseUrl, 
 			IQueryString queryString = null,
 			IHeaderCollection headers = null, 
-			IRequestBody body = null)
+			IRequestBody body = null,
+			CancellationToken cancellationToken = default)
 		{
 			if (queryString != null && queryString.Any())
 			{
 				var url = $"{baseUrl}?{queryString}";
-				return await this.ExecuteRequestAsync<TResult>(method, url, headers, body);
+				return await this.ExecuteRequestAsync<TResult>(method, url, headers, body, cancellationToken);
 			}
 			else
 			{
-				return await this.ExecuteRequestAsync<TResult>(method, baseUrl, headers, body);
+				return await this.ExecuteRequestAsync<TResult>(method, baseUrl, headers, body, cancellationToken);
 			}
 		}
 
@@ -143,7 +146,8 @@ namespace Ertis.Net.Rest
 			HttpMethod method, 
 			string url, 
 			IHeaderCollection headers = null, 
-			IRequestBody body = null)
+			IRequestBody body = null,
+			CancellationToken cancellationToken = default)
 		{
 			var restSharpMethod = method.ConvertToRestSharpMethod();
 			var request = new RestRequest(url, restSharpMethod)
@@ -171,7 +175,7 @@ namespace Ertis.Net.Rest
 				}
 			}
 			
-			var response = await this.Client.ExecuteAsync(request);
+			var response = await this.Client.ExecuteAsync(request, cancellationToken);
 			if (response.IsSuccessful)
 			{
 				return new ResponseResult(response.StatusCode)
@@ -214,16 +218,17 @@ namespace Ertis.Net.Rest
 			string baseUrl, 
 			IQueryString queryString = null, 
 			IHeaderCollection headers = null, 
-			IRequestBody body = null)
+			IRequestBody body = null,
+			CancellationToken cancellationToken = default)
 		{
 			if (queryString != null && queryString.Any())
 			{
 				var url = $"{baseUrl}?{queryString}";
-				return await this.ExecuteRequestAsync(method, url, headers, body);
+				return await this.ExecuteRequestAsync(method, url, headers, body, cancellationToken);
 			}
 			else
 			{
-				return await this.ExecuteRequestAsync(method, baseUrl, headers, body);
+				return await this.ExecuteRequestAsync(method, baseUrl, headers, body, cancellationToken);
 			}
 		}
 		

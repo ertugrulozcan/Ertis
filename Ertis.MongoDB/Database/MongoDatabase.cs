@@ -127,7 +127,7 @@ namespace Ertis.MongoDB.Database
 		
 		public async ValueTask<MongoDbStatistics> GetDatabaseStatisticsAsync(CancellationToken cancellationToken = default)
 		{
-			var resultDocument = await this.GetDatabaseStatisticsDocumentAsync(cancellationToken);
+			var resultDocument = await this.GetDatabaseStatisticsDocumentAsync(cancellationToken: cancellationToken);
 			var json = resultDocument.ToJson(new JsonWriterSettings
 			{
 				OutputMode = JsonOutputMode.RelaxedExtendedJson
@@ -145,7 +145,7 @@ namespace Ertis.MongoDB.Database
 		public async ValueTask<BsonDocument> GetDatabaseStatisticsDocumentAsync(CancellationToken cancellationToken = default)
 		{
 			var command = new BsonDocument { { "dbstats", 1 } };
-			return await this.Database.RunCommandAsync<BsonDocument>(command, cancellationToken:cancellationToken);
+			return await this.Database.RunCommandAsync<BsonDocument>(command, cancellationToken: cancellationToken);
 		}
 
 		#endregion

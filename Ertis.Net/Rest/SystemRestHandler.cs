@@ -44,9 +44,9 @@ namespace Ertis.Net.Rest
 					request.Content = httpContent;
 				}
 
-				var response = await httpClient.SendAsync(request, cancellationToken);
-				var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken);
-				var json = await response.Content.ReadAsStringAsync(cancellationToken);
+				var response = await httpClient.SendAsync(request, cancellationToken: cancellationToken);
+				var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken: cancellationToken);
+				var json = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
 					
 				if (response.IsSuccessStatusCode)
 				{
@@ -97,11 +97,11 @@ namespace Ertis.Net.Rest
 			if (queryString != null && queryString.Any())
 			{
 				var url = $"{baseUrl}?{queryString}";
-				return await this.ExecuteRequestAsync<TResult>(method, url, headers, body, cancellationToken);
+				return await this.ExecuteRequestAsync<TResult>(method, url, headers, body, cancellationToken: cancellationToken);
 			}
 			else
 			{
-				return await this.ExecuteRequestAsync<TResult>(method, baseUrl, headers, body, cancellationToken);
+				return await this.ExecuteRequestAsync<TResult>(method, baseUrl, headers, body, cancellationToken: cancellationToken);
 			}
 		}
 
@@ -138,9 +138,9 @@ namespace Ertis.Net.Rest
 					request.Content = httpContent;
 				}
 
-				var response = await httpClient.SendAsync(request, cancellationToken);
-				var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken);
-				var json = await response.Content.ReadAsStringAsync(cancellationToken);
+				var response = await httpClient.SendAsync(request, cancellationToken: cancellationToken);
+				var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken: cancellationToken);
+				var json = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
 					
 				if (response.IsSuccessStatusCode)
 				{
@@ -190,11 +190,11 @@ namespace Ertis.Net.Rest
 			if (queryString != null && queryString.Any())
 			{
 				var url = $"{baseUrl}?{queryString}";
-				return await this.ExecuteRequestAsync(method, url, headers, body, cancellationToken);
+				return await this.ExecuteRequestAsync(method, url, headers, body, cancellationToken: cancellationToken);
 			}
 			else
 			{
-				return await this.ExecuteRequestAsync(method, baseUrl, headers, body, cancellationToken);
+				return await this.ExecuteRequestAsync(method, baseUrl, headers, body, cancellationToken: cancellationToken);
 			}
 		}
 		

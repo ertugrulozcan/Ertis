@@ -38,11 +38,11 @@ namespace Ertis.Extensions.AspNetCore.Controllers
 				this.ExtractPaginationParameters(out int? skip, out int? limit, out bool withCount);
 				this.ValidatePaginationParams(skip, limit);
 				
-				var body = await this.ExtractRequestBodyAsync(cancellationToken);
+				var body = await this.ExtractRequestBodyAsync(cancellationToken: cancellationToken);
 				var whereQuery = this.ExtractWhereQuery(body, body);
 				var selectFields = Helpers.QueryHelper.ExtractSelectFields(body);
 				this.ExtractSortingParameters(out string sortField, out SortDirection? sortDirection);
-				var result = await this.GetDataAsync(whereQuery, skip, limit, withCount, sortField, sortDirection, selectFields, cancellationToken);
+				var result = await this.GetDataAsync(whereQuery, skip, limit, withCount, sortField, sortDirection, selectFields, cancellationToken: cancellationToken);
 
 				return this.Ok(result);
 			}

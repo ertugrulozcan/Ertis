@@ -74,13 +74,13 @@ namespace Ertis.MongoDB.Repository
 		
 		public async ValueTask<dynamic> FindOneAsync(string id, CancellationToken cancellationToken = default)
 		{
-			return await this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id))).FirstOrDefaultAsync(cancellationToken);
+			return await this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id))).FirstOrDefaultAsync(cancellationToken: cancellationToken);
 		}
 		
 		// ReSharper disable once UnusedMember.Local
 		private async ValueTask<dynamic> FindOneAsync(ObjectId objectId, CancellationToken cancellationToken = default)
 		{
-			return await this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", objectId)).FirstOrDefaultAsync(cancellationToken);
+			return await this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", objectId)).FirstOrDefaultAsync(cancellationToken: cancellationToken);
 		}
 
 		public dynamic FindOne(Expression<Func<dynamic, bool>> expression)
@@ -92,7 +92,7 @@ namespace Ertis.MongoDB.Repository
 		public async ValueTask<dynamic> FindOneAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
 		{
 			var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-			return await (await this.Collection.FindAsync(filterDefinition, cancellationToken: cancellationToken)).FirstOrDefaultAsync(cancellationToken);	
+			return await (await this.Collection.FindAsync(filterDefinition, cancellationToken: cancellationToken)).FirstOrDefaultAsync(cancellationToken: cancellationToken);	
 		}
 
 		public IPaginationCollection<dynamic> Find(
@@ -126,7 +126,7 @@ namespace Ertis.MongoDB.Repository
 				withCount,
 				sortField,
 				sortDirection,
-				cancellationToken);
+				cancellationToken: cancellationToken);
 		}
 		
 		public IPaginationCollection<dynamic> Find(
@@ -151,7 +151,7 @@ namespace Ertis.MongoDB.Repository
 			CancellationToken cancellationToken = default)
 		{
 			var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-			return await this.FilterAsync(filterExpression, skip, limit, withCount, sortField, sortDirection, cancellationToken);
+			return await this.FilterAsync(filterExpression, skip, limit, withCount, sortField, sortDirection, cancellationToken: cancellationToken);
 		}
 		
 		public IPaginationCollection<dynamic> Find(
@@ -176,7 +176,7 @@ namespace Ertis.MongoDB.Repository
 			CancellationToken cancellationToken = default)
 		{
 			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-			return await this.FilterAsync(filterDefinition, skip, limit, withCount, sortField, sortDirection, cancellationToken);
+			return await this.FilterAsync(filterDefinition, skip, limit, withCount, sortField, sortDirection, cancellationToken: cancellationToken);
 		}
 		
 		private IPaginationCollection<dynamic> Filter(
@@ -222,7 +222,7 @@ namespace Ertis.MongoDB.Repository
 			return new PaginationCollection<dynamic>
 			{
 				Count = totalCount,
-				Items = await collection.ToListAsync(cancellationToken)
+				Items = await collection.ToListAsync(cancellationToken: cancellationToken)
 			};
 		}
 		
@@ -383,7 +383,7 @@ namespace Ertis.MongoDB.Repository
 					sortField,
 					sortDirection,
 					selectFields,
-					cancellationToken);
+					cancellationToken: cancellationToken);
 			}
 			catch (MongoCommandException ex)
 			{
@@ -420,7 +420,7 @@ namespace Ertis.MongoDB.Repository
 					sortField,
 					sortDirection,
 					selectFields,
-					cancellationToken);
+					cancellationToken: cancellationToken);
 			}
 			catch (MongoCommandException ex)
 			{
@@ -502,7 +502,7 @@ namespace Ertis.MongoDB.Repository
 					totalCount = await this.Collection.CountDocumentsAsync(filterDefinition, cancellationToken: cancellationToken);
 				}
 
-				var documents = await collection.ToListAsync(cancellationToken);
+				var documents = await collection.ToListAsync(cancellationToken: cancellationToken);
 				var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
 
 				return new PaginationCollection<dynamic>
@@ -582,11 +582,11 @@ namespace Ertis.MongoDB.Repository
 			
 			if (entity is BsonDocument document)
 			{
-				await this.DocumentCollection.InsertOneAsync(document, new InsertOneOptions(), cancellationToken);
+				await this.DocumentCollection.InsertOneAsync(document, new InsertOneOptions(), cancellationToken: cancellationToken);
 			}
 			else
 			{
-				await this.Collection.InsertOneAsync(entity, new InsertOneOptions(), cancellationToken);	
+				await this.Collection.InsertOneAsync(entity, new InsertOneOptions(), cancellationToken: cancellationToken);	
 			}
 
 			if (this._actionBinder != null)
@@ -760,12 +760,12 @@ namespace Ertis.MongoDB.Repository
 		{
 			if (string.IsNullOrEmpty(id))
 			{
-				return await this.InsertAsync(entity, cancellationToken);
+				return await this.InsertAsync(entity, cancellationToken: cancellationToken);
 			}
 			else
 			{
-				var item = await this.FindOneAsync(id, cancellationToken);
-				return item == null ? await this.InsertAsync(entity, cancellationToken) : await this.UpdateAsync(entity, id, cancellationToken);
+				var item = await this.FindOneAsync(id, cancellationToken: cancellationToken);
+				return item == null ? await this.InsertAsync(entity, cancellationToken: cancellationToken) : await this.UpdateAsync(entity, id, cancellationToken: cancellationToken);
 			}
 		}
 
@@ -781,7 +781,7 @@ namespace Ertis.MongoDB.Repository
 		
 		public async ValueTask<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
 		{
-			var result = await this.Collection.DeleteOneAsync(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)), cancellationToken);
+			var result = await this.Collection.DeleteOneAsync(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)), cancellationToken: cancellationToken);
 			return result.IsAcknowledged && result.DeletedCount == 1;
 		}
 
@@ -796,7 +796,7 @@ namespace Ertis.MongoDB.Repository
 			var isDeletedAll = true;
 			foreach (var entity in entities)
 			{
-				isDeletedAll &= await this.DeleteAsync(entity, cancellationToken);
+				isDeletedAll &= await this.DeleteAsync(entity, cancellationToken: cancellationToken);
 			}
 
 			return isDeletedAll;
@@ -889,7 +889,7 @@ namespace Ertis.MongoDB.Repository
 					var bsonDocuments = bsonArray.Select(x => BsonDocument.Parse(x.ToString()));
 					var pipelineDefinition = PipelineDefinition<dynamic, BsonDocument>.Create(bsonDocuments);
 					var aggregationResultCursor = await this.Collection.AggregateAsync(pipelineDefinition, cancellationToken: cancellationToken);
-					var documents = await aggregationResultCursor.ToListAsync(cancellationToken);
+					var documents = await aggregationResultCursor.ToListAsync(cancellationToken: cancellationToken);
 					var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
 					return objects;
 				}
@@ -914,8 +914,8 @@ namespace Ertis.MongoDB.Repository
 
 		public async Task<IEnumerable<IIndexDefinition>> GetIndexesAsync(CancellationToken cancellationToken = default)
 		{
-			var indexesCursor = await this.Collection.Indexes.ListAsync(cancellationToken);
-			var indexes = await indexesCursor.ToListAsync(cancellationToken);
+			var indexesCursor = await this.Collection.Indexes.ListAsync(cancellationToken: cancellationToken);
+			var indexes = await indexesCursor.ToListAsync(cancellationToken: cancellationToken);
 			var indexDefinitions = new List<IIndexDefinition>();
 			foreach (var index in indexes)
 			{
@@ -969,9 +969,9 @@ namespace Ertis.MongoDB.Repository
 			switch (indexDefinition.Type)
 			{
 				case IndexType.Single:
-					return await this.CreateSingleIndexAsync(indexDefinition as SingleIndexDefinition, cancellationToken);
+					return await this.CreateSingleIndexAsync(indexDefinition as SingleIndexDefinition, cancellationToken: cancellationToken);
 				case IndexType.Compound:
-					return await this.CreateCompoundIndexAsync(indexDefinition as CompoundIndexDefinition, cancellationToken);
+					return await this.CreateCompoundIndexAsync(indexDefinition as CompoundIndexDefinition, cancellationToken: cancellationToken);
 				default:
 					throw new NotImplementedException("Not implemented yet for this index type");
 			}
@@ -982,7 +982,7 @@ namespace Ertis.MongoDB.Repository
 			var results = new List<string>();
 			foreach (var indexDefinition in indexDefinitions)
 			{
-				results.Add(await this.CreateIndexAsync(indexDefinition, cancellationToken));
+				results.Add(await this.CreateIndexAsync(indexDefinition, cancellationToken: cancellationToken));
 			}
 
 			return results.ToArray();
@@ -999,7 +999,7 @@ namespace Ertis.MongoDB.Repository
 		
 		public async Task<string> CreateSingleIndexAsync(SingleIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
 		{
-			return await this.CreateSingleIndexAsync(indexDefinition.Field, indexDefinition.Direction, cancellationToken);
+			return await this.CreateSingleIndexAsync(indexDefinition.Field, indexDefinition.Direction, cancellationToken: cancellationToken);
 		}
 		
 		public async Task<string> CreateCompoundIndexAsync(IDictionary<string, SortDirection> indexFieldDefinitions, CancellationToken cancellationToken = default)

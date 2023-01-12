@@ -41,9 +41,9 @@ namespace Ertis.Extensions.AspNetCore.Extensions
 			try
 			{
 				controller.Request.EnableBuffering();
-				await controller.Request.Body.CopyToAsync(requestBodyStream, cancellationToken);
+				await controller.Request.Body.CopyToAsync(requestBodyStream, cancellationToken: cancellationToken);
 				requestBodyStream.Seek(0, SeekOrigin.Begin);
-				var body = await new StreamReader(requestBodyStream).ReadToEndAsync(cancellationToken);
+				var body = await new StreamReader(requestBodyStream).ReadToEndAsync(cancellationToken: cancellationToken);
 				return body;
 			}
 			finally
@@ -72,7 +72,7 @@ namespace Ertis.Extensions.AspNetCore.Extensions
 		
 		public static async Task<string> ExtractWhereQueryAsync(this ControllerBase controller, CancellationToken cancellationToken = default)
 		{
-			string query = await controller.ExtractRequestBodyAsync(cancellationToken);
+			string query = await controller.ExtractRequestBodyAsync(cancellationToken: cancellationToken);
 			return controller.ExtractWhereQuery(query);
 		}
 		

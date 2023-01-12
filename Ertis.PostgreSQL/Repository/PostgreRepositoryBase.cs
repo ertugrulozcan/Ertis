@@ -64,11 +64,11 @@ namespace Ertis.PostgreSQL.Repository
 			var dbSet = this.ConfigureDbSet(this.database);
 			if (this.TrackingEnabled)
 			{
-				return await dbSet.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+				return await dbSet.FirstOrDefaultAsync(x => x.Id == id, cancellationToken: cancellationToken);
 			}
 			else
 			{
-				return await dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+				return await dbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken: cancellationToken);
 			}
 		}
 
@@ -90,11 +90,11 @@ namespace Ertis.PostgreSQL.Repository
 			var dbSet = this.ConfigureDbSet(this.database);
 			if (this.TrackingEnabled)
 			{
-				return await dbSet.FirstOrDefaultAsync(expression, cancellationToken);
+				return await dbSet.FirstOrDefaultAsync(expression, cancellationToken: cancellationToken);
 			}
 			else
 			{
-				return await dbSet.AsNoTracking().FirstOrDefaultAsync(expression, cancellationToken);	
+				return await dbSet.AsNoTracking().FirstOrDefaultAsync(expression, cancellationToken: cancellationToken);	
 			}
 		}
 
@@ -116,7 +116,7 @@ namespace Ertis.PostgreSQL.Repository
 			SortDirection? sortDirection = null, 
 			CancellationToken cancellationToken = default)
 		{
-			return await this.ExecuteWhereAsync(null, skip, limit, withCount, sortField, sortDirection, cancellationToken);
+			return await this.ExecuteWhereAsync(null, skip, limit, withCount, sortField, sortDirection, cancellationToken: cancellationToken);
 		}
 
 		public virtual IPaginationCollection<TEntity> Find(
@@ -139,7 +139,7 @@ namespace Ertis.PostgreSQL.Repository
 			SortDirection? sortDirection = null, 
 			CancellationToken cancellationToken = default)
 		{
-			return await this.ExecuteWhereAsync(expression, skip, limit, withCount, sortField, sortDirection, cancellationToken);
+			return await this.ExecuteWhereAsync(expression, skip, limit, withCount, sortField, sortDirection, cancellationToken: cancellationToken);
 		}
 
 		public virtual IPaginationCollection<TEntity> Find(
@@ -163,8 +163,8 @@ namespace Ertis.PostgreSQL.Repository
 			SortDirection? sortDirection = null, 
 			CancellationToken cancellationToken = default)
 		{
-			var expression = await ExpressionHelper.ParseExpressionAsync<TEntity>(query);
-			return await this.ExecuteWhereAsync(expression, skip, limit, withCount, sortField, sortDirection, cancellationToken);
+			var expression = await ExpressionHelper.ParseExpressionAsync<TEntity>(query, cancellationToken: cancellationToken);
+			return await this.ExecuteWhereAsync(expression, skip, limit, withCount, sortField, sortDirection, cancellationToken: cancellationToken);
 		}
 
 		private IPaginationCollection<TEntity> ExecuteWhere(
@@ -381,7 +381,7 @@ namespace Ertis.PostgreSQL.Repository
 
 				if (withCount != null && withCount.Value)
 				{
-					totalCount = await dbSet.LongCountAsync(expression, cancellationToken);
+					totalCount = await dbSet.LongCountAsync(expression, cancellationToken: cancellationToken);
 				}
 			}
 			else
@@ -441,13 +441,13 @@ namespace Ertis.PostgreSQL.Repository
 				
 				if (withCount != null && withCount.Value)
 				{
-					totalCount = await dbSet.LongCountAsync(cancellationToken);
+					totalCount = await dbSet.LongCountAsync(cancellationToken: cancellationToken);
 				}
 			}
 
 			return new PaginationCollection<TEntity>
 			{
-				Items = await queryable.ToListAsync(cancellationToken),
+				Items = await queryable.ToListAsync(cancellationToken: cancellationToken),
 				Count = totalCount ?? 0
 			};
 		}
@@ -465,9 +465,9 @@ namespace Ertis.PostgreSQL.Repository
 
 		public virtual async ValueTask<TEntity> InsertAsync(TEntity entity, CancellationToken cancellationToken = default)
 		{
-			var cursor = (await this.GetDbSet().AddAsync(entity, cancellationToken));
-			await this.database.SaveChangesAsync(cancellationToken);
-			return await this.FindOneAsync(cursor.Entity.Id, cancellationToken);
+			var cursor = (await this.GetDbSet().AddAsync(entity, cancellationToken: cancellationToken));
+			await this.database.SaveChangesAsync(cancellationToken: cancellationToken);
+			return await this.FindOneAsync(cursor.Entity.Id, cancellationToken: cancellationToken);
 		}
 		
 		public void BulkInsert(IEnumerable<TEntity> entities)
@@ -478,8 +478,8 @@ namespace Ertis.PostgreSQL.Repository
 
 		public async ValueTask BulkInsertAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
 		{
-			await this.GetDbSet().AddRangeAsync(entities, cancellationToken);
-			await this.database.SaveChangesAsync(cancellationToken);
+			await this.GetDbSet().AddRangeAsync(entities, cancellationToken: cancellationToken);
+			await this.database.SaveChangesAsync(cancellationToken: cancellationToken);
 		}
 
 		#endregion
@@ -515,12 +515,12 @@ namespace Ertis.PostgreSQL.Repository
 			if (this.TrackingEnabled)
 			{
 				var cursor = this.GetDbSet().Update(entity);
-				await this.database.SaveChangesAsync(cancellationToken);
+				await this.database.SaveChangesAsync(cancellationToken: cancellationToken);
 				return cursor.Entity;	
 			}
 			else
 			{
-				var current = await this.GetDbSet().AsNoTracking().FirstOrDefaultAsync(x => x.Id == entity.Id, cancellationToken);
+				var current = await this.GetDbSet().AsNoTracking().FirstOrDefaultAsync(x => x.Id == entity.Id, cancellationToken: cancellationToken);
 				if (current == null)
 				{
 					return null;
@@ -529,7 +529,7 @@ namespace Ertis.PostgreSQL.Repository
 				var entry = this.database.Entry(current);
 				entry.State = EntityState.Modified;
 				entry.CurrentValues.SetValues(entity);
-				await this.database.SaveChangesAsync(cancellationToken);
+				await this.database.SaveChangesAsync(cancellationToken: cancellationToken);
 				return entity;
 			}
 		}
@@ -549,14 +549,14 @@ namespace Ertis.PostgreSQL.Repository
 
 		public virtual async ValueTask<TEntity> UpsertAsync(TEntity entity, int id, CancellationToken cancellationToken = default)
 		{
-			var current = await this.FindOneAsync(id > 0 ? id : entity.Id, cancellationToken);
+			var current = await this.FindOneAsync(id > 0 ? id : entity.Id, cancellationToken: cancellationToken);
 			if (current == null)
 			{
-				return await this.InsertAsync(entity, cancellationToken);
+				return await this.InsertAsync(entity, cancellationToken: cancellationToken);
 			}
 			else
 			{
-				return await this.UpdateAsync(entity, id, cancellationToken);
+				return await this.UpdateAsync(entity, id, cancellationToken: cancellationToken);
 			}
 		}
 
@@ -595,25 +595,25 @@ namespace Ertis.PostgreSQL.Repository
 			if (this.TrackingEnabled)
 			{
 				this.GetDbSet().Remove(entity);
-				await this.database.SaveChangesAsync(cancellationToken);
+				await this.database.SaveChangesAsync(cancellationToken: cancellationToken);
 				return true;
 			}
 			else
 			{
 				this.database.Entry(entity).State = EntityState.Deleted;
 				this.GetDbSet().Remove(entity);
-				await this.database.SaveChangesAsync(cancellationToken);
+				await this.database.SaveChangesAsync(cancellationToken: cancellationToken);
 				return true;	
 			}
 		}
 		
 		public virtual async ValueTask<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
 		{
-			var entity = await this.FindOneAsync(id, cancellationToken);
+			var entity = await this.FindOneAsync(id, cancellationToken: cancellationToken);
 			if (entity == null)
 				return false;
 			
-			return await this.DeleteAsync(entity, cancellationToken);
+			return await this.DeleteAsync(entity, cancellationToken: cancellationToken);
 		}
 		
 		public bool BulkDelete(IEnumerable<TEntity> entities)
@@ -639,7 +639,7 @@ namespace Ertis.PostgreSQL.Repository
 			if (this.TrackingEnabled)
 			{
 				this.GetDbSet().RemoveRange(entities);
-				await this.database.SaveChangesAsync(cancellationToken);
+				await this.database.SaveChangesAsync(cancellationToken: cancellationToken);
 				return true;
 			}
 			else
@@ -647,7 +647,7 @@ namespace Ertis.PostgreSQL.Repository
 				var table = this.GetDbSet();
 				var noTrackingEntities = entities.Select(x => table.First(y => y.Id == x.Id));
 				table.RemoveRange(noTrackingEntities);
-				await this.database.SaveChangesAsync(cancellationToken);
+				await this.database.SaveChangesAsync(cancellationToken: cancellationToken);
 				return true;	
 			}
 		}
@@ -672,11 +672,11 @@ namespace Ertis.PostgreSQL.Repository
 		{
 			if (this.TrackingEnabled)
 			{
-				return await this.GetDbSet().LongCountAsync(cancellationToken);
+				return await this.GetDbSet().LongCountAsync(cancellationToken: cancellationToken);
 			}
 			else
 			{
-				return await this.GetDbSet().AsNoTracking().LongCountAsync(cancellationToken);	
+				return await this.GetDbSet().AsNoTracking().LongCountAsync(cancellationToken: cancellationToken);	
 			}
 		}
 
@@ -688,8 +688,8 @@ namespace Ertis.PostgreSQL.Repository
 
 		public virtual async ValueTask<long> CountAsync(string query, CancellationToken cancellationToken = default)
 		{
-			var expression = await ExpressionHelper.ParseExpressionAsync<TEntity>(query);
-			return await this.CountAsync(expression, cancellationToken);
+			var expression = await ExpressionHelper.ParseExpressionAsync<TEntity>(query, cancellationToken: cancellationToken);
+			return await this.CountAsync(expression, cancellationToken: cancellationToken);
 		}
 
 		public virtual long Count(Expression<Func<TEntity, bool>> expression)
@@ -708,11 +708,11 @@ namespace Ertis.PostgreSQL.Repository
 		{
 			if (this.TrackingEnabled)
 			{
-				return await this.GetDbSet().CountAsync(expression, cancellationToken);
+				return await this.GetDbSet().CountAsync(expression, cancellationToken: cancellationToken);
 			}
 			else
 			{
-				return await this.GetDbSet().AsNoTracking().CountAsync(expression, cancellationToken);	
+				return await this.GetDbSet().AsNoTracking().CountAsync(expression, cancellationToken: cancellationToken);	
 			}
 		}
 
@@ -727,7 +727,7 @@ namespace Ertis.PostgreSQL.Repository
 		
 		protected async ValueTask<int> SaveChangesAsync(CancellationToken cancellationToken = default)
 		{
-			return await this.database.SaveChangesAsync(cancellationToken);
+			return await this.database.SaveChangesAsync(cancellationToken: cancellationToken);
 		}
 
 		#endregion

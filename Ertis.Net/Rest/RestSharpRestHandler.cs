@@ -75,7 +75,7 @@ namespace Ertis.Net.Rest
 				}
 			}
 			
-			var response = await this.Client.ExecuteAsync<TResult>(request, cancellationToken);
+			var response = await this.Client.ExecuteAsync<TResult>(request, cancellationToken: cancellationToken);
 			if (response.IsSuccessful)
 			{
 				return new ResponseResult<TResult>(response.StatusCode)
@@ -125,11 +125,11 @@ namespace Ertis.Net.Rest
 			if (queryString != null && queryString.Any())
 			{
 				var url = $"{baseUrl}?{queryString}";
-				return await this.ExecuteRequestAsync<TResult>(method, url, headers, body, cancellationToken);
+				return await this.ExecuteRequestAsync<TResult>(method, url, headers, body, cancellationToken: cancellationToken);
 			}
 			else
 			{
-				return await this.ExecuteRequestAsync<TResult>(method, baseUrl, headers, body, cancellationToken);
+				return await this.ExecuteRequestAsync<TResult>(method, baseUrl, headers, body, cancellationToken: cancellationToken);
 			}
 		}
 
@@ -175,7 +175,7 @@ namespace Ertis.Net.Rest
 				}
 			}
 			
-			var response = await this.Client.ExecuteAsync(request, cancellationToken);
+			var response = await this.Client.ExecuteAsync(request, cancellationToken: cancellationToken);
 			if (response.IsSuccessful)
 			{
 				return new ResponseResult(response.StatusCode)
@@ -224,11 +224,11 @@ namespace Ertis.Net.Rest
 			if (queryString != null && queryString.Any())
 			{
 				var url = $"{baseUrl}?{queryString}";
-				return await this.ExecuteRequestAsync(method, url, headers, body, cancellationToken);
+				return await this.ExecuteRequestAsync(method, url, headers, body, cancellationToken: cancellationToken);
 			}
 			else
 			{
-				return await this.ExecuteRequestAsync(method, baseUrl, headers, body, cancellationToken);
+				return await this.ExecuteRequestAsync(method, baseUrl, headers, body, cancellationToken: cancellationToken);
 			}
 		}
 		

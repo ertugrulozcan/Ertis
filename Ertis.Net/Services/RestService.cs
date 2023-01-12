@@ -46,7 +46,7 @@ namespace Ertis.Net.Services
 			IRequestBody body = null, 
 			CancellationToken cancellationToken = default)
 		{
-			return await this.restHandler.ExecuteRequestAsync(HttpMethod.Get, url, queryString, headers, body, cancellationToken);
+			return await this.restHandler.ExecuteRequestAsync(HttpMethod.Get, url, queryString, headers, body, cancellationToken: cancellationToken);
 		}
 		
 		protected IResponseResult<TResult> Get<TResult>(
@@ -65,7 +65,7 @@ namespace Ertis.Net.Services
 			IRequestBody body = null, 
 			CancellationToken cancellationToken = default)
 		{
-			return await this.restHandler.ExecuteRequestAsync<TResult>(HttpMethod.Get, url, queryString, headers, body, cancellationToken);
+			return await this.restHandler.ExecuteRequestAsync<TResult>(HttpMethod.Get, url, queryString, headers, body, cancellationToken: cancellationToken);
 		}
 		
 		protected IResponseResult Post(
@@ -84,7 +84,7 @@ namespace Ertis.Net.Services
 			IRequestBody body = null, 
 			CancellationToken cancellationToken = default)
 		{
-			return await this.restHandler.ExecuteRequestAsync(HttpMethod.Post, url, queryString, headers, body, cancellationToken);
+			return await this.restHandler.ExecuteRequestAsync(HttpMethod.Post, url, queryString, headers, body, cancellationToken: cancellationToken);
 		}
 		
 		protected IResponseResult<TResult> Post<TResult>(
@@ -103,7 +103,7 @@ namespace Ertis.Net.Services
 			IRequestBody body = null, 
 			CancellationToken cancellationToken = default)
 		{
-			return await this.restHandler.ExecuteRequestAsync<TResult>(HttpMethod.Post, url, queryString, headers, body, cancellationToken);
+			return await this.restHandler.ExecuteRequestAsync<TResult>(HttpMethod.Post, url, queryString, headers, body, cancellationToken: cancellationToken);
 		}
 		
 		protected IResponseResult Put(
@@ -122,7 +122,7 @@ namespace Ertis.Net.Services
 			IRequestBody body = null, 
 			CancellationToken cancellationToken = default)
 		{
-			return await this.restHandler.ExecuteRequestAsync(HttpMethod.Put, url, queryString, headers, body, cancellationToken);
+			return await this.restHandler.ExecuteRequestAsync(HttpMethod.Put, url, queryString, headers, body, cancellationToken: cancellationToken);
 		}
 		
 		protected IResponseResult<TResult> Put<TResult>(
@@ -141,7 +141,7 @@ namespace Ertis.Net.Services
 			IRequestBody body = null, 
 			CancellationToken cancellationToken = default)
 		{
-			return await this.restHandler.ExecuteRequestAsync<TResult>(HttpMethod.Put, url, queryString, headers, body, cancellationToken);
+			return await this.restHandler.ExecuteRequestAsync<TResult>(HttpMethod.Put, url, queryString, headers, body, cancellationToken: cancellationToken);
 		}
 		
 		protected IResponseResult Delete(
@@ -160,7 +160,7 @@ namespace Ertis.Net.Services
 			IRequestBody body = null, 
 			CancellationToken cancellationToken = default)
 		{
-			return await this.restHandler.ExecuteRequestAsync(HttpMethod.Delete, url, queryString, headers, body, cancellationToken);
+			return await this.restHandler.ExecuteRequestAsync(HttpMethod.Delete, url, queryString, headers, body, cancellationToken: cancellationToken);
 		}
 		
 		protected IResponseResult<TResult> Delete<TResult>(
@@ -179,7 +179,7 @@ namespace Ertis.Net.Services
 			IRequestBody body = null, 
 			CancellationToken cancellationToken = default)
 		{
-			return await this.restHandler.ExecuteRequestAsync<TResult>(HttpMethod.Delete, url, queryString, headers, body, cancellationToken);
+			return await this.restHandler.ExecuteRequestAsync<TResult>(HttpMethod.Delete, url, queryString, headers, body, cancellationToken: cancellationToken);
 		}
 
 		#endregion

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PackageId>Ertis.ImageProcessing</PackageId>
+        <PackageVersion>7.0.0</PackageVersion>
+        <Authors>Ertuğrul Özcan</Authors>
+        <Description>Ertis.ImageProcessing</Description>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <Copyright>Ertuğrul Özcan | Copyright 2023 (c)</Copyright>
+        <PackageReleaseNotes>.Net 7</PackageReleaseNotes>
+        <PackageTags>Ertis.ImageProcessing</PackageTags>
+        <Title>Ertis.ImageProcessing</Title>
+        <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
+        <AssemblyVersion>7.0.0</AssemblyVersion>
+        <FileVersion>7.0.0</FileVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Ertis.Core" Version="7.0.2" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
+    </ItemGroup>
+
+</Project>

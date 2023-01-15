@@ -1,5 +1,3 @@
-// Branch: dotnet7 -> master
-
 using System;
 using System.Collections.Generic;
 using System.Linq;

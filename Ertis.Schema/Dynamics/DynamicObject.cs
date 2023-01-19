@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
 using Newtonsoft.Json.Linq;
 
@@ -210,7 +211,7 @@ namespace Ertis.Schema.Dynamics
                     }
                     else
                     {
-                        throw new InvalidOperationException("Undefined");
+                        throw new UndefinedFieldException(path);
                     }
                 }
                 else
@@ -229,7 +230,7 @@ namespace Ertis.Schema.Dynamics
                     }
                     else
                     {
-                        throw new InvalidOperationException("Undefined");
+                        throw new UndefinedFieldException(path);
                     }
                 }
                 else
@@ -239,7 +240,7 @@ namespace Ertis.Schema.Dynamics
             }
             else
             {
-                throw new InvalidOperationException("Undefined");
+                throw new UndefinedFieldException(path);
             }
         }
 
@@ -281,7 +282,7 @@ namespace Ertis.Schema.Dynamics
                 }
                 else
                 {
-                    throw new InvalidOperationException("Undefined");
+                    throw new UndefinedFieldException(key);
                 }
             }
 
@@ -331,7 +332,7 @@ namespace Ertis.Schema.Dynamics
                     }
                     else
                     {
-                        throw new InvalidOperationException("Undefined");
+                        throw new UndefinedFieldException(path);
                     }
                 }
                 else
@@ -357,7 +358,7 @@ namespace Ertis.Schema.Dynamics
             }
             else
             {
-                throw new InvalidOperationException("Undefined");
+                throw new UndefinedFieldException(path);
             }
         }
 
@@ -409,7 +410,7 @@ namespace Ertis.Schema.Dynamics
                 }
                 else
                 {
-                    throw new InvalidOperationException("Undefined");
+                    throw new UndefinedFieldException(key);
                 }
             }
 
@@ -452,7 +453,7 @@ namespace Ertis.Schema.Dynamics
         {
             if (!this.TryGetValue(path, out _, out var exception))
             {
-                if (exception is InvalidOperationException && exception.Message == "Undefined")
+                if (exception is UndefinedFieldException)
                 {
                     return false;
                 }

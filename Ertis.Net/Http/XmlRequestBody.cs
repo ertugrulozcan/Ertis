@@ -1,5 +1,6 @@
-using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace Ertis.Net.Http
 {
@@ -7,19 +8,27 @@ namespace Ertis.Net.Http
     {
         #region Properties
 
-        public object Payload { get; }
+        public object? Payload { get; }
 		
         public BodyTypes Type => BodyTypes.Xml;
 
-        public string Xml
+        // ReSharper disable once MemberCanBePrivate.Global
+        public string? Xml
         {
             get
             {
                 if (this.Payload == null)
                     return null;
-				
-                var serializer = new RestSharp.Serializers.Xml.DotNetXmlSerializer();
-                return serializer.Serialize(this.Payload);
+
+                using(var stringWriter = new StringWriter())
+                {
+                    using(var xmlWriter = XmlWriter.Create(stringWriter))
+                    {
+                        var xmlSerializer = new XmlSerializer(this.Payload.GetType());
+                        xmlSerializer.Serialize(xmlWriter, this.Payload);
+                        return stringWriter.ToString();
+                    }
+                }
             }
         }
 
@@ -42,10 +51,17 @@ namespace Ertis.Net.Http
 
         public HttpContent GetHttpContent()
         {
-            var buffer = System.Text.Encoding.UTF8.GetBytes(this.Xml);
-            var content = new ByteArrayContent(buffer);
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
-            return content;
+            if (this.Xml != null)
+            {
+                var buffer = System.Text.Encoding.UTF8.GetBytes(this.Xml);
+                var content = new ByteArrayContent(buffer);
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
+                return content;
+            }
+            else
+            {
+                return new StringContent(string.Empty);
+            }
         }
 
         #endregion

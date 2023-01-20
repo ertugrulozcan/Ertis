@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Ertis.Net.Http
 {
@@ -123,8 +120,8 @@ namespace Ertis.Net.Http
 		{
 			return string.Join("&", 
 				this.QueryDictionary
-					.Where(x => !string.IsNullOrEmpty(x.Key) && x.Value != null)
-					.Select(x => $"{x.Key}={Uri.EscapeDataString(x.Value?.ToString() ?? "")}"));
+					.Where(x => !string.IsNullOrEmpty(x.Key))
+					.Select(x => $"{x.Key}={Uri.EscapeDataString(x.Value.ToString() ?? "")}"));
 		}
 
 		public IEnumerator GetEnumerator()

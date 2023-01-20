@@ -2,8 +2,10 @@
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
         <PackageId>Ertis.Net</PackageId>
-        <PackageVersion>7.0.2</PackageVersion>
+        <PackageVersion>7.0.3</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.Net</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -13,13 +15,12 @@
         <Title>Ertis.Net</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>7.0.2</AssemblyVersion>
-        <FileVersion>7.0.2</FileVersion>
+        <AssemblyVersion>7.0.3</AssemblyVersion>
+        <FileVersion>7.0.3</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-      <PackageReference Include="RestSharp" Version="108.0.3" />
     </ItemGroup>
 
     <ItemGroup>

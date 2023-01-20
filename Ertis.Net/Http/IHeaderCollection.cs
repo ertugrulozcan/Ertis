@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Ertis.Net.Http
 {
 	public interface IHeaderCollection : IEnumerable<object>

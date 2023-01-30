@@ -24,6 +24,7 @@ namespace Ertis.Schema.Types
         reference,
         code,
         image,
-        video
+        video,
+        nestedType
     }
 }

@@ -170,7 +170,7 @@ namespace Ertis.Schema.Dynamics
                 var itemType = typeof(T).GetElementType();
                 if (itemType != null)
                 {
-                    return (T)array.Select(x => Cast(x, itemType));
+                    return (T) (array.Select(x => Cast(x, itemType)).ToArray() as object);
                 }
                 else
                 {

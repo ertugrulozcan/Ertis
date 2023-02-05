@@ -90,6 +90,18 @@ namespace Ertis.Schema.Dynamics
             var dynamicObject = new DynamicObject(obj);
             return dynamicObject.Deserialize<T>();
         }
+        
+        // ReSharper disable once MemberCanBePrivate.Global
+        public static object Cast(dynamic obj, Type type)
+        {
+            if (obj == null)
+            {
+                return null;
+            }
+
+            var dynamicObject = new DynamicObject(obj);
+            return dynamicObject.Deserialize(type);
+        }
 
         public IDictionary<string, object> ToDictionary()
         {
@@ -112,6 +124,12 @@ namespace Ertis.Schema.Dynamics
         public T Deserialize<T>()
         {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(this.ToJson());
+        }
+        
+        // ReSharper disable once MemberCanBePrivate.Global
+        public object Deserialize(Type type)
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject(this.ToJson(), type);
         }
         
         public dynamic ToDynamic()
@@ -146,6 +164,18 @@ namespace Ertis.Schema.Dynamics
             if (value is IDictionary<string, object> dictionary)
             {
                 return Create(dictionary).Deserialize<T>();
+            }
+            else if (typeof(T).IsArray && value.GetType().IsArray && value is object[] array)
+            {
+                var itemType = typeof(T).GetElementType();
+                if (itemType != null)
+                {
+                    return (T)array.Select(x => Cast(x, itemType));
+                }
+                else
+                {
+                    return default;
+                }
             }
             else if (typeof(T).IsEnum && Enum.TryParse(typeof(T), value.ToString(), false, out var enumValue))
             {
@@ -480,9 +510,9 @@ namespace Ertis.Schema.Dynamics
         #region Disposing
 
         private bool _disposedValue;
-
+        
         ~DynamicObject() => this.Dispose(false);
-		
+        
         public void Dispose()
         {
             this.Dispose(true);
@@ -503,7 +533,7 @@ namespace Ertis.Schema.Dynamics
                 _disposedValue = true;
             }
         }
-		
+	    
         #endregion
     }
 }

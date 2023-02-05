@@ -456,27 +456,27 @@ namespace Ertis.PostgreSQL.Repository
 		
 		#region Insert Methods
 
-		public virtual TEntity Insert(TEntity entity)
+		public virtual TEntity Insert(TEntity entity, InsertOptions? options = null)
 		{
 			var cursor = this.GetDbSet().Add(entity);
 			this.database.SaveChanges();
 			return this.FindOne(cursor.Entity.Id);
 		}
 
-		public virtual async ValueTask<TEntity> InsertAsync(TEntity entity, CancellationToken cancellationToken = default)
+		public virtual async ValueTask<TEntity> InsertAsync(TEntity entity, InsertOptions? options = null, CancellationToken cancellationToken = default)
 		{
 			var cursor = (await this.GetDbSet().AddAsync(entity, cancellationToken: cancellationToken));
 			await this.database.SaveChangesAsync(cancellationToken: cancellationToken);
 			return await this.FindOneAsync(cursor.Entity.Id, cancellationToken: cancellationToken);
 		}
 		
-		public void BulkInsert(IEnumerable<TEntity> entities)
+		public void BulkInsert(IEnumerable<TEntity> entities, InsertOptions? options = null)
 		{
 			this.GetDbSet().AddRange(entities);
 			this.database.SaveChanges();
 		}
 
-		public async ValueTask BulkInsertAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+		public async ValueTask BulkInsertAsync(IEnumerable<TEntity> entities, InsertOptions? options = null, CancellationToken cancellationToken = default)
 		{
 			await this.GetDbSet().AddRangeAsync(entities, cancellationToken: cancellationToken);
 			await this.database.SaveChangesAsync(cancellationToken: cancellationToken);
@@ -486,7 +486,7 @@ namespace Ertis.PostgreSQL.Repository
 		
 		#region Update Methods
 
-		public virtual TEntity Update(TEntity entity, int id = default)
+		public virtual TEntity Update(TEntity entity, int id = default, UpdateOptions? options = null)
 		{
 			if (this.TrackingEnabled)
 			{
@@ -510,7 +510,7 @@ namespace Ertis.PostgreSQL.Repository
 			}
 		}
 
-		public virtual async ValueTask<TEntity> UpdateAsync(TEntity entity, int id = default, CancellationToken cancellationToken = default)
+		public virtual async ValueTask<TEntity> UpdateAsync(TEntity entity, int id = default, UpdateOptions? options = null, CancellationToken cancellationToken = default)
 		{
 			if (this.TrackingEnabled)
 			{

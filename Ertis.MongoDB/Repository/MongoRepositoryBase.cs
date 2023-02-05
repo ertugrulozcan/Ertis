@@ -20,6 +20,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using SortDirection = Ertis.Core.Collections.SortDirection;
 using MongoDriver = MongoDB.Driver;
+using UpdateOptions = Ertis.Data.Models.UpdateOptions;
 
 namespace Ertis.MongoDB.Repository
 {
@@ -839,16 +840,16 @@ namespace Ertis.MongoDB.Repository
 		
 		#region Insert Methods
 
-		public TEntity Insert(TEntity entity)
+		public TEntity Insert(TEntity entity, InsertOptions? options = null)
 		{
-			if (this.actionBinder != null)
+			if (this.actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 			{
 				entity = this.actionBinder.BeforeInsert(entity);
 			}
 			
 			this.Collection.InsertOne(entity);
 			
-			if (this.actionBinder != null)
+			if (this.actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
 			{
 				entity = this.actionBinder.AfterInsert(entity);
 			}
@@ -856,16 +857,16 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 		
-		public async ValueTask<TEntity> InsertAsync(TEntity entity, CancellationToken cancellationToken = default)
+		public async ValueTask<TEntity> InsertAsync(TEntity entity, InsertOptions? options = null, CancellationToken cancellationToken = default)
 		{
-			if (this.actionBinder != null)
+			if (this.actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 			{
 				entity = this.actionBinder.BeforeInsert(entity);
 			}
 			
 			await this.Collection.InsertOneAsync(entity, new InsertOneOptions(), cancellationToken: cancellationToken);
 			
-			if (this.actionBinder != null)
+			if (this.actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
 			{
 				entity = this.actionBinder.AfterInsert(entity);
 			}
@@ -873,12 +874,12 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 
-		public void BulkInsert(IEnumerable<TEntity> entities)
+		public void BulkInsert(IEnumerable<TEntity> entities, InsertOptions? options = null)
 		{
 			this.Collection.InsertMany(entities);
 		}
 
-		public async ValueTask BulkInsertAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+		public async ValueTask BulkInsertAsync(IEnumerable<TEntity> entities, InsertOptions? options = null, CancellationToken cancellationToken = default)
 		{
 			await this.Collection.InsertManyAsync(entities, cancellationToken: cancellationToken);
 		}
@@ -887,9 +888,9 @@ namespace Ertis.MongoDB.Repository
 		
 		#region Update Methods
 
-		public TEntity Update(TEntity entity, string id = default)
+		public TEntity Update(TEntity entity, string id = default, UpdateOptions? options = null)
 		{
-			if (this.actionBinder != null)
+			if (this.actionBinder != null && (options ?? UpdateOptions.Default).TriggerBeforeActionBinder)
 			{
 				entity = this.actionBinder.BeforeUpdate(entity);
 			}
@@ -897,7 +898,7 @@ namespace Ertis.MongoDB.Repository
 			var updatedId = string.IsNullOrEmpty(id) ? entity.Id : id;
 			this.Collection.ReplaceOne(item => item.Id == updatedId, entity);
 
-			if (this.actionBinder != null)
+			if (this.actionBinder != null && (options ?? UpdateOptions.Default).TriggerAfterActionBinder)
 			{
 				entity = this.actionBinder.AfterUpdate(entity);
 			}
@@ -905,9 +906,9 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 		
-		public async ValueTask<TEntity> UpdateAsync(TEntity entity, string id = default, CancellationToken cancellationToken = default)
+		public async ValueTask<TEntity> UpdateAsync(TEntity entity, string id = default, UpdateOptions? options = null, CancellationToken cancellationToken = default)
 		{
-			if (this.actionBinder != null)
+			if (this.actionBinder != null && (options ?? UpdateOptions.Default).TriggerBeforeActionBinder)
 			{
 				entity = this.actionBinder.BeforeUpdate(entity);
 			}
@@ -915,7 +916,7 @@ namespace Ertis.MongoDB.Repository
 			var updatedId = string.IsNullOrEmpty(id) ? entity.Id : id;
 			await this.Collection.ReplaceOneAsync(item => item.Id == updatedId, entity, cancellationToken: cancellationToken);
 
-			if (this.actionBinder != null)
+			if (this.actionBinder != null && (options ?? UpdateOptions.Default).TriggerAfterActionBinder)
 			{
 				entity = this.actionBinder.AfterUpdate(entity);
 			}

@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Ertis.Core.Collections;
+using Ertis.Data.Models;
 
 namespace Ertis.Data.Repository
 {
@@ -35,21 +36,21 @@ namespace Ertis.Data.Repository
 		
 		#region Insert Methods
 
-		TEntity Insert(TEntity entity);
+		TEntity Insert(TEntity entity, InsertOptions? options = null);
 		
-		ValueTask<TEntity> InsertAsync(TEntity entity, CancellationToken cancellationToken = default);
+		ValueTask<TEntity> InsertAsync(TEntity entity, InsertOptions? options = null, CancellationToken cancellationToken = default);
 		
-		void BulkInsert(IEnumerable<TEntity> entity);
+		void BulkInsert(IEnumerable<TEntity> entity, InsertOptions? options = null);
 		
-		ValueTask BulkInsertAsync(IEnumerable<TEntity> entity, CancellationToken cancellationToken = default);
+		ValueTask BulkInsertAsync(IEnumerable<TEntity> entity, InsertOptions? options = null, CancellationToken cancellationToken = default);
 
 		#endregion
 		
 		#region Update Methods
 
-		TEntity Update(TEntity entity, TIdentifier id = default);
+		TEntity Update(TEntity entity, TIdentifier id = default, UpdateOptions? options = null);
 		
-		ValueTask<TEntity> UpdateAsync(TEntity entity, TIdentifier id = default, CancellationToken cancellationToken = default);
+		ValueTask<TEntity> UpdateAsync(TEntity entity, TIdentifier id = default, UpdateOptions? options = null, CancellationToken cancellationToken = default);
 
 		TEntity Upsert(TEntity entity, TIdentifier id = default);
 		

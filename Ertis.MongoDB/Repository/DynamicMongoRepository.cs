@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Ertis.Core.Collections;
+using Ertis.Data.Models;
 using Ertis.Data.Repository;
 using Ertis.MongoDB.Configuration;
 using Ertis.MongoDB.Exceptions;
@@ -18,6 +19,7 @@ using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using SortDirection = Ertis.Core.Collections.SortDirection;
 using MongoDriver = MongoDB.Driver;
+using UpdateOptions = Ertis.Data.Models.UpdateOptions;
 
 namespace Ertis.MongoDB.Repository
 {
@@ -549,9 +551,9 @@ namespace Ertis.MongoDB.Repository
 		
 		#region Insert Methods
 
-		public dynamic Insert(object entity)
+		public dynamic Insert(object entity, InsertOptions? options = null)
 		{
-			if (this._actionBinder != null)
+			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 			{
 				entity = this._actionBinder.BeforeInsert(entity);
 			}
@@ -565,7 +567,7 @@ namespace Ertis.MongoDB.Repository
 				this.Collection.InsertOne(entity);	
 			}
 
-			if (this._actionBinder != null)
+			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
 			{
 				entity = this._actionBinder.AfterInsert(entity);
 			}
@@ -573,9 +575,9 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 		
-		public async ValueTask<dynamic> InsertAsync(object entity, CancellationToken cancellationToken = default)
+		public async ValueTask<dynamic> InsertAsync(object entity, InsertOptions? options = null, CancellationToken cancellationToken = default)
 		{
-			if (this._actionBinder != null)
+			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 			{
 				entity = this._actionBinder.BeforeInsert(entity);
 			}
@@ -589,7 +591,7 @@ namespace Ertis.MongoDB.Repository
 				await this.Collection.InsertOneAsync(entity, new InsertOneOptions(), cancellationToken: cancellationToken);	
 			}
 
-			if (this._actionBinder != null)
+			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
 			{
 				entity = this._actionBinder.AfterInsert(entity);
 			}
@@ -597,11 +599,11 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 
-		public void BulkInsert(IEnumerable<object> entities)
+		public void BulkInsert(IEnumerable<object> entities, InsertOptions? options = null)
 		{
 			var enumerable = entities as object[] ?? entities.ToArray();
 			
-			if (this._actionBinder != null)
+			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 			{
 				foreach (var entity in enumerable)
 				{
@@ -611,7 +613,7 @@ namespace Ertis.MongoDB.Repository
 			
 			this.Collection.InsertMany(enumerable);
 
-			if (this._actionBinder != null)
+			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
 			{
 				foreach (var entity in enumerable)
 				{
@@ -620,11 +622,11 @@ namespace Ertis.MongoDB.Repository
 			}
 		}
 
-		public async ValueTask BulkInsertAsync(IEnumerable<object> entities, CancellationToken cancellationToken = default)
+		public async ValueTask BulkInsertAsync(IEnumerable<object> entities, InsertOptions? options = null, CancellationToken cancellationToken = default)
 		{
 			var enumerable = entities as object[] ?? entities.ToArray();
 			
-			if (this._actionBinder != null)
+			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 			{
 				foreach (var entity in enumerable)
 				{
@@ -634,7 +636,7 @@ namespace Ertis.MongoDB.Repository
 			
 			await this.Collection.InsertManyAsync(enumerable, cancellationToken: cancellationToken);
 
-			if (this._actionBinder != null)
+			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
 			{
 				foreach (var entity in enumerable)
 				{
@@ -643,9 +645,9 @@ namespace Ertis.MongoDB.Repository
 			}
 		}
 
-		public ICollection<dynamic> InsertMany(ICollection<object> entities)
+		public ICollection<dynamic> InsertMany(ICollection<object> entities, InsertOptions? options = null)
 		{
-			if (this._actionBinder != null)
+			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 			{
 				foreach (var entity in entities)
 				{
@@ -655,7 +657,7 @@ namespace Ertis.MongoDB.Repository
 			
 			this.Collection.InsertMany(entities);
 			
-			if (this._actionBinder != null)
+			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
 			{
 				foreach (var entity in entities)
 				{
@@ -666,9 +668,9 @@ namespace Ertis.MongoDB.Repository
 			return entities;
 		}
 		
-		public async Task<ICollection<dynamic>> InsertManyAsync(ICollection<object> entities, CancellationToken cancellationToken = default)
+		public async Task<ICollection<dynamic>> InsertManyAsync(ICollection<object> entities, InsertOptions? options = null, CancellationToken cancellationToken = default)
 		{
-			if (this._actionBinder != null)
+			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 			{
 				foreach (var entity in entities)
 				{
@@ -678,7 +680,7 @@ namespace Ertis.MongoDB.Repository
 			
 			await this.Collection.InsertManyAsync(entities, cancellationToken: cancellationToken);
 			
-			if (this._actionBinder != null)
+			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
 			{
 				foreach (var entity in entities)
 				{
@@ -693,9 +695,9 @@ namespace Ertis.MongoDB.Repository
 		
 		#region Update Methods
 
-		public dynamic Update(object entity, string id = default)
+		public dynamic Update(object entity, string id = default, UpdateOptions? options = null)
 		{
-			if (this._actionBinder != null)
+			if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerBeforeActionBinder)
 			{
 				entity = this._actionBinder.BeforeUpdate(entity);
 			}
@@ -709,7 +711,7 @@ namespace Ertis.MongoDB.Repository
 				this.Collection.ReplaceOne(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)), entity);	
 			}
 
-			if (this._actionBinder != null)
+			if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerAfterActionBinder)
 			{
 				entity = this._actionBinder.AfterUpdate(entity);
 			}
@@ -717,9 +719,9 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 		
-		public async ValueTask<dynamic> UpdateAsync(object entity, string id = default, CancellationToken cancellationToken = default)
+		public async ValueTask<dynamic> UpdateAsync(object entity, string id = default, UpdateOptions? options = null, CancellationToken cancellationToken = default)
 		{
-			if (this._actionBinder != null)
+			if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerBeforeActionBinder)
 			{
 				entity = this._actionBinder.BeforeUpdate(entity);
 			}
@@ -733,7 +735,7 @@ namespace Ertis.MongoDB.Repository
 				await this.Collection.ReplaceOneAsync(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)), entity, cancellationToken: cancellationToken);	
 			}
 
-			if (this._actionBinder != null)
+			if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerAfterActionBinder)
 			{
 				entity = this._actionBinder.AfterUpdate(entity);
 			}

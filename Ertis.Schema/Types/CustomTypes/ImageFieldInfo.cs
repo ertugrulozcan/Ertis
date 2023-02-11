@@ -307,17 +307,6 @@ namespace Ertis.Schema.Types.CustomTypes
             return true;
         }
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         private bool ValidateMinWidth(out Exception exception)
         {
             if (this.MinWidth != null)

@@ -1,6 +1,7 @@
 using System;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Exceptions;
+using Ertis.Schema.Models;
 using Ertis.Schema.Validation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -52,6 +53,12 @@ namespace Ertis.Schema.Types.CustomTypes
             }
         }
         
+        [JsonProperty("embeddedImageRules", NullValueHandling = NullValueHandling.Ignore)]
+        public ResolutionRules? EmbeddedImageRules { get; set; }
+        
+        [JsonProperty("embeddedImageMaxSize", NullValueHandling = NullValueHandling.Ignore)]
+        public int? EmbeddedImageMaxSize { get; set; }
+            
         #endregion
 
         #region Methods
@@ -155,6 +162,8 @@ namespace Ertis.Schema.Types.CustomTypes
                 FormatPattern = this.FormatPattern,
                 RegexPattern = this.RegexPattern,
                 RestrictRegexPattern = this.RestrictRegexPattern,
+                EmbeddedImageRules = this.EmbeddedImageRules,
+                EmbeddedImageMaxSize = this.EmbeddedImageMaxSize
             };
         }
 

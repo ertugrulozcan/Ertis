@@ -7,7 +7,7 @@ using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.Primitives
 {
-    public class EnumFieldInfo : FieldInfo<string>, IPrimitiveType
+    public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
     {
         #region Fields
 
@@ -39,6 +39,9 @@ namespace Ertis.Schema.Types.Primitives
         [JsonProperty("isUnique", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
         public bool IsUnique { get; set; }
         
+        [JsonProperty("isMultiple", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public bool IsMultiple { get; set; }
+        
         #endregion
 
         #region Methods
@@ -58,21 +61,39 @@ namespace Ertis.Schema.Types.Primitives
             bool isExistInEnums;
             if (obj != null)
             {
-                var type = obj.GetType();
-                if (!type.IsPrimitive && type != typeof(string))
+                if (this.IsMultiple)
                 {
-                    isValid = false;
-                    validationContext.Errors.Add(new FieldValidationException($"Enum value is must be primitive type ({this.Name})", this));   
+                    if (obj is EnumItem[] array)
+                    {
+                        isExistInEnums = array.All(item => this.Items.Any(x => x?.Value != null && x.Value.Equals(item.Value)));
+                    }
+                    else
+                    {
+                        isValid = false;
+                        isExistInEnums = false;
+                        validationContext.Errors.Add(new FieldValidationException($"Enum value is must be array type ({this.Name})", this));   
+                    }
                 }
-
-                isExistInEnums = this.Items.Any(x => x?.Value != null && x.Value.Equals(obj));
+                else
+                {
+                    if (obj is EnumItem item)
+                    {
+                        isExistInEnums = this.Items.Any(x => x?.Value != null && x.Value.Equals(item.Value));
+                    }
+                    else
+                    {
+                        isValid = false;
+                        isExistInEnums = false;
+                        validationContext.Errors.Add(new FieldValidationException($"Enum value is must be enum item type ({this.Name})", this));   
+                    }
+                }
             }
             else
             {
                 isExistInEnums = this.Items.Any(x => x?.Value == null);
             }
 
-            if (!isExistInEnums)
+            if (isValid && !isExistInEnums)
             {
                 isValid = false;
                 var enumValues = string.Join(", ", this.Items.Select(x => x?.Value == null ? "null" : $"'{x.Value}'"));
@@ -97,7 +118,7 @@ namespace Ertis.Schema.Types.Primitives
             
             if (this.Items.Any(x => x?.Value != null && !x.Value.GetType().IsPrimitive && x.Value.GetType() != typeof(string)))
             {
-                throw new FieldValidationException("Enum items must be primitive type", this);
+                throw new FieldValidationException("Enum item values must be primitive type", this);
             }
             
             var uniqueCount = this.Items.Select(x => x.Value).Distinct().Count();
@@ -125,6 +146,7 @@ namespace Ertis.Schema.Types.Primitives
                 IsReadonly = this.IsReadonly,
                 DefaultValue = this.DefaultValue,
                 Items = this.Items,
+                IsMultiple = this.IsMultiple
             };
         }
 

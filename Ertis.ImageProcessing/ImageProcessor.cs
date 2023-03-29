@@ -44,7 +44,7 @@ public static class ImageProcessor
 					Size = new Size(width ?? 0, height ?? 0),
 					Mode = mode ?? ResizeModeEnum.Crop,
 					Position = anchor ?? AnchorPositionMode.Center,
-					Sampler = (sampler ?? SamplerAlgorithm.Bicubic).ToResampler()
+					Sampler = (sampler ?? SamplerAlgorithm.Bicubic).ToResampler()!
 				};
 			
 				image.Mutate(x => x.Resize(options)); 

@@ -77,7 +77,7 @@ namespace Ertis.Schema.Types.Primitives
                 else
                 {
                     var type = obj.GetType();
-                    if (!type.IsPrimitive && type != typeof(string))
+                    if (type.IsPrimitive || type == typeof(string))
                     {
                         isExistInEnums = this.Items.Any(x => x?.Value != null && x.Value.Equals(obj));
                     }

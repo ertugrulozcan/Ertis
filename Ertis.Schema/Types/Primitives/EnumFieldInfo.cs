@@ -63,9 +63,9 @@ namespace Ertis.Schema.Types.Primitives
             {
                 if (this.IsMultiple)
                 {
-                    if (obj is EnumItem[] array)
+                    if (obj is string[] array)
                     {
-                        isExistInEnums = array.All(item => this.Items.Any(x => x?.Value != null && x.Value.Equals(item.Value)));
+                        isExistInEnums = array.All(item => this.Items.Any(x => x?.Value != null && x.Value.Equals(item)));
                     }
                     else
                     {
@@ -76,15 +76,16 @@ namespace Ertis.Schema.Types.Primitives
                 }
                 else
                 {
-                    if (obj is EnumItem item)
+                    var type = obj.GetType();
+                    if (!type.IsPrimitive && type != typeof(string))
                     {
-                        isExistInEnums = this.Items.Any(x => x?.Value != null && x.Value.Equals(item.Value));
+                        isExistInEnums = this.Items.Any(x => x?.Value != null && x.Value.Equals(obj));
                     }
                     else
                     {
                         isValid = false;
                         isExistInEnums = false;
-                        validationContext.Errors.Add(new FieldValidationException($"Enum value is must be enum item type ({this.Name})", this));   
+                        validationContext.Errors.Add(new FieldValidationException($"Enum value is must be primitive type ({this.Name})", this));   
                     }
                 }
             }

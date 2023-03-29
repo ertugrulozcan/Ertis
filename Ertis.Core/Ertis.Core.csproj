@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <PackageId>Ertis.Core</PackageId>
-        <PackageVersion>7.0.3</PackageVersion>
+        <PackageVersion>7.0.4</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.Core</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -13,12 +13,12 @@
         <Title>Ertis.Core</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>7.0.3</AssemblyVersion>
-        <FileVersion>7.0.3</FileVersion>
+        <AssemblyVersion>7.0.4</AssemblyVersion>
+        <FileVersion>7.0.4</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
 
 </Project>

@@ -225,7 +225,7 @@ namespace Ertis.Schema.Types.Primitives
                     }
                 }
 
-                return text;
+                return text.Trim();
             }
             else
             {

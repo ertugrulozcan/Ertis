@@ -67,6 +67,10 @@ namespace Ertis.Schema.Types.Primitives
                     {
                         isExistInEnums = array.All(item => this.Items.Any(x => x?.Value != null && x.Value.Equals(item)));
                     }
+                    else if (obj is object[] { Length: 0 })
+                    {
+                        isExistInEnums = true;
+                    }
                     else
                     {
                         isValid = false;

@@ -203,7 +203,7 @@ namespace Ertis.Schema.Types
                     break;
                 case null when this.IsRequired && this.GetDefaultValue() == null:
                     isValid = false;
-                    validationContext.Errors.Add(new FieldValidationException($"'{this.Name}' is required", this));
+                    validationContext.Errors.Add(new FieldValidationException($"{this.Name} is required", this));
                     break;
                 default:
                 {

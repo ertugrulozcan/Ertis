@@ -117,6 +117,12 @@ namespace Ertis.Schema.Types.Primitives
             
             if (obj is string text)
             {
+                if (this.IsRequired && string.IsNullOrEmpty(text.Trim()))
+                {
+                    isValid = false;
+                    validationContext.Errors.Add(new FieldValidationException($"{this.Name} is required", this));
+                }
+                
                 if (this.MaxLength != null && text.Length > this.MaxLength.Value)
                 {
                     isValid = false;
@@ -205,6 +211,7 @@ namespace Ertis.Schema.Types.Primitives
             return true;
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public string Format(DynamicObject content)
         {
             if (!string.IsNullOrEmpty(this.FormatPattern) && content != null)
@@ -225,7 +232,7 @@ namespace Ertis.Schema.Types.Primitives
                     }
                 }
 
-                return text.Trim();
+                return text;
             }
             else
             {

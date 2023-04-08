@@ -153,6 +153,18 @@ namespace Ertis.Schema.Types.CustomTypes
         
         [JsonProperty("aspectRatioRequired")]
         public bool AspectRatioRequired { get; set; }
+        
+        [JsonProperty("formWidth", NullValueHandling = NullValueHandling.Ignore)]
+        public string FormWidth { get; set; }
+        
+        [JsonProperty("formHeight", NullValueHandling = NullValueHandling.Ignore)]
+        public string FormHeight { get; set; }
+        
+        [JsonProperty("maxFormWidth", NullValueHandling = NullValueHandling.Ignore)]
+        public string MaxFormWidth { get; set; }
+        
+        [JsonProperty("maxFormHeight", NullValueHandling = NullValueHandling.Ignore)]
+        public string MaxFormHeight { get; set; }
 
         #endregion
         
@@ -416,7 +428,11 @@ namespace Ertis.Schema.Types.CustomTypes
                 RecommendedHeight = this.RecommendedHeight,
                 MinSizesRequired = this.MinSizesRequired,
                 MaxSizesRequired = this.MaxSizesRequired,
-                AspectRatioRequired = this.AspectRatioRequired
+                AspectRatioRequired = this.AspectRatioRequired,
+                FormWidth = this.FormWidth,
+                FormHeight = this.FormHeight,
+                MaxFormWidth = this.MaxFormWidth,
+                MaxFormHeight = this.MaxFormHeight
             };
         }
 

@@ -65,6 +65,20 @@ namespace Ertis.Schema.Types.CustomTypes
             else if (this.ReferenceType == ReferenceTypes.multiple && obj is object[] objectArray)
             {
                 isValid = objectArray.All(x => EnsureReferenceId(x) != null);
+                if (this.MultipleReferenceOptions != null)
+                {
+                    if (this.MultipleReferenceOptions.MaxCount != null && objectArray.Length > this.MultipleReferenceOptions.MaxCount.Value)
+                    {
+                        isValid = false;
+                        validationContext.Errors.Add(new FieldValidationException($"Multiple reference array length can not be greater than {this.MultipleReferenceOptions.MaxCount}", this));
+                    }
+                
+                    if (this.MultipleReferenceOptions.MinCount != null && objectArray.Length < this.MultipleReferenceOptions.MinCount.Value)
+                    {
+                        isValid = false;
+                        validationContext.Errors.Add(new FieldValidationException($"Multiple reference array length can not be less than {this.MultipleReferenceOptions.MinCount}", this));
+                    }
+                }
             }
             else if (this.ReferenceType == ReferenceTypes.collection)
             {

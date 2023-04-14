@@ -89,6 +89,10 @@ namespace Ertis.Schema.Types.Primitives
                     }
                 }
             }
+            else if (this.IsMultiple)
+            {
+                isExistInEnums = true;
+            }
             else
             {
                 isExistInEnums = this.Items.Any(x => x?.Value == null);

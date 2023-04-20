@@ -1,6 +1,6 @@
 namespace Ertis.MongoDB.Queries
 {
-    public class ObjectId : IQuery, IQueryExpression
+    public class ObjectId : QueryValue<string>, IQueryExpression
     {
         #region Properties
 
@@ -9,14 +9,14 @@ namespace Ertis.MongoDB.Queries
         public string Field => "_id";
 
         #endregion
-
+        
         #region Constructors
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="id">ObjectId</param>
-        public ObjectId(string id)
+        public ObjectId(string id) : base(id)
         {
             this.Id = id;
         }
@@ -27,7 +27,7 @@ namespace Ertis.MongoDB.Queries
 
         public override string ToString()
         {
-            return "{ \"" + this.Field + "\": " + $"ObjectId(\"{this.Id}\")" + " }";
+            return $"ObjectId(\"{this.Id}\")";
         }
 
         #endregion

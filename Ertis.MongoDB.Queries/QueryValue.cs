@@ -2,11 +2,11 @@ using System;
 
 namespace Ertis.MongoDB.Queries
 {
-    internal class QueryValue<T> : IQuery
+    public class QueryValue<T> : IQuery
     {
         #region Properties
 
-        private T Value { get; }
+        protected T Value { get; }
 
         #endregion
 
@@ -44,6 +44,10 @@ namespace Ertis.MongoDB.Queries
                 var dateTime = this.Value is DateTime time ? time : default;
                 return "\"" + dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "\"";
             }
+            else if (IsNumericType(typeof(T)))
+            {
+                return this.Value.ToString()?.Replace(',', '.');
+            }
             else if (this.Value == null)
             {
                 return "null";
@@ -54,6 +58,36 @@ namespace Ertis.MongoDB.Queries
             }
         }
 
+        private static bool IsNumericType(Type type)
+        {
+            return
+                IsIntegralNumericType(type) ||
+                IsFloatingPointNumericType(type);
+        }
+        
+        private static bool IsIntegralNumericType(Type type)
+        {
+            return
+                type == typeof(byte) ||
+                type == typeof(sbyte) ||
+                type == typeof(short) ||
+                type == typeof(ushort) ||
+                type == typeof(int) ||
+                type == typeof(uint) ||
+                type == typeof(nint) ||
+                type == typeof(nuint) ||
+                type == typeof(long) ||
+                type == typeof(ulong);
+        }
+        
+        private static bool IsFloatingPointNumericType(Type type)
+        {
+            return
+                type == typeof(float) ||
+                type == typeof(double) ||
+                type == typeof(decimal);
+        }
+        
         #endregion
     }
 }

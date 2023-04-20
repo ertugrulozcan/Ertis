@@ -13,10 +13,33 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
         {
             const string membershipId = "61b7bfa7fa20a74224879e13";
             const string id = "61fdb0eb923408d9b5d7f14a";
-            var query = QueryBuilder.Where(QueryBuilder.Equals("membership_id", membershipId), QueryBuilder.ObjectId(id));
+            var query = QueryBuilder.Where(QueryBuilder.Equals("membership_id", membershipId), QueryBuilder.Equals("_id", QueryBuilder.ObjectId(id)));
             var queryJson = query.ToString();
             Assert.NotNull(queryJson);
             Assert.AreEqual("{ \"membership_id\": \"61b7bfa7fa20a74224879e13\", \"_id\": ObjectId(\"61fdb0eb923408d9b5d7f14a\") }".Trim(), queryJson.Trim());
+        }
+        
+        [Test]
+        public void ObjectIdTest2()
+        {
+            const string organizationId = "6356f3240e37638afd92c516";
+            const string url = "/foo/bar";
+            var query = QueryBuilder.Where(QueryBuilder.Equals("organization_id", organizationId), QueryBuilder.Equals("url", url));
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ \"organization_id\": \"6356f3240e37638afd92c516\", \"url\": \"/foo/bar\" }".Trim(), queryJson.Trim());
+        }
+        
+        [Test]
+        public void ObjectIdTest3()
+        {
+            const string organizationId = "6356f3240e37638afd92c516";
+            const string id = "6439f2d9e41d91644e8b8126";
+            const string url = "/foo/bar";
+            var query = QueryBuilder.Where(QueryBuilder.Equals("organization_id", organizationId), QueryBuilder.Equals("url", url), QueryBuilder.NotEquals("_id", QueryBuilder.ObjectId(id)));
+            var queryJson = query.ToString();
+            Assert.NotNull(queryJson);
+            Assert.AreEqual("{ \"organization_id\": \"6356f3240e37638afd92c516\", \"url\": \"/foo/bar\", \"_id\": { $ne: ObjectId(\"6439f2d9e41d91644e8b8126\") } }".Trim(), queryJson.Trim());
         }
 
         #endregion

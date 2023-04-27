@@ -274,7 +274,7 @@ namespace Ertis.Schema.Types.Primitives
 
         internal int? IndexOf(FieldInfo itemFieldInfo)
         {
-            if (itemFieldInfo is { CurrentObject: { } } && this.CurrentObject is Array array)
+            if (itemFieldInfo is { CurrentObject: not null } && this.CurrentObject is Array array)
             {
                 return Array.IndexOf(array, itemFieldInfo.CurrentObject);
             }
@@ -294,12 +294,14 @@ namespace Ertis.Schema.Types.Primitives
                 IsVirtual = this.IsVirtual,
                 IsHidden = this.IsHidden,
                 IsReadonly = this.IsReadonly,
+                IsSearchable = this.IsSearchable,
                 DefaultValue = this.DefaultValue,
                 MinCount = this.MinCount,
                 MaxCount = this.MaxCount,
                 UniqueItems = this.UniqueItems,
                 ItemSchema = this.ItemSchema.Clone() as IFieldInfo,
                 UniqueBy = this.UniqueBy,
+                Appearance = this.Appearance
             };
         }
 

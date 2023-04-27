@@ -26,6 +26,7 @@ namespace Ertis.Schema.Serialization
         {
             try
             {
+                // ReSharper disable once CanSimplifyDictionaryLookupWithTryGetValue
                 if (jObject.ContainsKey("type"))
                 {
                     var fieldTypeName = jObject["type"]?.Value<string>();

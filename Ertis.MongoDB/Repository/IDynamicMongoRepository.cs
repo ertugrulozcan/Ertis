@@ -49,6 +49,14 @@ namespace Ertis.MongoDB.Repository
             IDictionary<string, bool> selectFields = null,
             CancellationToken cancellationToken = default);
         
+        TField[] Distinct<TField>(string distinctBy, string query = null);
+		
+        Task<TField[]> DistinctAsync<TField>(string distinctBy, string query = null, CancellationToken cancellationToken = default);
+		
+        TField[] Distinct<TField>(string distinctBy, Expression<Func<dynamic, bool>> expression);
+		
+        Task<TField[]> DistinctAsync<TField>(string distinctBy, Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default);
+        
         dynamic Aggregate(string query);
 		
         ValueTask<dynamic> AggregateAsync(string query, CancellationToken cancellationToken = default);

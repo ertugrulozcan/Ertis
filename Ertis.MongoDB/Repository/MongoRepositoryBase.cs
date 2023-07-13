@@ -472,6 +472,56 @@ namespace Ertis.MongoDB.Repository
 		
 		#endregion
 
+		#region Distinct Methods
+
+		public TField[] Distinct<TField>(string distinctBy, string query = null)
+		{
+			FieldDefinition<TEntity, TField> fieldDefinition = new StringFieldDefinition<TEntity, TField>(distinctBy);
+			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<TEntity>.Empty : new JsonFilterDefinition<TEntity>(query);
+			var cursor = this.Collection.Distinct(fieldDefinition, filterDefinition);
+			return cursor.Current.ToArray();
+		}
+		
+		public async Task<TField[]> DistinctAsync<TField>(string distinctBy, string query = null, CancellationToken cancellationToken = default)
+		{
+			FieldDefinition<TEntity, TField> fieldDefinition = new StringFieldDefinition<TEntity, TField>(distinctBy);
+			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<TEntity>.Empty : new JsonFilterDefinition<TEntity>(query);
+			var cursor = await this.Collection.DistinctAsync(fieldDefinition, filterDefinition, cancellationToken: cancellationToken);
+			var result = await cursor.ToListAsync(cancellationToken: cancellationToken);
+			return result.ToArray();
+		}
+		
+		public TField[] Distinct<TField>(string distinctBy, Expression<Func<TEntity, bool>> expression)
+		{
+			var filterExpression = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
+			return this.DistinctCore<TField>(distinctBy, filterExpression);
+		}
+		
+		public async Task<TField[]> DistinctAsync<TField>(string distinctBy, Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default)
+		{
+			var filterExpression = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
+			return await this.DistinctCoreAsync<TField>(distinctBy, filterExpression, cancellationToken: cancellationToken);
+		}
+		
+		private TField[] DistinctCore<TField>(string distinctBy, FilterDefinition<TEntity> predicate)
+		{
+			predicate ??= new ExpressionFilterDefinition<TEntity>(item => true);
+			FieldDefinition<TEntity, TField> fieldDefinition = new StringFieldDefinition<TEntity, TField>(distinctBy);
+			var cursor = this.Collection.Distinct(fieldDefinition, predicate);
+			return cursor.Current.ToArray();
+		}
+		
+		private async Task<TField[]> DistinctCoreAsync<TField>(string distinctBy, FilterDefinition<TEntity> predicate, CancellationToken cancellationToken = default)
+		{
+			predicate ??= new ExpressionFilterDefinition<TEntity>(item => true);
+			FieldDefinition<TEntity, TField> fieldDefinition = new StringFieldDefinition<TEntity, TField>(distinctBy);
+			var cursor = await this.Collection.DistinctAsync(fieldDefinition, predicate, cancellationToken: cancellationToken);
+			var result = await cursor.ToListAsync(cancellationToken: cancellationToken);
+			return result.ToArray();
+		}
+
+		#endregion
+
 		#region Query Methods
 
 		public IPaginationCollection<dynamic> Query(

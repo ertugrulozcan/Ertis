@@ -21,6 +21,14 @@ namespace Ertis.MongoDB.Repository
 		
 		ValueTask<IPaginationCollection<dynamic>> QueryAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null, IDictionary<string, bool> selectFields = null, CancellationToken cancellationToken = default);
 		
+		TField[] Distinct<TField>(string distinctBy, string query = null);
+		
+		Task<TField[]> DistinctAsync<TField>(string distinctBy, string query = null, CancellationToken cancellationToken = default);
+		
+		TField[] Distinct<TField>(string distinctBy, Expression<Func<TEntity, bool>> expression);
+		
+		Task<TField[]> DistinctAsync<TField>(string distinctBy, Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default);
+		
 		IPaginationCollection<TEntity> Search(string keyword, TextSearchOptions options = null, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null);
 		
 		ValueTask<IPaginationCollection<TEntity>> SearchAsync(string keyword, TextSearchOptions options = null, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null, CancellationToken cancellationToken = default);

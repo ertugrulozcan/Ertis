@@ -28,6 +28,7 @@ namespace Ertis.MongoDB.Repository
 		#region Services
 
 		private readonly IRepositoryActionBinder _actionBinder;
+		private readonly IDatabaseSettings settings;
 
 		#endregion
 		
@@ -49,6 +50,8 @@ namespace Ertis.MongoDB.Repository
 		/// <param name="actionBinder"></param>
 		protected DynamicMongoRepository(IDatabaseSettings settings, string collectionName, IRepositoryActionBinder actionBinder = null)
 		{
+			this.settings = settings;
+			
 			var connectionString = ConnectionStringHelper.GenerateConnectionString(settings);
 			var client = new MongoClient(connectionString);
 			var database = client.GetDatabase(settings.DefaultAuthDatabase);
@@ -235,6 +238,10 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null,
 			SortDirection? sortDirection = null)
 		{
+			var options = this.settings.AllowDiskUse == true 
+				? new FindOptions { AllowDiskUse = this.settings.AllowDiskUse } 
+				: null;
+			
 			predicate ??= new ExpressionFilterDefinition<dynamic>(item => true);
 
 			SortDefinition<dynamic> sortDefinition = null;
@@ -250,38 +257,38 @@ namespace Ertis.MongoDB.Repository
 			{
 				if (skip != null && limit != null)
 				{
-					collection = this.Collection.Find(predicate).Skip(skip).Limit(limit);
+					collection = this.Collection.Find(predicate, options).Skip(skip).Limit(limit);
 				}
 				else if (skip != null)
 				{
-					collection = this.Collection.Find(predicate).Skip(skip);
+					collection = this.Collection.Find(predicate, options).Skip(skip);
 				}
 				else if (limit != null)
 				{
-					collection = this.Collection.Find(predicate).Limit(limit);
+					collection = this.Collection.Find(predicate, options).Limit(limit);
 				}
 				else
 				{
-					collection = this.Collection.Find(predicate);	
+					collection = this.Collection.Find(predicate, options);	
 				}
 			}
 			else
 			{
 				if (skip != null && limit != null)
 				{
-					collection = this.Collection.Find(predicate).Sort(sortDefinition).Skip(skip).Limit(limit);
+					collection = this.Collection.Find(predicate, options).Sort(sortDefinition).Skip(skip).Limit(limit);
 				}
 				else if (skip != null)
 				{
-					collection = this.Collection.Find(predicate).Sort(sortDefinition).Skip(skip);
+					collection = this.Collection.Find(predicate, options).Sort(sortDefinition).Skip(skip);
 				}
 				else if (limit != null)
 				{
-					collection = this.Collection.Find(predicate).Sort(sortDefinition).Limit(limit);
+					collection = this.Collection.Find(predicate, options).Sort(sortDefinition).Limit(limit);
 				}
 				else
 				{
-					collection = this.Collection.Find(predicate).Sort(sortDefinition);	
+					collection = this.Collection.Find(predicate, options).Sort(sortDefinition);	
 				}
 			}
 

@@ -18,6 +18,8 @@ namespace Ertis.MongoDB.Configuration
 		
 		string DefaultAuthDatabase { get; }
 		
+		bool? AllowDiskUse { get; }
+
 		IDictionary<string, object> QueryString { get; }
 
 		#endregion

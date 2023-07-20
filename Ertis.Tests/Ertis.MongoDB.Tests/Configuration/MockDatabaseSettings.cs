@@ -19,6 +19,8 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests.Configuration
 		
 		public string DefaultAuthDatabase { get; set; }
 		
+		public bool? AllowDiskUse { get; set; }
+		
 		public IDictionary<string, object> QueryString { get; set; }
 
 		#endregion

@@ -22,6 +22,8 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests.Configuration
 		public bool? AllowDiskUse { get; set; }
 		
 		public IDictionary<string, object> QueryString { get; set; }
+		
+		public IClientSettings ClientSettings { get; set; }
 
 		#endregion
 	}

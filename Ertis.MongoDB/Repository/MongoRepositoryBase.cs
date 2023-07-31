@@ -28,8 +28,8 @@ namespace Ertis.MongoDB.Repository
 	{
 		#region Services
 
-		private readonly IRepositoryActionBinder actionBinder;
-		private readonly IDatabaseSettings settings;
+		private readonly IRepositoryActionBinder _actionBinder;
+		private readonly IDatabaseSettings _settings;
 
 		#endregion
 		
@@ -49,16 +49,144 @@ namespace Ertis.MongoDB.Repository
 		/// <param name="actionBinder"></param>
 		protected MongoRepositoryBase(IDatabaseSettings settings, string collectionName, IRepositoryActionBinder actionBinder = null)
 		{
-			this.settings = settings;
+			this._settings = settings;
 			
 			var connectionString = ConnectionStringHelper.GenerateConnectionString(settings);
-			var client = new MongoClient(connectionString);
+			var mongoClientSettings = this.SetClientSettings(settings, connectionString);
+			var client = mongoClientSettings != null ? new MongoClient(mongoClientSettings) : new MongoClient(connectionString);
 			var database = client.GetDatabase(settings.DefaultAuthDatabase);
 
 			this.Collection = database.GetCollection<TEntity>(collectionName);
 			this.CreateSearchIndexesAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
-			this.actionBinder = actionBinder;
+			this._actionBinder = actionBinder;
+		}
+
+		#endregion
+
+		#region Connection Methods
+
+		private MongoClientSettings SetClientSettings(IDatabaseSettings settings, string connectionString)
+		{
+			PrintClientSettingsLogs(settings);
+			
+			if (settings.ClientSettings != null)
+			{
+				var mongoClientSettings = MongoClientSettings.FromUrl(MongoUrl.Create(connectionString));
+				
+				if (settings.ClientSettings.MaxConnectionLifeTime != null)
+				{
+					mongoClientSettings.MaxConnectionLifeTime = settings.ClientSettings.MaxConnectionLifeTime.Value;
+				}
+				
+				if (settings.ClientSettings.SocketTimeout != null)
+				{
+					mongoClientSettings.SocketTimeout = settings.ClientSettings.SocketTimeout.Value;
+				}
+				
+				if (settings.ClientSettings.MaxConnectionIdleTime != null)
+				{
+					mongoClientSettings.MaxConnectionIdleTime = settings.ClientSettings.MaxConnectionIdleTime.Value;
+				}
+				
+				if (settings.ClientSettings.ConnectTimeout != null)
+				{
+					mongoClientSettings.ConnectTimeout = settings.ClientSettings.ConnectTimeout.Value;
+				}
+				
+				if (settings.ClientSettings.ServerSelectionTimeout != null)
+				{
+					mongoClientSettings.ServerSelectionTimeout = settings.ClientSettings.ServerSelectionTimeout.Value;
+				}
+				
+				if (settings.ClientSettings.HeartbeatInterval != null)
+				{
+					mongoClientSettings.HeartbeatInterval = settings.ClientSettings.HeartbeatInterval.Value;
+				}
+				
+				if (settings.ClientSettings.HeartbeatTimeout != null)
+				{
+					mongoClientSettings.HeartbeatTimeout = settings.ClientSettings.HeartbeatTimeout.Value;
+				}
+				
+				if (settings.ClientSettings.MinConnectionPoolSize != null)
+				{
+					mongoClientSettings.MinConnectionPoolSize = settings.ClientSettings.MinConnectionPoolSize.Value;
+				}
+				
+				if (settings.ClientSettings.MaxConnectionPoolSize != null)
+				{
+					mongoClientSettings.MaxConnectionPoolSize = settings.ClientSettings.MaxConnectionPoolSize.Value;
+				}
+				
+				if (settings.ClientSettings.MaxConnecting != null)
+				{
+					mongoClientSettings.MaxConnecting = settings.ClientSettings.MaxConnecting.Value;
+				}
+
+				return mongoClientSettings;
+			}
+
+			return null;
+		}
+
+		private static void PrintClientSettingsLogs(IDatabaseSettings settings)
+		{
+			if (settings?.ClientSettings == null)
+			{
+				Console.WriteLine("Default client settings using.");
+				return;
+			}
+			
+			if (settings.ClientSettings.MaxConnectionLifeTime != null)
+			{
+				Console.WriteLine($"MaxConnectionLifeTime: {settings.ClientSettings.MaxConnectionLifeTime.Value:hh\\:mm\\:ss}");
+			}
+				
+			if (settings.ClientSettings.SocketTimeout != null)
+			{
+				Console.WriteLine($"SocketTimeout: {settings.ClientSettings.SocketTimeout.Value:hh\\:mm\\:ss}");
+			}
+				
+			if (settings.ClientSettings.MaxConnectionIdleTime != null)
+			{
+				Console.WriteLine($"MaxConnectionIdleTime: {settings.ClientSettings.MaxConnectionIdleTime.Value:hh\\:mm\\:ss}");
+			}
+				
+			if (settings.ClientSettings.ConnectTimeout != null)
+			{
+				Console.WriteLine($"ConnectTimeout: {settings.ClientSettings.ConnectTimeout.Value:hh\\:mm\\:ss}");
+			}
+				
+			if (settings.ClientSettings.ServerSelectionTimeout != null)
+			{
+				Console.WriteLine($"ServerSelectionTimeout: {settings.ClientSettings.ServerSelectionTimeout.Value:hh\\:mm\\:ss}");
+			}
+				
+			if (settings.ClientSettings.HeartbeatInterval != null)
+			{
+				Console.WriteLine($"HeartbeatInterval: {settings.ClientSettings.HeartbeatInterval.Value:hh\\:mm\\:ss}");
+			}
+				
+			if (settings.ClientSettings.HeartbeatTimeout != null)
+			{
+				Console.WriteLine($"HeartbeatTimeout: {settings.ClientSettings.HeartbeatTimeout.Value:hh\\:mm\\:ss}");
+			}
+				
+			if (settings.ClientSettings.MinConnectionPoolSize != null)
+			{
+				Console.WriteLine($"MinConnectionPoolSize: {settings.ClientSettings.MinConnectionPoolSize.Value}");
+			}
+				
+			if (settings.ClientSettings.MaxConnectionPoolSize != null)
+			{
+				Console.WriteLine($"MaxConnectionPoolSize: {settings.ClientSettings.MaxConnectionPoolSize.Value}");
+			}
+				
+			if (settings.ClientSettings.MaxConnecting != null)
+			{
+				Console.WriteLine($"MaxConnecting: {settings.ClientSettings.MaxConnecting.Value}");
+			}
 		}
 
 		#endregion
@@ -420,8 +548,8 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null,
 			SortDirection? sortDirection = null)
 		{
-			var options = this.settings.AllowDiskUse == true 
-				? new FindOptions { AllowDiskUse = this.settings.AllowDiskUse } 
+			var options = this._settings.AllowDiskUse == true 
+				? new FindOptions { AllowDiskUse = this._settings.AllowDiskUse } 
 				: null;
 			
 			predicate ??= new ExpressionFilterDefinition<TEntity>(item => true);
@@ -899,16 +1027,16 @@ namespace Ertis.MongoDB.Repository
 
 		public TEntity Insert(TEntity entity, InsertOptions? options = null)
 		{
-			if (this.actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
+			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 			{
-				entity = this.actionBinder.BeforeInsert(entity);
+				entity = this._actionBinder.BeforeInsert(entity);
 			}
 			
 			this.Collection.InsertOne(entity);
 			
-			if (this.actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
+			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
 			{
-				entity = this.actionBinder.AfterInsert(entity);
+				entity = this._actionBinder.AfterInsert(entity);
 			}
 			
 			return entity;
@@ -916,16 +1044,16 @@ namespace Ertis.MongoDB.Repository
 		
 		public async ValueTask<TEntity> InsertAsync(TEntity entity, InsertOptions? options = null, CancellationToken cancellationToken = default)
 		{
-			if (this.actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
+			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 			{
-				entity = this.actionBinder.BeforeInsert(entity);
+				entity = this._actionBinder.BeforeInsert(entity);
 			}
 			
 			await this.Collection.InsertOneAsync(entity, new InsertOneOptions(), cancellationToken: cancellationToken);
 			
-			if (this.actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
+			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
 			{
-				entity = this.actionBinder.AfterInsert(entity);
+				entity = this._actionBinder.AfterInsert(entity);
 			}
 			
 			return entity;
@@ -947,17 +1075,17 @@ namespace Ertis.MongoDB.Repository
 
 		public TEntity Update(TEntity entity, string id = default, UpdateOptions? options = null)
 		{
-			if (this.actionBinder != null && (options ?? UpdateOptions.Default).TriggerBeforeActionBinder)
+			if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerBeforeActionBinder)
 			{
-				entity = this.actionBinder.BeforeUpdate(entity);
+				entity = this._actionBinder.BeforeUpdate(entity);
 			}
 
 			var updatedId = string.IsNullOrEmpty(id) ? entity.Id : id;
 			this.Collection.ReplaceOne(item => item.Id == updatedId, entity);
 
-			if (this.actionBinder != null && (options ?? UpdateOptions.Default).TriggerAfterActionBinder)
+			if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerAfterActionBinder)
 			{
-				entity = this.actionBinder.AfterUpdate(entity);
+				entity = this._actionBinder.AfterUpdate(entity);
 			}
 			
 			return entity;
@@ -965,17 +1093,17 @@ namespace Ertis.MongoDB.Repository
 		
 		public async ValueTask<TEntity> UpdateAsync(TEntity entity, string id = default, UpdateOptions? options = null, CancellationToken cancellationToken = default)
 		{
-			if (this.actionBinder != null && (options ?? UpdateOptions.Default).TriggerBeforeActionBinder)
+			if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerBeforeActionBinder)
 			{
-				entity = this.actionBinder.BeforeUpdate(entity);
+				entity = this._actionBinder.BeforeUpdate(entity);
 			}
 
 			var updatedId = string.IsNullOrEmpty(id) ? entity.Id : id;
 			await this.Collection.ReplaceOneAsync(item => item.Id == updatedId, entity, cancellationToken: cancellationToken);
 
-			if (this.actionBinder != null && (options ?? UpdateOptions.Default).TriggerAfterActionBinder)
+			if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerAfterActionBinder)
 			{
-				entity = this.actionBinder.AfterUpdate(entity);
+				entity = this._actionBinder.AfterUpdate(entity);
 			}
 			
 			return entity;

@@ -173,7 +173,7 @@ public class ClientSettings : IClientSettings
 			return mongoClientSettings;
 		}
 
-		return null;
+		return MongoClientSettings.FromConnectionString(connectionString);
 	}
 
 	#endregion

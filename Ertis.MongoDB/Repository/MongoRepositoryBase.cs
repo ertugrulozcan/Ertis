@@ -18,6 +18,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Events;
 using SortDirection = Ertis.Core.Collections.SortDirection;
 using MongoDriver = MongoDB.Driver;
 using UpdateOptions = Ertis.Data.Models.UpdateOptions;
@@ -48,13 +49,23 @@ namespace Ertis.MongoDB.Repository
 		/// <param name="collectionName"></param>
 		/// <param name="clientSettings"></param>
 		/// <param name="actionBinder"></param>
-		protected MongoRepositoryBase(IDatabaseSettings settings, string collectionName, IClientSettings clientSettings = null, IRepositoryActionBinder actionBinder = null)
+		/// <param name="eventSubscriber"></param>
+		protected MongoRepositoryBase(IDatabaseSettings settings, string collectionName, IClientSettings clientSettings = null, IRepositoryActionBinder actionBinder = null, IEventSubscriber eventSubscriber = null)
 		{
 			this._settings = settings;
 			
 			var connectionString = ConnectionStringHelper.GenerateConnectionString(settings);
 			var mongoClientSettings = ClientSettings.GetMongoClientSettings(clientSettings, connectionString);
-			var client = mongoClientSettings != null ? new MongoClient(mongoClientSettings) : new MongoClient(connectionString);
+
+			if (eventSubscriber != null)
+			{
+				mongoClientSettings.ClusterConfigurator = builder =>
+				{
+					builder.Subscribe(eventSubscriber);
+				};
+			}
+
+			var client = new MongoClient(mongoClientSettings);
 			var database = client.GetDatabase(settings.DefaultAuthDatabase);
 
 			this.Collection = database.GetCollection<TEntity>(collectionName);

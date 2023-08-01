@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using MongoDB.Driver;
 
 namespace Ertis.MongoDB.Configuration;
@@ -30,6 +31,8 @@ public interface IClientSettings
 	#endregion
 }
 
+[SuppressMessage("ReSharper", "PropertyCanBeMadeInitOnly.Global")]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public class ClientSettings : IClientSettings
 {
 	#region Properties
@@ -55,9 +58,35 @@ public class ClientSettings : IClientSettings
 	public int? MaxConnecting { get; set; }
 	
 	#endregion
+
+	#region Constructors
+
+	// ReSharper disable once MemberCanBePrivate.Global
+	public ClientSettings()
+	{
+		
+	}
+	
+	public ClientSettings(IClientOptions clientOptions)
+	{
+		var options = FromClientOptions(clientOptions);
+		this.MaxConnectionLifeTime = options.MaxConnectionLifeTime;
+		this.SocketTimeout = options.SocketTimeout;
+		this.MaxConnectionIdleTime = options.MaxConnectionIdleTime;
+		this.ConnectTimeout = options.ConnectTimeout;
+		this.ServerSelectionTimeout = options.ServerSelectionTimeout;
+		this.HeartbeatInterval = options.HeartbeatInterval;
+		this.HeartbeatTimeout = options.HeartbeatTimeout;
+		this.MinConnectionPoolSize = options.MinConnectionPoolSize;
+		this.MaxConnectionPoolSize = options.MaxConnectionPoolSize;
+		this.MaxConnecting = options.MaxConnecting;
+	}
+
+	#endregion
 	
 	#region Methods
 
+	// ReSharper disable once MemberCanBePrivate.Global
 	public static IClientSettings FromClientOptions(IClientOptions options)
 	{
 		return new ClientSettings
@@ -87,8 +116,6 @@ public class ClientSettings : IClientSettings
 
 	internal static MongoClientSettings GetMongoClientSettings(IClientSettings clientSettings, string connectionString)
 	{
-		PrintClientSettingsLogs(clientSettings);
-		
 		if (clientSettings != null)
 		{
 			var mongoClientSettings = MongoClientSettings.FromUrl(MongoUrl.Create(connectionString));
@@ -147,65 +174,6 @@ public class ClientSettings : IClientSettings
 		}
 
 		return null;
-	}
-
-	private static void PrintClientSettingsLogs(IClientSettings clientSettings)
-	{
-		if (clientSettings == null)
-		{
-			Console.WriteLine("Default client settings using.");
-			return;
-		}
-		
-		if (clientSettings.MaxConnectionLifeTime != null)
-		{
-			Console.WriteLine($"MaxConnectionLifeTime: {clientSettings.MaxConnectionLifeTime.Value:hh\\:mm\\:ss}");
-		}
-			
-		if (clientSettings.SocketTimeout != null)
-		{
-			Console.WriteLine($"SocketTimeout: {clientSettings.SocketTimeout.Value:hh\\:mm\\:ss}");
-		}
-			
-		if (clientSettings.MaxConnectionIdleTime != null)
-		{
-			Console.WriteLine($"MaxConnectionIdleTime: {clientSettings.MaxConnectionIdleTime.Value:hh\\:mm\\:ss}");
-		}
-			
-		if (clientSettings.ConnectTimeout != null)
-		{
-			Console.WriteLine($"ConnectTimeout: {clientSettings.ConnectTimeout.Value:hh\\:mm\\:ss}");
-		}
-			
-		if (clientSettings.ServerSelectionTimeout != null)
-		{
-			Console.WriteLine($"ServerSelectionTimeout: {clientSettings.ServerSelectionTimeout.Value:hh\\:mm\\:ss}");
-		}
-			
-		if (clientSettings.HeartbeatInterval != null)
-		{
-			Console.WriteLine($"HeartbeatInterval: {clientSettings.HeartbeatInterval.Value:hh\\:mm\\:ss}");
-		}
-			
-		if (clientSettings.HeartbeatTimeout != null)
-		{
-			Console.WriteLine($"HeartbeatTimeout: {clientSettings.HeartbeatTimeout.Value:hh\\:mm\\:ss}");
-		}
-			
-		if (clientSettings.MinConnectionPoolSize != null)
-		{
-			Console.WriteLine($"MinConnectionPoolSize: {clientSettings.MinConnectionPoolSize.Value}");
-		}
-			
-		if (clientSettings.MaxConnectionPoolSize != null)
-		{
-			Console.WriteLine($"MaxConnectionPoolSize: {clientSettings.MaxConnectionPoolSize.Value}");
-		}
-			
-		if (clientSettings.MaxConnecting != null)
-		{
-			Console.WriteLine($"MaxConnecting: {clientSettings.MaxConnecting.Value}");
-		}
 	}
 
 	#endregion

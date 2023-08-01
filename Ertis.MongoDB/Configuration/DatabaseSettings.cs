@@ -22,8 +22,6 @@ namespace Ertis.MongoDB.Configuration
 		
 		public IDictionary<string, object> QueryString { get; set; }
 		
-		public IClientSettings ClientSettings { get; set; }
-		
 		#endregion
 	}
 }

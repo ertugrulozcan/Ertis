@@ -21,8 +21,6 @@ namespace Ertis.MongoDB.Configuration
 		bool? AllowDiskUse { get; }
 
 		IDictionary<string, object> QueryString { get; }
-		
-		IClientSettings ClientSettings { get; }
 
 		#endregion
 	}

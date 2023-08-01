@@ -47,13 +47,15 @@ namespace Ertis.MongoDB.Repository
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="collectionName"></param>
+		/// <param name="clientSettings"></param>
 		/// <param name="actionBinder"></param>
-		protected DynamicMongoRepository(IDatabaseSettings settings, string collectionName, IRepositoryActionBinder actionBinder = null)
+		protected DynamicMongoRepository(IDatabaseSettings settings, string collectionName, IClientSettings clientSettings = null, IRepositoryActionBinder actionBinder = null)
 		{
 			this.settings = settings;
 			
 			var connectionString = ConnectionStringHelper.GenerateConnectionString(settings);
-			var client = new MongoClient(connectionString);
+			var mongoClientSettings = ClientSettings.GetMongoClientSettings(clientSettings, connectionString);
+			var client = mongoClientSettings != null ? new MongoClient(mongoClientSettings) : new MongoClient(connectionString);
 			var database = client.GetDatabase(settings.DefaultAuthDatabase);
 
 			this.Collection = database.GetCollection<dynamic>(collectionName);

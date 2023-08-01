@@ -46,13 +46,14 @@ namespace Ertis.MongoDB.Repository
 		/// </summary>
 		/// <param name="settings"></param>
 		/// <param name="collectionName"></param>
+		/// <param name="clientSettings"></param>
 		/// <param name="actionBinder"></param>
-		protected MongoRepositoryBase(IDatabaseSettings settings, string collectionName, IRepositoryActionBinder actionBinder = null)
+		protected MongoRepositoryBase(IDatabaseSettings settings, string collectionName, IClientSettings clientSettings = null, IRepositoryActionBinder actionBinder = null)
 		{
 			this._settings = settings;
 			
 			var connectionString = ConnectionStringHelper.GenerateConnectionString(settings);
-			var mongoClientSettings = this.SetClientSettings(settings, connectionString);
+			var mongoClientSettings = ClientSettings.GetMongoClientSettings(clientSettings, connectionString);
 			var client = mongoClientSettings != null ? new MongoClient(mongoClientSettings) : new MongoClient(connectionString);
 			var database = client.GetDatabase(settings.DefaultAuthDatabase);
 
@@ -60,133 +61,6 @@ namespace Ertis.MongoDB.Repository
 			this.CreateSearchIndexesAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
 			this._actionBinder = actionBinder;
-		}
-
-		#endregion
-
-		#region Connection Methods
-
-		private MongoClientSettings SetClientSettings(IDatabaseSettings settings, string connectionString)
-		{
-			PrintClientSettingsLogs(settings);
-			
-			if (settings.ClientSettings != null)
-			{
-				var mongoClientSettings = MongoClientSettings.FromUrl(MongoUrl.Create(connectionString));
-				
-				if (settings.ClientSettings.MaxConnectionLifeTime != null)
-				{
-					mongoClientSettings.MaxConnectionLifeTime = settings.ClientSettings.MaxConnectionLifeTime.Value;
-				}
-				
-				if (settings.ClientSettings.SocketTimeout != null)
-				{
-					mongoClientSettings.SocketTimeout = settings.ClientSettings.SocketTimeout.Value;
-				}
-				
-				if (settings.ClientSettings.MaxConnectionIdleTime != null)
-				{
-					mongoClientSettings.MaxConnectionIdleTime = settings.ClientSettings.MaxConnectionIdleTime.Value;
-				}
-				
-				if (settings.ClientSettings.ConnectTimeout != null)
-				{
-					mongoClientSettings.ConnectTimeout = settings.ClientSettings.ConnectTimeout.Value;
-				}
-				
-				if (settings.ClientSettings.ServerSelectionTimeout != null)
-				{
-					mongoClientSettings.ServerSelectionTimeout = settings.ClientSettings.ServerSelectionTimeout.Value;
-				}
-				
-				if (settings.ClientSettings.HeartbeatInterval != null)
-				{
-					mongoClientSettings.HeartbeatInterval = settings.ClientSettings.HeartbeatInterval.Value;
-				}
-				
-				if (settings.ClientSettings.HeartbeatTimeout != null)
-				{
-					mongoClientSettings.HeartbeatTimeout = settings.ClientSettings.HeartbeatTimeout.Value;
-				}
-				
-				if (settings.ClientSettings.MinConnectionPoolSize != null)
-				{
-					mongoClientSettings.MinConnectionPoolSize = settings.ClientSettings.MinConnectionPoolSize.Value;
-				}
-				
-				if (settings.ClientSettings.MaxConnectionPoolSize != null)
-				{
-					mongoClientSettings.MaxConnectionPoolSize = settings.ClientSettings.MaxConnectionPoolSize.Value;
-				}
-				
-				if (settings.ClientSettings.MaxConnecting != null)
-				{
-					mongoClientSettings.MaxConnecting = settings.ClientSettings.MaxConnecting.Value;
-				}
-
-				return mongoClientSettings;
-			}
-
-			return null;
-		}
-
-		private static void PrintClientSettingsLogs(IDatabaseSettings settings)
-		{
-			if (settings?.ClientSettings == null)
-			{
-				Console.WriteLine("Default client settings using.");
-				return;
-			}
-			
-			if (settings.ClientSettings.MaxConnectionLifeTime != null)
-			{
-				Console.WriteLine($"MaxConnectionLifeTime: {settings.ClientSettings.MaxConnectionLifeTime.Value:hh\\:mm\\:ss}");
-			}
-				
-			if (settings.ClientSettings.SocketTimeout != null)
-			{
-				Console.WriteLine($"SocketTimeout: {settings.ClientSettings.SocketTimeout.Value:hh\\:mm\\:ss}");
-			}
-				
-			if (settings.ClientSettings.MaxConnectionIdleTime != null)
-			{
-				Console.WriteLine($"MaxConnectionIdleTime: {settings.ClientSettings.MaxConnectionIdleTime.Value:hh\\:mm\\:ss}");
-			}
-				
-			if (settings.ClientSettings.ConnectTimeout != null)
-			{
-				Console.WriteLine($"ConnectTimeout: {settings.ClientSettings.ConnectTimeout.Value:hh\\:mm\\:ss}");
-			}
-				
-			if (settings.ClientSettings.ServerSelectionTimeout != null)
-			{
-				Console.WriteLine($"ServerSelectionTimeout: {settings.ClientSettings.ServerSelectionTimeout.Value:hh\\:mm\\:ss}");
-			}
-				
-			if (settings.ClientSettings.HeartbeatInterval != null)
-			{
-				Console.WriteLine($"HeartbeatInterval: {settings.ClientSettings.HeartbeatInterval.Value:hh\\:mm\\:ss}");
-			}
-				
-			if (settings.ClientSettings.HeartbeatTimeout != null)
-			{
-				Console.WriteLine($"HeartbeatTimeout: {settings.ClientSettings.HeartbeatTimeout.Value:hh\\:mm\\:ss}");
-			}
-				
-			if (settings.ClientSettings.MinConnectionPoolSize != null)
-			{
-				Console.WriteLine($"MinConnectionPoolSize: {settings.ClientSettings.MinConnectionPoolSize.Value}");
-			}
-				
-			if (settings.ClientSettings.MaxConnectionPoolSize != null)
-			{
-				Console.WriteLine($"MaxConnectionPoolSize: {settings.ClientSettings.MaxConnectionPoolSize.Value}");
-			}
-				
-			if (settings.ClientSettings.MaxConnecting != null)
-			{
-				Console.WriteLine($"MaxConnecting: {settings.ClientSettings.MaxConnecting.Value}");
-			}
 		}
 
 		#endregion

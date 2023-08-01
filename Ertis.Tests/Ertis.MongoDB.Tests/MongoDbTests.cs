@@ -25,10 +25,6 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 		{
 			IDatabaseSettings databaseSettings = new MockDatabaseSettings
 			{
-				Scheme = "mongodb+srv",
-				Username = "ertugrulozcan",
-				Password = ".Abcd1234!",
-				Host = "davincicluster.0hs0r.mongodb.net",
 				DefaultAuthDatabase = "test_db"
 			};
 			

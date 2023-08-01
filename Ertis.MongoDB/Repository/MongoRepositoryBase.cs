@@ -9,6 +9,7 @@ using Ertis.Core.Collections;
 using Ertis.Data.Models;
 using Ertis.Data.Repository;
 using Ertis.MongoDB.Attributes;
+using Ertis.MongoDB.Client;
 using Ertis.MongoDB.Configuration;
 using Ertis.MongoDB.Exceptions;
 using Ertis.MongoDB.Helpers;
@@ -18,7 +19,6 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Events;
 using SortDirection = Ertis.Core.Collections.SortDirection;
 using MongoDriver = MongoDB.Driver;
 using UpdateOptions = Ertis.Data.Models.UpdateOptions;
@@ -30,6 +30,7 @@ namespace Ertis.MongoDB.Repository
 		#region Services
 
 		private readonly IRepositoryActionBinder _actionBinder;
+		
 		private readonly IDatabaseSettings _settings;
 
 		#endregion
@@ -45,28 +46,15 @@ namespace Ertis.MongoDB.Repository
 		/// <summary>
 		/// Constructor
 		/// </summary>
+		/// <param name="clientProvider"></param>
 		/// <param name="settings"></param>
 		/// <param name="collectionName"></param>
-		/// <param name="clientSettings"></param>
 		/// <param name="actionBinder"></param>
-		/// <param name="eventSubscriber"></param>
-		protected MongoRepositoryBase(IDatabaseSettings settings, string collectionName, IClientSettings clientSettings = null, IRepositoryActionBinder actionBinder = null, IEventSubscriber eventSubscriber = null)
+		protected MongoRepositoryBase(IMongoClientProvider clientProvider, IDatabaseSettings settings, string collectionName, IRepositoryActionBinder actionBinder = null)
 		{
 			this._settings = settings;
 			
-			var connectionString = ConnectionStringHelper.GenerateConnectionString(settings);
-			var mongoClientSettings = ClientSettings.GetMongoClientSettings(clientSettings, connectionString);
-
-			if (eventSubscriber != null)
-			{
-				mongoClientSettings.ClusterConfigurator = builder =>
-				{
-					builder.Subscribe(eventSubscriber);
-				};
-			}
-
-			var client = new MongoClient(mongoClientSettings);
-			var database = client.GetDatabase(settings.DefaultAuthDatabase);
+			var database = clientProvider.Client.GetDatabase(settings.DefaultAuthDatabase);
 
 			this.Collection = database.GetCollection<TEntity>(collectionName);
 			this.CreateSearchIndexesAsync().ConfigureAwait(false).GetAwaiter().GetResult();

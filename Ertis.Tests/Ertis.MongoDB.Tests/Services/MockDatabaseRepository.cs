@@ -13,7 +13,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests.Services
 		/// Constructor
 		/// </summary>
 		/// <param name="settings"></param>
-		public MockDatabaseRepository(IDatabaseSettings settings) : base(settings, "test")
+		public MockDatabaseRepository(IDatabaseSettings settings) : base(null, settings, "test")
 		{
 			
 		}

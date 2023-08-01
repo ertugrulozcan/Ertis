@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Ertis.Core.Collections;
 using Ertis.Data.Models;
 using Ertis.Data.Repository;
+using Ertis.MongoDB.Client;
 using Ertis.MongoDB.Configuration;
 using Ertis.MongoDB.Exceptions;
 using Ertis.MongoDB.Helpers;
@@ -17,7 +18,6 @@ using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Events;
 using SortDirection = Ertis.Core.Collections.SortDirection;
 using MongoDriver = MongoDB.Driver;
 using UpdateOptions = Ertis.Data.Models.UpdateOptions;
@@ -29,7 +29,7 @@ namespace Ertis.MongoDB.Repository
 		#region Services
 
 		private readonly IRepositoryActionBinder _actionBinder;
-		private readonly IDatabaseSettings settings;
+		private readonly IDatabaseSettings _settings;
 
 		#endregion
 		
@@ -46,32 +46,19 @@ namespace Ertis.MongoDB.Repository
 		/// <summary>
 		/// Constructor
 		/// </summary>
+		/// <param name="clientProvider"></param>
 		/// <param name="settings"></param>
 		/// <param name="collectionName"></param>
-		/// <param name="clientSettings"></param>
 		/// <param name="actionBinder"></param>
-		/// <param name="eventSubscriber"></param>
-		protected DynamicMongoRepository(IDatabaseSettings settings, string collectionName, IClientSettings clientSettings = null, IRepositoryActionBinder actionBinder = null, IEventSubscriber eventSubscriber = null)
+		protected DynamicMongoRepository(IMongoClientProvider clientProvider, IDatabaseSettings settings, string collectionName, IRepositoryActionBinder actionBinder = null)
 		{
-			this.settings = settings;
+			this._settings = settings;
 			
-			var connectionString = ConnectionStringHelper.GenerateConnectionString(settings);
-			var mongoClientSettings = ClientSettings.GetMongoClientSettings(clientSettings, connectionString);
-			
-			if (eventSubscriber != null)
-			{
-				mongoClientSettings.ClusterConfigurator = builder =>
-				{
-					builder.Subscribe(eventSubscriber);
-				};
-			}
-			
-			var client = new MongoClient(mongoClientSettings);
-			var database = client.GetDatabase(settings.DefaultAuthDatabase);
+			var database = clientProvider.Client.GetDatabase(settings.DefaultAuthDatabase);
 
 			this.Collection = database.GetCollection<dynamic>(collectionName);
 			this.DocumentCollection = database.GetCollection<BsonDocument>(collectionName);
-
+			
 			this._actionBinder = actionBinder;
 		}
 
@@ -251,8 +238,8 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null,
 			SortDirection? sortDirection = null)
 		{
-			var options = this.settings.AllowDiskUse == true 
-				? new FindOptions { AllowDiskUse = this.settings.AllowDiskUse } 
+			var options = this._settings.AllowDiskUse == true 
+				? new FindOptions { AllowDiskUse = this._settings.AllowDiskUse } 
 				: null;
 			
 			predicate ??= new ExpressionFilterDefinition<dynamic>(item => true);

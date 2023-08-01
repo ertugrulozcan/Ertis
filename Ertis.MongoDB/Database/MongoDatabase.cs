@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Ertis.MongoDB.Client;
 using Ertis.MongoDB.Configuration;
-using Ertis.MongoDB.Helpers;
 using Ertis.MongoDB.Models;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
@@ -26,12 +26,11 @@ namespace Ertis.MongoDB.Database
 		/// <summary>
 		/// Constructor
 		/// </summary>
+		/// <param name="clientProvider"></param>
 		/// <param name="settings"></param>
-		public MongoDatabase(IDatabaseSettings settings)
+		public MongoDatabase(IMongoClientProvider clientProvider, IDatabaseSettings settings)
 		{
-			string connectionString = ConnectionStringHelper.GenerateConnectionString(settings);
-			var client = new MongoClient(connectionString);
-			this.Database = client.GetDatabase(settings.DefaultAuthDatabase);
+			this.Database = clientProvider.Client.GetDatabase(settings.DefaultAuthDatabase);
 		}
 
 		#endregion
@@ -138,12 +137,14 @@ namespace Ertis.MongoDB.Database
 
 		public BsonDocument GetDatabaseStatisticsDocument()
 		{
+			// ReSharper disable once StringLiteralTypo
 			var command = new BsonDocument { { "dbstats", 1 } };
 			return this.Database.RunCommand<BsonDocument>(command);
 		}
 
 		public async ValueTask<BsonDocument> GetDatabaseStatisticsDocumentAsync(CancellationToken cancellationToken = default)
 		{
+			// ReSharper disable once StringLiteralTypo
 			var command = new BsonDocument { { "dbstats", 1 } };
 			return await this.Database.RunCommandAsync<BsonDocument>(command, cancellationToken: cancellationToken);
 		}

@@ -218,6 +218,13 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             Assert.AreEqual("{ \"where\": { \"first_name\": \"Ertuğrul\", \"last_name\": \"Özcan\" }, \"select\": { \"first_name\": 0, \"last_name\": 1 } }".Trim(), combinedQueryJson.Trim());
         }
 
+        [Test]
+        public void NotNullTest()
+        {
+            var query = QueryBuilder.Combine(QueryBuilder.NotEquals<string>("tvSeriesId", null), QueryBuilder.Equals("sys.state", "published"));
+            Assert.AreEqual("{ \"tvSeriesId\": { $ne: null }, \"sys.state\": \"published\" }".Trim(), query.ToString()?.Trim());
+        }
+
         #endregion
 
         #region Equals & NotEquals Tests

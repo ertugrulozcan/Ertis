@@ -31,6 +31,10 @@ namespace Ertis.MongoDB.Queries
             {
                 return query.ToString();
             }
+            else if (this.Value == null)
+            {
+                return "null";
+            }
             else if (typeof(T) == typeof(string) || this.Value is string)
             {
                 return "\"" + this.Value + "\"";
@@ -47,10 +51,6 @@ namespace Ertis.MongoDB.Queries
             else if (IsNumericType(typeof(T)))
             {
                 return this.Value.ToString()?.Replace(',', '.');
-            }
-            else if (this.Value == null)
-            {
-                return "null";
             }
             else
             {

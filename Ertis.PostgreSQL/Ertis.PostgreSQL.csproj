@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <PackageId>Ertis.PostgreSQL</PackageId>
-        <PackageVersion>7.0.6</PackageVersion>
+        <PackageVersion>7.0.7</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.PostgreSQL</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -13,12 +13,12 @@
         <Title>Ertis.PostgreSQL</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>7.0.6</AssemblyVersion>
-        <FileVersion>7.0.6</FileVersion>
+        <AssemblyVersion>7.0.7</AssemblyVersion>
+        <FileVersion>7.0.7</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.6.0" />
+      <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.7.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.10" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>

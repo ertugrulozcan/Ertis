@@ -348,6 +348,7 @@ namespace Ertis.MongoDB.Repository
 			string sortField = null, 
 			SortDirection? sortDirection = null)
 		{
+			query = QueryHelper.EnsureObjectIdsAndISODates(query);
 			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<TEntity>.Empty : new JsonFilterDefinition<TEntity>(query);
 			return this.Filter(filterDefinition, skip, limit, withCount, sortField, sortDirection);
 		}
@@ -361,6 +362,7 @@ namespace Ertis.MongoDB.Repository
 			SortDirection? sortDirection = null, 
 			CancellationToken cancellationToken = default)
 		{
+			query = QueryHelper.EnsureObjectIdsAndISODates(query);
 			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<TEntity>.Empty : new JsonFilterDefinition<TEntity>(query);
 			return await this.FilterAsync(filterDefinition, skip, limit, withCount, sortField, sortDirection, cancellationToken: cancellationToken);
 		}
@@ -485,6 +487,7 @@ namespace Ertis.MongoDB.Repository
 		public TField[] Distinct<TField>(string distinctBy, string query = null)
 		{
 			FieldDefinition<TEntity, TField> fieldDefinition = new StringFieldDefinition<TEntity, TField>(distinctBy);
+			query = QueryHelper.EnsureObjectIdsAndISODates(query);
 			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<TEntity>.Empty : new JsonFilterDefinition<TEntity>(query);
 			var cursor = this.Collection.Distinct(fieldDefinition, filterDefinition);
 			return cursor.Current.ToArray();
@@ -493,6 +496,7 @@ namespace Ertis.MongoDB.Repository
 		public async Task<TField[]> DistinctAsync<TField>(string distinctBy, string query = null, CancellationToken cancellationToken = default)
 		{
 			FieldDefinition<TEntity, TField> fieldDefinition = new StringFieldDefinition<TEntity, TField>(distinctBy);
+			query = QueryHelper.EnsureObjectIdsAndISODates(query);
 			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<TEntity>.Empty : new JsonFilterDefinition<TEntity>(query);
 			var cursor = await this.Collection.DistinctAsync(fieldDefinition, filterDefinition, cancellationToken: cancellationToken);
 			var result = await cursor.ToListAsync(cancellationToken: cancellationToken);
@@ -1066,12 +1070,14 @@ namespace Ertis.MongoDB.Repository
 		
 		public long Count(string query)
 		{
+			query = QueryHelper.EnsureObjectIdsAndISODates(query);
 			var filterDefinition = new JsonFilterDefinition<TEntity>(query);
 			return this.Collection.CountDocuments(filterDefinition);
 		}
 		
 		public async ValueTask<long> CountAsync(string query, CancellationToken cancellationToken = default)
 		{
+			query = QueryHelper.EnsureObjectIdsAndISODates(query);
 			var filterDefinition = new JsonFilterDefinition<TEntity>(query);
 			return await this.Collection.CountDocumentsAsync(filterDefinition, cancellationToken: cancellationToken);
 		}

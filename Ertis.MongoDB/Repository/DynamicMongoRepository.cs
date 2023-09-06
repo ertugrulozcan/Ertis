@@ -871,12 +871,12 @@ namespace Ertis.MongoDB.Repository
 
 		public long Count()
 		{
-			return this.Collection.CountDocuments(item => true);
+			return this.DocumentCollection.CountDocuments(item => true);
 		}
 		
 		public async ValueTask<long> CountAsync(CancellationToken cancellationToken = default)
 		{
-			return await this.Collection.CountDocumentsAsync(item => true, cancellationToken: cancellationToken);
+			return await this.DocumentCollection.CountDocumentsAsync(item => true, cancellationToken: cancellationToken);
 		}
 		
 		public long Count(Expression<Func<dynamic, bool>> expression)

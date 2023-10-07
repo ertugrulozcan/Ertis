@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace Ertis.Schema.Extensions
@@ -22,6 +23,19 @@ namespace Ertis.Schema.Extensions
             }
 
             return dictionary;
+        }
+        
+        public static string GetFullPath(this JToken jToken)
+        {
+            if (jToken.Path.StartsWith("['") && jToken.Path.EndsWith("']"))
+            {
+                return string.Join('.', jToken.AncestorsAndSelf()
+                    .OfType<JProperty>()
+                    .Select(p => p.Name)
+                    .Reverse());
+            }
+
+            return jToken.Path;
         }
         
         #endregion

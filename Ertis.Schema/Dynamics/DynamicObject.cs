@@ -229,9 +229,8 @@ namespace Ertis.Schema.Dynamics
             
             var segments = path.Split('.');
             var key = segments[0];
-            if (dictionary.ContainsKey(key))
+            if (dictionary.TryGetValue(key, out var value))
             {
-                var value = dictionary[key];
                 if (segments.Length > 1)
                 {
                     if (value is IDictionary<string, object> subDictionary)
@@ -247,7 +246,7 @@ namespace Ertis.Schema.Dynamics
                 else
                 {
                     return value;
-                }
+                }   
             }
             else if (TryGetValueFromArray(key, dictionary, out var foundValue))
             {
@@ -282,9 +281,8 @@ namespace Ertis.Schema.Dynamics
                 var indexerCloseIndex = key.IndexOf(']');
 
                 var originalKey = key.Substring(0, indexerStartIndex);
-                if (dictionary.ContainsKey(originalKey))
+                if (dictionary.TryGetValue(originalKey, out var value))
                 {
-                    var value = dictionary[originalKey];
                     if (value is Array array)
                     {
                         var indexStr = key.Substring(indexerStartIndex + 1, indexerCloseIndex - indexerStartIndex - 1);
@@ -400,9 +398,8 @@ namespace Ertis.Schema.Dynamics
             if (indexerStartIndex > 0 && indexerCloseIndex > 0 && indexerStartIndex < indexerCloseIndex)
             {
                 var originalKey = key.Substring(0, indexerStartIndex);
-                if (dictionary.ContainsKey(originalKey))
+                if (dictionary.TryGetValue(originalKey, out var value))
                 {
-                    var value = dictionary[originalKey];
                     if (value is Array array)
                     {
                         var indexStr = key.Substring(indexerStartIndex + 1, indexerCloseIndex - indexerStartIndex - 1);

@@ -39,7 +39,7 @@ namespace Ertis.Schema.Extensions
                 }
                 case JObject jObject:
                 {
-                    return jObject.Children().ToDictionary(childToken => childToken.Path, ToDictionaryCore);
+                    return jObject.Children().ToDictionary(childToken => childToken.GetFullPath(), ToDictionaryCore);
                 }
                 case JArray jArray:
                 {

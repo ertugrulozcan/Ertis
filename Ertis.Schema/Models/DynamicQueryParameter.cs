@@ -20,6 +20,9 @@ namespace Ertis.Schema.Models
 		[JsonConverter(typeof(StringEnumConverter))]
 		public DynamicQueryParameterType Type { get; set; }
 		
+		[JsonProperty("defaultValue")]
+		public object DefaultValue { get; set; }
+		
 		[JsonProperty("isRequired")]
 		public bool IsRequired { get; set; }
 

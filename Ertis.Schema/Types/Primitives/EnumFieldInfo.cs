@@ -58,7 +58,7 @@ namespace Ertis.Schema.Types.Primitives
         {
             var isValid = base.Validate(obj, validationContext);
             
-            bool isExistInEnums;
+            var isExistInEnums = false;
             if (obj != null)
             {
                 if (this.IsMultiple)
@@ -70,7 +70,6 @@ namespace Ertis.Schema.Types.Primitives
                     else
                     {
                         isValid = false;
-                        isExistInEnums = false;
                         validationContext.Errors.Add(new FieldValidationException($"Enum value is must be array type ({this.Name})", this));   
                     }
                 }
@@ -84,21 +83,12 @@ namespace Ertis.Schema.Types.Primitives
                     else
                     {
                         isValid = false;
-                        isExistInEnums = false;
                         validationContext.Errors.Add(new FieldValidationException($"Enum value is must be primitive type ({this.Name})", this));   
                     }
                 }
             }
-            else if (this.IsMultiple)
-            {
-                isExistInEnums = true;
-            }
-            else
-            {
-                isExistInEnums = this.Items.Any(x => x?.Value == null);
-            }
 
-            if (isValid && !isExistInEnums)
+            if (isValid && obj != null && !isExistInEnums)
             {
                 isValid = false;
                 var enumValues = string.Join(", ", this.Items.Select(x => x?.Value == null ? "null" : $"'{x.Value}'"));

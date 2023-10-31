@@ -148,6 +148,66 @@ namespace Ertis.MongoDB.Database
 			var command = new BsonDocument { { "dbstats", 1 } };
 			return await this.Database.RunCommandAsync<BsonDocument>(command, cancellationToken: cancellationToken);
 		}
+		
+		public async Task CopyOneAsync(string documentId, string sourceCollectionName, string destinationCollectionName)
+		{
+			var sourceCollection = this.Database.GetCollection<BsonDocument>(sourceCollectionName);
+			if (sourceCollection == null)
+			{
+				throw new MongoException($"There is no collection named '{sourceCollectionName}'");
+			}
+			
+			var destinationCollection = this.Database.GetCollection<BsonDocument>(destinationCollectionName);
+			if (destinationCollection == null)
+			{
+				throw new MongoException($"There is no collection named '{destinationCollectionName}'");
+			}
+			
+			using (var cursor = await sourceCollection.Find(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(documentId))).ToCursorAsync())
+			{
+				while (await cursor.MoveNextAsync())
+				{
+					var batch = cursor.Current;
+					foreach (var document in batch)
+					{
+						await destinationCollection.BulkWriteAsync(new WriteModel<BsonDocument>[]
+						{
+							new InsertOneModel<BsonDocument>(document)
+						});
+					}
+				}
+			}
+		}
+		
+		public async Task CopyAllAsync(string sourceCollectionName, string destinationCollectionName)
+		{
+			var sourceCollection = this.Database.GetCollection<BsonDocument>(sourceCollectionName);
+			if (sourceCollection == null)
+			{
+				throw new MongoException($"There is no collection named '{sourceCollectionName}'");
+			}
+			
+			var destinationCollection = this.Database.GetCollection<BsonDocument>(destinationCollectionName);
+			if (destinationCollection == null)
+			{
+				throw new MongoException($"There is no collection named '{destinationCollectionName}'");
+			}
+			
+			using (var cursor = await sourceCollection.FindAsync(_ => true))
+			{
+				while (await cursor.MoveNextAsync())
+				{
+					var batch = cursor.Current;
+					foreach (var document in batch)
+					{
+						await destinationCollection.BulkWriteAsync(new WriteModel<BsonDocument>[]
+						{
+							new InsertOneModel<BsonDocument>(document)
+						});
+					}
+				}
+			}
+		}
 
 		#endregion
 	}

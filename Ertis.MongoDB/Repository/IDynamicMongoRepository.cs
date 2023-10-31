@@ -11,6 +11,8 @@ namespace Ertis.MongoDB.Repository
 {
     public interface IDynamicMongoRepository : IDynamicRepository<string>
     {
+        string CollectionName { get; }
+        
         IPaginationCollection<dynamic> Query(
             string query,
             int? skip = null,

@@ -13,6 +13,8 @@ namespace Ertis.MongoDB.Repository
 {
 	public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where TEntity : IEntity<string>
 	{
+		string CollectionName { get; }
+		
 		IPaginationCollection<dynamic> Query(string query, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null, IDictionary<string, bool> selectFields = null);
 
 		IPaginationCollection<dynamic> Query(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string sortField = null, SortDirection? sortDirection = null, IDictionary<string, bool> selectFields = null);

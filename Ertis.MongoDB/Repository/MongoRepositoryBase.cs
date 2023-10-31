@@ -37,6 +37,8 @@ namespace Ertis.MongoDB.Repository
 		
 		#region Properties
 
+		public string CollectionName { get; }
+		
 		private IMongoCollection<TEntity> Collection { get; }
 
 		#endregion
@@ -56,6 +58,7 @@ namespace Ertis.MongoDB.Repository
 			
 			var database = clientProvider.Client.GetDatabase(settings.DefaultAuthDatabase);
 
+			this.CollectionName = collectionName;
 			this.Collection = database.GetCollection<TEntity>(collectionName);
 			this.CreateSearchIndexesAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 

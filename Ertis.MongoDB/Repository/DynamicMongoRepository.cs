@@ -35,6 +35,8 @@ namespace Ertis.MongoDB.Repository
 		
 		#region Properties
 		
+		public string CollectionName { get; }
+		
 		private IMongoCollection<dynamic> Collection { get; }
 		
 		private IMongoCollection<BsonDocument> DocumentCollection { get; }
@@ -56,6 +58,7 @@ namespace Ertis.MongoDB.Repository
 			
 			var database = clientProvider.Client.GetDatabase(settings.DefaultAuthDatabase);
 
+			this.CollectionName = collectionName;
 			this.Collection = database.GetCollection<dynamic>(collectionName);
 			this.DocumentCollection = database.GetCollection<BsonDocument>(collectionName);
 			

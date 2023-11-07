@@ -179,7 +179,7 @@ namespace Ertis.MongoDB.Database
 						{
 							await destinationCollection.BulkWriteAsync(new WriteModel<BsonDocument>[]
 							{
-								new UpdateOneModel<BsonDocument>(Builders<BsonDocument>.Filter.Empty, document)
+								new UpdateOneModel<BsonDocument>(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(documentId)), document)
 								{
 									IsUpsert = true
 								}

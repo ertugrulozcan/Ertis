@@ -170,12 +170,7 @@ namespace Ertis.MongoDB.Database
 					var batch = cursor.Current;
 					foreach (var document in batch)
 					{
-						var result = await destinationCollection.BulkWriteAsync(new WriteModel<BsonDocument>[]
-						{
-							new InsertOneModel<BsonDocument>(document)
-						});
-
-						if (overwriteIfExist && result.InsertedCount == 0)
+						if (overwriteIfExist)
 						{
 							await destinationCollection.BulkWriteAsync(new WriteModel<BsonDocument>[]
 							{
@@ -184,6 +179,13 @@ namespace Ertis.MongoDB.Database
 									IsUpsert = true
 								}
 							});
+						}
+						else
+						{
+							await destinationCollection.BulkWriteAsync(new WriteModel<BsonDocument>[]
+							{
+								new InsertOneModel<BsonDocument>(document)
+							});	
 						}
 					}
 				}

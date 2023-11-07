@@ -149,7 +149,7 @@ namespace Ertis.MongoDB.Database
 			return await this.Database.RunCommandAsync<BsonDocument>(command, cancellationToken: cancellationToken);
 		}
 		
-		public async Task CopyOneAsync(string documentId, string sourceCollectionName, string destinationCollectionName)
+		public async Task CopyOneAsync(string documentId, string sourceCollectionName, string destinationCollectionName, bool overwriteIfExist = false)
 		{
 			var sourceCollection = this.Database.GetCollection<BsonDocument>(sourceCollectionName);
 			if (sourceCollection == null)
@@ -170,10 +170,21 @@ namespace Ertis.MongoDB.Database
 					var batch = cursor.Current;
 					foreach (var document in batch)
 					{
-						await destinationCollection.BulkWriteAsync(new WriteModel<BsonDocument>[]
+						var result = await destinationCollection.BulkWriteAsync(new WriteModel<BsonDocument>[]
 						{
 							new InsertOneModel<BsonDocument>(document)
 						});
+
+						if (overwriteIfExist && result.InsertedCount == 0)
+						{
+							await destinationCollection.BulkWriteAsync(new WriteModel<BsonDocument>[]
+							{
+								new UpdateOneModel<BsonDocument>(Builders<BsonDocument>.Filter.Empty, document)
+								{
+									IsUpsert = true
+								}
+							});
+						}
 					}
 				}
 			}

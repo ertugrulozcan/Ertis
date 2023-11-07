@@ -34,8 +34,10 @@ namespace Ertis.MongoDB.Database
 
 		ValueTask<BsonDocument> GetDatabaseStatisticsDocumentAsync(CancellationToken cancellationToken = default);
 
-		Task CopyOneAsync(string documentId, string sourceCollectionName, string destinationCollectionName, bool overwriteIfExist = false);
+		Task CopyOneAsync(string documentId, string sourceCollectionName, string destinationCollectionName);
 
 		Task CopyAllAsync(string sourceCollectionName, string destinationCollectionName);
+
+		Task ReplaceOneAsync(string documentId, string sourceCollectionName, string destinationCollectionName);
 	}
 }

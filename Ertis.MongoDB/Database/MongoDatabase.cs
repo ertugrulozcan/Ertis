@@ -149,7 +149,7 @@ namespace Ertis.MongoDB.Database
 			return await this.Database.RunCommandAsync<BsonDocument>(command, cancellationToken: cancellationToken);
 		}
 		
-		public async Task CopyOneAsync(string documentId, string sourceCollectionName, string destinationCollectionName, bool overwriteIfExist = false)
+		public async Task CopyOneAsync(string documentId, string sourceCollectionName, string destinationCollectionName)
 		{
 			var sourceCollection = this.Database.GetCollection<BsonDocument>(sourceCollectionName);
 			if (sourceCollection == null)
@@ -170,23 +170,37 @@ namespace Ertis.MongoDB.Database
 					var batch = cursor.Current;
 					foreach (var document in batch)
 					{
-						if (overwriteIfExist)
+						await destinationCollection.BulkWriteAsync(new WriteModel<BsonDocument>[]
 						{
-							await destinationCollection.BulkWriteAsync(new WriteModel<BsonDocument>[]
-							{
-								new UpdateOneModel<BsonDocument>(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(documentId)), document)
-								{
-									IsUpsert = true
-								}
-							});
-						}
-						else
-						{
-							await destinationCollection.BulkWriteAsync(new WriteModel<BsonDocument>[]
-							{
-								new InsertOneModel<BsonDocument>(document)
-							});	
-						}
+							new InsertOneModel<BsonDocument>(document)
+						});
+					}
+				}
+			}
+		}
+		
+		public async Task ReplaceOneAsync(string documentId, string sourceCollectionName, string destinationCollectionName)
+		{
+			var sourceCollection = this.Database.GetCollection<BsonDocument>(sourceCollectionName);
+			if (sourceCollection == null)
+			{
+				throw new MongoException($"There is no collection named '{sourceCollectionName}'");
+			}
+			
+			var destinationCollection = this.Database.GetCollection<BsonDocument>(destinationCollectionName);
+			if (destinationCollection == null)
+			{
+				throw new MongoException($"There is no collection named '{destinationCollectionName}'");
+			}
+			
+			using (var cursor = await sourceCollection.Find(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(documentId))).ToCursorAsync())
+			{
+				while (await cursor.MoveNextAsync())
+				{
+					var batch = cursor.Current;
+					foreach (var document in batch)
+					{
+						await destinationCollection.ReplaceOneAsync(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(documentId)), document);
 					}
 				}
 			}

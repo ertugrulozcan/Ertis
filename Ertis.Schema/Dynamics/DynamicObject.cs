@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Linq;
 using Ertis.Schema.Exceptions;
@@ -8,6 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Ertis.Schema.Dynamics
 {
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public class DynamicObject : ICloneable, IDisposable
     {
         #region Properties
@@ -157,7 +159,19 @@ namespace Ertis.Schema.Dynamics
             return GetValueCore(path, this.PropertyDictionary);
         }
         
-        // ReSharper disable once MemberCanBePrivate.Global
+        public object GetValue(string path, object defaultValue)
+        {
+            try
+            {
+                return GetValueCore(path, this.PropertyDictionary);
+            }
+            catch (UndefinedFieldException)
+            {
+                return defaultValue;
+            }
+        }
+        
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public T GetValue<T>(string path)
         {
             var value = GetValueCore(path, this.PropertyDictionary);
@@ -187,12 +201,38 @@ namespace Ertis.Schema.Dynamics
             }
         }
         
-        // ReSharper disable once MemberCanBePrivate.Global
+        // ReSharper disable once MethodOverloadWithOptionalParameter
+        public T GetValue<T>(string path, T defaultValue = default)
+        {
+            try
+            {
+                return this.GetValue<T>(path);
+            }
+            catch (UndefinedFieldException)
+            {
+                return defaultValue;
+            }
+        }
+        
+        public bool TryGetValue(string path, out object value)
+        {
+            try
+            {
+                value = this.GetValue(path);
+                return true;
+            }
+            catch
+            {
+                value = default;
+                return false;
+            }
+        }
+        
         public bool TryGetValue(string path, out object value, out Exception exception)
         {
             try
             {
-                value = GetValue(path);
+                value = this.GetValue(path);
                 exception = null;
                 return true;
             }
@@ -204,11 +244,25 @@ namespace Ertis.Schema.Dynamics
             }
         }
         
+        public bool TryGetValue<T>(string path, out T value)
+        {
+            try
+            {
+                value = this.GetValue<T>(path);
+                return true;
+            }
+            catch
+            {
+                value = default;
+                return false;
+            }
+        }
+        
         public bool TryGetValue<T>(string path, out T value, out Exception exception)
         {
             try
             {
-                value = GetValue<T>(path);
+                value = this.GetValue<T>(path);
                 exception = null;
                 return true;
             }

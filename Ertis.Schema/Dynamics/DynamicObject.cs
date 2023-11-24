@@ -184,6 +184,15 @@ namespace Ertis.Schema.Dynamics
                 var itemType = typeof(T).GetElementType();
                 if (itemType != null)
                 {
+                    if (itemType.IsPrimitive)
+                    {
+                        return (T) (array.ToArray() as object);
+                    }
+                    else if (itemType == typeof(string))
+                    {
+                        return (T) (array.Select(x => x.ToString()).ToArray() as object);
+                    }
+                    
                     return (T) (array.Select(x => Cast(x, itemType)).ToArray() as object);
                 }
                 else
@@ -197,7 +206,14 @@ namespace Ertis.Schema.Dynamics
             }
             else
             {
-                return (T) value;
+                try
+                {
+                    return (T) Convert.ChangeType(value, typeof(T));
+                }
+                catch
+                {
+                    return (T) value;
+                }
             }
         }
         

@@ -16,7 +16,7 @@ namespace Ertis.Tests.Ertis.TemplateEngine.Tests
             var parser = new Parser();
             var segments = parser.Parse(testTemplate);
             var parsed = string.Join(string.Empty, segments);
-            Assert.AreEqual(testTemplate, parsed);
+            Assert.That(testTemplate == parsed);
         }
         
         [Test]
@@ -38,7 +38,7 @@ namespace Ertis.Tests.Ertis.TemplateEngine.Tests
             var formatter = new Formatter();
             var formatted = formatter.Format(testTemplate, testData);
             
-            Assert.AreEqual("bla bla bla Ertuğrul foo bar foo bar Özcan kara uzum habbesi Ahmetle le le le canim{{  last name}} pof. (Created at: 01/01/2022 23:59:00, Created by: migration)", formatted);
+            Assert.That("bla bla bla Ertuğrul foo bar foo bar Özcan kara uzum habbesi Ahmetle le le le canim{{  last name}} pof. (Created at: 01/01/2022 23:59:00, Created by: migration)" == formatted);
         }
         
         [Test]
@@ -61,7 +61,7 @@ namespace Ertis.Tests.Ertis.TemplateEngine.Tests
             
             var formatted = formatter.Format(testTemplate, testData);
             
-            Assert.AreEqual("62b8d1e023af61a96846d4f3", formatted);
+            Assert.That("62b8d1e023af61a96846d4f3" == formatted);
         }
 
         #endregion

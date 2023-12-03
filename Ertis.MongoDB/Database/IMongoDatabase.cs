@@ -5,11 +5,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Ertis.MongoDB.Models;
 using MongoDB.Bson;
+using MongoDriver = MongoDB.Driver;
 
 namespace Ertis.MongoDB.Database
 {
 	public interface IMongoDatabase
 	{
+		MongoDriver.IMongoDatabase Database { get; }
+		
 		void CreateCollection(string name);
 
 		ValueTask CreateCollectionAsync(string name, CancellationToken cancellationToken = default);

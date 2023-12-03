@@ -17,7 +17,7 @@ namespace Ertis.MongoDB.Database
 	{
 		#region Properties
 
-		private MongoDriver.IMongoDatabase Database { get; }
+		public MongoDriver.IMongoDatabase Database { get; }
 
 		#endregion	
 		

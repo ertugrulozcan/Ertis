@@ -507,65 +507,56 @@ namespace Ertis.MongoDB.Repository
 			SortDirection? sortDirection = null,
 			Locale? locale = null)
 		{
-			var options = locale != null ? 
-				this._settings.AllowDiskUse == true 
-					? new FindOptions { AllowDiskUse = this._settings.AllowDiskUse, Collation = new Collation(LocaleHelper.GetLanguageCode(locale.Value)) } 
-					: new FindOptions { Collation = new Collation(LocaleHelper.GetLanguageCode(locale.Value)) } : 
-				this._settings.AllowDiskUse == true 
-					? new FindOptions { AllowDiskUse = this._settings.AllowDiskUse } 
-					: null;
-			
 			predicate ??= new ExpressionFilterDefinition<TEntity>(item => true);
 
-			SortDefinition<TEntity> sortDefinition = null;
+			SortDefinition<TEntity> sortDefinition;
 			if (!string.IsNullOrEmpty(orderBy))
 			{
 				SortDefinitionBuilder<TEntity> builder = new SortDefinitionBuilder<TEntity>();
 				FieldDefinition<TEntity> fieldDefinition = new StringFieldDefinition<TEntity>(orderBy);
 				sortDefinition = sortDirection is null or SortDirection.Ascending ? builder.Ascending(fieldDefinition) : builder.Descending(fieldDefinition);	
 			}
-
-			IFindFluent<TEntity, TEntity> collection;
-			if (sortDefinition == null)
+			else
 			{
-				if (skip != null && limit != null)
-				{
-					collection = this.Collection.Find(predicate, options).Skip(skip).Limit(limit);
-				}
-				else if (skip != null)
-				{
-					collection = this.Collection.Find(predicate, options).Skip(skip);
-				}
-				else if (limit != null)
-				{
-					collection = this.Collection.Find(predicate, options).Limit(limit);
-				}
-				else
-				{
-					collection = this.Collection.Find(predicate, options);	
-				}
+				SortDefinitionBuilder<TEntity> builder = new SortDefinitionBuilder<TEntity>();
+				sortDefinition = sortDirection is null or SortDirection.Ascending ? builder.Ascending("_id") : builder.Descending("_id");
+			}
+			
+			IFindFluent<TEntity, TEntity> collection;
+			var options = this.GetFindOptions(orderBy, locale);
+			if (skip != null && limit != null)
+			{
+				collection = this.Collection.Find(predicate, options).Sort(sortDefinition).Skip(skip).Limit(limit);
+			}
+			else if (skip != null)
+			{
+				collection = this.Collection.Find(predicate, options).Sort(sortDefinition).Skip(skip);
+			}
+			else if (limit != null)
+			{
+				collection = this.Collection.Find(predicate, options).Sort(sortDefinition).Limit(limit);
 			}
 			else
 			{
-				if (skip != null && limit != null)
-				{
-					collection = this.Collection.Find(predicate, options).Sort(sortDefinition).Skip(skip).Limit(limit);
-				}
-				else if (skip != null)
-				{
-					collection = this.Collection.Find(predicate, options).Sort(sortDefinition).Skip(skip);
-				}
-				else if (limit != null)
-				{
-					collection = this.Collection.Find(predicate, options).Sort(sortDefinition).Limit(limit);
-				}
-				else
-				{
-					collection = this.Collection.Find(predicate, options).Sort(sortDefinition);	
-				}
+				collection = this.Collection.Find(predicate, options).Sort(sortDefinition);	
 			}
 
 			return collection;
+		}
+
+		private FindOptions GetFindOptions(string orderBy, Locale? locale)
+		{
+			if (!string.IsNullOrEmpty(orderBy) && orderBy != "_id" && locale != null)
+			{
+				var collation = new Collation(LocaleHelper.GetLanguageCode(locale.Value));
+				return new FindOptions { AllowDiskUse = this._settings.AllowDiskUse, Collation = collation };
+			}
+			else if (this._settings.AllowDiskUse == true)
+			{
+				return new FindOptions { AllowDiskUse = true };
+			}
+
+			return null;
 		}
 
 		#endregion

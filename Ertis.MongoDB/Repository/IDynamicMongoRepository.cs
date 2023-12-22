@@ -13,43 +13,102 @@ namespace Ertis.MongoDB.Repository
     {
         string CollectionName { get; }
         
-        IPaginationCollection<dynamic> Query(
-            string query,
-            int? skip = null,
-            int? limit = null,
-            bool? withCount = null,
-            string sortField = null,
-            SortDirection? sortDirection = null,
-            IDictionary<string, bool> selectFields = null);
+        IPaginationCollection<dynamic> Find(
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null,
+			Locale? locale = null);
+		
+		ValueTask<IPaginationCollection<dynamic>> FindAsync(
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null, 
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default);
+		
+		IPaginationCollection<dynamic> Find(
+			Expression<Func<dynamic, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null,
+			Locale? locale = null);
+		
+		ValueTask<IPaginationCollection<dynamic>> FindAsync(
+			Expression<Func<dynamic, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null,
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default);
 
-        IPaginationCollection<dynamic> Query(
-            Expression<Func<dynamic, bool>> expression,
-            int? skip = null,
-            int? limit = null,
-            bool? withCount = null,
-            string sortField = null,
-            SortDirection? sortDirection = null,
-            IDictionary<string, bool> selectFields = null);
+		IPaginationCollection<dynamic> Find(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null,
+			Locale? locale = null);
 
-        ValueTask<IPaginationCollection<dynamic>> QueryAsync(
-            string query,
-            int? skip = null,
-            int? limit = null,
-            bool? withCount = null,
-            string sortField = null,
-            SortDirection? sortDirection = null,
-            IDictionary<string, bool> selectFields = null,
-            CancellationToken cancellationToken = default);
+		ValueTask<IPaginationCollection<dynamic>> FindAsync(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null,
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default);
+		
+		IPaginationCollection<dynamic> Query(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null);
 
-        ValueTask<IPaginationCollection<dynamic>> QueryAsync(
-            Expression<Func<dynamic, bool>> expression,
-            int? skip = null,
-            int? limit = null,
-            bool? withCount = null,
-            string sortField = null,
-            SortDirection? sortDirection = null,
-            IDictionary<string, bool> selectFields = null,
-            CancellationToken cancellationToken = default);
+		IPaginationCollection<dynamic> Query(
+			Expression<Func<dynamic, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null);
+		
+		ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default);
+		
+		ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+			Expression<Func<dynamic, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string sortField = null, 
+			SortDirection? sortDirection = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default);
         
         TField[] Distinct<TField>(string distinctBy, string query = null);
 		

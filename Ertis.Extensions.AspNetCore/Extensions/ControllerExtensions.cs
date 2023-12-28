@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -66,13 +67,13 @@ namespace Ertis.Extensions.AspNetCore.Extensions
 		
 		public static string ExtractWhereQuery(this ControllerBase controller)
 		{
-			string query = controller.ExtractRequestBody();
+			var query = controller.ExtractRequestBody();
 			return controller.ExtractWhereQuery(query);
 		}
 		
 		public static async Task<string> ExtractWhereQueryAsync(this ControllerBase controller, CancellationToken cancellationToken = default)
 		{
-			string query = await controller.ExtractRequestBodyAsync(cancellationToken: cancellationToken);
+			var query = await controller.ExtractRequestBodyAsync(cancellationToken: cancellationToken);
 			return controller.ExtractWhereQuery(query);
 		}
 		
@@ -81,7 +82,7 @@ namespace Ertis.Extensions.AspNetCore.Extensions
 			skip = null;
 			if (controller.Request.Query.ContainsKey("skip"))
 			{
-				if (int.TryParse(controller.Request.Query["skip"], out int _skip))
+				if (int.TryParse(controller.Request.Query["skip"], out var _skip))
 				{
 					skip = _skip;
 				}
@@ -90,7 +91,7 @@ namespace Ertis.Extensions.AspNetCore.Extensions
 			limit = null;
 			if (controller.Request.Query.ContainsKey("limit"))
 			{
-				if (int.TryParse(controller.Request.Query["limit"], out int _limit))
+				if (int.TryParse(controller.Request.Query["limit"], out var _limit))
 				{
 					limit = _limit;
 				}
@@ -106,18 +107,42 @@ namespace Ertis.Extensions.AspNetCore.Extensions
 
 		public static void ExtractSortingParameters(this ControllerBase controller, out string sortField, out SortDirection? sortDirection)
 		{
-			sortField = null;
-			sortDirection = null;
+			ExtractSortingParameters(controller, out var sorting);
 			
-			if (controller.Request.Query.ContainsKey("sort"))
+			if (sorting != null && sorting.Any())
 			{
-				string sortingExpression = controller.Request.Query["sort"].ToString();
-				sortingExpression = sortingExpression.Replace("%20", " ");
-				var parts = sortingExpression.Split(' ');
-				sortField = parts.First();
-				if (parts.Length > 1 && parts[1].ToLower() == "desc")
+				sortField = sorting.First().OrderBy;
+				sortDirection = sorting.First().SortDirection;
+			}
+			else
+			{
+				sortField = null;
+				sortDirection = null;	
+			}
+		}
+		
+		public static void ExtractSortingParameters(this ControllerBase controller, out Sorting sorting)
+		{
+			sorting = null;
+			
+			if (controller.Request.Query.TryGetValue("sort", out var sortQueryString))
+			{
+				var sortingExpression = sortQueryString.ToString()?.Trim();
+				if (!string.IsNullOrEmpty(sortingExpression))
 				{
-					sortDirection = SortDirection.Descending;
+					var sortFields = new List<SortField>();
+					var sortingExpressions = sortingExpression.Split(';');
+					foreach (var sortingParam in sortingExpressions)
+					{
+						if (!string.IsNullOrEmpty(sortingParam))
+						{
+							var parts = sortingParam.Replace("%20", " ").Replace("+", " ").Split(' ');
+							var sortField = parts.First();
+							sortFields.Add(new SortField(sortField, parts.Length > 1 && parts[1].ToLower() == "desc" ? SortDirection.Descending : SortDirection.Ascending));	
+						}
+					}
+
+					sorting = new Sorting(sortFields);
 				}
 			}
 		}
@@ -127,20 +152,24 @@ namespace Ertis.Extensions.AspNetCore.Extensions
 			const string format = "dd-MM-yyyy";
 			
 			startDate = null;
+			// ReSharper disable once StringLiteralTypo
 			if (controller.Request.Query.ContainsKey("startdate"))
 			{
+				// ReSharper disable once StringLiteralTypo
 				string startDateString = controller.Request.Query["startdate"];
-				if (DateTime.TryParseExact(startDateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateTime))
+				if (DateTime.TryParseExact(startDateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTime))
 				{
 					startDate = dateTime;
 				}
 			}
 			
 			endDate = null;
+			// ReSharper disable once StringLiteralTypo
 			if (controller.Request.Query.ContainsKey("enddate"))
 			{
+				// ReSharper disable once StringLiteralTypo
 				string endDateString = controller.Request.Query["enddate"];
-				if (DateTime.TryParseExact(endDateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateTime))
+				if (DateTime.TryParseExact(endDateString, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTime))
 				{
 					endDate = dateTime;
 				}

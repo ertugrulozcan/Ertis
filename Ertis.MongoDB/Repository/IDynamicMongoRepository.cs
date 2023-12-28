@@ -17,16 +17,31 @@ namespace Ertis.MongoDB.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null,
 			Locale? locale = null);
+        
+        IPaginationCollection<dynamic> Find(
+	        int? skip = null, 
+	        int? limit = null, 
+	        bool? withCount = null, 
+	        Sorting sorting = null, 
+	        Locale? locale = null);
 		
 		ValueTask<IPaginationCollection<dynamic>> FindAsync(
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null, 
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default);
+		
+		ValueTask<IPaginationCollection<dynamic>> FindAsync(
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
@@ -35,8 +50,16 @@ namespace Ertis.MongoDB.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null,
+			Locale? locale = null);
+		
+		IPaginationCollection<dynamic> Find(
+			Expression<Func<dynamic, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null, 
 			Locale? locale = null);
 		
 		ValueTask<IPaginationCollection<dynamic>> FindAsync(
@@ -44,8 +67,17 @@ namespace Ertis.MongoDB.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null,
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default);
+		
+		ValueTask<IPaginationCollection<dynamic>> FindAsync(
+			Expression<Func<dynamic, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 
@@ -54,8 +86,16 @@ namespace Ertis.MongoDB.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null,
+			Locale? locale = null);
+		
+		IPaginationCollection<dynamic> Find(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null, 
 			Locale? locale = null);
 
 		ValueTask<IPaginationCollection<dynamic>> FindAsync(
@@ -63,8 +103,17 @@ namespace Ertis.MongoDB.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null,
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default);
+		
+		ValueTask<IPaginationCollection<dynamic>> FindAsync(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
@@ -73,8 +122,17 @@ namespace Ertis.MongoDB.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null);
+		
+		IPaginationCollection<dynamic> Query(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null,  
 			IDictionary<string, bool> selectFields = null,
 			Locale? locale = null);
 
@@ -83,8 +141,17 @@ namespace Ertis.MongoDB.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null);
+		
+		IPaginationCollection<dynamic> Query(
+			Expression<Func<dynamic, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null, 
 			IDictionary<string, bool> selectFields = null,
 			Locale? locale = null);
 		
@@ -93,7 +160,28 @@ namespace Ertis.MongoDB.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
+			SortDirection? sortDirection = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default);
+		
+		ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default);
+		
+		ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+			Expression<Func<dynamic, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null, 
 			IDictionary<string, bool> selectFields = null,
 			Locale? locale = null, 
@@ -104,8 +192,7 @@ namespace Ertis.MongoDB.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
-			SortDirection? sortDirection = null, 
+			Sorting sorting = null, 
 			IDictionary<string, bool> selectFields = null,
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);

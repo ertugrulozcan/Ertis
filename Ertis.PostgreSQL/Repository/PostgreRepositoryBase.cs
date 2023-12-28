@@ -102,21 +102,40 @@ namespace Ertis.PostgreSQL.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null)
 		{
-			return this.ExecuteWhere(null, skip, limit, withCount, sortField, sortDirection);
+			return this.ExecuteWhere(null, skip, limit, withCount, orderBy, sortDirection);
+		}
+		
+		public virtual IPaginationCollection<TEntity> Find(
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null)
+		{
+			return this.ExecuteWhere(null, skip, limit, withCount, sorting);
 		}
 
 		public virtual async ValueTask<IPaginationCollection<TEntity>> FindAsync(
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null, 
 			CancellationToken cancellationToken = default)
 		{
-			return await this.ExecuteWhereAsync(null, skip, limit, withCount, sortField, sortDirection, cancellationToken: cancellationToken);
+			return await this.ExecuteWhereAsync(null, skip, limit, withCount, orderBy, sortDirection, cancellationToken: cancellationToken);
+		}
+		
+		public virtual async ValueTask<IPaginationCollection<TEntity>> FindAsync(
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null, 
+			CancellationToken cancellationToken = default)
+		{
+			return await this.ExecuteWhereAsync(null, skip, limit, withCount, sorting, cancellationToken: cancellationToken);
 		}
 
 		public virtual IPaginationCollection<TEntity> Find(
@@ -124,10 +143,20 @@ namespace Ertis.PostgreSQL.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null)
 		{
-			return this.ExecuteWhere(expression, skip, limit, withCount, sortField, sortDirection);
+			return this.ExecuteWhere(expression, skip, limit, withCount, orderBy, sortDirection);
+		}
+		
+		public virtual IPaginationCollection<TEntity> Find(
+			Expression<Func<TEntity, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null)
+		{
+			return this.ExecuteWhere(expression, skip, limit, withCount, sorting);
 		}
 
 		public virtual async ValueTask<IPaginationCollection<TEntity>> FindAsync(
@@ -135,11 +164,22 @@ namespace Ertis.PostgreSQL.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null, 
 			CancellationToken cancellationToken = default)
 		{
-			return await this.ExecuteWhereAsync(expression, skip, limit, withCount, sortField, sortDirection, cancellationToken: cancellationToken);
+			return await this.ExecuteWhereAsync(expression, skip, limit, withCount, orderBy, sortDirection, cancellationToken: cancellationToken);
+		}
+		
+		public virtual async ValueTask<IPaginationCollection<TEntity>> FindAsync(
+			Expression<Func<TEntity, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null,
+			CancellationToken cancellationToken = default)
+		{
+			return await this.ExecuteWhereAsync(expression, skip, limit, withCount, sorting, cancellationToken: cancellationToken);
 		}
 
 		public virtual IPaginationCollection<TEntity> Find(
@@ -147,11 +187,22 @@ namespace Ertis.PostgreSQL.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null)
 		{
 			var expression = ExpressionHelper.ParseExpression<TEntity>(query);
-			return this.ExecuteWhere(expression, skip, limit, withCount, sortField, sortDirection);
+			return this.ExecuteWhere(expression, skip, limit, withCount, orderBy, sortDirection);
+		}
+		
+		public virtual IPaginationCollection<TEntity> Find(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null)
+		{
+			var expression = ExpressionHelper.ParseExpression<TEntity>(query);
+			return this.ExecuteWhere(expression, skip, limit, withCount, sorting);
 		}
 
 		public virtual async ValueTask<IPaginationCollection<TEntity>> FindAsync(
@@ -159,12 +210,24 @@ namespace Ertis.PostgreSQL.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null, 
 			CancellationToken cancellationToken = default)
 		{
 			var expression = await ExpressionHelper.ParseExpressionAsync<TEntity>(query, cancellationToken: cancellationToken);
-			return await this.ExecuteWhereAsync(expression, skip, limit, withCount, sortField, sortDirection, cancellationToken: cancellationToken);
+			return await this.ExecuteWhereAsync(expression, skip, limit, withCount, orderBy, sortDirection, cancellationToken: cancellationToken);
+		}
+		
+		public virtual async ValueTask<IPaginationCollection<TEntity>> FindAsync(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null,
+			CancellationToken cancellationToken = default)
+		{
+			var expression = await ExpressionHelper.ParseExpressionAsync<TEntity>(query, cancellationToken: cancellationToken);
+			return await this.ExecuteWhereAsync(expression, skip, limit, withCount, sorting, cancellationToken: cancellationToken);
 		}
 
 		private IPaginationCollection<TEntity> ExecuteWhere(
@@ -172,134 +235,70 @@ namespace Ertis.PostgreSQL.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null)
 		{
-			IQueryable<TEntity> queryable;
-			long? totalCount = null;
+			return this.ExecuteWhere(
+				expression,
+				skip,
+				limit,
+				withCount,
+				new Sorting(orderBy, sortDirection));
+		}
 
+		private IPaginationCollection<TEntity> ExecuteWhere(
+			Expression<Func<TEntity, bool>> expression,
+			int? skip = null,
+			int? limit = null,
+			bool? withCount = null,
+			Sorting sorting = null)
+		{
 			var db = this.ConfigureDbSet(this.database);
 			var dbSet = this.TrackingEnabled ? db : db.AsNoTracking();
-			var sortExpression = ExpressionHelper.ConvertSortExpression<TEntity>(sortField);
-			if (expression != null)
-			{
-				if (skip != null && limit != null)
-				{
-					if (sortExpression != null)
-					{
-						queryable = sortDirection == SortDirection.Descending ? 
-							dbSet.Where(expression).OrderByDescending(sortExpression).Skip(skip.Value).Take(limit.Value) : 
-							dbSet.Where(expression).OrderBy(sortExpression).Skip(skip.Value).Take(limit.Value);
-					}
-					else
-					{
-						queryable = dbSet.Where(expression).Skip(skip.Value).Take(limit.Value);	
-					}
-				}
-				else if (skip != null)
-				{
-					if (sortExpression != null)
-					{
-						queryable = sortDirection == SortDirection.Descending ? 
-							dbSet.Where(expression).OrderByDescending(sortExpression).Skip(skip.Value) : 
-							dbSet.Where(expression).OrderBy(sortExpression).Skip(skip.Value);
-					}
-					else
-					{
-						queryable = dbSet.Where(expression).Skip(skip.Value);	
-					}
-				}
-				else if (limit != null)
-				{
-					if (sortExpression != null)
-					{
-						queryable = sortDirection == SortDirection.Descending ? 
-							dbSet.Where(expression).OrderByDescending(sortExpression).Take(limit.Value) : 
-							dbSet.Where(expression).OrderBy(sortExpression).Take(limit.Value);
-					}
-					else
-					{
-						queryable = dbSet.Where(expression).Take(limit.Value);	
-					}
-				}
-				else
-				{
-					if (sortExpression != null)
-					{
-						queryable = sortDirection == SortDirection.Descending ? 
-							dbSet.Where(expression).OrderByDescending(sortExpression) : 
-							dbSet.Where(expression).OrderBy(sortExpression);
-					}
-					else
-					{
-						queryable = dbSet.Where(expression);	
-					}
-				}
+			var queryable = expression != null ? dbSet.Where(expression) : dbSet;
 
-				if (withCount != null && withCount.Value)
+			if (sorting is { Count: > 0 })
+			{
+				for (var i = 0; i < sorting.Count; i++)
 				{
-					totalCount = dbSet.LongCount(expression);
+					var sortExpression = ExpressionHelper.ConvertSortExpression<TEntity>(sorting[i].OrderBy);
+					if (sortExpression != null)
+					{
+						if (i > 0 && queryable is IOrderedQueryable<TEntity> orderedQueryable)
+						{
+							queryable = sorting[i].SortDirection == SortDirection.Descending 
+								? orderedQueryable.ThenByDescending(sortExpression) 
+								: orderedQueryable.ThenBy(sortExpression);
+						}
+						else
+						{
+							queryable = sorting[i].SortDirection == SortDirection.Descending 
+								? queryable.OrderByDescending(sortExpression) 
+								: queryable.OrderBy(sortExpression);
+						}
+					}
 				}
 			}
-			else
+			
+			if (skip != null && limit != null)
 			{
-				if (skip != null && limit != null)
-				{
-					if (sortExpression != null)
-					{
-						queryable = sortDirection == SortDirection.Descending ? 
-							dbSet.OrderByDescending(sortExpression).Skip(skip.Value).Take(limit.Value) : 
-							dbSet.OrderBy(sortExpression).Skip(skip.Value).Take(limit.Value);
-					}
-					else
-					{
-						queryable = dbSet.Skip(skip.Value).Take(limit.Value);	
-					}
-				}
-				else if (skip != null)
-				{
-					if (sortExpression != null)
-					{
-						queryable = sortDirection == SortDirection.Descending ? 
-							dbSet.OrderByDescending(sortExpression).Skip(skip.Value) : 
-							dbSet.OrderBy(sortExpression).Skip(skip.Value);
-					}
-					else
-					{
-						queryable = dbSet.Skip(skip.Value);	
-					}
-				}
-				else if (limit != null)
-				{
-					if (sortExpression != null)
-					{
-						queryable = sortDirection == SortDirection.Descending ? 
-							dbSet.OrderByDescending(sortExpression).Take(limit.Value) : 
-							dbSet.OrderBy(sortExpression).Take(limit.Value);
-					}
-					else
-					{
-						queryable = dbSet.Take(limit.Value);	
-					}
-				}
-				else
-				{
-					if (sortExpression != null)
-					{
-						queryable = sortDirection == SortDirection.Descending ? 
-							dbSet.OrderByDescending(sortExpression) : 
-							dbSet.OrderBy(sortExpression);
-					}
-					else
-					{
-						queryable = dbSet;	
-					}
-				}
-				
-				if (withCount != null && withCount.Value)
-				{
-					totalCount = dbSet.LongCount();
-				}
+				queryable = queryable.Skip(skip.Value).Take(limit.Value);
+			}
+			else if (skip != null)
+			{
+				queryable = queryable.Skip(skip.Value);
+			}
+			else if (limit != null)
+			{
+				queryable = queryable.Take(limit.Value);
+			}
+
+			long? totalCount = null;
+			if (withCount != null && withCount.Value)
+			{
+				totalCount = expression != null ? 
+					dbSet.LongCount(expression) : 
+					dbSet.LongCount();
 			}
 
 			return new PaginationCollection<TEntity>
@@ -314,135 +313,73 @@ namespace Ertis.PostgreSQL.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			string sortField = null, 
+			string orderBy = null, 
 			SortDirection? sortDirection = null, 
 			CancellationToken cancellationToken = default)
 		{
-			IQueryable<TEntity> queryable;
-			long? totalCount = null;
-			
+			return await this.ExecuteWhereAsync(
+				expression,
+				skip,
+				limit,
+				withCount,
+				new Sorting(orderBy, sortDirection),
+				cancellationToken: cancellationToken);
+		}
+
+		private async ValueTask<IPaginationCollection<TEntity>> ExecuteWhereAsync(
+			Expression<Func<TEntity, bool>> expression,
+			int? skip = null,
+			int? limit = null,
+			bool? withCount = null,
+			Sorting sorting = null,
+			CancellationToken cancellationToken = default)
+		{
 			var db = this.ConfigureDbSet(this.database);
 			var dbSet = this.TrackingEnabled ? db : db.AsNoTracking();
-			var sortExpression = ExpressionHelper.ConvertSortExpression<TEntity>(sortField);
-			if (expression != null)
-			{
-				if (skip != null && limit != null)
-				{
-					if (sortExpression != null)
-					{
-						queryable = sortDirection == SortDirection.Descending ? 
-							dbSet.Where(expression).OrderByDescending(sortExpression).Skip(skip.Value).Take(limit.Value) : 
-							dbSet.Where(expression).OrderBy(sortExpression).Skip(skip.Value).Take(limit.Value);
-					}
-					else
-					{
-						queryable = dbSet.Where(expression).Skip(skip.Value).Take(limit.Value);	
-					}
-				}
-				else if (skip != null)
-				{
-					if (sortExpression != null)
-					{
-						queryable = sortDirection == SortDirection.Descending ? 
-							dbSet.Where(expression).OrderByDescending(sortExpression).Skip(skip.Value) : 
-							dbSet.Where(expression).OrderBy(sortExpression).Skip(skip.Value);
-					}
-					else
-					{
-						queryable = dbSet.Where(expression).Skip(skip.Value);	
-					}
-				}
-				else if (limit != null)
-				{
-					if (sortExpression != null)
-					{
-						queryable = sortDirection == SortDirection.Descending ? 
-							dbSet.Where(expression).OrderByDescending(sortExpression).Take(limit.Value) : 
-							dbSet.Where(expression).OrderBy(sortExpression).Take(limit.Value);
-					}
-					else
-					{
-						queryable = dbSet.Where(expression).Take(limit.Value);	
-					}
-				}
-				else
-				{
-					if (sortExpression != null)
-					{
-						queryable = sortDirection == SortDirection.Descending ? 
-							dbSet.Where(expression).OrderByDescending(sortExpression) : 
-							dbSet.Where(expression).OrderBy(sortExpression);
-					}
-					else
-					{
-						queryable = dbSet.Where(expression);	
-					}
-				}
+			var queryable = expression != null ? dbSet.Where(expression) : dbSet;
 
-				if (withCount != null && withCount.Value)
+			if (sorting is { Count: > 0 })
+			{
+				for (var i = 0; i < sorting.Count; i++)
 				{
-					totalCount = await dbSet.LongCountAsync(expression, cancellationToken: cancellationToken);
+					var sortExpression = ExpressionHelper.ConvertSortExpression<TEntity>(sorting[i].OrderBy);
+					if (sortExpression != null)
+					{
+						if (i > 0 && queryable is IOrderedQueryable<TEntity> orderedQueryable)
+						{
+							queryable = sorting[i].SortDirection == SortDirection.Descending 
+								? orderedQueryable.ThenByDescending(sortExpression) 
+								: orderedQueryable.ThenBy(sortExpression);
+						}
+						else
+						{
+							queryable = sorting[i].SortDirection == SortDirection.Descending 
+								? queryable.OrderByDescending(sortExpression) 
+								: queryable.OrderBy(sortExpression);
+						}
+					}
 				}
 			}
-			else
+			
+			if (skip != null && limit != null)
 			{
-				if (skip != null && limit != null)
-				{
-					if (sortExpression != null)
-					{
-						queryable = sortDirection == SortDirection.Descending ? 
-							dbSet.OrderByDescending(sortExpression).Skip(skip.Value).Take(limit.Value) : 
-							dbSet.OrderBy(sortExpression).Skip(skip.Value).Take(limit.Value);
-					}
-					else
-					{
-						queryable = dbSet.Skip(skip.Value).Take(limit.Value);	
-					}
-				}
-				else if (skip != null)
-				{
-					if (sortExpression != null)
-					{
-						queryable = sortDirection == SortDirection.Descending ? 
-							dbSet.OrderByDescending(sortExpression).Skip(skip.Value) : 
-							dbSet.OrderBy(sortExpression).Skip(skip.Value);
-					}
-					else
-					{
-						queryable = dbSet.Skip(skip.Value);	
-					}
-				}
-				else if (limit != null)
-				{
-					if (sortExpression != null)
-					{
-						queryable = sortDirection == SortDirection.Descending ? 
-							dbSet.OrderByDescending(sortExpression).Take(limit.Value) : 
-							dbSet.OrderBy(sortExpression).Take(limit.Value);
-					}
-					else
-					{
-						queryable = dbSet.Take(limit.Value);	
-					}
-				}
-				else
-				{
-					if (sortExpression != null)
-					{
-						queryable = sortDirection == SortDirection.Descending ? 
-							dbSet.OrderByDescending(sortExpression) : 
-							dbSet.OrderBy(sortExpression);
-					}
-					else
-					{
-						queryable = dbSet;	
-					}
-				}
-				
-				if (withCount != null && withCount.Value)
-				{
-					totalCount = await dbSet.LongCountAsync(cancellationToken: cancellationToken);
-				}
+				queryable = queryable.Skip(skip.Value).Take(limit.Value);
+			}
+			else if (skip != null)
+			{
+				queryable = queryable.Skip(skip.Value);
+			}
+			else if (limit != null)
+			{
+				queryable = queryable.Take(limit.Value);
+			}
+
+			long? totalCount = null;
+			if (withCount != null && withCount.Value)
+			{
+				totalCount = expression != null ? 
+					await dbSet.LongCountAsync(expression, cancellationToken: cancellationToken) : 
+					await dbSet.LongCountAsync(cancellationToken: cancellationToken);
 			}
 
 			return new PaginationCollection<TEntity>

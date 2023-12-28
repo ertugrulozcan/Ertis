@@ -38,7 +38,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 		[Test]
 		public void FindTest()
 		{
-			var paginationCollection = this.mockDatabaseRepository.Find();
+			var paginationCollection = this.mockDatabaseRepository.Find(null, null, null, null, null);
 			foreach (var item in paginationCollection.Items)
 			{
 				Console.WriteLine($"{item.Id} - {item.Text}");
@@ -123,7 +123,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 					{ "array_field.string_field", true }
 				};
 				
-				var paginationResult = this.mockDatabaseRepository.Query(query, selectFields:selectFields);
+				var paginationResult = this.mockDatabaseRepository.Query(query, null, null, null, null, null, selectFields:selectFields);
 				string json = JsonConvert.SerializeObject(paginationResult);
 				Console.WriteLine(json);
 			}
@@ -143,7 +143,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 			{
 				string query = "{ \"sys.created_at\": { \"$gte\": \"2021-01-24T00:00:00.000Z\" } }";
 
-				var paginationResult = this.mockDatabaseRepository.Query(query);
+				var paginationResult = this.mockDatabaseRepository.Query(query, null, null, null, null, null, null);
 				string json = JsonConvert.SerializeObject(paginationResult);
 				Console.WriteLine(json);
 			}

@@ -8,20 +8,15 @@ public class Sorting : ICollection<SortField>
 {
 	#region Properties
 
-	private List<SortField> Fields { get; }
+	private List<SortField> Fields { get; } = new();
 
-	public int Count => this.Fields.Count;
+	public int Count => this.Fields?.Count ?? 0;
 
 	public bool IsReadOnly => false;
 
 	#endregion
 
 	#region Constructors
-
-	public Sorting()
-	{
-		this.Fields = new List<SortField>();
-	}
 	
 	public Sorting(IEnumerable<SortField> fields)
 	{
@@ -52,7 +47,7 @@ public class Sorting : ICollection<SortField>
 	
 	#region Operators
 	
-	public SortField this[int index] => this.Fields[index];
+	public SortField this[int index] => this.Fields?[index];
 
 	public static implicit operator Sorting(SortField sortField) => new (sortField);
 

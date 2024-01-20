@@ -11,6 +11,8 @@ namespace Ertis.Schema.Exceptions
         public string FieldName => this.FieldInfo.Name;
 
         public string FieldPath => this.FieldInfo.Path;
+        
+        public bool ThrowEvenOnCreate { get; init; }
 
         #endregion
 

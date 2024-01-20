@@ -103,7 +103,14 @@ namespace Ertis.Schema.Types.CustomTypes
         {
             var isValid = base.Validate(obj, validationContext);
 
-            if (obj is string[] array)
+            var array = obj switch
+            {
+                string[] stringArray => stringArray,
+                object[] objectArray => objectArray.Where(x => x is string).Cast<string>().ToArray(),
+                _ => null
+            };
+            
+            if (array != null)
             {
                 if (this.MaxCount != null && array.Length > this.MaxCount.Value)
                 {
@@ -121,26 +128,38 @@ namespace Ertis.Schema.Types.CustomTypes
                 if (array.Length != uniqueCount)
                 {
                     isValid = false;
-                    validationContext.Errors.Add(new FieldValidationException("Tags items must be unique", this));
+                    validationContext.Errors.Add(new FieldValidationException("Tags items must be unique", this)
+                    {
+                        ThrowEvenOnCreate = true
+                    });
                 }
 
                 // Item validations
                 if (array.Any(string.IsNullOrEmpty))
                 {
                     isValid = false;
-                    validationContext.Errors.Add(new FieldValidationException("Tags items can not be empty", this));
+                    validationContext.Errors.Add(new FieldValidationException("Tags items can not be empty", this)
+                    {
+                        ThrowEvenOnCreate = true
+                    });
                 }
                 
                 if (this.MaxLength != null && array.Any(x => x.Length > this.MaxLength.Value))
                 {
                     isValid = false;
-                    validationContext.Errors.Add(new FieldValidationException($"The length of tag items can not be greater than {this.MaxLength} character", this));
+                    validationContext.Errors.Add(new FieldValidationException($"The length of tag items can not be greater than {this.MaxLength} character", this)
+                    {
+                        ThrowEvenOnCreate = true
+                    });
                 }
                 
                 if (this.MinLength != null && array.Any(x => x.Length < this.MinLength.Value))
                 {
                     isValid = false;
-                    validationContext.Errors.Add(new FieldValidationException($"The length of tag items can not be less than {this.MinLength} character", this));
+                    validationContext.Errors.Add(new FieldValidationException($"The length of tag items can not be less than {this.MinLength} character", this)
+                    {
+                        ThrowEvenOnCreate = true
+                    });
                 }
             }
             

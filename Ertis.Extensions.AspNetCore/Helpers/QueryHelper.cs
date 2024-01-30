@@ -16,13 +16,9 @@ namespace Ertis.Extensions.AspNetCore.Helpers
 			}
 			
 			var root = Newtonsoft.Json.JsonConvert.DeserializeObject(body);
-			if (root is JObject rootNode)
+			if (root is JObject rootNode && rootNode.TryGetValue("where", out var whereNode))
 			{
-				if (rootNode.ContainsKey("where"))
-				{
-					var whereNode = rootNode["where"];
-					return whereNode?.ToString();
-				}
+				return whereNode.ToString();
 			}
 
 			return null;
@@ -40,15 +36,15 @@ namespace Ertis.Extensions.AspNetCore.Helpers
 			var root = Newtonsoft.Json.JsonConvert.DeserializeObject(body);
 			if (root is JObject rootNode)
 			{
-				if (rootNode.ContainsKey("select"))
+				if (rootNode.TryGetValue("select", out var jToken))
 				{
-					if (rootNode["select"] is JObject selectNode)
+					if (jToken is JObject selectNode)
 					{
 						foreach (var (key, value) in selectNode)
 						{
 							if (value != null)
 							{
-								int intValue = 0;
+								var intValue = 0;
 								if (value.TryGetValue(out bool boolValue) || value.TryGetValue(out intValue))
 								{
 									fieldDictionary.Add(key, boolValue || intValue == 1);	

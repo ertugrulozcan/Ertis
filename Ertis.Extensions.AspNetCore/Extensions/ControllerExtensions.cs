@@ -76,6 +76,38 @@ namespace Ertis.Extensions.AspNetCore.Extensions
 			var query = await controller.ExtractRequestBodyAsync(cancellationToken: cancellationToken);
 			return controller.ExtractWhereQuery(query);
 		}
+
+		public static Dictionary<string, bool> ExtractSelectFieldsFromQuery(this ControllerBase controller, char separator = ',')
+		{
+			var selectFields = new Dictionary<string, bool>();
+			if (controller.Request.Query.TryGetValue("include", out var includeValues))
+			{
+				var includeFields = includeValues.ToString().Split(separator);
+				foreach (var field in includeFields)
+				{
+					selectFields.Add(field, true);
+				}
+			}
+			
+			if (controller.Request.Query.TryGetValue("exclude", out var excludeValues))
+			{
+				var excludeFields = excludeValues.ToString().Split(separator);
+				foreach (var field in excludeFields)
+				{
+					// ReSharper disable once RedundantDictionaryContainsKeyBeforeAdding
+					if (selectFields.ContainsKey(field))
+					{
+						selectFields[field] = false;
+					}
+					else
+					{
+						selectFields.Add(field, false);	
+					}
+				}
+			}
+
+			return selectFields;
+		}
 		
 		public static void ExtractPaginationParameters(this ControllerBase controller, out int? skip, out int? limit, out bool withCount)
 		{

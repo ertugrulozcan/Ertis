@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Ertis.Core.Collections;
 
@@ -99,14 +101,25 @@ public class SortField
 {
 	#region Properties
 
+	[JsonProperty("orderBy")]
 	public string OrderBy { get; set; }
 	
+	[JsonProperty("sortDirection")]
+	[JsonConverter(typeof(StringEnumConverter))]
 	public SortDirection? SortDirection { get; set; }
 
 	#endregion
 	
 	#region Constructors
 
+	/// <summary>
+	/// Parameterless Constructor
+	/// </summary>
+	public SortField()
+	{
+		// NOP (For serialization)
+	}
+	
 	/// <summary>
 	/// Constructor
 	/// </summary>

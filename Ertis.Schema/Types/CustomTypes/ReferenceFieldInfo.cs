@@ -279,6 +279,9 @@ namespace Ertis.Schema.Types.CustomTypes
         [JsonProperty("queryParams", NullValueHandling = NullValueHandling.Ignore)]
         public CollectionReferenceParameter[] QueryParams { get; set; }
         
+        [JsonProperty("excludedFields")]
+        public string[] ExcludedFields { get; set; }
+        
         #endregion
 
         #region Methods

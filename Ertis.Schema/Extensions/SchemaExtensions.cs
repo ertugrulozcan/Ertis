@@ -97,6 +97,11 @@ namespace Ertis.Schema.Extensions
                 schema.SetConstants(model);
                 schema.SetFormatPatterns(model);
                 schema.SetDateTimes(model);
+
+                if (!isValidContent && !validationContext.Errors.Any())
+                {
+                    validationContext.Errors.Add(new FieldValidationException("Unknown validation error", rootObjectFieldInfo));
+                }
                 
                 return isValidContent;
             }

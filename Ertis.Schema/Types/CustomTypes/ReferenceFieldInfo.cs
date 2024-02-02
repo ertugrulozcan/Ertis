@@ -60,7 +60,12 @@ namespace Ertis.Schema.Types.CustomTypes
             // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (this.ReferenceType == ReferenceTypes.single)
             {
-                isValid = EnsureReferenceId(obj) != null;
+                var hasReferenceId = EnsureReferenceId(obj) != null;
+                isValid = hasReferenceId;
+                if (!hasReferenceId)
+                {
+                    validationContext.Errors.Add(new FieldValidationException($"The reference field [{this.Name}] has no _id field", this));
+                }
             }
             else if (this.ReferenceType == ReferenceTypes.multiple && obj is object[] objectArray)
             {

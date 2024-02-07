@@ -19,7 +19,6 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using SortDirection = Ertis.Core.Collections.SortDirection;
-using MongoDriver = MongoDB.Driver;
 using UpdateOptions = Ertis.Data.Models.UpdateOptions;
 
 namespace Ertis.MongoDB.Repository
@@ -480,10 +479,13 @@ namespace Ertis.MongoDB.Repository
 				var sortDefinitions = new List<SortDefinition<dynamic>>();
 				foreach (var sortField in sorting)
 				{
-					var fieldDefinition = new StringFieldDefinition<dynamic>(sortField.OrderBy);
-					sortDefinitions.Add(sortField.SortDirection is null or SortDirection.Ascending 
-						? sortDefinitionBuilder.Ascending(fieldDefinition) 
-						: sortDefinitionBuilder.Descending(fieldDefinition));	
+					if (sortField.OrderBy != null && !string.IsNullOrEmpty(sortField.OrderBy.Trim()))
+					{
+						var fieldDefinition = new StringFieldDefinition<dynamic>(sortField.OrderBy);
+						sortDefinitions.Add(sortField.SortDirection is null or SortDirection.Ascending 
+							? sortDefinitionBuilder.Ascending(fieldDefinition) 
+							: sortDefinitionBuilder.Descending(fieldDefinition));	
+					}
 				}
 
 				sortDefinition = sortDefinitionBuilder.Combine(sortDefinitions);

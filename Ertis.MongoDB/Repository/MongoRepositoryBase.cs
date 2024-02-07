@@ -20,7 +20,6 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using SortDirection = Ertis.Core.Collections.SortDirection;
-using MongoDriver = MongoDB.Driver;
 using UpdateOptions = Ertis.Data.Models.UpdateOptions;
 
 namespace Ertis.MongoDB.Repository
@@ -663,10 +662,13 @@ namespace Ertis.MongoDB.Repository
 				var sortDefinitions = new List<SortDefinition<TEntity>>();
 				foreach (var sortField in sorting)
 				{
-					var fieldDefinition = new StringFieldDefinition<TEntity>(sortField.OrderBy);
-					sortDefinitions.Add(sortField.SortDirection is null or SortDirection.Ascending 
-						? sortDefinitionBuilder.Ascending(fieldDefinition) 
-						: sortDefinitionBuilder.Descending(fieldDefinition));	
+					if (sortField.OrderBy != null && !string.IsNullOrEmpty(sortField.OrderBy.Trim()))
+					{
+						var fieldDefinition = new StringFieldDefinition<TEntity>(sortField.OrderBy);
+						sortDefinitions.Add(sortField.SortDirection is null or SortDirection.Ascending 
+							? sortDefinitionBuilder.Ascending(fieldDefinition) 
+							: sortDefinitionBuilder.Descending(fieldDefinition));	
+					}	
 				}
 
 				sortDefinition = sortDefinitionBuilder.Combine(sortDefinitions);
@@ -833,7 +835,7 @@ namespace Ertis.MongoDB.Repository
 		{
 			try
 			{
-				FilterDefinition<TEntity> filterDefinition = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
+				var filterDefinition = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
 				return this.ExecuteQuery(
 					filterDefinition,
 					skip,
@@ -949,7 +951,7 @@ namespace Ertis.MongoDB.Repository
 		{
 			try
 			{
-				FilterDefinition<TEntity> filterDefinition = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
+				var filterDefinition = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
 				return await this.ExecuteQueryAsync(
 					filterDefinition,
 					skip,
@@ -1007,9 +1009,7 @@ namespace Ertis.MongoDB.Repository
 		{
 			try
 			{
-				var filterResult =
-					this.ExecuteFilter(filterDefinition, skip, limit, sorting, locale);
-
+				var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, locale);
 				var projectionDefinition = ExecuteSelectQuery<TEntity>(selectFields);
 				var collection = filterResult.Project(projectionDefinition);
 			
@@ -1054,9 +1054,7 @@ namespace Ertis.MongoDB.Repository
 		{
 			try
 			{
-				var filterResult =
-					this.ExecuteFilter(filterDefinition, skip, limit, sorting, locale);
-
+				var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, locale);
 				var projectionDefinition = ExecuteSelectQuery<TEntity>(selectFields);
 				var collection = filterResult.Project(projectionDefinition);
 			

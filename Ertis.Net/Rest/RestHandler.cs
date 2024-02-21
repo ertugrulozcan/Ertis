@@ -1,5 +1,6 @@
 using Ertis.Core.Models.Response;
 using Ertis.Net.Http;
+using Newtonsoft.Json;
 
 namespace Ertis.Net.Rest;
 
@@ -60,9 +61,10 @@ public class RestHandler : IRestHandler
 		HttpMethod method, 
 		string url, 
 		IHeaderCollection? headers = null,
-		IRequestBody? body = null)
+		IRequestBody? body = null, 
+		JsonConverter[]? converters = null)
 	{
-		return this.ExecuteRequestAsync<TResult>(method, url, headers, body).ConfigureAwait(false).GetAwaiter().GetResult();
+		return this.ExecuteRequestAsync<TResult>(method, url, headers, body, converters).ConfigureAwait(false).GetAwaiter().GetResult();
 	}
 
 	public async Task<IResponseResult<TResult>> ExecuteRequestAsync<TResult>(
@@ -70,8 +72,10 @@ public class RestHandler : IRestHandler
 		string url, 
 		IHeaderCollection? headers = null,
 		IRequestBody? body = null,
+		JsonConverter[]? converters = null, 
 		CancellationToken cancellationToken = default)
 	{
+		// ReSharper disable once ConvertToUsingDeclaration
 		using (var httpClient = new HttpClient())
 		{
 			var request = new HttpRequestMessage(method, url);
@@ -110,7 +114,7 @@ public class RestHandler : IRestHandler
 				{
 					Json = json,
 					RawData = rawData,
-					Data = Newtonsoft.Json.JsonConvert.DeserializeObject<TResult>(json)!,
+					Data = JsonConvert.DeserializeObject<TResult>(json, converters ?? Array.Empty<JsonConverter>())!,
 				};
 			}
 			else
@@ -129,16 +133,17 @@ public class RestHandler : IRestHandler
 		string baseUrl, 
 		IQueryString? queryString = null,
 		IHeaderCollection? headers = null, 
-		IRequestBody? body = null)
+		IRequestBody? body = null, 
+		JsonConverter[]? converters = null)
 	{
 		if (queryString != null && queryString.Any())
 		{
 			var url = $"{baseUrl}?{queryString}";
-			return this.ExecuteRequest<TResult>(method, url, headers, body);
+			return this.ExecuteRequest<TResult>(method, url, headers, body, converters);
 		}
 		else
 		{
-			return this.ExecuteRequest<TResult>(method, baseUrl, headers, body);
+			return this.ExecuteRequest<TResult>(method, baseUrl, headers, body, converters);
 		}
 	}
 
@@ -147,17 +152,18 @@ public class RestHandler : IRestHandler
 		string baseUrl, 
 		IQueryString? queryString = null,
 		IHeaderCollection? headers = null, 
-		IRequestBody? body = null,
+		IRequestBody? body = null, 
+		JsonConverter[]? converters = null,
 		CancellationToken cancellationToken = default)
 	{
 		if (queryString != null && queryString.Any())
 		{
 			var url = $"{baseUrl}?{queryString}";
-			return await this.ExecuteRequestAsync<TResult>(method, url, headers, body, cancellationToken: cancellationToken);
+			return await this.ExecuteRequestAsync<TResult>(method, url, headers, body, converters, cancellationToken: cancellationToken);
 		}
 		else
 		{
-			return await this.ExecuteRequestAsync<TResult>(method, baseUrl, headers, body, cancellationToken: cancellationToken);
+			return await this.ExecuteRequestAsync<TResult>(method, baseUrl, headers, body, converters, cancellationToken: cancellationToken);
 		}
 	}
 
@@ -177,6 +183,7 @@ public class RestHandler : IRestHandler
 		IRequestBody? body = null,
 		CancellationToken cancellationToken = default)
 	{
+		// ReSharper disable once ConvertToUsingDeclaration
 		using (var httpClient = new HttpClient())
 		{
 			var request = new HttpRequestMessage(method, url);

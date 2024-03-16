@@ -23,6 +23,7 @@ namespace Ertis.Schema.Types
         private readonly bool isHidden;
         private readonly bool isReadonly;
         private readonly bool isSearchable;
+        private readonly double? searchWeight;
 
         #endregion
         
@@ -157,6 +158,17 @@ namespace Ertis.Schema.Types
             {
                 this.isSearchable = value;
                 this.OnPropertyChanged(nameof(this.IsSearchable));
+            }
+        }
+        
+        [JsonProperty("searchWeight", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double? SearchWeight
+        {
+            get => this.searchWeight;
+            init
+            {
+                this.searchWeight = value;
+                this.OnPropertyChanged(nameof(this.SearchWeight));
             }
         }
         

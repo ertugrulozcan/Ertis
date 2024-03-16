@@ -295,6 +295,7 @@ namespace Ertis.Schema.Types.Primitives
                 IsHidden = this.IsHidden,
                 IsReadonly = this.IsReadonly,
                 IsSearchable = this.IsSearchable,
+                SearchWeight = this.SearchWeight,
                 DefaultValue = this.DefaultValue,
                 MinCount = this.MinCount,
                 MaxCount = this.MaxCount,

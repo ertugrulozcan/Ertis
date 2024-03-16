@@ -42,6 +42,9 @@ namespace Ertis.Schema.Types
         
         [JsonProperty("isSearchable", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
         bool IsSearchable { get; init; }
+        
+        [JsonProperty("searchWeight", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        double? SearchWeight { get; init; }
 
         #endregion
         

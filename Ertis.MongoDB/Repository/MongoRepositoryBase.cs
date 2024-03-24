@@ -803,6 +803,42 @@ namespace Ertis.MongoDB.Repository
 				}
 			}
 		}
+		
+		public IPaginationCollection<T> Query<T>(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null)
+		{
+			try
+			{
+				query = QueryHelper.EnsureObjectIdsAndISODates(query);
+				var filterDefinition = new JsonFilterDefinition<TEntity>(query);
+				return this.ExecuteQuery<T>(
+					filterDefinition,
+					skip,
+					limit,
+					withCount,
+					sorting,
+					selectFields,
+					locale);
+			}
+			catch (MongoCommandException ex)
+			{
+				switch (ex.Code)
+				{
+					case 31249:
+						throw new SelectQueryPathCollisionException(ex);
+					case 31254:
+						throw new SelectQueryInclusionException(ex);
+					default:
+						throw;
+				}
+			}
+		}
 
 		public IPaginationCollection<dynamic> Query(
 			string query,
@@ -815,6 +851,26 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null)
 		{
 			return this.Query(
+				query,
+				skip,
+				limit,
+				withCount,
+				new Sorting(orderBy, sortDirection),
+				selectFields,
+				locale);
+		}
+		
+		public IPaginationCollection<T> Query<T>(
+			string query,
+			int? skip = null,
+			int? limit = null,
+			bool? withCount = null,
+			string orderBy = null,
+			SortDirection? sortDirection = null,
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null)
+		{
+			return this.Query<T>(
 				query,
 				skip,
 				limit,
@@ -858,6 +914,41 @@ namespace Ertis.MongoDB.Repository
 				}
 			}
 		}
+		
+		public IPaginationCollection<T> Query<T>(
+			Expression<Func<TEntity, bool>> expression,
+			int? skip = null,
+			int? limit = null,
+			bool? withCount = null,
+			Sorting sorting = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null)
+		{
+			try
+			{
+				var filterDefinition = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
+				return this.ExecuteQuery<T>(
+					filterDefinition,
+					skip,
+					limit,
+					withCount,
+					sorting,
+					selectFields,
+					locale);
+			}
+			catch (MongoCommandException ex)
+			{
+				switch (ex.Code)
+				{
+					case 31249:
+						throw new SelectQueryPathCollisionException(ex);
+					case 31254:
+						throw new SelectQueryInclusionException(ex);
+					default:
+						throw;
+				}
+			}
+		}
 
 		public IPaginationCollection<dynamic> Query(
 			Expression<Func<TEntity, bool>> expression,
@@ -870,6 +961,26 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null)
 		{
 			return this.Query(
+				expression,
+				skip,
+				limit,
+				withCount,
+				new Sorting(orderBy, sortDirection), 
+				selectFields,
+				locale);
+		}
+		
+		public IPaginationCollection<T> Query<T>(
+			Expression<Func<TEntity, bool>> expression,
+			int? skip = null,
+			int? limit = null,
+			bool? withCount = null,
+			string orderBy = null,
+			SortDirection? sortDirection = null,
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null)
+		{
+			return this.Query<T>(
 				expression,
 				skip,
 				limit,
@@ -916,6 +1027,44 @@ namespace Ertis.MongoDB.Repository
 				}
 			}
 		}
+		
+		public async ValueTask<IPaginationCollection<T>> QueryAsync<T>(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null, 
+			IDictionary<string, bool> selectFields = null, 
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				query = QueryHelper.EnsureObjectIdsAndISODates(query);
+				var filterDefinition = new JsonFilterDefinition<TEntity>(query);
+				return await this.ExecuteQueryAsync<T>(
+					filterDefinition,
+					skip,
+					limit,
+					withCount,
+					sorting,
+					selectFields,
+					locale,
+					cancellationToken: cancellationToken);
+			}
+			catch (MongoCommandException ex)
+			{
+				switch (ex.Code)
+				{
+					case 31249:
+						throw new SelectQueryPathCollisionException(ex);
+					case 31254:
+						throw new SelectQueryInclusionException(ex);
+					default:
+						throw;
+				}
+			}
+		}
 
 		public async ValueTask<IPaginationCollection<dynamic>> QueryAsync(
 			string query,
@@ -929,6 +1078,28 @@ namespace Ertis.MongoDB.Repository
 			CancellationToken cancellationToken = default)
 		{
 			return await this.QueryAsync(
+				query,
+				skip,
+				limit,
+				withCount,
+				new Sorting(orderBy, sortDirection), 
+				selectFields,
+				locale,
+				cancellationToken: cancellationToken);
+		}
+		
+		public async ValueTask<IPaginationCollection<T>> QueryAsync<T>(
+			string query,
+			int? skip = null,
+			int? limit = null,
+			bool? withCount = null,
+			string orderBy = null,
+			SortDirection? sortDirection = null,
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null,
+			CancellationToken cancellationToken = default)
+		{
+			return await this.QueryAsync<T>(
 				query,
 				skip,
 				limit,
@@ -975,6 +1146,43 @@ namespace Ertis.MongoDB.Repository
 				}
 			}
 		}
+		
+		public async ValueTask<IPaginationCollection<T>> QueryAsync<T>(
+			Expression<Func<TEntity, bool>> expression,
+			int? skip = null,
+			int? limit = null,
+			bool? withCount = null,
+			Sorting sorting = null, 
+			IDictionary<string, bool> selectFields = null, 
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				var filterDefinition = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
+				return await this.ExecuteQueryAsync<T>(
+					filterDefinition,
+					skip,
+					limit,
+					withCount,
+					sorting,
+					selectFields,
+					locale,
+					cancellationToken: cancellationToken);
+			}
+			catch (MongoCommandException ex)
+			{
+				switch (ex.Code)
+				{
+					case 31249:
+						throw new SelectQueryPathCollisionException(ex);
+					case 31254:
+						throw new SelectQueryInclusionException(ex);
+					default:
+						throw;
+				}
+			}
+		}
 
 		public async ValueTask<IPaginationCollection<dynamic>> QueryAsync(
 			Expression<Func<TEntity, bool>> expression,
@@ -988,6 +1196,28 @@ namespace Ertis.MongoDB.Repository
 			CancellationToken cancellationToken = default)
 		{
 			return await this.QueryAsync(
+				expression,
+				skip,
+				limit,
+				withCount,
+				new Sorting(orderBy, sortDirection), 
+				selectFields,
+				locale,
+				cancellationToken: cancellationToken);
+		}
+		
+		public async ValueTask<IPaginationCollection<T>> QueryAsync<T>(
+			Expression<Func<TEntity, bool>> expression,
+			int? skip = null,
+			int? limit = null,
+			bool? withCount = null,
+			string orderBy = null,
+			SortDirection? sortDirection = null,
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null,
+			CancellationToken cancellationToken = default)
+		{
+			return await this.QueryAsync<T>(
 				expression,
 				skip,
 				limit,
@@ -1042,6 +1272,50 @@ namespace Ertis.MongoDB.Repository
 			}
 		}
 		
+		private IPaginationCollection<T> ExecuteQuery<T>(
+			FilterDefinition<TEntity> filterDefinition,
+			int? skip = null,
+			int? limit = null,
+			bool? withCount = null,
+			Sorting sorting = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null)
+		{
+			try
+			{
+				var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, locale);
+				var projectionDefinition = ExecuteSelectQuery<TEntity>(selectFields);
+				var collection = filterResult.Project(projectionDefinition);
+			
+				long totalCount = 0;
+				if (withCount != null && withCount.Value)
+				{
+					totalCount = this.Collection.CountDocuments(filterDefinition);
+				}
+
+				var documents = collection.ToList();
+				var objects = documents.Select(BsonTypeMapper.MapToDotNetValue).Cast<T>();
+
+				return new PaginationCollection<T>
+				{
+					Count = totalCount,
+					Items = objects
+				};	
+			}
+			catch (MongoCommandException ex)
+			{
+				switch (ex.Code)
+				{
+					case 31249:
+						throw new SelectQueryPathCollisionException(ex);
+					case 31254:
+						throw new SelectQueryInclusionException(ex);
+					default:
+						throw;
+				}
+			}
+		}
+		
 		private async ValueTask<IPaginationCollection<dynamic>> ExecuteQueryAsync(
 			FilterDefinition<TEntity> filterDefinition,
 			int? skip = null,
@@ -1068,6 +1342,51 @@ namespace Ertis.MongoDB.Repository
 				var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
 
 				return new PaginationCollection<dynamic>
+				{
+					Count = totalCount,
+					Items = objects
+				};	
+			}
+			catch (MongoCommandException ex)
+			{
+				switch (ex.Code)
+				{
+					case 31249:
+						throw new SelectQueryPathCollisionException(ex);
+					case 31254:
+						throw new SelectQueryInclusionException(ex);
+					default:
+						throw;
+				}
+			}
+		}
+		
+		private async ValueTask<IPaginationCollection<T>> ExecuteQueryAsync<T>(
+			FilterDefinition<TEntity> filterDefinition,
+			int? skip = null,
+			int? limit = null,
+			bool? withCount = null,
+			Sorting sorting = null, 
+			IDictionary<string, bool> selectFields = null, 
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, locale);
+				var projectionDefinition = ExecuteSelectQuery<TEntity>(selectFields);
+				var collection = filterResult.Project(projectionDefinition);
+			
+				long totalCount = 0;
+				if (withCount != null && withCount.Value)
+				{
+					totalCount = await this.Collection.CountDocumentsAsync(filterDefinition, cancellationToken: cancellationToken);
+				}
+
+				var documents = await collection.ToListAsync(cancellationToken: cancellationToken);
+				var objects = documents.Select(BsonTypeMapper.MapToDotNetValue).Cast<T>();
+
+				return new PaginationCollection<T>
 				{
 					Count = totalCount,
 					Items = objects

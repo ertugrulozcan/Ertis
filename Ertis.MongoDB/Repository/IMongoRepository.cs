@@ -129,7 +129,26 @@ namespace Ertis.MongoDB.Repository
 			IDictionary<string, bool> selectFields = null,
 			Locale? locale = null);
 		
+		IPaginationCollection<T> Query<T>(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string orderBy = null, 
+			SortDirection? sortDirection = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null);
+		
 		IPaginationCollection<dynamic> Query(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null);
+		
+		IPaginationCollection<T> Query<T>(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -148,7 +167,26 @@ namespace Ertis.MongoDB.Repository
 			IDictionary<string, bool> selectFields = null,
 			Locale? locale = null);
 		
+		IPaginationCollection<T> Query<T>(
+			Expression<Func<TEntity, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string orderBy = null, 
+			SortDirection? sortDirection = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null);
+		
 		IPaginationCollection<dynamic> Query(
+			Expression<Func<TEntity, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null);
+		
+		IPaginationCollection<T> Query<T>(
 			Expression<Func<TEntity, bool>> expression, 
 			int? skip = null, 
 			int? limit = null, 
@@ -168,7 +206,28 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
+		ValueTask<IPaginationCollection<T>> QueryAsync<T>(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string orderBy = null, 
+			SortDirection? sortDirection = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default);
+		
 		ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+			string query, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default);
+		
+		ValueTask<IPaginationCollection<T>> QueryAsync<T>(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -189,7 +248,28 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
+		ValueTask<IPaginationCollection<T>> QueryAsync<T>(
+			Expression<Func<TEntity, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			string orderBy = null, 
+			SortDirection? sortDirection = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default);
+		
 		ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+			Expression<Func<TEntity, bool>> expression, 
+			int? skip = null, 
+			int? limit = null, 
+			bool? withCount = null, 
+			Sorting sorting = null, 
+			IDictionary<string, bool> selectFields = null,
+			Locale? locale = null, 
+			CancellationToken cancellationToken = default);
+		
+		ValueTask<IPaginationCollection<T>> QueryAsync<T>(
 			Expression<Func<TEntity, bool>> expression, 
 			int? skip = null, 
 			int? limit = null, 

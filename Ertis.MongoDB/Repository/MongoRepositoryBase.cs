@@ -1294,7 +1294,7 @@ namespace Ertis.MongoDB.Repository
 				}
 
 				var documents = collection.ToList();
-				var objects = documents.Select(BsonTypeMapper.MapToDotNetValue).Cast<T>();
+				var objects = documents.Select(x => BsonSerializer.Deserialize<T>(x));
 
 				return new PaginationCollection<T>
 				{
@@ -1384,7 +1384,7 @@ namespace Ertis.MongoDB.Repository
 				}
 
 				var documents = await collection.ToListAsync(cancellationToken: cancellationToken);
-				var objects = documents.Select(BsonTypeMapper.MapToDotNetValue).Cast<T>();
+				var objects = documents.Select(x => BsonSerializer.Deserialize<T>(x));
 
 				return new PaginationCollection<T>
 				{

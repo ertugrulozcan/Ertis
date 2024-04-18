@@ -25,6 +25,9 @@ namespace Ertis.Schema.Models
 		
 		[JsonProperty("isRequired")]
 		public bool IsRequired { get; set; }
+		
+		[JsonProperty("isNullable")]
+		public bool IsNullable { get; set; }
 
 		#endregion
 	}

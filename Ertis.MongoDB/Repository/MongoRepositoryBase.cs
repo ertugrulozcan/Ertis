@@ -667,8 +667,15 @@ namespace Ertis.MongoDB.Repository
 						var fieldDefinition = new StringFieldDefinition<TEntity>(sortField.OrderBy);
 						sortDefinitions.Add(sortField.SortDirection is null or SortDirection.Ascending 
 							? sortDefinitionBuilder.Ascending(fieldDefinition) 
-							: sortDefinitionBuilder.Descending(fieldDefinition));	
-					}	
+							: sortDefinitionBuilder.Descending(fieldDefinition));
+						
+						if (sorting.All(x => x.OrderBy != "_id"))
+						{
+							sortDefinitions.Add(sortField.SortDirection is null or SortDirection.Ascending 
+								? sortDefinitionBuilder.Ascending("_id") 
+								: sortDefinitionBuilder.Descending("_id"));	
+						}
+					}
 				}
 
 				sortDefinition = sortDefinitionBuilder.Combine(sortDefinitions);

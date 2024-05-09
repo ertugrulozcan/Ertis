@@ -1,8 +1,11 @@
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.TemplateEngine
 {
     public class PlaceHolder : ITemplateSegment
     {
         #region Properties
+
+        public SegmentType Type => SegmentType.PlaceHolder;
 
         public string Inner { get; init; }
         

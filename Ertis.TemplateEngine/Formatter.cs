@@ -61,6 +61,11 @@ namespace Ertis.TemplateEngine
             return stringBuilder.ToString();
         }
 
+        public ITemplateSegment[] LookUp(string template)
+        {
+            return this.Parser.Parse(template).ToArray();
+        }
+
         private static object ExtractData(string path, IDictionary<string, object> dictionary)
         {
             if (string.IsNullOrEmpty(path))

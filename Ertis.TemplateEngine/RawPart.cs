@@ -3,6 +3,8 @@ namespace Ertis.TemplateEngine
     public class RawPart : ITemplateSegment
     {
         #region Properties
+        
+        public SegmentType Type => SegmentType.RawPart;
 
         public string RawValue { get; init; }
 

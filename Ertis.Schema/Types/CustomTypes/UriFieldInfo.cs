@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
@@ -12,7 +13,9 @@ namespace Ertis.Schema.Types.CustomTypes
         #region Properties
 
         [JsonProperty("type")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("type")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
         public override FieldType Type => FieldType.uri;
 
         #endregion

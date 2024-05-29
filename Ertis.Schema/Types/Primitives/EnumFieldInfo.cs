@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
 using Newtonsoft.Json;
@@ -18,10 +19,13 @@ namespace Ertis.Schema.Types.Primitives
         #region Properties
 
         [JsonProperty("type")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("type")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
         public override FieldType Type => FieldType.@enum;
         
         [JsonProperty("items")]
+        [JsonPropertyName("items")]
         public EnumItem[] Items
         {
             get => this.items;
@@ -37,9 +41,13 @@ namespace Ertis.Schema.Types.Primitives
         }
         
         [JsonProperty("isUnique", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("isUnique")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool IsUnique { get; set; }
         
         [JsonProperty("isMultiple", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("isMultiple")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool IsMultiple { get; set; }
         
         #endregion
@@ -154,9 +162,11 @@ namespace Ertis.Schema.Types.Primitives
             #region Properties
 
             [JsonProperty("displayName")]
+            [JsonPropertyName("displayName")]
             public string DisplayName { get; set; }
             
             [JsonProperty("value")]
+            [JsonPropertyName("value")]
             public string Value { get; set; }
 
             #endregion

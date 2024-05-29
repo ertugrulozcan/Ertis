@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 namespace Ertis.Schema.Types
@@ -16,6 +17,8 @@ namespace Ertis.Schema.Types
         #region Properties
         
         [JsonProperty("defaultValue", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("defaultValue")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         T DefaultValue { get; }
         
         #endregion

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Dynamic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
 using Ertis.Schema.Serialization;
@@ -17,10 +18,13 @@ namespace Ertis.Schema.Types.Primitives
     {
         #region Properties
 
-        [JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string Slug => this.Name;
 
         [JsonProperty("allowAdditionalProperties", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("allowAdditionalProperties")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool AllowAdditionalProperties { get; init; }
         
         #endregion
@@ -52,11 +56,14 @@ namespace Ertis.Schema.Types.Primitives
         #region Properties
 
         [JsonProperty("type")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("type")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
         public override FieldType Type => FieldType.@object;
 
         [JsonProperty("properties")]
-        [JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
+        [JsonPropertyName("properties")]
+        [Newtonsoft.Json.JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
         public override IReadOnlyCollection<IFieldInfo> Properties
         {
             get => this.properties;

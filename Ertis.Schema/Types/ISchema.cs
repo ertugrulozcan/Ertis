@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Dynamics;
 using Ertis.Schema.Serialization;
 using Ertis.Schema.Validation;
@@ -12,13 +13,16 @@ namespace Ertis.Schema.Types
         #region Properties
 
         [JsonProperty("slug")]
+        [JsonPropertyName("slug")]
         string Slug { get; }
         
         [JsonProperty("properties")]
-        [JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
+        [JsonPropertyName("properties")]
+        [Newtonsoft.Json.JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
         IReadOnlyCollection<IFieldInfo> Properties { get; }
         
         [JsonProperty("allowAdditionalProperties")]
+        [JsonPropertyName("allowAdditionalProperties")]
         bool AllowAdditionalProperties { get; }
         
         #endregion

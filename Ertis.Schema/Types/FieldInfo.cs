@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
@@ -29,7 +30,8 @@ namespace Ertis.Schema.Types
         
         #region Properties
         
-        [JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string Name
         {
             get => this.name;
@@ -40,7 +42,8 @@ namespace Ertis.Schema.Types
             }
         }
 
-        [JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public IFieldInfo Parent
         {
             get => this.parent;
@@ -51,7 +54,8 @@ namespace Ertis.Schema.Types
             }
         }
 
-        [JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string Path
         {
             get
@@ -67,6 +71,8 @@ namespace Ertis.Schema.Types
         }
 
         [JsonProperty("displayName", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("displayName")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string DisplayName
         {
             get => this.displayName;
@@ -78,6 +84,8 @@ namespace Ertis.Schema.Types
         }
 
         [JsonProperty("description", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("description")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Description
         {
             get => this.description;
@@ -89,10 +97,14 @@ namespace Ertis.Schema.Types
         }
 
         [JsonProperty("type")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("type")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
         public abstract FieldType Type { get; }
 
         [JsonProperty("isRequired", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("isRequired")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool IsRequired
         {
             get => this.isRequired;
@@ -104,6 +116,8 @@ namespace Ertis.Schema.Types
         }
 
         [JsonProperty("isVirtual", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("isVirtual")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool IsVirtual
         {
             get => this.isVirtual;
@@ -115,6 +129,8 @@ namespace Ertis.Schema.Types
         }
 
         [JsonProperty("isHidden", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("isHidden")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool IsHidden
         {
             get => this.isHidden;
@@ -126,6 +142,8 @@ namespace Ertis.Schema.Types
         }
         
         [JsonProperty("isReadonly", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("isReadonly")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool IsReadonly
         {
             get => this.isReadonly;
@@ -137,6 +155,8 @@ namespace Ertis.Schema.Types
         }
         
         [JsonProperty("appearance", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("appearance")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string Appearance
         {
             get => this.appearance;
@@ -147,10 +167,13 @@ namespace Ertis.Schema.Types
             }
         }
         
-        [JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         protected internal object CurrentObject { get; private set; }
 
         [JsonProperty("isSearchable", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("isSearchable")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool IsSearchable
         {
             get => this.isSearchable;
@@ -162,6 +185,8 @@ namespace Ertis.Schema.Types
         }
         
         [JsonProperty("searchWeight", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("searchWeight")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public double? SearchWeight
         {
             get => this.searchWeight;
@@ -287,6 +312,8 @@ namespace Ertis.Schema.Types
         #region Properties
 
         [JsonProperty("defaultValue", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("defaultValue")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public T DefaultValue
         {
             get => this.defaultValue;

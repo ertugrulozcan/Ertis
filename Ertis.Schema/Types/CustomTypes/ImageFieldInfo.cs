@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
@@ -25,16 +26,23 @@ namespace Ertis.Schema.Types.CustomTypes
 		#region Properties
         
         [JsonProperty("type")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("type")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
         public override FieldType Type => FieldType.image;
         
-        [JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         public override IReadOnlyCollection<IFieldInfo> Properties { get; init; }
         
         [JsonProperty("multiple", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("multiple")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool Multiple { get; set; }
         
         [JsonProperty("maxSize", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("maxSize")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MaxSize
         {
             get => this.maxSize;
@@ -50,6 +58,8 @@ namespace Ertis.Schema.Types.CustomTypes
         }
         
         [JsonProperty("minCount", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("minCount")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MinCount
         {
             get => this.minCount;
@@ -65,6 +75,8 @@ namespace Ertis.Schema.Types.CustomTypes
         }
         
         [JsonProperty("maxCount", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("maxCount")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MaxCount
         {
             get => this.maxCount;
@@ -80,6 +92,8 @@ namespace Ertis.Schema.Types.CustomTypes
         }
         
         [JsonProperty("minWidth", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("minWidth")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MinWidth
         {
             get => this.minWidth;
@@ -95,6 +109,8 @@ namespace Ertis.Schema.Types.CustomTypes
         }
         
         [JsonProperty("minHeight", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("minHeight")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MinHeight
         {
             get => this.minHeight;
@@ -110,6 +126,8 @@ namespace Ertis.Schema.Types.CustomTypes
         }
         
         [JsonProperty("maxWidth", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("maxWidth")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MaxWidth
         {
             get => this.maxWidth;
@@ -125,6 +143,8 @@ namespace Ertis.Schema.Types.CustomTypes
         }
         
         [JsonProperty("maxHeight", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("maxHeight")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MaxHeight
         {
             get => this.maxHeight;
@@ -140,30 +160,45 @@ namespace Ertis.Schema.Types.CustomTypes
         }
         
         [JsonProperty("recommendedWidth", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("recommendedWidth")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? RecommendedWidth { get; set; }
         
         [JsonProperty("recommendedHeight", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("recommendedHeight")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? RecommendedHeight { get; set; }
         
         [JsonProperty("maxSizesRequired")]
+        [JsonPropertyName("maxSizesRequired")]
         public bool MaxSizesRequired { get; set; }
         
         [JsonProperty("minSizesRequired")]
+        [JsonPropertyName("minSizesRequired")]
         public bool MinSizesRequired { get; set; }
         
         [JsonProperty("aspectRatioRequired")]
+        [JsonPropertyName("aspectRatioRequired")]
         public bool AspectRatioRequired { get; set; }
         
         [JsonProperty("formWidth", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("formWidth")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string FormWidth { get; set; }
         
         [JsonProperty("formHeight", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("formHeight")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string FormHeight { get; set; }
         
         [JsonProperty("maxFormWidth", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("maxFormWidth")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string MaxFormWidth { get; set; }
         
         [JsonProperty("maxFormHeight", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("maxFormHeight")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string MaxFormHeight { get; set; }
 
         #endregion

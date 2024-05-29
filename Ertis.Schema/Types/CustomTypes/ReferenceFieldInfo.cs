@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Models;
 using Ertis.Schema.Validation;
@@ -25,23 +26,35 @@ namespace Ertis.Schema.Types.CustomTypes
         #region Properties
 
         [JsonProperty("type")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("type")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
         public override FieldType Type => FieldType.reference;
         
         [JsonProperty("referenceType")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("referenceType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
         public ReferenceTypes ReferenceType { get; set; }
         
         [JsonProperty("contentType", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("contentType")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string ContentType { get; set; }
         
         [JsonProperty("singleReferenceOptions", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("singleReferenceOptions")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public SingleReferenceOptions SingleReferenceOptions { get; set; }
         
         [JsonProperty("multipleReferenceOptions", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("multipleReferenceOptions")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public MultipleReferenceOptions MultipleReferenceOptions { get; set; }
         
         [JsonProperty("collectionReferenceOptions", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("collectionReferenceOptions")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public CollectionReferenceOptions CollectionReferenceOptions { get; set; }
 
         #endregion
@@ -156,6 +169,8 @@ namespace Ertis.Schema.Types.CustomTypes
         #region Properties
 
         [JsonProperty("minCount", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("minCount")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MinCount
         {
             get => this.minCount;
@@ -171,6 +186,8 @@ namespace Ertis.Schema.Types.CustomTypes
         }
         
         [JsonProperty("maxCount", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("maxCount")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MaxCount
         {
             get => this.maxCount;
@@ -246,9 +263,13 @@ namespace Ertis.Schema.Types.CustomTypes
         #region Properties
 
         [JsonProperty("collection", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("collection")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string CollectionSlug { get; set; }
         
         [JsonProperty("skip", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("skip")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? Skip
         {
             get => this.skip;
@@ -264,6 +285,8 @@ namespace Ertis.Schema.Types.CustomTypes
         }
         
         [JsonProperty("limit", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("limit")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? Limit
         {
             get => this.limit;
@@ -279,12 +302,17 @@ namespace Ertis.Schema.Types.CustomTypes
         }
         
         [JsonProperty("asObject", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("asObject")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public bool? AsObject { get; set; }
         
         [JsonProperty("queryParams", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("queryParams")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public CollectionReferenceParameter[] QueryParams { get; set; }
         
         [JsonProperty("excludedFields")]
+        [JsonPropertyName("excludedFields")]
         public string[] ExcludedFields { get; set; }
         
         #endregion
@@ -337,13 +365,17 @@ namespace Ertis.Schema.Types.CustomTypes
         #region Properties
 		
         [JsonProperty("value")]
+        [JsonPropertyName("value")]
         public object Value { get; set; }
 		
         [JsonProperty("bindingType")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("bindingType")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
         public BindingTypes BindingType { get; set; }
 		
         [JsonProperty("dynamicParameter")]
+        [JsonPropertyName("dynamicParameter")]
         public string DynamicParameter { get; set; }
 		
         #endregion

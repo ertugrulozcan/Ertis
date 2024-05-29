@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Helpers;
 using Ertis.Schema.Validation;
@@ -21,13 +22,17 @@ namespace Ertis.Schema.Types.Primitives
         #region Properties
 
         [JsonProperty("type")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("type")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
         public override FieldType Type => FieldType.@float;
         
         /// <summary>
         /// Greater than or equal
         /// </summary>
         [JsonProperty("minimum", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("minimum")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? Minimum
         {
             get => this.minimum;
@@ -46,6 +51,8 @@ namespace Ertis.Schema.Types.Primitives
         /// Less than or equal
         /// </summary>
         [JsonProperty("maximum", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("maximum")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? Maximum
         {
             get => this.maximum;
@@ -64,6 +71,8 @@ namespace Ertis.Schema.Types.Primitives
         /// Greater than
         /// </summary>
         [JsonProperty("exclusiveMinimum", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("exclusiveMinimum")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? ExclusiveMinimum
         {
             get => this.exclusiveMinimum;
@@ -82,6 +91,8 @@ namespace Ertis.Schema.Types.Primitives
         /// Less than or equal
         /// </summary>
         [JsonProperty("exclusiveMaximum", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("exclusiveMaximum")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? ExclusiveMaximum
         {
             get => this.exclusiveMaximum;
@@ -97,6 +108,8 @@ namespace Ertis.Schema.Types.Primitives
         }
         
         [JsonProperty("isUnique", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("isUnique")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool IsUnique { get; set; }
         
         #endregion

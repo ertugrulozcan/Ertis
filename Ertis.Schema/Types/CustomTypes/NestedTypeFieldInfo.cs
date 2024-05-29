@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Dynamic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
 using Ertis.Schema.Serialization;
@@ -25,11 +26,14 @@ public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
     #region Properties
 
     [JsonProperty("type")]
-    [JsonConverter(typeof(StringEnumConverter))]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+    [JsonPropertyName("type")]
+    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
     public override FieldType Type => FieldType.nestedType;
 
     [JsonProperty("properties")]
-    [JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
+    [JsonPropertyName("properties")]
+    [Newtonsoft.Json.JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
     public override IReadOnlyCollection<IFieldInfo> Properties
     {
         get => this.properties;
@@ -52,6 +56,7 @@ public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
     }
     
     [JsonProperty("nestedTypeId")]
+    [JsonPropertyName("nestedTypeId")]
     public string NestedTypeId { get; set; }
 
     #endregion

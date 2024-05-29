@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Models;
@@ -20,10 +21,14 @@ namespace Ertis.Schema.Types.CustomTypes
         #region Properties
 
         [JsonProperty("type")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("type")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
         public override FieldType Type => FieldType.richtext;
 
         [JsonProperty("minWordCount", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("minWordCount")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MinWordCount
         {
             get => this.minWordCount;
@@ -39,6 +44,8 @@ namespace Ertis.Schema.Types.CustomTypes
         }
         
         [JsonProperty("maxWordCount", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("maxWordCount")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MaxWordCount
         {
             get => this.maxWordCount;
@@ -54,9 +61,13 @@ namespace Ertis.Schema.Types.CustomTypes
         }
         
         [JsonProperty("embeddedImageRules", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("embeddedImageRules")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ResolutionRules? EmbeddedImageRules { get; set; }
         
         [JsonProperty("embeddedImageMaxSize", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("embeddedImageMaxSize")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? EmbeddedImageMaxSize { get; set; }
             
         #endregion

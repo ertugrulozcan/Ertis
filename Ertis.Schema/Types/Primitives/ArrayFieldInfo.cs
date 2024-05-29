@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Dynamics;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
@@ -25,11 +26,14 @@ namespace Ertis.Schema.Types.Primitives
         #region Properties
 
         [JsonProperty("type")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("type")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
         public override FieldType Type => FieldType.array;
         
         [JsonProperty("itemSchema")]
-        [JsonConverter(typeof(FieldInfoJsonConverter))]
+        [JsonPropertyName("itemSchema")]
+        [Newtonsoft.Json.JsonConverter(typeof(FieldInfoJsonConverter))]
         public IFieldInfo ItemSchema
         {
             get => this.itemSchema;
@@ -54,6 +58,8 @@ namespace Ertis.Schema.Types.Primitives
         }
 
         [JsonProperty("minCount", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("minCount")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MinCount
         {
             get => this.minCount;
@@ -69,6 +75,8 @@ namespace Ertis.Schema.Types.Primitives
         }
         
         [JsonProperty("maxCount", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("maxCount")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MaxCount
         {
             get => this.maxCount;
@@ -84,9 +92,13 @@ namespace Ertis.Schema.Types.Primitives
         }
 
         [JsonProperty("uniqueItems", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("uniqueItems")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool UniqueItems { get; init; }
 
         [JsonProperty("uniqueBy", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("uniqueBy")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public IEnumerable<string> UniqueBy
         {
             get => this.uniqueBy;

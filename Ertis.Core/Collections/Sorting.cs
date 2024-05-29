@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -102,10 +103,12 @@ public class SortField
 	#region Properties
 
 	[JsonProperty("orderBy")]
+	[JsonPropertyName("orderBy")]
 	public string OrderBy { get; set; }
 	
 	[JsonProperty("sortDirection")]
-	[JsonConverter(typeof(StringEnumConverter))]
+	[JsonPropertyName("sortDirection")]
+	[Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
 	public SortDirection? SortDirection { get; set; }
 
 	#endregion

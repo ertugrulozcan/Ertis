@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
 using Newtonsoft.Json;
@@ -21,10 +22,14 @@ namespace Ertis.Schema.Types.CustomTypes
 		#region Properties
 
         [JsonProperty("type")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("type")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
         public override FieldType Type => FieldType.tags;
         
         [JsonProperty("minCount", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("minCount")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MinCount
         {
             get => this.minCount;
@@ -40,6 +45,8 @@ namespace Ertis.Schema.Types.CustomTypes
         }
         
         [JsonProperty("maxCount", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("maxCount")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MaxCount
         {
             get => this.maxCount;
@@ -55,6 +62,8 @@ namespace Ertis.Schema.Types.CustomTypes
         }
         
         [JsonProperty("minLength", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("minLength")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MinLength
         {
             get => this.minLength;
@@ -70,6 +79,8 @@ namespace Ertis.Schema.Types.CustomTypes
         }
         
         [JsonProperty("maxLength", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("maxLength")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MaxLength
         {
             get => this.maxLength;

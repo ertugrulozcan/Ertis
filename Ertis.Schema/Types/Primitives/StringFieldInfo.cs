@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Ertis.Schema.Dynamics;
 using Ertis.Schema.Exceptions;
@@ -30,10 +31,14 @@ namespace Ertis.Schema.Types.Primitives
         #region Properties
 
         [JsonProperty("type")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("type")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
         public override FieldType Type => FieldType.@string;
         
         [JsonProperty("minLength", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("minLength")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MinLength
         {
             get => this.minLength;
@@ -49,6 +54,8 @@ namespace Ertis.Schema.Types.Primitives
         }
         
         [JsonProperty("maxLength", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("maxLength")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int? MaxLength
         {
             get => this.maxLength;
@@ -64,6 +71,8 @@ namespace Ertis.Schema.Types.Primitives
         }
         
         [JsonProperty("formatPattern", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("formatPattern")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string FormatPattern
         {
             get => this.formatPattern;
@@ -81,12 +90,18 @@ namespace Ertis.Schema.Types.Primitives
         }
 
         [JsonProperty("regexPattern", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("regexPattern")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string RegexPattern { get; init; }
         
         [JsonProperty("restrictRegexPattern", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("restrictRegexPattern")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string RestrictRegexPattern { get; init; }
 
         [JsonProperty("isUnique", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("isUnique")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool IsUnique { get; set; }
         
         #endregion

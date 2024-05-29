@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Serialization;
 using Ertis.Schema.Types.Primitives;
@@ -26,11 +27,14 @@ public class PhotoGalleryFieldInfo : FieldInfo<Array>
     #region Properties
 
     [JsonProperty("type")]
-    [JsonConverter(typeof(StringEnumConverter))]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+    [JsonPropertyName("type")]
+    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
     public override FieldType Type => FieldType.photoGallery;
     
     [JsonProperty("itemSchema")]
-    [JsonConverter(typeof(FieldInfoJsonConverter))]
+    [JsonPropertyName("itemSchema")]
+    [Newtonsoft.Json.JsonConverter(typeof(FieldInfoJsonConverter))]
     public IFieldInfo ItemSchema
     {
         get
@@ -80,6 +84,8 @@ public class PhotoGalleryFieldInfo : FieldInfo<Array>
     }
     
     [JsonProperty("maxSize", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("maxSize")]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxSize
     {
         get => this.maxSize;
@@ -95,6 +101,8 @@ public class PhotoGalleryFieldInfo : FieldInfo<Array>
     }
 
     [JsonProperty("minCount", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("minCount")]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MinCount
     {
         get => this.minCount;
@@ -110,6 +118,8 @@ public class PhotoGalleryFieldInfo : FieldInfo<Array>
     }
     
     [JsonProperty("maxCount", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("maxCount")]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxCount
     {
         get => this.maxCount;
@@ -125,6 +135,8 @@ public class PhotoGalleryFieldInfo : FieldInfo<Array>
     }
     
     [JsonProperty("minWidth", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("minWidth")]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MinWidth
     {
         get => this.minWidth;
@@ -140,6 +152,8 @@ public class PhotoGalleryFieldInfo : FieldInfo<Array>
     }
     
     [JsonProperty("minHeight", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("minHeight")]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MinHeight
     {
         get => this.minHeight;
@@ -155,6 +169,8 @@ public class PhotoGalleryFieldInfo : FieldInfo<Array>
     }
     
     [JsonProperty("maxWidth", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("maxWidth")]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxWidth
     {
         get => this.maxWidth;
@@ -170,6 +186,8 @@ public class PhotoGalleryFieldInfo : FieldInfo<Array>
     }
     
     [JsonProperty("maxHeight", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("maxHeight")]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxHeight
     {
         get => this.maxHeight;
@@ -185,18 +203,25 @@ public class PhotoGalleryFieldInfo : FieldInfo<Array>
     }
     
     [JsonProperty("recommendedWidth", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("recommendedWidth")]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? RecommendedWidth { get; set; }
     
     [JsonProperty("recommendedHeight", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("recommendedHeight")]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? RecommendedHeight { get; set; }
     
     [JsonProperty("maxSizesRequired")]
+    [JsonPropertyName("maxSizesRequired")]
     public bool MaxSizesRequired { get; set; }
     
     [JsonProperty("minSizesRequired")]
+    [JsonPropertyName("minSizesRequired")]
     public bool MinSizesRequired { get; set; }
     
     [JsonProperty("aspectRatioRequired")]
+    [JsonPropertyName("aspectRatioRequired")]
     public bool AspectRatioRequired { get; set; }
 
     #endregion

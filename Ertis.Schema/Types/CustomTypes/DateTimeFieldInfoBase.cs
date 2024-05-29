@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
@@ -12,9 +13,13 @@ namespace Ertis.Schema.Types.CustomTypes
         #region Properties
 
         [JsonProperty("minValue", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("minValue")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public DateTime? MinValue { get; init; }
 
         [JsonProperty("maxValue", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("maxValue")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public DateTime? MaxValue { get; init; }
         
         #endregion
@@ -31,7 +36,8 @@ namespace Ertis.Schema.Types.CustomTypes
         
         #region Abstract Properties
         
-        [JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
+        [System.Text.Json.Serialization.JsonIgnore]
         protected abstract string StringFormat { get; }
         
         #endregion
@@ -39,6 +45,8 @@ namespace Ertis.Schema.Types.CustomTypes
         #region Properties
         
         [JsonProperty("minValue", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("minValue")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public DateTime? MinValue
         {
             get => this.minValue;
@@ -54,6 +62,8 @@ namespace Ertis.Schema.Types.CustomTypes
         }
         
         [JsonProperty("maxValue", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("maxValue")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public DateTime? MaxValue
         {
             get => this.maxValue;

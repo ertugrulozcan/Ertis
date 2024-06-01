@@ -14,7 +14,7 @@ namespace Ertis.TemplateEngine
 
         #region Properties
 
-        private ParserOptions Options { get; }
+        internal ParserOptions Options { get; }
 
         #endregion
         

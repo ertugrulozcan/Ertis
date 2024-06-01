@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -49,7 +50,23 @@ namespace Ertis.TemplateEngine
                     }
                     else
                     {
-                        stringBuilder.Append(segment);
+                        // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+                        switch (this.Parser.Options.UndefinedStrategy)
+                        {
+                            case UndefinedStrategy.Ignore:
+                                stringBuilder.Append(segment);
+                                break;
+                            case UndefinedStrategy.Remove:
+                                break;
+                            case UndefinedStrategy.Throw:
+                                throw new ArgumentException($"{placeHolder.Value} is undefined");
+                            case UndefinedStrategy.Swap:
+                                if (!string.IsNullOrEmpty(this.Parser.Options.Fallback))
+                                {
+                                    stringBuilder.Append(this.Parser.Options.Fallback);
+                                }
+                                break;
+                        }
                     }
                 }
                 else

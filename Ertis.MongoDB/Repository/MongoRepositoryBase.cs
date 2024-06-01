@@ -1721,5 +1721,129 @@ namespace Ertis.MongoDB.Repository
 		}
 		
 		#endregion
+
+		#region Increment Methods
+
+		public TEntity Increment(string id, string field, int value = 1)
+		{
+			return this.IncrementCore(id, field, value);
+		}
+		
+		public TEntity Increment(string id, string field, long value = 1)
+		{
+			return this.IncrementCore(id, field, value);
+		}
+		
+		private TEntity IncrementCore<TValue>(string id, string field, TValue value)
+		{
+			return this.Collection.FindOneAndUpdate(item => item.Id == id, Builders<TEntity>.Update.Inc(field, value));
+		}
+		
+		public async ValueTask<TEntity> IncrementAsync(string id, string field, int value = 1, CancellationToken cancellationToken = default)
+		{
+			return await this.IncrementCoreAsync(id, field, value, cancellationToken: cancellationToken);
+		}
+		
+		public async ValueTask<TEntity> IncrementAsync(string id, string field, long value = 1, CancellationToken cancellationToken = default)
+		{
+			return await this.IncrementCoreAsync(id, field, value, cancellationToken: cancellationToken);
+		}
+		
+		private async ValueTask<TEntity> IncrementCoreAsync<TValue>(string id, string field, TValue value, CancellationToken cancellationToken = default)
+		{
+			return await this.Collection.FindOneAndUpdateAsync(item => item.Id == id, Builders<TEntity>.Update.Inc(field, value), cancellationToken: cancellationToken);
+		}
+		
+		public TEntity Increment(string id, Expression<Func<TEntity, int>> expression, int value = 1)
+		{
+			return this.IncrementCore(id, expression, value);
+		}
+		
+		public TEntity Increment(string id, Expression<Func<TEntity, long>> expression, long value = 1)
+		{
+			return this.IncrementCore(id, expression, value);
+		}
+		
+		private TEntity IncrementCore<TValue>(string id, Expression<Func<TEntity, TValue>> expression, TValue value)
+		{
+			return this.Collection.FindOneAndUpdate(item => item.Id == id, Builders<TEntity>.Update.Inc(expression, value));
+		}
+
+		public async ValueTask<TEntity> IncrementAsync(string id, Expression<Func<TEntity, int>> expression, int value = 1, CancellationToken cancellationToken = default)
+		{
+			return await this.IncrementCoreAsync(id, expression, value, cancellationToken: cancellationToken);
+		}
+		
+		public async ValueTask<TEntity> IncrementAsync(string id, Expression<Func<TEntity, long>> expression, long value = 1, CancellationToken cancellationToken = default)
+		{
+			return await this.IncrementCoreAsync(id, expression, value, cancellationToken: cancellationToken);
+		}
+		
+		private async ValueTask<TEntity> IncrementCoreAsync<TValue>(string id, Expression<Func<TEntity, TValue>> expression, TValue value, CancellationToken cancellationToken = default)
+		{
+			return await this.Collection.FindOneAndUpdateAsync(item => item.Id == id, Builders<TEntity>.Update.Inc(expression, value), cancellationToken: cancellationToken);
+		}
+		
+		public TEntity Increment(Expression<Func<TEntity, bool>> filter, string field, int value = 1)
+		{
+			return this.IncrementCore(filter, field, value);
+		}
+		
+		public TEntity Increment(Expression<Func<TEntity, bool>> filter, string field, long value = 1)
+		{
+			return this.IncrementCore(filter, field, value);
+		}
+		
+		private TEntity IncrementCore<TValue>(Expression<Func<TEntity, bool>> filter, string field, TValue value)
+		{
+			return this.Collection.FindOneAndUpdate(filter, Builders<TEntity>.Update.Inc(field, value));
+		}
+		
+		public async ValueTask<TEntity> IncrementAsync(Expression<Func<TEntity, bool>> filter, string field, int value = 1, CancellationToken cancellationToken = default)
+		{
+			return await this.IncrementCoreAsync(filter, field, value, cancellationToken: cancellationToken);
+		}
+		
+		public async ValueTask<TEntity> IncrementAsync(Expression<Func<TEntity, bool>> filter, string field, long value = 1, CancellationToken cancellationToken = default)
+		{
+			return await this.IncrementCoreAsync(filter, field, value, cancellationToken: cancellationToken);
+		}
+		
+		private async ValueTask<TEntity> IncrementCoreAsync<TValue>(Expression<Func<TEntity, bool>> filter, string field, TValue value, CancellationToken cancellationToken = default)
+		{
+			return await this.Collection.FindOneAndUpdateAsync(filter, Builders<TEntity>.Update.Inc(field, value), cancellationToken: cancellationToken);
+		}
+		
+		public TEntity Increment(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, int>> expression, int value = 1)
+		{
+			return this.IncrementCore(filter, expression, value);
+		}
+		
+		public TEntity Increment(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, long>> expression, long value = 1)
+		{
+			return this.IncrementCore(filter, expression, value);
+		}
+		
+		private TEntity IncrementCore<TValue>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TValue>> expression, TValue value)
+		{
+			return this.Collection.FindOneAndUpdate(filter, Builders<TEntity>.Update.Inc(expression, value));
+		}
+
+		public async ValueTask<TEntity> IncrementAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, int>> expression, int value = 1, CancellationToken cancellationToken = default)
+		{
+			return await this.IncrementCoreAsync(filter, expression, value, cancellationToken: cancellationToken);
+		}
+		
+		public async ValueTask<TEntity> IncrementAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, long>> expression, long value = 1, CancellationToken cancellationToken = default)
+		{
+			return await this.IncrementCoreAsync(filter, expression, value, cancellationToken: cancellationToken);
+		}
+		
+		private async ValueTask<TEntity> IncrementCoreAsync<TValue>(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, TValue>> expression, TValue value, CancellationToken cancellationToken = default)
+		{
+			return await this.Collection.FindOneAndUpdateAsync(filter, Builders<TEntity>.Update.Inc(expression, value), cancellationToken: cancellationToken);
+		}
+
+		#endregion
 	}
 }

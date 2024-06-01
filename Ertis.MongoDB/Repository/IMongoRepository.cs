@@ -278,6 +278,38 @@ namespace Ertis.MongoDB.Repository
 			IDictionary<string, bool> selectFields = null,
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
+
+		TEntity Increment(string id, string field, int value = 1);
+		
+		TEntity Increment(string id, string field, long value = 1);
+		
+		ValueTask<TEntity> IncrementAsync(string id, string field, int value = 1, CancellationToken cancellationToken = default);
+		
+		ValueTask<TEntity> IncrementAsync(string id, string field, long value = 1, CancellationToken cancellationToken = default);
+		
+		TEntity Increment(string id, Expression<Func<TEntity, int>> expression, int value = 1);
+		
+		TEntity Increment(string id, Expression<Func<TEntity, long>> expression, long value = 1);
+		
+		ValueTask<TEntity> IncrementAsync(string id, Expression<Func<TEntity, int>> expression, int value = 1, CancellationToken cancellationToken = default);
+		
+		ValueTask<TEntity> IncrementAsync(string id, Expression<Func<TEntity, long>> expression, long value = 1, CancellationToken cancellationToken = default);
+		
+		TEntity Increment(Expression<Func<TEntity, bool>> filter, string field, int value = 1);
+		
+		TEntity Increment(Expression<Func<TEntity, bool>> filter, string field, long value = 1);
+		
+		ValueTask<TEntity> IncrementAsync(Expression<Func<TEntity, bool>> filter, string field, int value = 1, CancellationToken cancellationToken = default);
+		
+		ValueTask<TEntity> IncrementAsync(Expression<Func<TEntity, bool>> filter, string field, long value = 1, CancellationToken cancellationToken = default);
+		
+		TEntity Increment(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, int>> expression, int value = 1);
+		
+		TEntity Increment(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, long>> expression, long value = 1);
+		
+		ValueTask<TEntity> IncrementAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, int>> expression, int value = 1, CancellationToken cancellationToken = default);
+		
+		ValueTask<TEntity> IncrementAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, long>> expression, long value = 1, CancellationToken cancellationToken = default);
 		
 		TField[] Distinct<TField>(string distinctBy, string query = null);
 		

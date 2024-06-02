@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -102,15 +103,43 @@ namespace Ertis.TemplateEngine
                 {
                     return ExtractData(string.Join(".", pathParts.Skip(1)), subDictionary);
                 }
-                else
+            }
+            else if (key.Contains('[') && key.Contains(']'))
+            {
+                var arrayStartIndex = key.IndexOf('[');
+                var arrayEndIndex = key.IndexOf(']');
+                var indexLength = arrayEndIndex - arrayStartIndex;
+                if (arrayStartIndex > 0 && indexLength > 1)
                 {
-                    return null;
+                    if (int.TryParse(key.AsSpan(arrayStartIndex + 1, indexLength - 1), out var index))
+                    {
+                        var fieldKey = key[..arrayStartIndex];
+                        if (dictionary.TryGetValue(fieldKey, out var obj) && obj is IList array)
+                        {
+                            if (index < 0)
+                            {
+                                index = array.Count - index;
+                            }
+
+                            if (index > array.Count)
+                            {
+                                throw new ArgumentOutOfRangeException(fieldKey, array, "The index parameter was greater than array length");
+                            }
+                            
+                            if (pathParts.Length == 1)
+                            {
+                                return array[index];
+                            }
+                            else if (array[index] is IDictionary<string, object> subDictionary)
+                            {
+                                return ExtractData(string.Join(".", pathParts.Skip(1)), subDictionary);
+                            }
+                        }
+                    }
                 }
             }
-            else
-            {
-                return null;
-            }
+            
+            return null;
         }
         
         #endregion

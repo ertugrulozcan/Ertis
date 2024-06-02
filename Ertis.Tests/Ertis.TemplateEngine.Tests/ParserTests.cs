@@ -38,7 +38,7 @@ namespace Ertis.Tests.Ertis.TemplateEngine.Tests
             var formatter = new Formatter();
             var formatted = formatter.Format(testTemplate, testData);
             
-            Assert.That("bla bla bla Ertuğrul foo bar foo bar Özcan kara uzum habbesi Ahmetle le le le canim{{  last name}} pof. (Created at: 01/01/2022 23:59:00, Created by: migration)" == formatted);
+            Assert.That("bla bla bla Ertuğrul foo bar foo bar Özcan kara uzum habbesi Ahmetle le le le canim{{  last name}} pof. (Created at: 1.01.2022 23:59:00, Created by: migration)" == formatted);
         }
         
         [Test]
@@ -62,6 +62,67 @@ namespace Ertis.Tests.Ertis.TemplateEngine.Tests
             var formatted = formatter.Format(testTemplate, testData);
             
             Assert.That("62b8d1e023af61a96846d4f3" == formatted);
+        }
+        
+        [Test]
+        public void TemplateEngineFormatter_UrlPattern_Test()
+        {
+            const string defaultUrlPattern = "{category.slug}/{slug}-{cid}";
+            var testData = new Dictionary<string, object>
+            {
+                { "_id", "665c604238278d825ebcd90c" },
+                { "contentType", "TextNews" },
+                { "title", "Content Test" },
+                { "slug", "content-test" },
+                { "tags", new [] { "tag-1", "tag-2" } },
+                { "category", new Dictionary<string, object> {
+                    { "title", "Beşiktaş" },
+                    { "slug", "besiktas" }
+                }},
+                { "cid", "10015" }
+            };
+            
+            var formatter = new Formatter(new ParserOptions
+            {
+                OpenBrackets = "{",
+                CloseBrackets = "}"
+            });
+            
+            var formatted = formatter.Format(defaultUrlPattern, testData);
+            
+            Assert.That("besiktas/content-test-10015" == formatted);
+        }
+        
+        [Test]
+        public void TemplateEngineFormatter_Array_Test()
+        {
+            const string defaultUrlPattern = "{categories[0].slug}/{slug}-{cid}";
+            var testData = new Dictionary<string, object>
+            {
+                { "_id", "665c604238278d825ebcd90c" },
+                { "contentType", "TextNews" },
+                { "title", "Content Test" },
+                { "slug", "content-test" },
+                { "tags", new [] { "tag-1", "tag-2" } },
+                { "categories", new []
+                {
+                    new Dictionary<string, object> {
+                        { "title", "Beşiktaş" },
+                        { "slug", "besiktas" }
+                    }
+                }},
+                { "cid", "10015" }
+            };
+            
+            var formatter = new Formatter(new ParserOptions
+            {
+                OpenBrackets = "{",
+                CloseBrackets = "}"
+            });
+            
+            var formatted = formatter.Format(defaultUrlPattern, testData);
+            
+            Assert.That("besiktas/content-test-10015" == formatted);
         }
 
         #endregion

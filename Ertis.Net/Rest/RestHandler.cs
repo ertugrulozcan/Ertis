@@ -54,6 +54,25 @@ public class RestHandler : IRestHandler
 	};
 
 	#endregion
+
+	#region Services
+
+	private readonly IHttpClientFactory _httpClientFactory;
+
+	#endregion
+	
+	#region Constructors
+	
+	/// <summary>
+	/// Constructor
+	/// </summary>
+	/// <param name="httpClientFactory"></param>
+	public RestHandler(IHttpClientFactory httpClientFactory)
+	{
+		this._httpClientFactory = httpClientFactory;
+	}
+
+	#endregion
 	
 	#region Methods
 
@@ -75,56 +94,53 @@ public class RestHandler : IRestHandler
 		JsonConverter[]? converters = null, 
 		CancellationToken cancellationToken = default)
 	{
-		// ReSharper disable once ConvertToUsingDeclaration
-		using (var httpClient = new HttpClient())
+		using var httpClient = this._httpClientFactory.CreateClient();
+		var request = new HttpRequestMessage(method, url);
+		if (headers != null)
 		{
-			var request = new HttpRequestMessage(method, url);
-			if (headers != null)
+			foreach (var (key, value) in headers.ToDictionary())
 			{
-				foreach (var (key, value) in headers.ToDictionary())
+				if (DefaultHeaders.Contains(key))
 				{
-					if (DefaultHeaders.Contains(key))
-					{
-						httpClient.DefaultRequestHeaders.Add(key, value.ToString());
-					}
-					else if (ContentHeaders.Contains(key))
-					{
-						request.Content?.Headers.Add(key, value.ToString());
-					}
-					else
-					{
-						request.Headers.Add(key, value.ToString());	
-					}
+					httpClient.DefaultRequestHeaders.Add(key, value.ToString());
+				}
+				else if (ContentHeaders.Contains(key))
+				{
+					request.Content?.Headers.Add(key, value.ToString());
+				}
+				else
+				{
+					request.Headers.Add(key, value.ToString());
 				}
 			}
+		}
 
-			var httpContent = body?.GetHttpContent();
-			if (httpContent != null)
-			{
-				request.Content = httpContent;
-			}
+		var httpContent = body?.GetHttpContent();
+		if (httpContent != null)
+		{
+			request.Content = httpContent;
+		}
 
-			var response = await httpClient.SendAsync(request, cancellationToken: cancellationToken);
-			var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken: cancellationToken);
-			var json = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
+		var response = await httpClient.SendAsync(request, cancellationToken: cancellationToken);
+		var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken: cancellationToken);
+		var json = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
 				
-			if (response.IsSuccessStatusCode)
+		if (response.IsSuccessStatusCode)
+		{
+			return new ResponseResult<TResult>(response.StatusCode)
 			{
-				return new ResponseResult<TResult>(response.StatusCode)
-				{
-					Json = json,
-					RawData = rawData,
-					Data = JsonConvert.DeserializeObject<TResult>(json, converters ?? Array.Empty<JsonConverter>())!,
-				};
-			}
-			else
+				Json = json,
+				RawData = rawData,
+				Data = JsonConvert.DeserializeObject<TResult>(json, converters ?? Array.Empty<JsonConverter>())!,
+			};
+		}
+		else
+		{
+			return new ResponseResult<TResult>(response.StatusCode, json)
 			{
-				return new ResponseResult<TResult>(response.StatusCode, json)
-				{
-					Json = json,
-					RawData = rawData
-				};
-			}
+				Json = json,
+				RawData = rawData
+			};
 		}
 	}
 
@@ -183,55 +199,52 @@ public class RestHandler : IRestHandler
 		IRequestBody? body = null,
 		CancellationToken cancellationToken = default)
 	{
-		// ReSharper disable once ConvertToUsingDeclaration
-		using (var httpClient = new HttpClient())
+		using var httpClient = this._httpClientFactory.CreateClient();
+		var request = new HttpRequestMessage(method, url);
+		var httpContent = body?.GetHttpContent();
+		if (httpContent != null)
 		{
-			var request = new HttpRequestMessage(method, url);
-			var httpContent = body?.GetHttpContent();
-			if (httpContent != null)
-			{
-				request.Content = httpContent;
-			}
+			request.Content = httpContent;
+		}
 
-			if (headers != null)
+		if (headers != null)
+		{
+			foreach (var (key, value) in headers.ToDictionary())
 			{
-				foreach (var (key, value) in headers.ToDictionary())
+				if (DefaultHeaders.Contains(key))
 				{
-					if (DefaultHeaders.Contains(key))
-					{
-						httpClient.DefaultRequestHeaders.Add(key, value.ToString());
-					}
-					else if (ContentHeaders.Contains(key))
-					{
-						request.Content?.Headers.Add(key, value.ToString());
-					}
-					else
-					{
-						request.Headers.Add(key, value.ToString());	
-					}
+					httpClient.DefaultRequestHeaders.Add(key, value.ToString());
+				}
+				else if (ContentHeaders.Contains(key))
+				{
+					request.Content?.Headers.Add(key, value.ToString());
+				}
+				else
+				{
+					request.Headers.Add(key, value.ToString());	
 				}
 			}
+		}
 			
-			var response = await httpClient.SendAsync(request, cancellationToken: cancellationToken);
-			var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken: cancellationToken);
-			var json = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
+		var response = await httpClient.SendAsync(request, cancellationToken: cancellationToken);
+		var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken: cancellationToken);
+		var json = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
 				
-			if (response.IsSuccessStatusCode)
+		if (response.IsSuccessStatusCode)
+		{
+			return new ResponseResult(response.StatusCode)
 			{
-				return new ResponseResult(response.StatusCode)
-				{
-					Json = json,
-					RawData = rawData
-				};
-			}
-			else
+				Json = json,
+				RawData = rawData
+			};
+		}
+		else
+		{
+			return new ResponseResult(response.StatusCode, json)
 			{
-				return new ResponseResult(response.StatusCode, json)
-				{
-					Json = json,
-					RawData = rawData
-				};
-			}
+				Json = json,
+				RawData = rawData
+			};
 		}
 	}
 

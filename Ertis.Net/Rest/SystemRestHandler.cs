@@ -1,13 +1,11 @@
 using Ertis.Core.Models.Response;
 using Ertis.Net.Http;
-using Newtonsoft.Json;
 
 namespace Ertis.Net.Rest;
 
-[Obsolete("This class uses Newtonsoft library for json serialization and is no longer supported. Please use SystemRestHandler.")]
-public class RestHandler : IRestHandler
+public class SystemRestHandler : ISystemRestHandler
 {
-	#region Constants
+    #region Constants
 
 	private static readonly string[] DefaultHeaders = 
 	{
@@ -68,7 +66,7 @@ public class RestHandler : IRestHandler
 	/// Constructor
 	/// </summary>
 	/// <param name="httpClientFactory"></param>
-	public RestHandler(IHttpClientFactory httpClientFactory)
+	public SystemRestHandler(IHttpClientFactory httpClientFactory)
 	{
 		this._httpClientFactory = httpClientFactory;
 	}
@@ -81,10 +79,9 @@ public class RestHandler : IRestHandler
 		HttpMethod method, 
 		string url, 
 		IHeaderCollection? headers = null,
-		IRequestBody? body = null, 
-		JsonConverter[]? converters = null)
+		IRequestBody? body = null)
 	{
-		return this.ExecuteRequestAsync<TResult>(method, url, headers, body, converters).ConfigureAwait(false).GetAwaiter().GetResult();
+		return this.ExecuteRequestAsync<TResult>(method, url, headers, body).ConfigureAwait(false).GetAwaiter().GetResult();
 	}
 
 	public async Task<IResponseResult<TResult>> ExecuteRequestAsync<TResult>(
@@ -92,7 +89,6 @@ public class RestHandler : IRestHandler
 		string url, 
 		IHeaderCollection? headers = null,
 		IRequestBody? body = null,
-		JsonConverter[]? converters = null, 
 		CancellationToken cancellationToken = default)
 	{
 		using var httpClient = this._httpClientFactory.CreateClient();
@@ -132,7 +128,7 @@ public class RestHandler : IRestHandler
 			{
 				Json = json,
 				RawData = rawData,
-				Data = JsonConvert.DeserializeObject<TResult>(json, converters ?? Array.Empty<JsonConverter>())!,
+				Data = System.Text.Json.JsonSerializer.Deserialize<TResult>(json)!,
 			};
 		}
 		else
@@ -150,17 +146,16 @@ public class RestHandler : IRestHandler
 		string baseUrl, 
 		IQueryString? queryString = null,
 		IHeaderCollection? headers = null, 
-		IRequestBody? body = null, 
-		JsonConverter[]? converters = null)
+		IRequestBody? body = null)
 	{
 		if (queryString != null && queryString.Any())
 		{
 			var url = $"{baseUrl}?{queryString}";
-			return this.ExecuteRequest<TResult>(method, url, headers, body, converters);
+			return this.ExecuteRequest<TResult>(method, url, headers, body);
 		}
 		else
 		{
-			return this.ExecuteRequest<TResult>(method, baseUrl, headers, body, converters);
+			return this.ExecuteRequest<TResult>(method, baseUrl, headers, body);
 		}
 	}
 
@@ -170,17 +165,16 @@ public class RestHandler : IRestHandler
 		IQueryString? queryString = null,
 		IHeaderCollection? headers = null, 
 		IRequestBody? body = null, 
-		JsonConverter[]? converters = null,
 		CancellationToken cancellationToken = default)
 	{
 		if (queryString != null && queryString.Any())
 		{
 			var url = $"{baseUrl}?{queryString}";
-			return await this.ExecuteRequestAsync<TResult>(method, url, headers, body, converters, cancellationToken: cancellationToken);
+			return await this.ExecuteRequestAsync<TResult>(method, url, headers, body, cancellationToken: cancellationToken);
 		}
 		else
 		{
-			return await this.ExecuteRequestAsync<TResult>(method, baseUrl, headers, body, converters, cancellationToken: cancellationToken);
+			return await this.ExecuteRequestAsync<TResult>(method, baseUrl, headers, body, cancellationToken: cancellationToken);
 		}
 	}
 

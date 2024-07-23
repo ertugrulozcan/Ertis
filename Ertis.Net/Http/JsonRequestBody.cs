@@ -11,7 +11,13 @@ namespace Ertis.Net.Http
 		public BodyTypes Type => BodyTypes.Json;
 
 		// ReSharper disable once MemberCanBePrivate.Global
-		public string? Json => this.Payload == null ? null : Newtonsoft.Json.JsonConvert.SerializeObject(this.Payload);
+		public string? Json => 
+			this.Payload switch
+			{
+				null => null,
+				string => this.Payload.ToString(),
+				_ => Newtonsoft.Json.JsonConvert.SerializeObject(this.Payload)
+			};
 
 		#endregion
 

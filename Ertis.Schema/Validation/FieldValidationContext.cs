@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Ertis.Schema.Dynamics;
+using Ertis.Schema.Dynamics.Legacy;
 using Ertis.Schema.Exceptions;
 
 namespace Ertis.Schema.Validation

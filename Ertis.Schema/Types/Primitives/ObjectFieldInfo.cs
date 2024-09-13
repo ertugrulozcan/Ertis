@@ -10,7 +10,7 @@ using Ertis.Schema.Serialization;
 using Ertis.Schema.Validation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using DynamicObject = Ertis.Schema.Dynamics.DynamicObject;
+using DynamicObject = Ertis.Schema.Dynamics.Legacy.DynamicObject;
 
 namespace Ertis.Schema.Types.Primitives
 {

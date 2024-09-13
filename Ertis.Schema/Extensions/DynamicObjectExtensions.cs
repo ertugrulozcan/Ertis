@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Ertis.Schema.Dynamics;
+using Ertis.Schema.Dynamics.Legacy;
 
 namespace Ertis.Schema.Extensions
 {

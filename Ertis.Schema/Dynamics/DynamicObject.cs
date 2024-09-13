@@ -3,604 +3,589 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Linq;
+using System.Text.Json;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
-using Newtonsoft.Json.Linq;
 
-namespace Ertis.Schema.Dynamics
+namespace Ertis.Schema.Dynamics;
+
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+public class DynamicObject : ICloneable, IDisposable
 {
-    [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    public class DynamicObject : ICloneable, IDisposable
+    #region Properties
+
+    private IDictionary<string, object> PropertyDictionary { get; set; }
+
+    #endregion
+
+    #region Indexer Overloading
+
+    public object this[string path]
     {
-        #region Properties
+        get => this.GetValue(path);
+        set => this.SetValue(path, value);
+    }
 
-        private IDictionary<string, object> PropertyDictionary { get; set; }
+    #endregion
 
-        #endregion
+    #region Constructors
 
-        #region Indexer Overloading
-
-        public object this[string path]
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    private DynamicObject()
+    {
+        this.PropertyDictionary = new Dictionary<string, object>();
+    }
+    
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    public DynamicObject(object obj)
+    {
+        if (obj is DynamicObject dynamicObject)
         {
-            get => this.GetValue(path);
-            set => this.SetValue(path, value);
+            this.PropertyDictionary = dynamicObject.PropertyDictionary;
+        }
+        else
+        {
+            this.PropertyDictionary = obj.ToDictionary();   
+        }
+    }
+
+    #endregion
+
+    #region Methods
+    
+    public static DynamicObject Create(IDictionary<string, object> dictionary)
+    {
+        object model = dictionary.ToDynamic();
+        return new DynamicObject
+        {
+            PropertyDictionary = model.ToDictionary()
+        };
+    }
+
+    public static DynamicObject Parse(string json)
+    {
+        return new DynamicObject
+        {
+            PropertyDictionary = Newtonsoft.Json.Linq.JToken.Parse(json).ToDictionary()
+        };
+    }
+    
+    public static T Cast<T>(dynamic obj) where T : class
+    {
+        if (obj == null)
+        {
+            return null;
         }
 
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        private DynamicObject()
+        var dynamicObject = new DynamicObject(obj);
+        return dynamicObject.Deserialize<T>();
+    }
+    
+    // ReSharper disable once MemberCanBePrivate.Global
+    public static object Cast(dynamic obj, Type type)
+    {
+        if (obj == null)
         {
-            this.PropertyDictionary = new Dictionary<string, object>();
+            return null;
         }
-        
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public DynamicObject(object obj)
+
+        var dynamicObject = new DynamicObject(obj);
+        return dynamicObject.Deserialize(type);
+    }
+
+    public IDictionary<string, object> ToDictionary()
+    {
+        return this.PropertyDictionary;
+    }
+    
+    public string ToJson()
+    {
+        var dynamicObject = ToDynamic();
+        return JsonSerializer.Serialize(dynamicObject);
+    }
+    
+    public string Serialize()
+    {
+        return this.ToJson();
+    }
+    
+    public T Deserialize<T>()
+    {
+        return JsonSerializer.Deserialize<T>(this.ToJson());
+    }
+    
+    public object Deserialize(Type type)
+    {
+        return JsonSerializer.Deserialize(this.ToJson(), type);
+    }
+    
+    public dynamic ToDynamic()
+    {
+        IDictionary<string, object> expandoDictionary = new ExpandoObject();
+        foreach (var pair in this.PropertyDictionary)
         {
-            if (obj is DynamicObject dynamicObject)
+            if (pair.Value is IDictionary<string, object> childDictionary)
             {
-                this.PropertyDictionary = dynamicObject.PropertyDictionary;
+                expandoDictionary.Add(new KeyValuePair<string, object>(pair.Key, childDictionary.ToDynamic()));
             }
             else
             {
-                this.PropertyDictionary = obj.ToDictionary();   
+                expandoDictionary.Add(pair);   
             }
         }
 
-        #endregion
-
-        #region Methods
-        
-        public static DynamicObject Create(IDictionary<string, object> dictionary)
-        {
-            object model = dictionary.ToDynamic();
-            return new DynamicObject
-            {
-                PropertyDictionary = model.ToDictionary()
-            };
-        }
-
-        public static DynamicObject Parse(string json)
-        {
-            return new DynamicObject
-            {
-                PropertyDictionary = JToken.Parse(json).ToDictionary()
-            };
-        }
-        
-        public static DynamicObject Load(JToken jToken)
-        {
-            return new DynamicObject
-            {
-                PropertyDictionary = jToken.ToDictionary()
-            };
-        }
-        
-        public static T Cast<T>(dynamic obj) where T : class
-        {
-            if (obj == null)
-            {
-                return null;
-            }
-
-            var dynamicObject = new DynamicObject(obj);
-            return dynamicObject.Deserialize<T>();
-        }
-        
-        // ReSharper disable once MemberCanBePrivate.Global
-        public static object Cast(dynamic obj, Type type)
-        {
-            if (obj == null)
-            {
-                return null;
-            }
-
-            var dynamicObject = new DynamicObject(obj);
-            return dynamicObject.Deserialize(type);
-        }
-
-        public IDictionary<string, object> ToDictionary()
-        {
-            return this.PropertyDictionary;
-        }
-        
-        public string ToJson()
-        {
-            var dynamicObject = ToDynamic();
-            return Newtonsoft.Json.JsonConvert.SerializeObject(dynamicObject);
-        }
-        
-        // ReSharper disable once MemberCanBePrivate.Global
-        public string Serialize()
-        {
-            return this.ToJson();
-        }
-        
-        // ReSharper disable once MemberCanBePrivate.Global
-        public T Deserialize<T>()
-        {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(this.ToJson());
-        }
-        
-        // ReSharper disable once MemberCanBePrivate.Global
-        public object Deserialize(Type type)
-        {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject(this.ToJson(), type);
-        }
-        
-        public dynamic ToDynamic()
-        {
-            IDictionary<string, object> expandoDictionary = new ExpandoObject();
-            foreach (var pair in this.PropertyDictionary)
-            {
-                if (pair.Value is IDictionary<string, object> childDictionary)
-                {
-                    expandoDictionary.Add(new KeyValuePair<string, object>(pair.Key, childDictionary.ToDynamic()));
-                }
-                else
-                {
-                    expandoDictionary.Add(pair);   
-                }
-            }
-
-            dynamic dynamicObject = (ExpandoObject) expandoDictionary;
-            return dynamicObject;
-        }
-
-        // ReSharper disable once MemberCanBePrivate.Global
-        public object GetValue(string path)
+        dynamic dynamicObject = (ExpandoObject) expandoDictionary;
+        return dynamicObject;
+    }
+    
+    public object GetValue(string path)
+    {
+        return GetValueCore(path, this.PropertyDictionary);
+    }
+    
+    public object GetValue(string path, object defaultValue)
+    {
+        try
         {
             return GetValueCore(path, this.PropertyDictionary);
         }
-        
-        public object GetValue(string path, object defaultValue)
+        catch (UndefinedFieldException)
         {
-            try
-            {
-                return GetValueCore(path, this.PropertyDictionary);
-            }
-            catch (UndefinedFieldException)
-            {
-                return defaultValue;
-            }
+            return defaultValue;
         }
-        
-        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-        public T GetValue<T>(string path)
+    }
+    
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    public T GetValue<T>(string path)
+    {
+        var value = GetValueCore(path, this.PropertyDictionary);
+        if (value is IDictionary<string, object> dictionary)
         {
-            var value = GetValueCore(path, this.PropertyDictionary);
-            if (value is IDictionary<string, object> dictionary)
+            return Create(dictionary).Deserialize<T>();
+        }
+        else if (typeof(T).IsArray && value.GetType().IsArray && value is object[] array)
+        {
+            var itemType = typeof(T).GetElementType();
+            if (itemType != null)
             {
-                return Create(dictionary).Deserialize<T>();
-            }
-            else if (typeof(T).IsArray && value.GetType().IsArray && value is object[] array)
-            {
-                var itemType = typeof(T).GetElementType();
-                if (itemType != null)
+                if (itemType.IsPrimitive)
                 {
-                    if (itemType.IsPrimitive)
-                    {
-                        return (T) (array.ToArray() as object);
-                    }
-                    else if (itemType == typeof(string))
-                    {
-                        return (T) (array.Select(x => x.ToString()).ToArray() as object);
-                    }
-                    
-                    return (T) (array.Select(x => Cast(x, itemType)).ToArray() as object);
+                    return (T) (array.ToArray() as object);
                 }
-                else
+                else if (itemType == typeof(string))
                 {
-                    return default;
+                    return (T) (array.Select(x => x.ToString()).ToArray() as object);
                 }
-            }
-            else if (typeof(T).IsEnum && Enum.TryParse(typeof(T), value.ToString(), false, out var enumValue))
-            {
-                return (T) enumValue;
+                
+                return (T) (array.Select(x => Cast(x, itemType)).ToArray() as object);
             }
             else
             {
-                try
-                {
-                    return (T) Convert.ChangeType(value, typeof(T));
-                }
-                catch
-                {
-                    return (T) value;
-                }
+                return default;
             }
         }
-        
-        // ReSharper disable once MethodOverloadWithOptionalParameter
-        public T GetValue<T>(string path, T defaultValue = default)
+        else if (typeof(T).IsEnum && Enum.TryParse(typeof(T), value.ToString(), false, out var enumValue))
+        {
+            return (T) enumValue;
+        }
+        else
         {
             try
             {
-                return this.GetValue<T>(path);
-            }
-            catch (UndefinedFieldException)
-            {
-                return defaultValue;
-            }
-        }
-        
-        public bool TryGetValue(string path, out object value)
-        {
-            try
-            {
-                value = this.GetValue(path);
-                return true;
+                return (T) Convert.ChangeType(value, typeof(T));
             }
             catch
             {
-                value = default;
-                return false;
+                return (T) value;
             }
         }
-        
-        public bool TryGetValue(string path, out object value, out Exception exception)
+    }
+    
+    public T GetValue<T>(string path, T defaultValue)
+    {
+        try
         {
-            try
-            {
-                value = this.GetValue(path);
-                exception = null;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                value = default;
-                exception = ex;
-                return false;
-            }
+            return this.GetValue<T>(path);
         }
-        
-        public bool TryGetValue<T>(string path, out T value)
+        catch (UndefinedFieldException)
         {
-            try
-            {
-                value = this.GetValue<T>(path);
-                return true;
-            }
-            catch
-            {
-                value = default;
-                return false;
-            }
+            return defaultValue;
         }
-        
-        public bool TryGetValue<T>(string path, out T value, out Exception exception)
+    }
+    
+    public bool TryGetValue(string path, out object value)
+    {
+        try
         {
-            try
-            {
-                value = this.GetValue<T>(path);
-                exception = null;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                value = default;
-                exception = ex;
-                return false;
-            }
+            value = this.GetValue(path);
+            return true;
         }
+        catch
+        {
+            value = default;
+            return false;
+        }
+    }
+    
+    public bool TryGetValue(string path, out object value, out Exception exception)
+    {
+        try
+        {
+            value = this.GetValue(path);
+            exception = null;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            value = default;
+            exception = ex;
+            return false;
+        }
+    }
+    
+    public bool TryGetValue<T>(string path, out T value)
+    {
+        try
+        {
+            value = this.GetValue<T>(path);
+            return true;
+        }
+        catch
+        {
+            value = default;
+            return false;
+        }
+    }
+    
+    public bool TryGetValue<T>(string path, out T value, out Exception exception)
+    {
+        try
+        {
+            value = this.GetValue<T>(path);
+            exception = null;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            value = default;
+            exception = ex;
+            return false;
+        }
+    }
 
-        private static object GetValueCore(string path, IDictionary<string, object> dictionary)
+    private static object GetValueCore(string path, IDictionary<string, object> dictionary)
+    {
+        if (string.IsNullOrEmpty(path))
         {
-            if (string.IsNullOrEmpty(path))
+            throw new ArgumentException("Path can not be null or empty!");
+        }
+        
+        var segments = path.Split('.');
+        var key = segments[0];
+        if (dictionary.TryGetValue(key, out var value))
+        {
+            if (segments.Length > 1)
             {
-                throw new ArgumentException("Path can not be null or empty!");
-            }
-            
-            var segments = path.Split('.');
-            var key = segments[0];
-            if (dictionary.TryGetValue(key, out var value))
-            {
-                if (segments.Length > 1)
+                if (value is IDictionary<string, object> subDictionary)
                 {
-                    if (value is IDictionary<string, object> subDictionary)
-                    {
-                        var subPath = string.Join(".", segments.Skip(1));
-                        return GetValueCore(subPath, subDictionary);
-                    }
-                    else
-                    {
-                        throw new UndefinedFieldException(path);
-                    }
+                    var subPath = string.Join(".", segments.Skip(1));
+                    return GetValueCore(subPath, subDictionary);
                 }
                 else
                 {
-                    return value;
-                }   
-            }
-            else if (TryGetValueFromArray(key, dictionary, out var foundValue))
-            {
-                if (segments.Length > 1)
-                {
-                    if (foundValue is IDictionary<string, object> subDictionary)
-                    {
-                        var subPath = string.Join(".", segments.Skip(1));
-                        return GetValueCore(subPath, subDictionary);
-                    }
-                    else
-                    {
-                        throw new UndefinedFieldException(path);
-                    }
-                }
-                else
-                {
-                    return foundValue;
+                    throw new UndefinedFieldException(path);
                 }
             }
             else
             {
-                throw new UndefinedFieldException(path);
+                return value;
+            }   
+        }
+        else if (TryGetValueFromArray(key, dictionary, out var foundValue))
+        {
+            if (segments.Length > 1)
+            {
+                if (foundValue is IDictionary<string, object> subDictionary)
+                {
+                    var subPath = string.Join(".", segments.Skip(1));
+                    return GetValueCore(subPath, subDictionary);
+                }
+                else
+                {
+                    throw new UndefinedFieldException(path);
+                }
+            }
+            else
+            {
+                return foundValue;
             }
         }
-
-        private static bool TryGetValueFromArray(string key, IDictionary<string, object> dictionary, out object foundValue)
+        else
         {
-            if (key.Contains('[') && key.EndsWith(']'))
-            {
-                var indexerStartIndex = key.IndexOf('[');
-                var indexerCloseIndex = key.IndexOf(']');
+            throw new UndefinedFieldException(path);
+        }
+    }
 
-                var originalKey = key.Substring(0, indexerStartIndex);
-                if (dictionary.TryGetValue(originalKey, out var value))
+    private static bool TryGetValueFromArray(string key, IDictionary<string, object> dictionary, out object foundValue)
+    {
+        if (key.Contains('[') && key.EndsWith(']'))
+        {
+            var indexerStartIndex = key.IndexOf('[');
+            var indexerCloseIndex = key.IndexOf(']');
+
+            var originalKey = key.Substring(0, indexerStartIndex);
+            if (dictionary.TryGetValue(originalKey, out var value))
+            {
+                if (value is Array array)
                 {
-                    if (value is Array array)
+                    var indexStr = key.Substring(indexerStartIndex + 1, indexerCloseIndex - indexerStartIndex - 1);
+                    if (int.TryParse(indexStr, out var index))
                     {
-                        var indexStr = key.Substring(indexerStartIndex + 1, indexerCloseIndex - indexerStartIndex - 1);
-                        if (int.TryParse(indexStr, out var index))
+                        if (index < array.Length)
                         {
-                            if (index < array.Length)
+                            foundValue = array.GetValue(index);
+                            return true;
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException($"Out of range (length: {array.Length}, index: {index})");
+                        }
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"Array index is not valid integer ('{indexStr}')");
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Indexed node is not an array");
+                }
+            }
+            else
+            {
+                throw new UndefinedFieldException(key);
+            }
+        }
+
+        foundValue = null;
+        return false;
+    }
+    
+    public void SetValue(string path, object value, bool createIfNotExist = false)
+    {
+        SetValueCore(path, value, this.PropertyDictionary, createIfNotExist);
+    }
+    
+    public bool TrySetValue(string path, object value, out Exception exception, bool createIfNotExist = false)
+    {
+        try
+        {
+            SetValue(path, value, createIfNotExist);
+            exception = null;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            exception = ex;
+            return false;
+        }
+    }
+    
+    private static void SetValueCore(string path, object obj, IDictionary<string, object> dictionary, bool createIfNotExist)
+    {
+        if (string.IsNullOrEmpty(path))
+        {
+            throw new ArgumentException("Path can not be null or empty!");
+        }
+        
+        var segments = path.Split('.');
+        var key = segments[0];
+        if (dictionary.ContainsKey(key))
+        {
+            var value = dictionary[key];
+            if (segments.Length > 1)
+            {
+                if (value is IDictionary<string, object> subDictionary)
+                {
+                    var subPath = string.Join(".", segments.Skip(1));
+                    SetValueCore(subPath, obj, subDictionary, createIfNotExist);
+                }
+                else
+                {
+                    throw new UndefinedFieldException(path);
+                }
+            }
+            else
+            {
+                dictionary[key] = obj;
+            }
+        }
+        else if (TrySetValueOnArray(path, dictionary, obj))
+        {
+            // NOP
+        }
+        else if (createIfNotExist)
+        {
+            if (segments.Length > 1)
+            {
+                var subPath = string.Join(".", segments.Skip(1));
+                SetValueCore(subPath, obj, new Dictionary<string, object>(), true);
+            }
+            else
+            {
+                dictionary.Add(key, obj);
+            }
+        }
+        else
+        {
+            throw new UndefinedFieldException(path);
+        }
+    }
+
+    private static bool TrySetValueOnArray(string key, IDictionary<string, object> dictionary, object setValue)
+    {
+        var indexerStartIndex = key.IndexOf('[');
+        var indexerCloseIndex = key.IndexOf(']');
+        
+        if (indexerStartIndex > 0 && indexerCloseIndex > 0 && indexerStartIndex < indexerCloseIndex)
+        {
+            var originalKey = key.Substring(0, indexerStartIndex);
+            if (dictionary.TryGetValue(originalKey, out var value))
+            {
+                if (value is Array array)
+                {
+                    var indexStr = key.Substring(indexerStartIndex + 1, indexerCloseIndex - indexerStartIndex - 1);
+                    if (int.TryParse(indexStr, out var index))
+                    {
+                        if (index < array.Length)
+                        {
+                            var indexerPath = $"{originalKey}[{index}]";
+                            var arrayItem = array.GetValue(index);
+                            if (key.Length > indexerPath.Length && arrayItem is IDictionary<string, object> subDictionary)
                             {
-                                foundValue = array.GetValue(index);
+                                SetValueCore(key[indexerPath.Length..].TrimStart('.'), setValue, subDictionary, false);
                                 return true;
                             }
                             else
                             {
-                                throw new InvalidOperationException($"Out of range (length: {array.Length}, index: {index})");
+                                array.SetValue(setValue, index);
+                                return true;   
                             }
                         }
                         else
                         {
-                            throw new InvalidOperationException($"Array index is not valid integer ('{indexStr}')");
+                            throw new InvalidOperationException($"Out of range (length: {array.Length}, index: {index})");
                         }
                     }
                     else
                     {
-                        throw new InvalidOperationException($"Indexed node is not an array");
+                        throw new InvalidOperationException($"Array index is not valid integer ('{indexStr}')");
                     }
                 }
                 else
                 {
-                    throw new UndefinedFieldException(key);
-                }
-            }
-
-            foundValue = null;
-            return false;
-        }
-        
-        // ReSharper disable once MemberCanBePrivate.Global
-        public void SetValue(string path, object value, bool createIfNotExist = false)
-        {
-            SetValueCore(path, value, this.PropertyDictionary, createIfNotExist);
-        }
-        
-        public bool TrySetValue(string path, object value, out Exception exception, bool createIfNotExist = false)
-        {
-            try
-            {
-                SetValue(path, value, createIfNotExist);
-                exception = null;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                exception = ex;
-                return false;
-            }
-        }
-        
-        private static void SetValueCore(string path, object obj, IDictionary<string, object> dictionary, bool createIfNotExist)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                throw new ArgumentException("Path can not be null or empty!");
-            }
-            
-            var segments = path.Split('.');
-            var key = segments[0];
-            if (dictionary.ContainsKey(key))
-            {
-                var value = dictionary[key];
-                if (segments.Length > 1)
-                {
-                    if (value is IDictionary<string, object> subDictionary)
-                    {
-                        var subPath = string.Join(".", segments.Skip(1));
-                        SetValueCore(subPath, obj, subDictionary, createIfNotExist);
-                    }
-                    else
-                    {
-                        throw new UndefinedFieldException(path);
-                    }
-                }
-                else
-                {
-                    dictionary[key] = obj;
-                }
-            }
-            else if (TrySetValueOnArray(path, dictionary, obj))
-            {
-                // NOP
-            }
-            else if (createIfNotExist)
-            {
-                if (segments.Length > 1)
-                {
-                    var subPath = string.Join(".", segments.Skip(1));
-                    SetValueCore(subPath, obj, new Dictionary<string, object>(), true);
-                }
-                else
-                {
-                    dictionary.Add(key, obj);
+                    throw new InvalidOperationException($"Indexed node is not an array");
                 }
             }
             else
             {
-                throw new UndefinedFieldException(path);
+                throw new UndefinedFieldException(key);
             }
         }
 
-        private static bool TrySetValueOnArray(string key, IDictionary<string, object> dictionary, object setValue)
-        {
-            var indexerStartIndex = key.IndexOf('[');
-            var indexerCloseIndex = key.IndexOf(']');
-            
-            if (indexerStartIndex > 0 && indexerCloseIndex > 0 && indexerStartIndex < indexerCloseIndex)
-            {
-                var originalKey = key.Substring(0, indexerStartIndex);
-                if (dictionary.TryGetValue(originalKey, out var value))
-                {
-                    if (value is Array array)
-                    {
-                        var indexStr = key.Substring(indexerStartIndex + 1, indexerCloseIndex - indexerStartIndex - 1);
-                        if (int.TryParse(indexStr, out var index))
-                        {
-                            if (index < array.Length)
-                            {
-                                var indexerPath = $"{originalKey}[{index}]";
-                                var arrayItem = array.GetValue(index);
-                                if (key.Length > indexerPath.Length && arrayItem is IDictionary<string, object> subDictionary)
-                                {
-                                    SetValueCore(key[indexerPath.Length..].TrimStart('.'), setValue, subDictionary, false);
-                                    return true;
-                                }
-                                else
-                                {
-                                    array.SetValue(setValue, index);
-                                    return true;   
-                                }
-                            }
-                            else
-                            {
-                                throw new InvalidOperationException($"Out of range (length: {array.Length}, index: {index})");
-                            }
-                        }
-                        else
-                        {
-                            throw new InvalidOperationException($"Array index is not valid integer ('{indexStr}')");
-                        }
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"Indexed node is not an array");
-                    }
-                }
-                else
-                {
-                    throw new UndefinedFieldException(key);
-                }
-            }
-
-            return false;
-        }
-        
-        public void RemoveProperty(string path)
-        {
-            RemovePropertyCore(path, this.PropertyDictionary);
-        }
-        
-        private static void RemovePropertyCore(string path, IDictionary<string, object> dictionary)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                throw new ArgumentException("Path can not be null or empty!");
-            }
-            
-            var segments = path.Split('.');
-            var key = segments[0];
-            if (dictionary.ContainsKey(key))
-            {
-                var value = dictionary[key];
-                if (segments.Length > 1)
-                {
-                    if (value is IDictionary<string, object> subDictionary)
-                    {
-                        var subPath = string.Join(".", segments.Skip(1));
-                        RemovePropertyCore(subPath, subDictionary);
-                    }
-                }
-                else
-                {
-                    dictionary.Remove(key);
-                }
-            }
-        }
-        
-        public bool ContainsProperty(string path)
-        {
-            if (!this.TryGetValue(path, out _, out var exception))
-            {
-                if (exception is UndefinedFieldException)
-                {
-                    return false;
-                }
-                else
-                {
-                    throw exception;
-                }
-            }
-
-            return true;
-        }
-
-        #endregion
-
-        #region ICloneable
-
-        public object Clone()
-        {
-            return Parse(this.ToJson());
-        }
-
-        #endregion
-        
-        #region Disposing
-
-        private bool _disposedValue;
-        
-        ~DynamicObject() => this.Dispose(false);
-        
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!_disposedValue)
-            {
-                if (disposing)
-                {
-                    this.PropertyDictionary.Clear();
-                    this.PropertyDictionary = null;
-                }
-
-                // Free unmanaged resources (unmanaged objects) and override finalizer, set large fields to null
-                _disposedValue = true;
-            }
-        }
-	    
-        #endregion
+        return false;
     }
+    
+    public void RemoveProperty(string path)
+    {
+        RemovePropertyCore(path, this.PropertyDictionary);
+    }
+    
+    private static void RemovePropertyCore(string path, IDictionary<string, object> dictionary)
+    {
+        if (string.IsNullOrEmpty(path))
+        {
+            throw new ArgumentException("Path can not be null or empty!");
+        }
+        
+        var segments = path.Split('.');
+        var key = segments[0];
+        if (dictionary.ContainsKey(key))
+        {
+            var value = dictionary[key];
+            if (segments.Length > 1)
+            {
+                if (value is IDictionary<string, object> subDictionary)
+                {
+                    var subPath = string.Join(".", segments.Skip(1));
+                    RemovePropertyCore(subPath, subDictionary);
+                }
+            }
+            else
+            {
+                dictionary.Remove(key);
+            }
+        }
+    }
+    
+    public bool ContainsProperty(string path)
+    {
+        if (!this.TryGetValue(path, out _, out var exception))
+        {
+            if (exception is UndefinedFieldException)
+            {
+                return false;
+            }
+            else
+            {
+                throw exception;
+            }
+        }
+
+        return true;
+    }
+
+    #endregion
+
+    #region ICloneable
+
+    public object Clone()
+    {
+        return Parse(this.ToJson());
+    }
+
+    #endregion
+    
+    #region Disposing
+
+    private bool _disposedValue;
+    
+    ~DynamicObject() => this.Dispose(false);
+    
+    public void Dispose()
+    {
+        this.Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                this.PropertyDictionary.Clear();
+                this.PropertyDictionary = null;
+            }
+
+            // Free unmanaged resources (unmanaged objects) and override finalizer, set large fields to null
+            _disposedValue = true;
+        }
+    }
+	
+    #endregion
 }

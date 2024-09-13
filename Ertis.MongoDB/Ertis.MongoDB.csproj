@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <PackageId>Ertis.MongoDB</PackageId>
-        <PackageVersion>7.4.5</PackageVersion>
+        <PackageVersion>7.4.6</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.MongoDB</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -13,12 +13,12 @@
         <Title>Ertis.MongoDB</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>7.4.5</AssemblyVersion>
-        <FileVersion>7.4.5</FileVersion>
+        <AssemblyVersion>7.4.6</AssemblyVersion>
+        <FileVersion>7.4.6</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="MongoDB.Driver" Version="2.25.0" />
+      <PackageReference Include="MongoDB.Driver" Version="2.28.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
 

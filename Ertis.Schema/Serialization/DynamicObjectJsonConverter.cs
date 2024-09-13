@@ -1,5 +1,5 @@
 using System;
-using Ertis.Schema.Dynamics;
+using Ertis.Schema.Dynamics.Legacy;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 

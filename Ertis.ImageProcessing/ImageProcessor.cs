@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Processing;
 using ResizeModeEnum = SixLabors.ImageSharp.Processing.ResizeMode;
 
@@ -95,7 +97,7 @@ public static class ImageProcessor
 		}
 	}
 	
-	public static void Convert(Stream imageStream, Stream outputStream, ImageFormat destinationFormat)
+	public static void Convert(Stream imageStream, Stream outputStream, ImageFormat destinationFormat, int? quality = null)
 	{
 		try
 		{
@@ -109,7 +111,7 @@ public static class ImageProcessor
 					image.SaveAsGifAsync(outputStream);
 					break;
 				case ImageFormat.Jpeg:
-					image.SaveAsJpegAsync(outputStream);
+					image.SaveAsJpegAsync(outputStream, new JpegEncoder { Quality = quality });
 					break;
 				case ImageFormat.Pbm:
 					image.SaveAsPbmAsync(outputStream);
@@ -124,7 +126,7 @@ public static class ImageProcessor
 					image.SaveAsTiffAsync(outputStream);
 					break;
 				case ImageFormat.Webp:
-					image.SaveAsWebpAsync(outputStream);
+					image.SaveAsWebpAsync(outputStream, new WebpEncoder { FileFormat = WebpFileFormatType.Lossy, NearLossless = false, Quality = quality ?? 75 });
 					break;
 			}
 		}
@@ -134,7 +136,7 @@ public static class ImageProcessor
 		}
 	}
 	
-	public static async Task ConvertAsync(Stream imageStream, Stream outputStream, ImageFormat destinationFormat, CancellationToken cancellationToken = default)
+	public static async Task ConvertAsync(Stream imageStream, Stream outputStream, ImageFormat destinationFormat, int? quality = null, CancellationToken cancellationToken = default)
 	{
 		try
 		{
@@ -148,7 +150,7 @@ public static class ImageProcessor
 					await image.SaveAsGifAsync(outputStream, cancellationToken: cancellationToken);
 					break;
 				case ImageFormat.Jpeg:
-					await image.SaveAsJpegAsync(outputStream, cancellationToken: cancellationToken);
+					await image.SaveAsJpegAsync(outputStream, new JpegEncoder { Quality = quality }, cancellationToken: cancellationToken);
 					break;
 				case ImageFormat.Pbm:
 					await image.SaveAsPbmAsync(outputStream, cancellationToken: cancellationToken);
@@ -163,7 +165,7 @@ public static class ImageProcessor
 					await image.SaveAsTiffAsync(outputStream, cancellationToken: cancellationToken);
 					break;
 				case ImageFormat.Webp:
-					await image.SaveAsWebpAsync(outputStream, cancellationToken: cancellationToken);
+					await image.SaveAsWebpAsync(outputStream, new WebpEncoder { FileFormat = WebpFileFormatType.Lossy, NearLossless = false, Quality = quality ?? 75 }, cancellationToken: cancellationToken);
 					break;
 			}
 		}

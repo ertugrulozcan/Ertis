@@ -30,6 +30,12 @@ namespace Ertis.MongoDB.Queries
         {
             if (this.Operator != null)
             {
+                // Simplify $and operators
+                if (this.Operator == MongoOperator.And && this.All(x => x is IQueryExpression))
+                {
+                    return "{ " + string.Join(", ", this.Select(x => x.ToString()?.Trim().Trim('{').Trim('}').Trim())) + " }";
+                }
+                
                 var operatorTag = QueryHelper.GetOperatorTag(this.Operator.Value);
                 return "{ $" + operatorTag + ": [ " + string.Join(", ", this.Select(x => x.ToString())) + " ] }";
             }

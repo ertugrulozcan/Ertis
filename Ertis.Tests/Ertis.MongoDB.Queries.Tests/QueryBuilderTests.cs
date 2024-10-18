@@ -95,7 +95,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.Where(QueryBuilder.And(QueryBuilder.Equals("first_name", "Ertuğrul"), QueryBuilder.Equals("last_name", "Özcan")));
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ $and: [ { \"first_name\": \"Ertuğrul\" }, { \"last_name\": \"Özcan\" } ] }" .Trim() == queryJson?.Trim());
+            Assert.That("{ \"first_name\": \"Ertuğrul\", \"last_name\": \"Özcan\" }".Trim() == queryJson?.Trim()); // { $and: [ { "first_name": "Ertuğrul" }, { "last_name": "Özcan" } ] }
         }
         
         [Test]
@@ -110,7 +110,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.Where(QueryBuilder.And(queries));
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ $and: [ { \"first_name\": \"Ertuğrul\" }, { \"last_name\": \"Özcan\" } ] }" .Trim() == queryJson?.Trim());
+            Assert.That("{ \"first_name\": \"Ertuğrul\", \"last_name\": \"Özcan\" }".Trim() == queryJson?.Trim()); // { $and: [ { "first_name": "Ertuğrul" }, { "last_name": "Özcan" } ] }
         }
         
         [Test]
@@ -125,7 +125,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.Where(QueryBuilder.Or(queries));
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ $or: [ { \"first_name\": \"Ertuğrul\" }, { \"last_name\": \"Özcan\" } ] }" .Trim() == queryJson?.Trim());
+            Assert.That("{ $or: [ { \"first_name\": \"Ertuğrul\" }, { \"last_name\": \"Özcan\" } ] }".Trim() == queryJson?.Trim());
         }
         
         [Test]
@@ -143,7 +143,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.Where("event_time", queries);
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ \"event_time\": { $gte: \"" + startTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "\", $lte: \"" + endTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "\" } }" .Trim() == queryJson?.Trim());
+            Assert.That("{ \"event_time\": { $gte: \"" + startTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "\", $lte: \"" + endTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "\" } }".Trim() == queryJson?.Trim());
         }
         
         [Test]
@@ -164,7 +164,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.Where(eventTypeQuery, eventTimeQuery);
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ \"event_type\": \"TokenVerified\", \"event_time\": { $gte: \"" + startTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "\", $lte: \"" + endTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "\" } }" .Trim() == queryJson?.Trim());
+            Assert.That("{ \"event_type\": \"TokenVerified\", \"event_time\": { $gte: \"" + startTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "\", $lte: \"" + endTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "\" } }".Trim() == queryJson?.Trim());
         }
 
         #endregion
@@ -182,7 +182,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ \"select\": { \"first_name\": 0, \"last_name\": 1 } }" .Trim() == queryJson?.Trim());
+            Assert.That("{ \"select\": { \"first_name\": 0, \"last_name\": 1 } }".Trim() == queryJson?.Trim());
         }
 
         #endregion
@@ -201,7 +201,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var whereQuery = QueryBuilder.WhereOut(whereQueries);
             var whereQueryJson = whereQuery.ToString();
             Assert.That(whereQueryJson != null);
-            Assert.That("{ \"where\": { \"first_name\": \"Ertuğrul\", \"last_name\": \"Özcan\" } }" .Trim() == whereQueryJson?.Trim());
+            Assert.That("{ \"where\": { \"first_name\": \"Ertuğrul\", \"last_name\": \"Özcan\" } }".Trim() == whereQueryJson?.Trim());
             
             var selectQuery = QueryBuilder.Select(new Dictionary<string, bool>
             {
@@ -211,19 +211,19 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             
             var selectQueryJson = selectQuery.ToString();
             Assert.That(selectQueryJson != null);
-            Assert.That("{ \"select\": { \"first_name\": 0, \"last_name\": 1 } }" .Trim() == selectQueryJson?.Trim());
+            Assert.That("{ \"select\": { \"first_name\": 0, \"last_name\": 1 } }".Trim() == selectQueryJson?.Trim());
 
             var combinedQuery = QueryBuilder.Combine(whereQuery, selectQuery);
             var combinedQueryJson = combinedQuery.ToString();
             Assert.That(combinedQueryJson != null);
-            Assert.That("{ \"where\": { \"first_name\": \"Ertuğrul\", \"last_name\": \"Özcan\" }, \"select\": { \"first_name\": 0, \"last_name\": 1 } }" .Trim() == combinedQueryJson?.Trim());
+            Assert.That("{ \"where\": { \"first_name\": \"Ertuğrul\", \"last_name\": \"Özcan\" }, \"select\": { \"first_name\": 0, \"last_name\": 1 } }".Trim() == combinedQueryJson?.Trim());
         }
 
         [Test]
         public void NotNullTest()
         {
             var query = QueryBuilder.Combine(QueryBuilder.NotEquals<string>("tvSeriesId", null), QueryBuilder.Equals("sys.state", "published"));
-            Assert.That("{ \"tvSeriesId\": { $ne: null }, \"sys.state\": \"published\" }" .Trim() == query.ToString()?.Trim());
+            Assert.That("{ \"tvSeriesId\": { $ne: null }, \"sys.state\": \"published\" }".Trim() == query.ToString()?.Trim());
         }
 
         #endregion
@@ -236,7 +236,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.Equals("username", "ertugrul.ozcan");
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ \"username\": \"ertugrul.ozcan\" }" .Trim() == queryJson?.Trim());
+            Assert.That("{ \"username\": \"ertugrul.ozcan\" }".Trim() == queryJson?.Trim());
         }
         
         [Test]
@@ -246,7 +246,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.Equals("username", value);
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ \"username\": \"ertugrul.ozcan\" }" .Trim() == queryJson?.Trim());
+            Assert.That("{ \"username\": \"ertugrul.ozcan\" }".Trim() == queryJson?.Trim());
         }
         
         [Test]
@@ -255,7 +255,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.NotEquals("username", "ertugrul.ozcan");
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ \"username\": { $ne: \"ertugrul.ozcan\" } }" .Trim() == queryJson?.Trim());
+            Assert.That("{ \"username\": { $ne: \"ertugrul.ozcan\" } }".Trim() == queryJson?.Trim());
         }
 
         #endregion
@@ -268,7 +268,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.GreaterThan("age", 34);
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ \"age\": { $gt: 34 } }" .Trim() == queryJson?.Trim());
+            Assert.That("{ \"age\": { $gt: 34 } }".Trim() == queryJson?.Trim());
         }
         
         [Test]
@@ -277,7 +277,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.GreaterThanOrEqual("age", 34);
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ \"age\": { $gte: 34 } }" .Trim() == queryJson?.Trim());
+            Assert.That("{ \"age\": { $gte: 34 } }".Trim() == queryJson?.Trim());
         }
         
         [Test]
@@ -286,7 +286,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.LessThan("age", 34);
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ \"age\": { $lt: 34 } }" .Trim() == queryJson?.Trim());
+            Assert.That("{ \"age\": { $lt: 34 } }".Trim() == queryJson?.Trim());
         }
         
         [Test]
@@ -295,7 +295,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.LessThanOrEqual("age", 34);
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ \"age\": { $lte: 34 } }" .Trim() == queryJson?.Trim());
+            Assert.That("{ \"age\": { $lte: 34 } }".Trim() == queryJson?.Trim());
         }
 
         #endregion
@@ -308,7 +308,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.Contains("name", new [] { "ahmet", "ertugrul" });
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ \"name\": { $in: [ \"ahmet\", \"ertugrul\" ] } }" .Trim() == queryJson?.Trim());
+            Assert.That("{ \"name\": { $in: [ \"ahmet\", \"ertugrul\" ] } }".Trim() == queryJson?.Trim());
         }
         
         [Test]
@@ -317,7 +317,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.NotContains("age", new [] { 7, 13, 48 });
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ \"age\": { $nin: [ 7, 13, 48 ] } }" .Trim() == queryJson?.Trim());
+            Assert.That("{ \"age\": { $nin: [ 7, 13, 48 ] } }".Trim() == queryJson?.Trim());
         }
 
         #endregion
@@ -330,7 +330,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.And(QueryBuilder.GreaterThanOrEqual("age", 30), QueryBuilder.Equals("gender", "female"));
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ $and: [ { \"age\": { $gte: 30 } }, { \"gender\": \"female\" } ] }" .Trim() == queryJson?.Trim());
+            Assert.That("{ \"age\": { $gte: 30 }, \"gender\": \"female\" }".Trim() == queryJson?.Trim()); // { $and: [ { "age": { $gte: 30 } }, { "gender": "female" } ] }
         }
         
         [Test]
@@ -345,7 +345,25 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.And(expressions);
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ $and: [ { \"age\": { $gte: 30 } }, { \"gender\": \"female\" } ] }" .Trim() == queryJson?.Trim());
+            Assert.That("{ \"age\": { $gte: 30 }, \"gender\": \"female\" }".Trim() == queryJson?.Trim()); // { $and: [ { "age": { $gte: 30 } }, { "gender": "female" } ] }
+        }
+        
+        [Test]
+        public void AndTest3()
+        {
+            var query = QueryBuilder.And(QueryBuilder.NotEquals("_id", QueryBuilder.ObjectId("66c8c0a9a54a186fb2e0515b")), QueryBuilder.Equals("categories.slug", "futbol"));
+            var queryJson = query.ToString();
+            Assert.That(queryJson != null);
+            Assert.That("{ \"_id\": { $ne: ObjectId(\"66c8c0a9a54a186fb2e0515b\") }, \"categories.slug\": \"futbol\" }".Trim() == queryJson?.Trim()); // { $and: [ { "_id": { $ne: ObjectId("66c8c0a9a54a186fb2e0515b") } }, { "categories.slug": "futbol" } ] }
+        }
+        
+        [Test]
+        public void AndTest4()
+        {
+            var query = QueryBuilder.And(QueryBuilder.NotEquals("_id", QueryBuilder.ObjectId("66c8c0a9a54a186fb2e0515b")), QueryBuilder.Equals("categories.slug", "futbol"));
+            var queryJson = query.ToString();
+            Assert.That(queryJson != null);
+            Assert.That("{ \"_id\": { $ne: ObjectId(\"66c8c0a9a54a186fb2e0515b\") }, \"categories.slug\": \"futbol\" }".Trim() == queryJson?.Trim());
         }
         
         [Test]
@@ -354,7 +372,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.Or(QueryBuilder.GreaterThanOrEqual("age", 30), QueryBuilder.Equals("gender", "female"));
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ $or: [ { \"age\": { $gte: 30 } }, { \"gender\": \"female\" } ] }" .Trim() == queryJson?.Trim());
+            Assert.That("{ $or: [ { \"age\": { $gte: 30 } }, { \"gender\": \"female\" } ] }".Trim() == queryJson?.Trim());
         }
         
         [Test]
@@ -369,7 +387,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.Or(expressions);
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ $or: [ { \"age\": { $gte: 30 } }, { \"gender\": \"female\" } ] }" .Trim() == queryJson?.Trim());
+            Assert.That("{ $or: [ { \"age\": { $gte: 30 } }, { \"gender\": \"female\" } ] }".Trim() == queryJson?.Trim());
         }
         
         [Test]
@@ -378,7 +396,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var query = QueryBuilder.Nor(QueryBuilder.GreaterThanOrEqual("age", 30), QueryBuilder.Equals("gender", "female"));
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
-            Assert.That("{ $nor: [ { \"age\": { $gte: 30 } }, { \"gender\": \"female\" } ] }" .Trim() == queryJson?.Trim());
+            Assert.That("{ $nor: [ { \"age\": { $gte: 30 } }, { \"gender\": \"female\" } ] }".Trim() == queryJson?.Trim());
         }
         
         [Test]

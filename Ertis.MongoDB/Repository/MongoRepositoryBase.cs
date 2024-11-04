@@ -1468,6 +1468,64 @@ namespace Ertis.MongoDB.Repository
 				}
 			}
 		}
+		
+		public dynamic Aggregate(string matchStageJson, string groupStageJson, string sortStageJson)
+		{
+			try
+			{
+				var matchStage = string.IsNullOrEmpty(matchStageJson) ? null : new JsonPipelineStageDefinition<TEntity, BsonDocument>(QueryHelper.EnsureObjectIdsAndISODates(matchStageJson));
+				var groupStage = string.IsNullOrEmpty(groupStageJson) ? null : new JsonPipelineStageDefinition<TEntity, BsonDocument>(groupStageJson);
+				var sortStage = string.IsNullOrEmpty(sortStageJson) ? null : new JsonPipelineStageDefinition<TEntity, BsonDocument>(sortStageJson);
+				var stages = new[] { matchStage, groupStage, sortStage };
+				
+				var pipelineDefinition = PipelineDefinition<TEntity, BsonDocument>.Create(stages.Where(x => x != null));
+				var aggregationResultCursor = this.Collection.Aggregate(pipelineDefinition);
+				var documents = aggregationResultCursor.ToList();
+				var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
+				return objects;
+			}
+			catch (MongoCommandException ex)
+			{
+				switch (ex.Code)
+				{
+					case 31249:
+						throw new SelectQueryPathCollisionException(ex);
+					case 31254:
+						throw new SelectQueryInclusionException(ex);
+					default:
+						throw;
+				}
+			}
+		}
+		
+		public async ValueTask<dynamic> AggregateAsync(string matchStageJson, string groupStageJson, string sortStageJson, CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				var matchStage = string.IsNullOrEmpty(matchStageJson) ? null : new JsonPipelineStageDefinition<TEntity, BsonDocument>(QueryHelper.EnsureObjectIdsAndISODates(matchStageJson));
+				var groupStage = string.IsNullOrEmpty(groupStageJson) ? null : new JsonPipelineStageDefinition<TEntity, BsonDocument>(groupStageJson);
+				var sortStage = string.IsNullOrEmpty(sortStageJson) ? null : new JsonPipelineStageDefinition<TEntity, BsonDocument>(sortStageJson);
+				var stages = new[] { matchStage, groupStage, sortStage };
+				
+				var pipelineDefinition = PipelineDefinition<TEntity, BsonDocument>.Create(stages.Where(x => x != null));
+				var aggregationResultCursor = await this.Collection.AggregateAsync(pipelineDefinition, cancellationToken: cancellationToken);
+				var documents = await aggregationResultCursor.ToListAsync(cancellationToken: cancellationToken);
+				var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
+				return objects;
+			}
+			catch (MongoCommandException ex)
+			{
+				switch (ex.Code)
+				{
+					case 31249:
+						throw new SelectQueryPathCollisionException(ex);
+					case 31254:
+						throw new SelectQueryInclusionException(ex);
+					default:
+						throw;
+				}
+			}
+		}
 
 		#endregion
 

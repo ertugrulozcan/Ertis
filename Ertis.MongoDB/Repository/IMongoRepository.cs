@@ -326,10 +326,6 @@ namespace Ertis.MongoDB.Repository
 		dynamic Aggregate(string aggregationStagesJson);
 		
 		ValueTask<dynamic> AggregateAsync(string aggregationStagesJson, CancellationToken cancellationToken = default);
-
-		dynamic Aggregate(string matchStageJson, string groupStageJson, string sortStageJson);
-		
-		ValueTask<dynamic> AggregateAsync(string matchStageJson, string groupStageJson, string sortStageJson, CancellationToken cancellationToken = default);
 		
 		Task<IEnumerable<IIndexDefinition>> GetIndexesAsync(CancellationToken cancellationToken = default);
 

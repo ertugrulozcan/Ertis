@@ -1473,9 +1473,9 @@ namespace Ertis.MongoDB.Repository
 		{
 			try
 			{
-				var matchStage = string.IsNullOrEmpty(matchStageJson) ? null : new JsonPipelineStageDefinition<TEntity, BsonDocument>(QueryHelper.EnsureObjectIdsAndISODates(matchStageJson));
-				var groupStage = string.IsNullOrEmpty(groupStageJson) ? null : new JsonPipelineStageDefinition<TEntity, BsonDocument>(groupStageJson);
-				var sortStage = string.IsNullOrEmpty(sortStageJson) ? null : new JsonPipelineStageDefinition<TEntity, BsonDocument>(sortStageJson);
+				var matchStage = string.IsNullOrEmpty(matchStageJson) ? null : new JsonPipelineStageDefinition<BsonDocument, TEntity>(QueryHelper.EnsureObjectIdsAndISODates(matchStageJson));
+				var groupStage = string.IsNullOrEmpty(groupStageJson) ? null : new JsonPipelineStageDefinition<BsonDocument, TEntity>(groupStageJson);
+				var sortStage = string.IsNullOrEmpty(sortStageJson) ? null : new JsonPipelineStageDefinition<BsonDocument, TEntity>(sortStageJson);
 				var stages = new[] { matchStage, groupStage, sortStage };
 				
 				var pipelineDefinition = PipelineDefinition<TEntity, BsonDocument>.Create(stages.Where(x => x != null));
@@ -1502,9 +1502,9 @@ namespace Ertis.MongoDB.Repository
 		{
 			try
 			{
-				var matchStage = string.IsNullOrEmpty(matchStageJson) ? null : new JsonPipelineStageDefinition<TEntity, BsonDocument>(QueryHelper.EnsureObjectIdsAndISODates(matchStageJson));
-				var groupStage = string.IsNullOrEmpty(groupStageJson) ? null : new JsonPipelineStageDefinition<TEntity, BsonDocument>(groupStageJson);
-				var sortStage = string.IsNullOrEmpty(sortStageJson) ? null : new JsonPipelineStageDefinition<TEntity, BsonDocument>(sortStageJson);
+				var matchStage = string.IsNullOrEmpty(matchStageJson) ? null : new JsonPipelineStageDefinition<BsonDocument, TEntity>(QueryHelper.EnsureObjectIdsAndISODates(matchStageJson));
+				var groupStage = string.IsNullOrEmpty(groupStageJson) ? null : new JsonPipelineStageDefinition<BsonDocument, TEntity>(groupStageJson);
+				var sortStage = string.IsNullOrEmpty(sortStageJson) ? null : new JsonPipelineStageDefinition<BsonDocument, TEntity>(sortStageJson);
 				var stages = new[] { matchStage, groupStage, sortStage };
 				
 				var pipelineDefinition = PipelineDefinition<TEntity, BsonDocument>.Create(stages.Where(x => x != null));

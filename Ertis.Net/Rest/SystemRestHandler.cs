@@ -35,7 +35,7 @@ public class SystemRestHandler : ISystemRestHandler
 		"TE",
 		"Upgrade",
 		"Via",
-		"Warning",
+		"Warning"
 	};
 	
 	private static readonly string[] ContentHeaders = 
@@ -49,7 +49,7 @@ public class SystemRestHandler : ISystemRestHandler
 		"Content-Range",
 		"Content-Type",
 		"Expires",
-		"Last-Modified",
+		"Last-Modified"
 	};
 
 	#endregion
@@ -121,7 +121,10 @@ public class SystemRestHandler : ISystemRestHandler
 		var response = await httpClient.SendAsync(request, cancellationToken: cancellationToken);
 		var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken: cancellationToken);
 		var json = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
-				
+		var responseHeaders = response.Headers
+			.Where(x => x.Value.Any(y => !string.IsNullOrEmpty(y)))
+			.ToDictionary(x => x.Key, y => y.Value.FirstOrDefault());
+		
 		if (response.IsSuccessStatusCode)
 		{
 			return new ResponseResult<TResult>(response.StatusCode)
@@ -129,6 +132,7 @@ public class SystemRestHandler : ISystemRestHandler
 				Json = json,
 				RawData = rawData,
 				Data = System.Text.Json.JsonSerializer.Deserialize<TResult>(json)!,
+				Headers = responseHeaders
 			};
 		}
 		else
@@ -136,7 +140,8 @@ public class SystemRestHandler : ISystemRestHandler
 			return new ResponseResult<TResult>(response.StatusCode, json)
 			{
 				Json = json,
-				RawData = rawData
+				RawData = rawData,
+				Headers = responseHeaders
 			};
 		}
 	}
@@ -224,13 +229,17 @@ public class SystemRestHandler : ISystemRestHandler
 		var response = await httpClient.SendAsync(request, cancellationToken: cancellationToken);
 		var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken: cancellationToken);
 		var json = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
-				
+		var responseHeaders = response.Headers
+			.Where(x => x.Value.Any(y => !string.IsNullOrEmpty(y)))
+			.ToDictionary(x => x.Key, y => y.Value.FirstOrDefault());
+		
 		if (response.IsSuccessStatusCode)
 		{
 			return new ResponseResult(response.StatusCode)
 			{
 				Json = json,
-				RawData = rawData
+				RawData = rawData,
+				Headers = responseHeaders
 			};
 		}
 		else
@@ -238,7 +247,8 @@ public class SystemRestHandler : ISystemRestHandler
 			return new ResponseResult(response.StatusCode, json)
 			{
 				Json = json,
-				RawData = rawData
+				RawData = rawData,
+				Headers = responseHeaders
 			};
 		}
 	}

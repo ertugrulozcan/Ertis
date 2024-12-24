@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 
 namespace Ertis.Core.Models.Response
@@ -10,6 +11,8 @@ namespace Ertis.Core.Models.Response
 		bool IsSuccess { get; }
 		
 		HttpStatusCode? StatusCode { get; }
+		
+		IDictionary<string, string> Headers { get; }
 		
 		string Message { get; set; }
 		
@@ -72,6 +75,8 @@ namespace Ertis.Core.Models.Response
 		}
 		
 		public HttpStatusCode? StatusCode { get; private set; }
+		
+		public IDictionary<string, string> Headers { get; set; }
 		
 		public string Message { get; set; }
 		

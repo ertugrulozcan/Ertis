@@ -146,10 +146,10 @@ namespace Ertis.Schema.Types.CustomTypes
                 }
 
                 // Item validations
-                if (array.Any(string.IsNullOrEmpty))
+                if (array.Length > 0 && array.Any(string.IsNullOrEmpty))
                 {
                     isValid = false;
-                    validationContext.Errors.Add(new FieldValidationException("Tags items can not be empty", this)
+                    validationContext.Errors.Add(new FieldValidationException("Tags items can not be blank", this)
                     {
                         ThrowEvenOnCreate = true
                     });

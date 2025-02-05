@@ -1,4 +1,6 @@
+using System;
 using Ertis.MongoDB.Helpers;
+using Ertis.MongoDB.Queries;
 using NUnit.Framework;
 
 namespace Ertis.Tests.Ertis.MongoDB.Tests;
@@ -39,7 +41,7 @@ public class ISODateHelperTests
 	}
 
 	[Test]
-	public void Query_Ensure_Test()
+	public void Query_Ensure_Test_With_String_Query()
 	{
 		var query1 = "{ \"sys.published_at\": { \"$gt\": \"2022-12-09T21:00:00.528Z\" }, \"organization_id\": \"6356f3240e37638afd92c516\" }";
 		var query2 = QueryHelper.EnsureObjectIdsAndISODates(query1);
@@ -54,6 +56,30 @@ public class ISODateHelperTests
 				.Trim()
 			);
 	}
-
+	
+	[Test]
+	public void Query_Ensure_Test_With_String_Builder()
+	{
+		IQuery[] expressions = 
+		{
+			QueryBuilder.GreaterThan("sys.published_at", new DateTime(2022, 12, 09, 21, 00, 00)), 
+			QueryBuilder.Equals("organization_id", "6356f3240e37638afd92c516")
+		};
+                
+		var query = QueryBuilder.And(expressions);
+		var query2 = QueryHelper.EnsureObjectIdsAndISODates(query.ToString());
+		
+		Assert.That(
+			"{ \"sys.published_at\": { \"$gt\": ISODate(\"2022-12-09T21:00:00Z\") }, \"organization_id\": \"6356f3240e37638afd92c516\" }"
+				.Replace("\n", string.Empty)
+				.Replace(" ", string.Empty)
+				.Trim() == 
+			query2
+				.Replace("\n", string.Empty)
+				.Replace(" ", string.Empty)
+				.Trim()
+		);
+	}
+	
 	#endregion
 }

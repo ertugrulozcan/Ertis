@@ -75,6 +75,11 @@ public class SystemRestHandler : ISystemRestHandler
 	
 	#region Methods
 
+	public HttpClient GetHttpClient()
+	{
+		return this._httpClientFactory.CreateClient();
+	}
+
 	public IResponseResult<TResult> ExecuteRequest<TResult>(
 		HttpMethod method, 
 		string url, 

@@ -3,10 +3,11 @@ using Ertis.Net.Http;
 
 namespace Ertis.Net.Rest;
 
+// ReSharper disable once UnusedType.Global
 public class SystemRestHandler : ISystemRestHandler
 {
     #region Constants
-
+    
 	private static readonly string[] DefaultHeaders = 
 	{
 		"Accept",
@@ -51,13 +52,13 @@ public class SystemRestHandler : ISystemRestHandler
 		"Expires",
 		"Last-Modified"
 	};
-
+	
 	#endregion
-
+	
 	#region Services
-
+	
 	private readonly IHttpClientFactory _httpClientFactory;
-
+	
 	#endregion
 	
 	#region Constructors
@@ -70,33 +71,55 @@ public class SystemRestHandler : ISystemRestHandler
 	{
 		this._httpClientFactory = httpClientFactory;
 	}
-
+	
 	#endregion
 	
 	#region Methods
-
+	
 	public HttpClient GetHttpClient()
 	{
 		return this._httpClientFactory.CreateClient();
 	}
-
+	
 	public IResponseResult<TResult> ExecuteRequest<TResult>(
 		HttpMethod method, 
 		string url, 
 		IHeaderCollection? headers = null,
 		IRequestBody? body = null)
 	{
-		return this.ExecuteRequestAsync<TResult>(method, url, headers, body).ConfigureAwait(false).GetAwaiter().GetResult();
+		using var httpClient = this.GetHttpClient();
+		return this.ExecuteRequest<TResult>(httpClient, method, url, headers, body);
 	}
-
+	
+	public IResponseResult<TResult> ExecuteRequest<TResult>(
+		HttpClient httpClient, 
+		HttpMethod method, 
+		string url, 
+		IHeaderCollection? headers = null,
+		IRequestBody? body = null)
+	{
+		return this.ExecuteRequestAsync<TResult>(httpClient, method, url, headers, body).ConfigureAwait(false).GetAwaiter().GetResult();
+	}
+	
 	public async Task<IResponseResult<TResult>> ExecuteRequestAsync<TResult>(
+		HttpMethod method,
+		string url,
+		IHeaderCollection? headers = null,
+		IRequestBody? body = null,
+		CancellationToken cancellationToken = default)
+	{
+		using var httpClient = this.GetHttpClient();
+		return await this.ExecuteRequestAsync<TResult>(httpClient, method, url, headers, body, cancellationToken);
+	}
+	
+	public async Task<IResponseResult<TResult>> ExecuteRequestAsync<TResult>(
+		HttpClient httpClient, 
 		HttpMethod method, 
 		string url, 
 		IHeaderCollection? headers = null,
 		IRequestBody? body = null,
 		CancellationToken cancellationToken = default)
 	{
-		using var httpClient = this._httpClientFactory.CreateClient();
 		var request = new HttpRequestMessage(method, url);
 		if (headers != null)
 		{
@@ -116,13 +139,13 @@ public class SystemRestHandler : ISystemRestHandler
 				}
 			}
 		}
-
+		
 		var httpContent = body?.GetHttpContent();
 		if (httpContent != null)
 		{
 			request.Content = httpContent;
 		}
-
+		
 		var response = await httpClient.SendAsync(request, cancellationToken: cancellationToken);
 		var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken: cancellationToken);
 		var json = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
@@ -150,8 +173,20 @@ public class SystemRestHandler : ISystemRestHandler
 			};
 		}
 	}
-
+	
 	public IResponseResult<TResult> ExecuteRequest<TResult>(
+		HttpMethod method, 
+		string baseUrl, 
+		IQueryString? queryString = null,
+		IHeaderCollection? headers = null, 
+		IRequestBody? body = null)
+	{
+		using var httpClient = this.GetHttpClient();
+		return this.ExecuteRequest<TResult>(httpClient, method, baseUrl, queryString, headers, body);
+	}
+	
+	public IResponseResult<TResult> ExecuteRequest<TResult>(
+		HttpClient httpClient, 
 		HttpMethod method, 
 		string baseUrl, 
 		IQueryString? queryString = null,
@@ -161,15 +196,28 @@ public class SystemRestHandler : ISystemRestHandler
 		if (queryString != null && queryString.Any())
 		{
 			var url = $"{baseUrl}?{queryString}";
-			return this.ExecuteRequest<TResult>(method, url, headers, body);
+			return this.ExecuteRequest<TResult>(httpClient, method, url, headers, body);
 		}
 		else
 		{
-			return this.ExecuteRequest<TResult>(method, baseUrl, headers, body);
+			return this.ExecuteRequest<TResult>(httpClient, method, baseUrl, headers, body);
 		}
 	}
-
+	
 	public async Task<IResponseResult<TResult>> ExecuteRequestAsync<TResult>(
+		HttpMethod method, 
+		string baseUrl, 
+		IQueryString? queryString = null,
+		IHeaderCollection? headers = null, 
+		IRequestBody? body = null, 
+		CancellationToken cancellationToken = default)
+	{
+		using var httpClient = this.GetHttpClient();
+		return await this.ExecuteRequestAsync<TResult>(httpClient, method, baseUrl, queryString, headers, body, cancellationToken);
+	}
+	
+	public async Task<IResponseResult<TResult>> ExecuteRequestAsync<TResult>(
+		HttpClient httpClient, 
 		HttpMethod method, 
 		string baseUrl, 
 		IQueryString? queryString = null,
@@ -180,38 +228,60 @@ public class SystemRestHandler : ISystemRestHandler
 		if (queryString != null && queryString.Any())
 		{
 			var url = $"{baseUrl}?{queryString}";
-			return await this.ExecuteRequestAsync<TResult>(method, url, headers, body, cancellationToken: cancellationToken);
+			return await this.ExecuteRequestAsync<TResult>(httpClient, method, url, headers, body, cancellationToken: cancellationToken);
 		}
 		else
 		{
-			return await this.ExecuteRequestAsync<TResult>(method, baseUrl, headers, body, cancellationToken: cancellationToken);
+			return await this.ExecuteRequestAsync<TResult>(httpClient, method, baseUrl, headers, body, cancellationToken: cancellationToken);
 		}
 	}
-
+	
 	public IResponseResult ExecuteRequest(
 		HttpMethod method, 
 		string url,
 		IHeaderCollection? headers = null, 
 		IRequestBody? body = null)
 	{
-		return this.ExecuteRequestAsync(method, url, headers, body).ConfigureAwait(false).GetAwaiter().GetResult();
+		using var httpClient = this.GetHttpClient();
+		return this.ExecuteRequest(httpClient, method, url, headers, body);
 	}
-
+	
+	public IResponseResult ExecuteRequest(
+		HttpClient httpClient, 
+		HttpMethod method, 
+		string url,
+		IHeaderCollection? headers = null, 
+		IRequestBody? body = null)
+	{
+		return this.ExecuteRequestAsync(httpClient, method, url, headers, body).ConfigureAwait(false).GetAwaiter().GetResult();
+	}
+	
 	public async Task<IResponseResult> ExecuteRequestAsync(
+		HttpMethod method,
+		string url,
+		IHeaderCollection? headers = null,
+		IRequestBody? body = null,
+		CancellationToken cancellationToken = default)
+	{
+		using var httpClient = this.GetHttpClient();
+		return await this.ExecuteRequestAsync(httpClient, method, url, headers, body, cancellationToken);
+	}
+	
+	public async Task<IResponseResult> ExecuteRequestAsync(
+		HttpClient httpClient, 
 		HttpMethod method, 
 		string url, 
 		IHeaderCollection? headers = null, 
 		IRequestBody? body = null,
 		CancellationToken cancellationToken = default)
 	{
-		using var httpClient = this._httpClientFactory.CreateClient();
 		var request = new HttpRequestMessage(method, url);
 		var httpContent = body?.GetHttpContent();
 		if (httpContent != null)
 		{
 			request.Content = httpContent;
 		}
-
+		
 		if (headers != null)
 		{
 			foreach (var (key, value) in headers.ToDictionary())
@@ -230,7 +300,7 @@ public class SystemRestHandler : ISystemRestHandler
 				}
 			}
 		}
-			
+		
 		var response = await httpClient.SendAsync(request, cancellationToken: cancellationToken);
 		var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken: cancellationToken);
 		var json = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
@@ -257,8 +327,20 @@ public class SystemRestHandler : ISystemRestHandler
 			};
 		}
 	}
-
+	
 	public IResponseResult ExecuteRequest(
+		HttpMethod method, 
+		string baseUrl, 
+		IQueryString? queryString = null,
+		IHeaderCollection? headers = null, 
+		IRequestBody? body = null)
+	{
+		using var httpClient = this.GetHttpClient();
+		return this.ExecuteRequest(httpClient, method, baseUrl, queryString, headers, body);
+	}
+	
+	public IResponseResult ExecuteRequest(
+		HttpClient httpClient, 
 		HttpMethod method, 
 		string baseUrl, 
 		IQueryString? queryString = null,
@@ -268,15 +350,28 @@ public class SystemRestHandler : ISystemRestHandler
 		if (queryString != null && queryString.Any())
 		{
 			var url = $"{baseUrl}?{queryString}";
-			return this.ExecuteRequest(method, url, headers, body);
+			return this.ExecuteRequest(httpClient, method, url, headers, body);
 		}
 		else
 		{
-			return this.ExecuteRequest(method, baseUrl, headers, body);
+			return this.ExecuteRequest(httpClient, method, baseUrl, headers, body);
 		}
 	}
-
+	
 	public async Task<IResponseResult> ExecuteRequestAsync(
+		HttpMethod method, 
+		string baseUrl, 
+		IQueryString? queryString = null, 
+		IHeaderCollection? headers = null, 
+		IRequestBody? body = null,
+		CancellationToken cancellationToken = default)
+	{
+		using var httpClient = this.GetHttpClient();
+		return await this.ExecuteRequestAsync(httpClient, method, baseUrl, queryString, headers, body, cancellationToken);
+	}
+	
+	public async Task<IResponseResult> ExecuteRequestAsync(
+		HttpClient httpClient, 
 		HttpMethod method, 
 		string baseUrl, 
 		IQueryString? queryString = null, 
@@ -287,11 +382,11 @@ public class SystemRestHandler : ISystemRestHandler
 		if (queryString != null && queryString.Any())
 		{
 			var url = $"{baseUrl}?{queryString}";
-			return await this.ExecuteRequestAsync(method, url, headers, body, cancellationToken: cancellationToken);
+			return await this.ExecuteRequestAsync(httpClient, method, url, headers, body, cancellationToken: cancellationToken);
 		}
 		else
 		{
-			return await this.ExecuteRequestAsync(method, baseUrl, headers, body, cancellationToken: cancellationToken);
+			return await this.ExecuteRequestAsync(httpClient, method, baseUrl, headers, body, cancellationToken: cancellationToken);
 		}
 	}
 	

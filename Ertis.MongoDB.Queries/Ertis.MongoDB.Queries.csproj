@@ -1,20 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <PackageId>Ertis.MongoDB.Queries</PackageId>
-        <PackageVersion>7.0.9</PackageVersion>
+        <PackageVersion>9.0.0</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.MongoDB.Queries</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        <Copyright>Ertuğrul Özcan | Copyright 2022 (c)</Copyright>
-        <PackageReleaseNotes>.Net 7</PackageReleaseNotes>
+        <Copyright>Ertuğrul Özcan | Copyright 2025 (c)</Copyright>
+        <PackageReleaseNotes>.Net 9</PackageReleaseNotes>
         <PackageTags>Ertis.MongoDB.Queries</PackageTags>
         <Title>Ertis.MongoDB.Queries</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>7.0.9</AssemblyVersion>
-        <FileVersion>7.0.9</FileVersion>
+        <AssemblyVersion>9.0.0</AssemblyVersion>
+        <FileVersion>9.0.0</FileVersion>
     </PropertyGroup>
 
 </Project>

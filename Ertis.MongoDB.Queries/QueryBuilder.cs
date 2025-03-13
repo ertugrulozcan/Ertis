@@ -8,6 +8,28 @@ namespace Ertis.MongoDB.Queries;
 
 public static class QueryBuilder
 {
+    #region BuildIn Operators
+    
+    /// <summary>
+    /// ObjectId()
+    /// </summary>
+    /// <param name="id">Object ID</param>
+    public static IQueryExpression ObjectId(string id)
+    {
+        return new ObjectId(id);
+    }
+    
+    /// <summary>
+    /// ISODate()
+    /// </summary>
+    /// <param name="date">ISODate</param>
+    public static IQuery ISODate(DateTime date)
+    {
+        return new ISODate(date);
+    }
+    
+    #endregion
+    
     #region Where Methods
     
     public static IQuery Where(string key, string value)
@@ -183,15 +205,6 @@ public static class QueryBuilder
     #endregion
     
     #region Comparison Queries
-    
-    /// <summary>
-    /// Equals by document object id ($eq)
-    /// </summary>
-    /// <param name="id">Object ID</param>
-    public static IQueryExpression ObjectId(string id)
-    {
-        return new ObjectId(id);
-    }
     
     /// <summary>
     /// Equals ($eq)

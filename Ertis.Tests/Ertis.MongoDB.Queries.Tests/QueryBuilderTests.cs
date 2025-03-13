@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Ertis.MongoDB.Queries;
 using NUnit.Framework;
@@ -42,7 +43,54 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             Assert.That(queryJson != null);
             Assert.That("{ \"organization_id\": \"6356f3240e37638afd92c516\", \"url\": \"/foo/bar\", \"_id\": { $ne: ObjectId(\"6439f2d9e41d91644e8b8126\") } }".Trim() == queryJson?.Trim());
         }
+        
+        [Test]
+        public void ObjectIdTest4()
+        {
+            const string membershipId = "61b7bfa7fa20a74224879e13";
+            const string id = "61fdb0eb923408d9b5d7f14a";
+            var query = QueryBuilder.Where(QueryBuilder.Equals("membership_id", membershipId), QueryBuilder.Equals("foo", QueryBuilder.ObjectId(id)));
+            var queryJson = query.ToString();
+            Assert.That(queryJson != null);
+            Assert.That("{ \"membership_id\": \"61b7bfa7fa20a74224879e13\", \"foo\": ObjectId(\"61fdb0eb923408d9b5d7f14a\") }".Trim() == queryJson?.Trim());
+        }
+        
+        #endregion
+        
+        #region ISODate Tests
 
+        [Test]
+        public void ISODateTest1()
+        {
+            IQuery[] expressions = 
+            {
+                QueryBuilder.Equals("categories.slug", "super-league"), 
+                QueryBuilder.NotEquals("_id", QueryBuilder.ObjectId("66c8c2c1a54a186fb2e0546a")), 
+                QueryBuilder.LessThan("sys.published_at", "2024-08-19T16:25:35.390Z")
+            };
+                
+            var query = QueryBuilder.And(expressions);
+            var queryJson = query.ToString();
+            Assert.That(queryJson != null);
+            Assert.That("{ \"categories.slug\": \"super-league\", \"_id\": { $ne: ObjectId(\"66c8c2c1a54a186fb2e0546a\") }, \"sys.published_at\": { $lt: \"2024-08-19T16:25:35.390Z\" } }".Trim() == queryJson?.Trim());
+        }
+        
+        [Test]
+        public void ISODateTest2()
+        {
+            IQuery[] expressions = 
+            {
+                QueryBuilder.Equals("categories.slug", "super-league"), 
+                QueryBuilder.NotEquals("_id", QueryBuilder.ObjectId("66c8c2c1a54a186fb2e0546a")), 
+                QueryBuilder.LessThan("sys.published_at", QueryBuilder.ISODate(DateTime.Parse("2024-08-19T16:25:35.390Z").ToUniversalTime()))
+            };
+                
+            var query = QueryBuilder.And(expressions);
+            var queryJson = query.ToString();
+            Assert.That(queryJson != null);
+            Assert.That("{ \"categories.slug\": \"super-league\", \"_id\": { $ne: ObjectId(\"66c8c2c1a54a186fb2e0546a\") }, \"sys.published_at\": { $lt: ISODate(\"2024-08-19T16:25:35Z\") } }".Trim() == queryJson?.Trim());
+        }
+        
         #endregion
         
         #region Basic Where Methods

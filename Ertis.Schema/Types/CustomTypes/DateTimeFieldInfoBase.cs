@@ -197,6 +197,7 @@ namespace Ertis.Schema.Types.CustomTypes
                 FormatPattern = this.FormatPattern,
                 RegexPattern = this.RegexPattern,
                 RestrictRegexPattern = this.RestrictRegexPattern,
+                CaseInsensitive = this.CaseInsensitive
             };
         }
 

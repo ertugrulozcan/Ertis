@@ -98,6 +98,11 @@ namespace Ertis.Schema.Types.Primitives
         [JsonPropertyName("restrictRegexPattern")]
         [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public string RestrictRegexPattern { get; init; }
+        
+        [JsonProperty("caseInsensitive", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonPropertyName("caseInsensitive")]
+        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public bool CaseInsensitive { get; init; }
 
         [JsonProperty("isUnique", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
         [JsonPropertyName("isUnique")]
@@ -321,6 +326,7 @@ namespace Ertis.Schema.Types.Primitives
                 FormatPattern = this.FormatPattern,
                 RegexPattern = this.RegexPattern,
                 RestrictRegexPattern = this.RestrictRegexPattern,
+                CaseInsensitive = this.CaseInsensitive
             };
         }
         

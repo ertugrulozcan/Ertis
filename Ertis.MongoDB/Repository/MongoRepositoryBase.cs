@@ -29,7 +29,6 @@ namespace Ertis.MongoDB.Repository
 		#region Services
 
 		private readonly IRepositoryActionBinder _actionBinder;
-		
 		private readonly IDatabaseSettings _settings;
 
 		#endregion
@@ -668,13 +667,6 @@ namespace Ertis.MongoDB.Repository
 						sortDefinitions.Add(sortField.SortDirection is null or SortDirection.Ascending 
 							? sortDefinitionBuilder.Ascending(fieldDefinition) 
 							: sortDefinitionBuilder.Descending(fieldDefinition));
-						
-						if (sorting.All(x => x.OrderBy != "_id"))
-						{
-							sortDefinitions.Add(sortField.SortDirection is null or SortDirection.Ascending 
-								? sortDefinitionBuilder.Ascending("_id") 
-								: sortDefinitionBuilder.Descending("_id"));	
-						}
 					}
 				}
 

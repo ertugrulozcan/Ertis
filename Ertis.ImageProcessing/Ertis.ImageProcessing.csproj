@@ -4,7 +4,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PackageId>Ertis.ImageProcessing</PackageId>
-        <PackageVersion>9.0.0</PackageVersion>
+        <PackageVersion>9.0.1</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.ImageProcessing</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -14,12 +14,12 @@
         <Title>Ertis.ImageProcessing</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>9.0.0</AssemblyVersion>
-        <FileVersion>9.0.0</FileVersion>
+        <AssemblyVersion>9.0.1</AssemblyVersion>
+        <FileVersion>9.0.1</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
     </ItemGroup>
 
     <ItemGroup>

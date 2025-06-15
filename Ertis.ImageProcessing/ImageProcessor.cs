@@ -14,13 +14,13 @@ public static class ImageProcessor
 	#region Methods
 
 	[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
-	public static void Crop(Stream imageStream, Stream outputStream, CropBounds bounds, ImageFormat destinationFormat)
+	public static void Crop(Stream imageStream, Stream outputStream, CropBounds bounds, ImageFormat destinationFormat, int? quality = null)
 	{
 		try
 		{
 			using var image = Image.Load(imageStream);
 			image.Mutate(x => x.Crop(bounds.ToRectangle(image.Width, image.Height))); 
-			image.Save(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat));
+			image.Save(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality));
 		}
 		catch (Exception ex)
 		{
@@ -29,13 +29,13 @@ public static class ImageProcessor
 	}
 	
 	[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
-	public static async Task CropAsync(Stream imageStream, Stream outputStream, CropBounds bounds, ImageFormat destinationFormat, CancellationToken cancellationToken = default)
+	public static async Task CropAsync(Stream imageStream, Stream outputStream, CropBounds bounds, ImageFormat destinationFormat, int? quality = null, CancellationToken cancellationToken = default)
 	{
 		try
 		{
 			using var image = await Image.LoadAsync(imageStream, cancellationToken: cancellationToken);
 			image.Mutate(x => x.Crop(bounds.ToRectangle(image.Width, image.Height))); 
-			await image.SaveAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat), cancellationToken: cancellationToken);
+			await image.SaveAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality), cancellationToken: cancellationToken);
 		}
 		catch (Exception ex)
 		{
@@ -43,7 +43,7 @@ public static class ImageProcessor
 		}
 	}
 	
-	public static void Resize(Stream imageStream, Stream outputStream, int? width, int? height, ImageFormat destinationFormat, ResizeMode? mode = null, Anchor? anchor = null, SamplerAlgorithm? sampler = null)
+	public static void Resize(Stream imageStream, Stream outputStream, int? width, int? height, ImageFormat destinationFormat, ResizeMode? mode = null, Anchor? anchor = null, SamplerAlgorithm? sampler = null, int? quality = null)
 	{
 		if (width == null && height == null)
 		{
@@ -62,7 +62,7 @@ public static class ImageProcessor
 			};
 			
 			image.Mutate(x => x.Resize(options)); 
-			image.Save(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat));
+			image.Save(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality));
 		}
 		catch (Exception ex)
 		{
@@ -70,7 +70,7 @@ public static class ImageProcessor
 		}
 	}
 	
-	public static async Task ResizeAsync(Stream imageStream, Stream outputStream, int? width, int? height, ImageFormat destinationFormat, ResizeMode? mode = null, Anchor? anchor = null, SamplerAlgorithm? sampler = null, CancellationToken cancellationToken = default)
+	public static async Task ResizeAsync(Stream imageStream, Stream outputStream, int? width, int? height, ImageFormat destinationFormat, ResizeMode? mode = null, Anchor? anchor = null, SamplerAlgorithm? sampler = null, int? quality = null, CancellationToken cancellationToken = default)
 	{
 		if (width == null && height == null)
 		{
@@ -89,7 +89,7 @@ public static class ImageProcessor
 			};
 			
 			image.Mutate(x => x.Resize(options)); 
-			await image.SaveAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat), cancellationToken: cancellationToken);
+			await image.SaveAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality), cancellationToken: cancellationToken);
 		}
 		catch (Exception ex)
 		{
@@ -126,7 +126,7 @@ public static class ImageProcessor
 					image.SaveAsTiffAsync(outputStream);
 					break;
 				case ImageFormat.Webp:
-					image.SaveAsWebpAsync(outputStream, new WebpEncoder { FileFormat = WebpFileFormatType.Lossy, NearLossless = false, Quality = quality ?? 75 });
+					image.SaveAsWebpAsync(outputStream, new WebpEncoder { FileFormat = WebpFileFormatType.Lossy, NearLossless = false, Quality = quality ?? Constants.DefaultQuality });
 					break;
 			}
 		}
@@ -165,7 +165,7 @@ public static class ImageProcessor
 					await image.SaveAsTiffAsync(outputStream, cancellationToken: cancellationToken);
 					break;
 				case ImageFormat.Webp:
-					await image.SaveAsWebpAsync(outputStream, new WebpEncoder { FileFormat = WebpFileFormatType.Lossy, NearLossless = false, Quality = quality ?? 75 }, cancellationToken: cancellationToken);
+					await image.SaveAsWebpAsync(outputStream, new WebpEncoder { FileFormat = WebpFileFormatType.Lossy, NearLossless = false, Quality = quality ?? Constants.DefaultQuality }, cancellationToken: cancellationToken);
 					break;
 			}
 		}

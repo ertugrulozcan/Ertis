@@ -3,16 +3,18 @@ using System.Net;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Webp;
+using SixLabors.ImageSharp.Metadata;
 using SixLabors.ImageSharp.Processing;
 using ResizeModeEnum = SixLabors.ImageSharp.Processing.ResizeMode;
 
 namespace Ertis.ImageProcessing;
 
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
+// ReSharper disable once UnusedType.Global
 public static class ImageProcessor
 {
 	#region Methods
-
+	
 	[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 	public static void Crop(Stream imageStream, Stream outputStream, CropBounds bounds, ImageFormat destinationFormat, int? quality = null)
 	{
@@ -173,6 +175,12 @@ public static class ImageProcessor
 		{
 			throw new Ertis.ImageProcessing.Exceptions.ImageProcessingException(HttpStatusCode.BadRequest, ex.Message, "ImageProcessingError");
 		}
+	}
+	
+	public static async Task<ImageMetadata?> ReadExifAsync(Stream imageStream, CancellationToken cancellationToken = default)
+	{
+		using var image = await Image.LoadAsync(imageStream, cancellationToken: cancellationToken);
+		return image.Metadata;
 	}
 	
 	#endregion

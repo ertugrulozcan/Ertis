@@ -4,7 +4,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PackageId>Ertis.ImageProcessing</PackageId>
-        <PackageVersion>9.0.2</PackageVersion>
+        <PackageVersion>9.0.3</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.ImageProcessing</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -14,8 +14,8 @@
         <Title>Ertis.ImageProcessing</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>9.0.2</AssemblyVersion>
-        <FileVersion>9.0.2</FileVersion>
+        <AssemblyVersion>9.0.3</AssemblyVersion>
+        <FileVersion>9.0.3</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

@@ -202,6 +202,15 @@ public static class QueryBuilder
         };
     }
     
+    public static IQueryExpression Combine(string key, params IQuery[] expressions)
+    {
+        return new QueryExpression
+        {
+            Field = key,
+            Value = Combine(expressions)
+        };
+    }
+    
     #endregion
     
     #region Comparison Queries

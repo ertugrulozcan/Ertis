@@ -238,7 +238,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
         #region Combine Queries Tests
 
         [Test]
-        public void CombineTest()
+        public void CombineTest1()
         {
             IEnumerable<IQuery> whereQueries = new []
             {
@@ -265,6 +265,25 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
             var combinedQueryJson = combinedQuery.ToString();
             Assert.That(combinedQueryJson != null);
             Assert.That("{ \"where\": { \"first_name\": \"Ertuğrul\", \"last_name\": \"Özcan\" }, \"select\": { \"first_name\": 0, \"last_name\": 1 } }".Trim() == combinedQueryJson?.Trim());
+        }
+
+        [Test]
+        public void CombineTest2()
+        {
+            var expressions = new List<IQueryExpression>
+            {
+                QueryBuilder.Equals("isLocalNews", true),
+                QueryBuilder.Contains("categories.slug", new[] { "turkiye", "dunya" }),
+                QueryBuilder.Equals("localNewsCity.city.slug", "istanbul"),
+                QueryBuilder.Combine("timelineDate", 
+                    QueryBuilder.GreaterThanOrEqual(QueryBuilder.ISODate(new DateTime(2025, 08, 29))),
+                    QueryBuilder.LessThanOrEqual(QueryBuilder.ISODate(new DateTime(2025, 08, 30)))
+                )
+            };
+
+            var expression = QueryBuilder.And(expressions);
+            var query = expression.ToString().Trim();
+            Assert.That("{ \"isLocalNews\": true, \"categories.slug\": { $in: [ \"turkiye\", \"dunya\" ] }, \"localNewsCity.city.slug\": \"istanbul\", \"timelineDate\": { $gte: ISODate(\"2025-08-29T00:00:00Z\"), $lte: ISODate(\"2025-08-30T00:00:00Z\") } }".Trim() == query);
         }
 
         [Test]

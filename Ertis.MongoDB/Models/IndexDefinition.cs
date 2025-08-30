@@ -24,6 +24,26 @@ public interface IIndexDefinition
 	string Key { get; }
 }
 
+public enum IndexLocale
+{
+	none, 
+	danish, 
+	dutch, 
+	english, 
+	finnish, 
+	french, 
+	german, 
+	hungarian, 
+	italian, 
+	norwegian, 
+	portuguese, 
+	romanian, 
+	russian, 
+	spanish, 
+	swedish, 
+	turkish, 
+}
+
 public abstract class IndexDefinitionBase : IIndexDefinition
 {
 	#region Properties
@@ -124,6 +144,36 @@ public class CompoundIndexDefinition : IndexDefinitionBase
 		}
 		
 		this.Indexes = new ReadOnlyCollection<SingleIndexDefinition>(fieldNames.Select(x => new SingleIndexDefinition(x)).ToList());
+	}
+
+	#endregion
+}
+
+public class TextIndexDefinition : IndexDefinitionBase
+{
+	#region Properties
+
+	public string Field { get; }
+	
+	public IndexLocale Locale { get; }
+
+	public override IndexType Type => IndexType.Text;
+	
+	public override string Key => $"{this.Field}_text";
+
+	#endregion
+
+	#region Constructors
+
+	/// <summary>
+	/// Constructor
+	/// </summary>
+	/// <param name="field"></param>
+	/// <param name="locale"></param>
+	public TextIndexDefinition(string field, IndexLocale locale = IndexLocale.none)
+	{
+		this.Field = field;
+		this.Locale = locale;
 	}
 
 	#endregion

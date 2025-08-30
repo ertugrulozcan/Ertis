@@ -1353,6 +1353,8 @@ namespace Ertis.MongoDB.Repository
 					return await this.CreateSingleIndexAsync(indexDefinition as SingleIndexDefinition, cancellationToken: cancellationToken);
 				case IndexType.Compound:
 					return await this.CreateCompoundIndexAsync(indexDefinition as CompoundIndexDefinition, cancellationToken: cancellationToken);
+				case IndexType.Text:
+					return await this.CreateTextIndexAsync(indexDefinition as TextIndexDefinition, cancellationToken: cancellationToken);
 				default:
 					throw new NotImplementedException("Not implemented yet for this index type");
 			}
@@ -1409,6 +1411,16 @@ namespace Ertis.MongoDB.Repository
 			
 			var combinedIndexDefinition = Builders<dynamic>.IndexKeys.Combine(indexKeyDefinitions);
 			return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(combinedIndexDefinition), cancellationToken: cancellationToken);
+		}
+		
+		public async Task<string> CreateTextIndexAsync(TextIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
+		{
+			var indexOptions = new CreateIndexOptions
+			{
+				DefaultLanguage = indexDefinition.Locale.ToString()
+			};
+			
+			return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(Builders<dynamic>.IndexKeys.Text(indexDefinition.Field), indexOptions), cancellationToken: cancellationToken);
 		}
 
 		#endregion

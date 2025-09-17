@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PackageId>Ertis.Net</PackageId>
-        <PackageVersion>9.0.3</PackageVersion>
+        <PackageVersion>9.0.4</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.Net</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -15,8 +15,8 @@
         <Title>Ertis.Net</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>9.0.3</AssemblyVersion>
-        <FileVersion>9.0.3</FileVersion>
+        <AssemblyVersion>9.0.4</AssemblyVersion>
+        <FileVersion>9.0.4</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

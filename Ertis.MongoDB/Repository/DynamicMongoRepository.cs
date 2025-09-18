@@ -1168,8 +1168,7 @@ namespace Ertis.MongoDB.Repository
 		{
 			return entities.Aggregate(true, (current, entity) => (bool) (current & this.Delete(entity)));
 		}
-
-		[SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
+		
 		public async Task<bool> BulkDeleteAsync(IEnumerable<dynamic> entities, CancellationToken cancellationToken = default)
 		{
 			var isDeletedAll = true;
@@ -1180,7 +1179,49 @@ namespace Ertis.MongoDB.Repository
 
 			return isDeletedAll;
 		}
-
+		
+		public bool DeleteMany(Expression<Func<dynamic, bool>> expression)
+		{
+			var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+			var result = this.Collection.DeleteMany(filterDefinition);
+			return result.IsAcknowledged && result.DeletedCount == 1;
+		}
+		
+		public async Task<bool> DeleteManyAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
+		{
+			var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+			var result = await this.Collection.DeleteManyAsync(filterDefinition, cancellationToken: cancellationToken);
+			return result.IsAcknowledged && result.DeletedCount == 1;
+		}
+		
+		public bool DeleteMany(string query)
+		{
+			query = QueryHelper.EnsureObjectIdsAndISODates(query);
+			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+			var result = this.Collection.DeleteMany(filterDefinition);
+			return result.IsAcknowledged && result.DeletedCount == 1;
+		}
+		
+		public async Task<bool> DeleteManyAsync(string query, CancellationToken cancellationToken = default)
+		{
+			query = QueryHelper.EnsureObjectIdsAndISODates(query);
+			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+			var result = await this.Collection.DeleteManyAsync(filterDefinition, cancellationToken: cancellationToken);
+			return result.IsAcknowledged && result.DeletedCount == 1;
+		}
+		
+		public bool Clear()
+		{
+			var result = this.Collection.DeleteMany(Builders<dynamic>.Filter.Empty);
+			return result.IsAcknowledged && result.DeletedCount == 1;
+		}
+		
+		public async Task<bool> ClearAsync(CancellationToken cancellationToken = default)
+		{
+			var result = await this.Collection.DeleteManyAsync(Builders<dynamic>.Filter.Empty, cancellationToken: cancellationToken);
+			return result.IsAcknowledged && result.DeletedCount == 1;
+		}
+		
 		#endregion
 		
 		#region Count Methods

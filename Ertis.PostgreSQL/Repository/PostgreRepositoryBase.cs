@@ -588,6 +588,39 @@ namespace Ertis.PostgreSQL.Repository
 				return true;	
 			}
 		}
+		
+		public bool DeleteMany(Expression<Func<TEntity, bool>> expression)
+		{
+			throw new Exception("The method or operation is not implemented for PostgreSQL.");
+		}
+		
+		public async Task<bool> DeleteManyAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default)
+		{
+			await Task.CompletedTask;
+			throw new Exception("The method or operation is not implemented for PostgreSQL.");
+		}
+		
+		public bool DeleteMany(string query)
+		{
+			throw new Exception("The method or operation is not implemented for PostgreSQL.");
+		}
+		
+		public async Task<bool> DeleteManyAsync(string query, CancellationToken cancellationToken = default)
+		{
+			await Task.CompletedTask;
+			throw new Exception("The method or operation is not implemented for PostgreSQL.");
+		}
+		
+		public bool Clear()
+		{
+			throw new Exception("The method or operation is not implemented for PostgreSQL.");
+		}
+		
+		public async Task<bool> ClearAsync(CancellationToken cancellationToken = default)
+		{
+			await Task.CompletedTask;
+			throw new Exception("The method or operation is not implemented for PostgreSQL.");
+		}
 
 		#endregion
 		

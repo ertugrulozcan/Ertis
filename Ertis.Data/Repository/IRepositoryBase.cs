@@ -78,6 +78,18 @@ namespace Ertis.Data.Repository
 		bool BulkDelete(IEnumerable<TEntity> entities);
 		
 		Task<bool> BulkDeleteAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
+		
+		bool DeleteMany(Expression<Func<TEntity, bool>> expression);
+
+		Task<bool> DeleteManyAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default);
+
+		bool DeleteMany(string query);
+
+		Task<bool> DeleteManyAsync(string query, CancellationToken cancellationToken = default);
+
+		bool Clear();
+
+		Task<bool> ClearAsync(CancellationToken cancellationToken = default);
 
 		#endregion
 		

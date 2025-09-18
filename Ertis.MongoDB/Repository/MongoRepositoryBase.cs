@@ -1684,6 +1684,48 @@ namespace Ertis.MongoDB.Repository
 			var result = await this.Collection.DeleteManyAsync(Builders<TEntity>.Filter.In(d => d.Id, array.Select(x => x.Id)), cancellationToken: cancellationToken);
 			return result.IsAcknowledged && result.DeletedCount == array.Length;
 		}
+		
+		public bool DeleteMany(Expression<Func<TEntity, bool>> expression)
+		{
+			var filterDefinition = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
+			var result = this.Collection.DeleteMany(filterDefinition);
+			return result.IsAcknowledged && result.DeletedCount == 1;
+		}
+		
+		public async Task<bool> DeleteManyAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default)
+		{
+			var filterDefinition = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
+			var result = await this.Collection.DeleteManyAsync(filterDefinition, cancellationToken: cancellationToken);
+			return result.IsAcknowledged && result.DeletedCount == 1;
+		}
+		
+		public bool DeleteMany(string query)
+		{
+			query = QueryHelper.EnsureObjectIdsAndISODates(query);
+			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<TEntity>.Empty : new JsonFilterDefinition<TEntity>(query);
+			var result = this.Collection.DeleteMany(filterDefinition);
+			return result.IsAcknowledged && result.DeletedCount == 1;
+		}
+		
+		public async Task<bool> DeleteManyAsync(string query, CancellationToken cancellationToken = default)
+		{
+			query = QueryHelper.EnsureObjectIdsAndISODates(query);
+			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<TEntity>.Empty : new JsonFilterDefinition<TEntity>(query);
+			var result = await this.Collection.DeleteManyAsync(filterDefinition, cancellationToken: cancellationToken);
+			return result.IsAcknowledged && result.DeletedCount == 1;
+		}
+		
+		public bool Clear()
+		{
+			var result = this.Collection.DeleteMany(Builders<TEntity>.Filter.Empty);
+			return result.IsAcknowledged && result.DeletedCount == 1;
+		}
+		
+		public async Task<bool> ClearAsync(CancellationToken cancellationToken = default)
+		{
+			var result = await this.Collection.DeleteManyAsync(Builders<TEntity>.Filter.Empty, cancellationToken: cancellationToken);
+			return result.IsAcknowledged && result.DeletedCount == 1;
+		}
 
 		#endregion
 		

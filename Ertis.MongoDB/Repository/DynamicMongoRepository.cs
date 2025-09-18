@@ -79,13 +79,13 @@ namespace Ertis.MongoDB.Repository
 			return this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", objectId)).FirstOrDefault();
 		}
 		
-		public async ValueTask<dynamic> FindOneAsync(string id, CancellationToken cancellationToken = default)
+		public async Task<dynamic> FindOneAsync(string id, CancellationToken cancellationToken = default)
 		{
 			return await this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id))).FirstOrDefaultAsync(cancellationToken: cancellationToken);
 		}
 		
 		// ReSharper disable once UnusedMember.Local
-		private async ValueTask<dynamic> FindOneAsync(ObjectId objectId, CancellationToken cancellationToken = default)
+		private async Task<dynamic> FindOneAsync(ObjectId objectId, CancellationToken cancellationToken = default)
 		{
 			return await this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", objectId)).FirstOrDefaultAsync(cancellationToken: cancellationToken);
 		}
@@ -96,7 +96,7 @@ namespace Ertis.MongoDB.Repository
 			return this.Collection.Find(filterDefinition).FirstOrDefault();
 		}
 
-		public async ValueTask<dynamic> FindOneAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
+		public async Task<dynamic> FindOneAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
 		{
 			var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
 			return await (await this.Collection.FindAsync(filterDefinition, cancellationToken: cancellationToken)).FirstOrDefaultAsync(cancellationToken: cancellationToken);	
@@ -121,7 +121,7 @@ namespace Ertis.MongoDB.Repository
 			return this.Find(skip, limit, withCount, sorting, locale: null);
 		}
 
-		public async ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		public async Task<IPaginationCollection<dynamic>> FindAsync(
 			int? skip = null,
 			int? limit = null,
 			bool? withCount = null,
@@ -132,7 +132,7 @@ namespace Ertis.MongoDB.Repository
 			return await this.FindAsync(skip, limit, withCount, orderBy, sortDirection, locale: null, cancellationToken: cancellationToken);
 		}
 		
-		public async ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		public async Task<IPaginationCollection<dynamic>> FindAsync(
 			int? skip = null,
 			int? limit = null,
 			bool? withCount = null,
@@ -163,7 +163,7 @@ namespace Ertis.MongoDB.Repository
 			return this.Find(expression, skip, limit, withCount, sorting, locale: null);
 		}
 
-		public async ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		public async Task<IPaginationCollection<dynamic>> FindAsync(
 			Expression<Func<dynamic, bool>> expression,
 			int? skip = null,
 			int? limit = null,
@@ -175,7 +175,7 @@ namespace Ertis.MongoDB.Repository
 			return await this.FindAsync(expression, skip, limit, withCount, orderBy, sortDirection, locale: null, cancellationToken: cancellationToken);
 		}
 		
-		public async ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		public async Task<IPaginationCollection<dynamic>> FindAsync(
 			Expression<Func<dynamic, bool>> expression,
 			int? skip = null,
 			int? limit = null,
@@ -207,7 +207,7 @@ namespace Ertis.MongoDB.Repository
 			return this.Find(query, skip, limit, withCount, sorting, locale: null);
 		}
 
-		public async ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		public async Task<IPaginationCollection<dynamic>> FindAsync(
 			string query,
 			int? skip = null,
 			int? limit = null,
@@ -219,7 +219,7 @@ namespace Ertis.MongoDB.Repository
 			return await this.FindAsync(query, skip, limit, withCount, orderBy, sortDirection, locale: null, cancellationToken: cancellationToken);
 		}
 		
-		public async ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		public async Task<IPaginationCollection<dynamic>> FindAsync(
 			string query,
 			int? skip = null,
 			int? limit = null,
@@ -266,7 +266,7 @@ namespace Ertis.MongoDB.Repository
 				locale);
 		}
 
-		public async ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		public async Task<IPaginationCollection<dynamic>> FindAsync(
 			int? skip = null,
 			int? limit = null,
 			bool? withCount = null,
@@ -286,7 +286,7 @@ namespace Ertis.MongoDB.Repository
 				cancellationToken: cancellationToken);
 		}
 		
-		public async ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		public async Task<IPaginationCollection<dynamic>> FindAsync(
 			int? skip = null,
 			int? limit = null,
 			bool? withCount = null,
@@ -331,7 +331,7 @@ namespace Ertis.MongoDB.Repository
 			return this.Filter(filterExpression, skip, limit, withCount, sorting, locale);
 		}
 		
-		public async ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		public async Task<IPaginationCollection<dynamic>> FindAsync(
 			Expression<Func<dynamic, bool>> expression, 
 			int? skip = null, 
 			int? limit = null, 
@@ -345,7 +345,7 @@ namespace Ertis.MongoDB.Repository
 			return await this.FilterAsync(filterExpression, skip, limit, withCount, new Sorting(orderBy, sortDirection), locale, cancellationToken: cancellationToken);
 		}
 		
-		public async ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		public async Task<IPaginationCollection<dynamic>> FindAsync(
 			Expression<Func<dynamic, bool>> expression, 
 			int? skip = null, 
 			int? limit = null, 
@@ -387,7 +387,7 @@ namespace Ertis.MongoDB.Repository
 			return this.Filter(filterDefinition, skip, limit, withCount, sorting, locale);
 		}
 		
-		public async ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		public async Task<IPaginationCollection<dynamic>> FindAsync(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -402,7 +402,7 @@ namespace Ertis.MongoDB.Repository
 			return await this.FilterAsync(filterDefinition, skip, limit, withCount, new Sorting(orderBy, sortDirection), locale, cancellationToken: cancellationToken);
 		}
 		
-		public async ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		public async Task<IPaginationCollection<dynamic>> FindAsync(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -644,7 +644,7 @@ namespace Ertis.MongoDB.Repository
 				locale);
 		}
 
-		public async ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+		public async Task<IPaginationCollection<dynamic>> QueryAsync(
 			string query,
 			int? skip = null,
 			int? limit = null,
@@ -682,7 +682,7 @@ namespace Ertis.MongoDB.Repository
 			}
 		}
 		
-		public async ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+		public async Task<IPaginationCollection<dynamic>> QueryAsync(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -704,7 +704,7 @@ namespace Ertis.MongoDB.Repository
 				cancellationToken: cancellationToken);
 		}
 
-		public async ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+		public async Task<IPaginationCollection<dynamic>> QueryAsync(
 			Expression<Func<dynamic, bool>> expression,
 			int? skip = null,
 			int? limit = null,
@@ -726,7 +726,7 @@ namespace Ertis.MongoDB.Repository
 				cancellationToken: cancellationToken);
 		}
 
-		public async ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+		public async Task<IPaginationCollection<dynamic>> QueryAsync(
 			Expression<Func<dynamic, bool>> expression,
 			int? skip = null,
 			int? limit = null,
@@ -952,7 +952,7 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 		
-		public async ValueTask<dynamic> InsertAsync(object entity, InsertOptions? options = null, CancellationToken cancellationToken = default)
+		public async Task<dynamic> InsertAsync(object entity, InsertOptions? options = null, CancellationToken cancellationToken = default)
 		{
 			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 			{
@@ -999,7 +999,7 @@ namespace Ertis.MongoDB.Repository
 			}
 		}
 
-		public async ValueTask BulkInsertAsync(IEnumerable<object> entities, InsertOptions? options = null, CancellationToken cancellationToken = default)
+		public async Task BulkInsertAsync(IEnumerable<object> entities, InsertOptions? options = null, CancellationToken cancellationToken = default)
 		{
 			var enumerable = entities as object[] ?? entities.ToArray();
 			
@@ -1096,7 +1096,7 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 		
-		public async ValueTask<dynamic> UpdateAsync(object entity, string id = default, UpdateOptions? options = null, CancellationToken cancellationToken = default)
+		public async Task<dynamic> UpdateAsync(object entity, string id = default, UpdateOptions? options = null, CancellationToken cancellationToken = default)
 		{
 			if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerBeforeActionBinder)
 			{
@@ -1135,7 +1135,7 @@ namespace Ertis.MongoDB.Repository
 		}
 		
 		[SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
-		public async ValueTask<dynamic> UpsertAsync(dynamic entity, string id = default, CancellationToken cancellationToken = default)
+		public async Task<dynamic> UpsertAsync(dynamic entity, string id = default, CancellationToken cancellationToken = default)
 		{
 			if (string.IsNullOrEmpty(id))
 			{
@@ -1158,7 +1158,7 @@ namespace Ertis.MongoDB.Repository
 			return result.IsAcknowledged && result.DeletedCount == 1;
 		}
 		
-		public async ValueTask<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
+		public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
 		{
 			var result = await this.Collection.DeleteOneAsync(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)), cancellationToken: cancellationToken);
 			return result.IsAcknowledged && result.DeletedCount == 1;
@@ -1170,7 +1170,7 @@ namespace Ertis.MongoDB.Repository
 		}
 
 		[SuppressMessage("ReSharper", "LoopCanBeConvertedToQuery")]
-		public async ValueTask<bool> BulkDeleteAsync(IEnumerable<dynamic> entities, CancellationToken cancellationToken = default)
+		public async Task<bool> BulkDeleteAsync(IEnumerable<dynamic> entities, CancellationToken cancellationToken = default)
 		{
 			var isDeletedAll = true;
 			foreach (var entity in entities)
@@ -1190,7 +1190,7 @@ namespace Ertis.MongoDB.Repository
 			return this.DocumentCollection.CountDocuments(item => true);
 		}
 		
-		public async ValueTask<long> CountAsync(CancellationToken cancellationToken = default)
+		public async Task<long> CountAsync(CancellationToken cancellationToken = default)
 		{
 			return await this.DocumentCollection.CountDocumentsAsync(item => true, cancellationToken: cancellationToken);
 		}
@@ -1201,7 +1201,7 @@ namespace Ertis.MongoDB.Repository
 			return this.Collection.CountDocuments(filterExpression);
 		}
 		
-		public async ValueTask<long> CountAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
+		public async Task<long> CountAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
 		{
 			FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
 			return await this.Collection.CountDocumentsAsync(filterExpression, cancellationToken: cancellationToken);
@@ -1214,7 +1214,7 @@ namespace Ertis.MongoDB.Repository
 			return this.Collection.CountDocuments(filterDefinition);
 		}
 		
-		public async ValueTask<long> CountAsync(string query, CancellationToken cancellationToken = default)
+		public async Task<long> CountAsync(string query, CancellationToken cancellationToken = default)
 		{
 			query = QueryHelper.EnsureObjectIdsAndISODates(query);
 			var filterDefinition = new JsonFilterDefinition<dynamic>(query);
@@ -1257,7 +1257,7 @@ namespace Ertis.MongoDB.Repository
 			}
 		}
 		
-		public async ValueTask<dynamic> AggregateAsync(string query, CancellationToken cancellationToken = default)
+		public async Task<dynamic> AggregateAsync(string query, CancellationToken cancellationToken = default)
 		{
 			try
 			{

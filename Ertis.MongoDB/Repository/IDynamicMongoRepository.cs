@@ -28,7 +28,7 @@ namespace Ertis.MongoDB.Repository
 	        Sorting sorting = null, 
 	        Locale? locale = null);
 		
-		ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		Task<IPaginationCollection<dynamic>> FindAsync(
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
@@ -37,7 +37,7 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		Task<IPaginationCollection<dynamic>> FindAsync(
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
@@ -62,7 +62,7 @@ namespace Ertis.MongoDB.Repository
 			Sorting sorting = null, 
 			Locale? locale = null);
 		
-		ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		Task<IPaginationCollection<dynamic>> FindAsync(
 			Expression<Func<dynamic, bool>> expression, 
 			int? skip = null, 
 			int? limit = null, 
@@ -72,7 +72,7 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		Task<IPaginationCollection<dynamic>> FindAsync(
 			Expression<Func<dynamic, bool>> expression, 
 			int? skip = null, 
 			int? limit = null, 
@@ -98,7 +98,7 @@ namespace Ertis.MongoDB.Repository
 			Sorting sorting = null, 
 			Locale? locale = null);
 
-		ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		Task<IPaginationCollection<dynamic>> FindAsync(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -108,7 +108,7 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<dynamic>> FindAsync(
+		Task<IPaginationCollection<dynamic>> FindAsync(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -155,7 +155,7 @@ namespace Ertis.MongoDB.Repository
 			IDictionary<string, bool> selectFields = null,
 			Locale? locale = null);
 		
-		ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+		Task<IPaginationCollection<dynamic>> QueryAsync(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -166,7 +166,7 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+		Task<IPaginationCollection<dynamic>> QueryAsync(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -176,7 +176,7 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+		Task<IPaginationCollection<dynamic>> QueryAsync(
 			Expression<Func<dynamic, bool>> expression, 
 			int? skip = null, 
 			int? limit = null, 
@@ -187,7 +187,7 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+		Task<IPaginationCollection<dynamic>> QueryAsync(
 			Expression<Func<dynamic, bool>> expression, 
 			int? skip = null, 
 			int? limit = null, 
@@ -207,7 +207,7 @@ namespace Ertis.MongoDB.Repository
         
         dynamic Aggregate(string query);
 		
-        ValueTask<dynamic> AggregateAsync(string query, CancellationToken cancellationToken = default);
+        Task<dynamic> AggregateAsync(string query, CancellationToken cancellationToken = default);
 
         Task<IEnumerable<IIndexDefinition>> GetIndexesAsync(CancellationToken cancellationToken = default);
         

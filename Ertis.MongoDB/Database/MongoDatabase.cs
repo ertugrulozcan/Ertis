@@ -42,7 +42,7 @@ namespace Ertis.MongoDB.Database
 			this.Database.CreateCollection(name);
 		}
 		
-		public async ValueTask CreateCollectionAsync(string name, CancellationToken cancellationToken = default)
+		public async Task CreateCollectionAsync(string name, CancellationToken cancellationToken = default)
 		{
 			await this.Database.CreateCollectionAsync(name, cancellationToken: cancellationToken);
 		}
@@ -52,7 +52,7 @@ namespace Ertis.MongoDB.Database
 			this.Database.DropCollection(name);
 		}
 		
-		public async ValueTask DropCollectionAsync(string name, CancellationToken cancellationToken = default)
+		public async Task DropCollectionAsync(string name, CancellationToken cancellationToken = default)
 		{
 			await this.Database.DropCollectionAsync(name, cancellationToken: cancellationToken);
 		}
@@ -62,7 +62,7 @@ namespace Ertis.MongoDB.Database
 			this.Database.RenameCollection(oldName, newName);
 		}
 		
-		public async ValueTask RenameCollectionAsync(string oldName, string newName, CancellationToken cancellationToken = default)
+		public async Task RenameCollectionAsync(string oldName, string newName, CancellationToken cancellationToken = default)
 		{
 			await this.Database.RenameCollectionAsync(oldName, newName, cancellationToken: cancellationToken);
 		}
@@ -89,7 +89,7 @@ namespace Ertis.MongoDB.Database
 			}
 		}
 		
-		public async ValueTask<IEnumerable<string>> ListCollectionsAsync( 
+		public async Task<IEnumerable<string>> ListCollectionsAsync( 
 			Expression<Func<BsonDocument, bool>> filterExpression = null, 
 			CancellationToken cancellationToken = default)
 		{
@@ -124,7 +124,7 @@ namespace Ertis.MongoDB.Database
 			return Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbStatistics>(json);
 		}
 		
-		public async ValueTask<MongoDbStatistics> GetDatabaseStatisticsAsync(CancellationToken cancellationToken = default)
+		public async Task<MongoDbStatistics> GetDatabaseStatisticsAsync(CancellationToken cancellationToken = default)
 		{
 			var resultDocument = await this.GetDatabaseStatisticsDocumentAsync(cancellationToken: cancellationToken);
 			var json = resultDocument.ToJson(new JsonWriterSettings
@@ -142,7 +142,7 @@ namespace Ertis.MongoDB.Database
 			return this.Database.RunCommand<BsonDocument>(command);
 		}
 
-		public async ValueTask<BsonDocument> GetDatabaseStatisticsDocumentAsync(CancellationToken cancellationToken = default)
+		public async Task<BsonDocument> GetDatabaseStatisticsDocumentAsync(CancellationToken cancellationToken = default)
 		{
 			// ReSharper disable once StringLiteralTypo
 			var command = new BsonDocument { { "dbstats", 1 } };

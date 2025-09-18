@@ -15,27 +15,27 @@ namespace Ertis.MongoDB.Database
 		
 		void CreateCollection(string name);
 
-		ValueTask CreateCollectionAsync(string name, CancellationToken cancellationToken = default);
+		Task CreateCollectionAsync(string name, CancellationToken cancellationToken = default);
 
 		void DropCollection(string name);
 
-		ValueTask DropCollectionAsync(string name, CancellationToken cancellationToken = default);
+		Task DropCollectionAsync(string name, CancellationToken cancellationToken = default);
 
 		void RenameCollection(string oldName, string newName);
 
-		ValueTask RenameCollectionAsync(string oldName, string newName, CancellationToken cancellationToken = default);
+		Task RenameCollectionAsync(string oldName, string newName, CancellationToken cancellationToken = default);
 
 		IEnumerable<string> ListCollections(Expression<Func<BsonDocument, bool>> filterExpression = null);
 
-		ValueTask<IEnumerable<string>> ListCollectionsAsync(Expression<Func<BsonDocument, bool>> filterExpression = null, CancellationToken cancellationToken = default);
+		Task<IEnumerable<string>> ListCollectionsAsync(Expression<Func<BsonDocument, bool>> filterExpression = null, CancellationToken cancellationToken = default);
 
 		MongoDbStatistics GetDatabaseStatistics();
 
-		ValueTask<MongoDbStatistics> GetDatabaseStatisticsAsync(CancellationToken cancellationToken = default);
+		Task<MongoDbStatistics> GetDatabaseStatisticsAsync(CancellationToken cancellationToken = default);
 		
 		BsonDocument GetDatabaseStatisticsDocument();
 
-		ValueTask<BsonDocument> GetDatabaseStatisticsDocumentAsync(CancellationToken cancellationToken = default);
+		Task<BsonDocument> GetDatabaseStatisticsDocumentAsync(CancellationToken cancellationToken = default);
 
 		Task CopyOneAsync(string documentId, string sourceCollectionName, string destinationCollectionName);
 

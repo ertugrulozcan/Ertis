@@ -30,7 +30,7 @@ namespace Ertis.MongoDB.Repository
 			Sorting sorting = null, 
 			Locale? locale = null);
 		
-		ValueTask<IPaginationCollection<TEntity>> FindAsync(
+		Task<IPaginationCollection<TEntity>> FindAsync(
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
@@ -39,7 +39,7 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<TEntity>> FindAsync(
+		Task<IPaginationCollection<TEntity>> FindAsync(
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
@@ -64,7 +64,7 @@ namespace Ertis.MongoDB.Repository
 			Sorting sorting = null, 
 			Locale? locale = null);
 		
-		ValueTask<IPaginationCollection<TEntity>> FindAsync(
+		Task<IPaginationCollection<TEntity>> FindAsync(
 			Expression<Func<TEntity, bool>> expression, 
 			int? skip = null, 
 			int? limit = null, 
@@ -74,7 +74,7 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<TEntity>> FindAsync(
+		Task<IPaginationCollection<TEntity>> FindAsync(
 			Expression<Func<TEntity, bool>> expression, 
 			int? skip = null, 
 			int? limit = null, 
@@ -100,7 +100,7 @@ namespace Ertis.MongoDB.Repository
 			Sorting sorting = null, 
 			Locale? locale = null);
 
-		ValueTask<IPaginationCollection<TEntity>> FindAsync(
+		Task<IPaginationCollection<TEntity>> FindAsync(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -110,7 +110,7 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<TEntity>> FindAsync(
+		Task<IPaginationCollection<TEntity>> FindAsync(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -195,7 +195,7 @@ namespace Ertis.MongoDB.Repository
 			IDictionary<string, bool> selectFields = null,
 			Locale? locale = null);
 		
-		ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+		Task<IPaginationCollection<dynamic>> QueryAsync(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -206,7 +206,7 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<T>> QueryAsync<T>(
+		Task<IPaginationCollection<T>> QueryAsync<T>(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -217,7 +217,7 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+		Task<IPaginationCollection<dynamic>> QueryAsync(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -227,7 +227,7 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<T>> QueryAsync<T>(
+		Task<IPaginationCollection<T>> QueryAsync<T>(
 			string query, 
 			int? skip = null, 
 			int? limit = null, 
@@ -237,7 +237,7 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+		Task<IPaginationCollection<dynamic>> QueryAsync(
 			Expression<Func<TEntity, bool>> expression, 
 			int? skip = null, 
 			int? limit = null, 
@@ -248,7 +248,7 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<T>> QueryAsync<T>(
+		Task<IPaginationCollection<T>> QueryAsync<T>(
 			Expression<Func<TEntity, bool>> expression, 
 			int? skip = null, 
 			int? limit = null, 
@@ -259,7 +259,7 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<dynamic>> QueryAsync(
+		Task<IPaginationCollection<dynamic>> QueryAsync(
 			Expression<Func<TEntity, bool>> expression, 
 			int? skip = null, 
 			int? limit = null, 
@@ -269,7 +269,7 @@ namespace Ertis.MongoDB.Repository
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
-		ValueTask<IPaginationCollection<T>> QueryAsync<T>(
+		Task<IPaginationCollection<T>> QueryAsync<T>(
 			Expression<Func<TEntity, bool>> expression, 
 			int? skip = null, 
 			int? limit = null, 
@@ -283,33 +283,33 @@ namespace Ertis.MongoDB.Repository
 		
 		TEntity Increment(string id, string field, long value = 1);
 		
-		ValueTask<TEntity> IncrementAsync(string id, string field, int value = 1, CancellationToken cancellationToken = default);
+		Task<TEntity> IncrementAsync(string id, string field, int value = 1, CancellationToken cancellationToken = default);
 		
-		ValueTask<TEntity> IncrementAsync(string id, string field, long value = 1, CancellationToken cancellationToken = default);
+		Task<TEntity> IncrementAsync(string id, string field, long value = 1, CancellationToken cancellationToken = default);
 		
 		TEntity Increment(string id, Expression<Func<TEntity, int>> expression, int value = 1);
 		
 		TEntity Increment(string id, Expression<Func<TEntity, long>> expression, long value = 1);
 		
-		ValueTask<TEntity> IncrementAsync(string id, Expression<Func<TEntity, int>> expression, int value = 1, CancellationToken cancellationToken = default);
+		Task<TEntity> IncrementAsync(string id, Expression<Func<TEntity, int>> expression, int value = 1, CancellationToken cancellationToken = default);
 		
-		ValueTask<TEntity> IncrementAsync(string id, Expression<Func<TEntity, long>> expression, long value = 1, CancellationToken cancellationToken = default);
+		Task<TEntity> IncrementAsync(string id, Expression<Func<TEntity, long>> expression, long value = 1, CancellationToken cancellationToken = default);
 		
 		TEntity Increment(Expression<Func<TEntity, bool>> filter, string field, int value = 1);
 		
 		TEntity Increment(Expression<Func<TEntity, bool>> filter, string field, long value = 1);
 		
-		ValueTask<TEntity> IncrementAsync(Expression<Func<TEntity, bool>> filter, string field, int value = 1, CancellationToken cancellationToken = default);
+		Task<TEntity> IncrementAsync(Expression<Func<TEntity, bool>> filter, string field, int value = 1, CancellationToken cancellationToken = default);
 		
-		ValueTask<TEntity> IncrementAsync(Expression<Func<TEntity, bool>> filter, string field, long value = 1, CancellationToken cancellationToken = default);
+		Task<TEntity> IncrementAsync(Expression<Func<TEntity, bool>> filter, string field, long value = 1, CancellationToken cancellationToken = default);
 		
 		TEntity Increment(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, int>> expression, int value = 1);
 		
 		TEntity Increment(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, long>> expression, long value = 1);
 		
-		ValueTask<TEntity> IncrementAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, int>> expression, int value = 1, CancellationToken cancellationToken = default);
+		Task<TEntity> IncrementAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, int>> expression, int value = 1, CancellationToken cancellationToken = default);
 		
-		ValueTask<TEntity> IncrementAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, long>> expression, long value = 1, CancellationToken cancellationToken = default);
+		Task<TEntity> IncrementAsync(Expression<Func<TEntity, bool>> filter, Expression<Func<TEntity, long>> expression, long value = 1, CancellationToken cancellationToken = default);
 		
 		TField[] Distinct<TField>(string distinctBy, string query = null);
 		
@@ -321,11 +321,11 @@ namespace Ertis.MongoDB.Repository
 		
 		IPaginationCollection<TEntity> Search(string keyword, TextSearchOptions options = null, int? skip = null, int? limit = null, bool? withCount = null, string orderBy = null, SortDirection? sortDirection = null);
 		
-		ValueTask<IPaginationCollection<TEntity>> SearchAsync(string keyword, TextSearchOptions options = null, int? skip = null, int? limit = null, bool? withCount = null, string orderBy = null, SortDirection? sortDirection = null, CancellationToken cancellationToken = default);
+		Task<IPaginationCollection<TEntity>> SearchAsync(string keyword, TextSearchOptions options = null, int? skip = null, int? limit = null, bool? withCount = null, string orderBy = null, SortDirection? sortDirection = null, CancellationToken cancellationToken = default);
 
 		dynamic Aggregate(string aggregationStagesJson);
 		
-		ValueTask<dynamic> AggregateAsync(string aggregationStagesJson, CancellationToken cancellationToken = default);
+		Task<dynamic> AggregateAsync(string aggregationStagesJson, CancellationToken cancellationToken = default);
 		
 		Task<IEnumerable<IIndexDefinition>> GetIndexesAsync(CancellationToken cancellationToken = default);
 

@@ -36,7 +36,7 @@ namespace Ertis.MongoDB.Repository
 		
 		public string CollectionName { get; }
 		
-		protected IMongoCollection<dynamic> Collection { get; }
+		private IMongoCollection<dynamic> Collection { get; }
 		
 		private IMongoCollection<BsonDocument> DocumentCollection { get; }
 
@@ -1335,54 +1335,100 @@ namespace Ertis.MongoDB.Repository
 		#region Index Methods
 
 		public async Task<IEnumerable<IIndexDefinition>> GetIndexesAsync(CancellationToken cancellationToken = default)
-		{
-			var indexesCursor = await this.Collection.Indexes.ListAsync(cancellationToken: cancellationToken);
-			var indexes = await indexesCursor.ToListAsync(cancellationToken: cancellationToken);
-			var indexDefinitions = new List<IIndexDefinition>();
-			foreach (var index in indexes)
-			{
-				if (index.Contains("key") && index["key"].IsBsonDocument)
-				{
-					var nodes = index["key"].AsBsonDocument.Elements.ToArray();
-					if (nodes.Any())
-					{
-						if (nodes.Length == 1)
-						{
-							// Single
-							var node = nodes[0];
-							indexDefinitions.Add(new SingleIndexDefinition(node.Name,
-								node.Value.IsInt32
-									? (node.Value.AsInt32 == -1
-										? SortDirection.Descending
-										: SortDirection.Ascending)
-									: null));
-						}
-						else
-						{
-							// Compound
-							var subIndexDefinitions = new List<SingleIndexDefinition>();
-							foreach (var node in nodes)
-							{
-								subIndexDefinitions.Add(new SingleIndexDefinition(node.Name,
-									node.Value.IsInt32
-										? (node.Value.AsInt32 == -1
-											? SortDirection.Descending
-											: SortDirection.Ascending)
-										: null));
-							}
-							
-							indexDefinitions.Add(new CompoundIndexDefinition(subIndexDefinitions.ToArray()));
-						}
-					}
-					else
-					{
-						return Enumerable.Empty<IIndexDefinition>();
-					}
-				}
-			}
-			
-			return indexDefinitions;
-		}
+	    {
+	        var indexesCursor = await this.Collection.Indexes.ListAsync(cancellationToken: cancellationToken);
+	        var indexes = await indexesCursor.ToListAsync(cancellationToken: cancellationToken);
+	        var indexDefinitions = new List<IIndexDefinition>();
+	        foreach (var index in indexes)
+	        {
+	            if (index.Contains("key") && index["key"].IsBsonDocument)
+	            {
+	                var nodes = index["key"].AsBsonDocument.Elements.ToArray();
+	                if (nodes.Length > 0)
+	                {
+	                    if (nodes.Length == 1)
+	                    {
+	                        // Single index
+	                        var node = nodes[0];
+	                        indexDefinitions.Add(new SingleIndexDefinition(node.Name,
+	                            node.Value.IsInt32
+	                                ? node.Value.AsInt32 == -1
+		                                ? SortDirection.Descending
+		                                : SortDirection.Ascending
+	                                : null));
+	                    }
+	                    else
+	                    {
+	                        if (nodes.Any(x => x.Name == "_fts" && x.Value.AsString == "text"))
+	                        {
+	                            // Text index
+	                            if (index.Contains("name"))
+	                            {
+	                                var names = index["name"].AsString;
+	                                if (!string.IsNullOrEmpty(names))
+	                                {
+	                                    var parts = names.Split('_');
+	                                    if (parts.LastOrDefault() == "text")
+	                                    {
+	                                        var weightedFields = parts.SkipLast(1).ToDictionary(x => x, _ => 0);
+	                                        if (weightedFields.Count != 0)
+	                                        {
+	                                            if (index.Contains("weights"))
+	                                            {
+	                                                var weights = index["weights"].AsBsonDocument;
+	                                                foreach (var (field, _) in weightedFields)
+	                                                {
+	                                                    if (weights.Contains(field) && weights[field].IsInt32)
+	                                                    {
+	                                                        var weight = weights[field].AsInt32;
+	                                                        weightedFields[field] = weight;
+	                                                    }
+	                                                }
+	                                            }
+	                                            
+	                                            IndexLocale? locale = null;
+	                                            if (index.Contains("default_language"))
+	                                            {
+	                                                var defaultLocale = index["default_language"].AsString;
+	                                                if (!string.IsNullOrEmpty(defaultLocale) && Enum.TryParse<IndexLocale>(defaultLocale, out var locale_))
+	                                                {
+	                                                    locale = locale_;
+	                                                }
+	                                            }
+	                                            
+	                                            indexDefinitions.Add(new TextIndexDefinition(weightedFields, locale ?? IndexLocale.none));
+	                                        }
+	                                    }
+	                                }
+	                            }
+	                        }
+	                        else
+	                        {
+	                            // Compound index
+	                            var subIndexDefinitions = new List<SingleIndexDefinition>();
+	                            foreach (var node in nodes)
+	                            {
+	                                subIndexDefinitions.Add(new SingleIndexDefinition(node.Name,
+	                                    node.Value.IsInt32
+	                                        ? node.Value.AsInt32 == -1
+		                                        ? SortDirection.Descending
+		                                        : SortDirection.Ascending
+	                                        : null));
+	                            }
+	                            
+	                            indexDefinitions.Add(new CompoundIndexDefinition(subIndexDefinitions.ToArray()));
+	                        }
+	                    }
+	                }
+	                else
+	                {
+	                    return Enumerable.Empty<IIndexDefinition>();
+	                }
+	            }
+	        }
+	        
+	        return indexDefinitions;
+	    }
 		
 		public async Task<string> CreateIndexAsync(IIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
 		{

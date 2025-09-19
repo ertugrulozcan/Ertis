@@ -38,7 +38,7 @@ namespace Ertis.MongoDB.Repository
 
 		public string CollectionName { get; }
 		
-		private IMongoCollection<TEntity> Collection { get; }
+		protected IMongoCollection<TEntity> Collection { get; }
 
 		#endregion
 
@@ -213,12 +213,39 @@ namespace Ertis.MongoDB.Repository
 		
 		public async Task<string> CreateTextIndexAsync(TextIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
 		{
-			var indexOptions = new CreateIndexOptions
+			if (indexDefinition.WeightedFields != null && indexDefinition.WeightedFields.Count != 0)
 			{
-				DefaultLanguage = indexDefinition.Locale.ToString()
-			};
-			
-			return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<TEntity>(Builders<TEntity>.IndexKeys.Text(indexDefinition.Field), indexOptions), cancellationToken: cancellationToken);
+				var indexOptions = new CreateIndexOptions
+				{
+					DefaultLanguage = indexDefinition.Locale.ToString()
+				};
+				
+				var isWeighted = indexDefinition.WeightedFields.Any(x => x.Value > 1) && indexDefinition.WeightedFields.Count > 1;
+				if (isWeighted)
+				{
+					indexOptions.Weights = new BsonDocument(indexDefinition.WeightedFields);
+					var indexKeys = Builders<TEntity>.IndexKeys.Combine(indexDefinition.Fields.Select(field => Builders<TEntity>.IndexKeys.Text(field)));
+					var index = new CreateIndexModel<TEntity>(indexKeys, indexOptions);
+					return await this.Collection.Indexes.CreateOneAsync(index, cancellationToken: cancellationToken);
+				}
+				else if (indexDefinition.Fields.Length > 1)
+				{
+					var indexKeys = Builders<TEntity>.IndexKeys.Combine(indexDefinition.Fields.Select(field => Builders<TEntity>.IndexKeys.Text(field)));
+					var index = new CreateIndexModel<TEntity>(indexKeys, indexOptions);
+					return await this.Collection.Indexes.CreateOneAsync(index, cancellationToken: cancellationToken);
+				}
+				else
+				{
+					var field = indexDefinition.Fields.FirstOrDefault();
+					var indexKeys = Builders<TEntity>.IndexKeys.Text(field);
+					var index = new CreateIndexModel<TEntity>(indexKeys, indexOptions);
+					return await this.Collection.Indexes.CreateOneAsync(index, cancellationToken: cancellationToken);
+				}
+			}
+			else
+			{
+				throw new IndexException("No fields defined");
+			}
 		}
 
 		private async Task CreateSearchIndexesAsync(CancellationToken cancellationToken = default)

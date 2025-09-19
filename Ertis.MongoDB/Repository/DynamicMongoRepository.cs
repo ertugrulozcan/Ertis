@@ -36,7 +36,7 @@ namespace Ertis.MongoDB.Repository
 		
 		public string CollectionName { get; }
 		
-		private IMongoCollection<dynamic> Collection { get; }
+		protected IMongoCollection<dynamic> Collection { get; }
 		
 		private IMongoCollection<BsonDocument> DocumentCollection { get; }
 
@@ -1456,12 +1456,39 @@ namespace Ertis.MongoDB.Repository
 		
 		public async Task<string> CreateTextIndexAsync(TextIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
 		{
-			var indexOptions = new CreateIndexOptions
+			if (indexDefinition.WeightedFields != null && indexDefinition.WeightedFields.Count != 0)
 			{
-				DefaultLanguage = indexDefinition.Locale.ToString()
-			};
-			
-			return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(Builders<dynamic>.IndexKeys.Text(indexDefinition.Field), indexOptions), cancellationToken: cancellationToken);
+				var indexOptions = new CreateIndexOptions
+				{
+					DefaultLanguage = indexDefinition.Locale.ToString()
+				};
+				
+				var isWeighted = indexDefinition.WeightedFields.Any(x => x.Value > 1) && indexDefinition.WeightedFields.Count > 1;
+				if (isWeighted)
+				{
+					indexOptions.Weights = new BsonDocument(indexDefinition.WeightedFields);
+					var indexKeys = Builders<dynamic>.IndexKeys.Combine(indexDefinition.Fields.Select(field => Builders<dynamic>.IndexKeys.Text(field)));
+					var index = new CreateIndexModel<dynamic>(indexKeys, indexOptions);
+					return await this.Collection.Indexes.CreateOneAsync(index, cancellationToken: cancellationToken);
+				}
+				else if (indexDefinition.Fields.Length > 1)
+				{
+					var indexKeys = Builders<dynamic>.IndexKeys.Combine(indexDefinition.Fields.Select(field => Builders<dynamic>.IndexKeys.Text(field)));
+					var index = new CreateIndexModel<dynamic>(indexKeys, indexOptions);
+					return await this.Collection.Indexes.CreateOneAsync(index, cancellationToken: cancellationToken);
+				}
+				else
+				{
+					var field = indexDefinition.Fields.FirstOrDefault();
+					var indexKeys = Builders<dynamic>.IndexKeys.Text(field);
+					var index = new CreateIndexModel<dynamic>(indexKeys, indexOptions);
+					return await this.Collection.Indexes.CreateOneAsync(index, cancellationToken: cancellationToken);
+				}
+			}
+			else
+			{
+				throw new IndexException("No fields defined");
+			}
 		}
 
 		#endregion

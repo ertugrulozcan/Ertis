@@ -263,6 +263,7 @@ namespace Ertis.MongoDB.Repository
 			{
 				var indexOptions = new CreateIndexOptions
 				{
+					Name = indexDefinition.Key, 
 					DefaultLanguage = indexDefinition.Locale.ToString()
 				};
 				

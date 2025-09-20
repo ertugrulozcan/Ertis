@@ -12,6 +12,8 @@ public class RawRequestBody : IRequestBody
     
     private string ContentType { get; }
     
+    private string? Encoding { get; }
+    
     #endregion
     
     #region Constructors
@@ -22,11 +24,13 @@ public class RawRequestBody : IRequestBody
     /// <param name="payload"></param>
     /// <param name="bodyType"></param>
     /// <param name="contentType"></param>
-    public RawRequestBody(byte[] payload, BodyTypes bodyType, string contentType)
+    /// <param name="encoding"></param>
+    public RawRequestBody(byte[] payload, BodyTypes bodyType, string contentType, string? encoding = null)
     {
         this.Payload = payload;
         this.Type = bodyType;
         this.ContentType = contentType;
+        this.Encoding = encoding;
     }
     
     #endregion
@@ -38,7 +42,11 @@ public class RawRequestBody : IRequestBody
         if (this.Payload is byte[] buffer)
         {
             var content = new ByteArrayContent(buffer);
-            content.Headers.ContentType = new MediaTypeHeaderValue(this.ContentType);
+            content.Headers.ContentType = new MediaTypeHeaderValue(this.ContentType)
+            {
+                CharSet = this.Encoding
+            };
+            
             return content;	
         }
         else

@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <PackageId>Ertis.MongoDB</PackageId>
-        <PackageVersion>9.1.1</PackageVersion>
+        <PackageVersion>9.1.2</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.MongoDB</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -13,8 +13,8 @@
         <Title>Ertis.MongoDB</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>9.1.1</AssemblyVersion>
-        <FileVersion>9.1.1</FileVersion>
+        <AssemblyVersion>9.1.2</AssemblyVersion>
+        <FileVersion>9.1.2</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

@@ -22,1609 +22,1608 @@ using SortDirection = Ertis.Core.Collections.SortDirection;
 using UpdateOptions = Ertis.Data.Models.UpdateOptions;
 
 // ReSharper disable MethodOverloadWithOptionalParameter
-namespace Ertis.MongoDB.Repository
+namespace Ertis.MongoDB.Repository;
+
+// ReSharper disable once UnusedType.Global
+public abstract class DynamicMongoRepository : IDynamicMongoRepository
 {
-	// ReSharper disable once UnusedType.Global
-	public abstract class DynamicMongoRepository : IDynamicMongoRepository
+	#region Services
+
+	private readonly IRepositoryActionBinder _actionBinder;
+	private readonly IDatabaseSettings _settings;
+
+	#endregion
+	
+	#region Properties
+	
+	public string CollectionName { get; }
+	
+	private IMongoCollection<dynamic> Collection { get; }
+	
+	private IMongoCollection<BsonDocument> DocumentCollection { get; }
+
+	#endregion
+
+	#region Constructors
+
+	/// <summary>
+	/// Constructor
+	/// </summary>
+	/// <param name="clientProvider"></param>
+	/// <param name="settings"></param>
+	/// <param name="collectionName"></param>
+	/// <param name="actionBinder"></param>
+	protected DynamicMongoRepository(IMongoClientProvider clientProvider, IDatabaseSettings settings, string collectionName, IRepositoryActionBinder actionBinder = null)
 	{
-		#region Services
-
-		private readonly IRepositoryActionBinder _actionBinder;
-		private readonly IDatabaseSettings _settings;
-
-		#endregion
+		this._settings = settings;
 		
-		#region Properties
-		
-		public string CollectionName { get; }
-		
-		private IMongoCollection<dynamic> Collection { get; }
-		
-		private IMongoCollection<BsonDocument> DocumentCollection { get; }
+		var database = clientProvider.Client.GetDatabase(settings.DefaultAuthDatabase);
 
-		#endregion
+		this.CollectionName = collectionName;
+		this.Collection = database.GetCollection<dynamic>(collectionName);
+		this.DocumentCollection = database.GetCollection<BsonDocument>(collectionName);
+		
+		this._actionBinder = actionBinder;
+	}
 
-		#region Constructors
+	#endregion
+	
+	#region Find Methods
 
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		/// <param name="clientProvider"></param>
-		/// <param name="settings"></param>
-		/// <param name="collectionName"></param>
-		/// <param name="actionBinder"></param>
-		protected DynamicMongoRepository(IMongoClientProvider clientProvider, IDatabaseSettings settings, string collectionName, IRepositoryActionBinder actionBinder = null)
+	public dynamic FindOne(string id)
+	{
+		return this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id))).FirstOrDefault();
+	}
+	
+	// ReSharper disable once UnusedMember.Local
+	private dynamic FindOne(ObjectId objectId)
+	{
+		return this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", objectId)).FirstOrDefault();
+	}
+	
+	public async Task<dynamic> FindOneAsync(string id, CancellationToken cancellationToken = default)
+	{
+		return await this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id))).FirstOrDefaultAsync(cancellationToken: cancellationToken);
+	}
+	
+	// ReSharper disable once UnusedMember.Local
+	private async Task<dynamic> FindOneAsync(ObjectId objectId, CancellationToken cancellationToken = default)
+	{
+		return await this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", objectId)).FirstOrDefaultAsync(cancellationToken: cancellationToken);
+	}
+
+	public dynamic FindOne(Expression<Func<dynamic, bool>> expression)
+	{
+		var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+		return this.Collection.Find(filterDefinition).FirstOrDefault();
+	}
+
+	public async Task<dynamic> FindOneAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
+	{
+		var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+		return await (await this.Collection.FindAsync(filterDefinition, cancellationToken: cancellationToken)).FirstOrDefaultAsync(cancellationToken: cancellationToken);	
+	}
+	
+	public IPaginationCollection<dynamic> Find(
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		string orderBy = null,
+		SortDirection? sortDirection = null)
+	{
+		return this.Find(skip, limit, withCount, orderBy, sortDirection, locale: null);
+	}
+	
+	public IPaginationCollection<dynamic> Find(
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		Sorting sorting = null)
+	{
+		return this.Find(skip, limit, withCount, sorting, locale: null);
+	}
+
+	public async Task<IPaginationCollection<dynamic>> FindAsync(
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		string orderBy = null,
+		SortDirection? sortDirection = null,
+		CancellationToken cancellationToken = default)
+	{
+		return await this.FindAsync(skip, limit, withCount, orderBy, sortDirection, locale: null, cancellationToken: cancellationToken);
+	}
+	
+	public async Task<IPaginationCollection<dynamic>> FindAsync(
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		Sorting sorting = null, 
+		CancellationToken cancellationToken = default)
+	{
+		return await this.FindAsync(skip, limit, withCount, sorting, locale: null, cancellationToken: cancellationToken);
+	}
+
+	public IPaginationCollection<dynamic> Find(
+		Expression<Func<dynamic, bool>> expression,
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		string orderBy = null,
+		SortDirection? sortDirection = null)
+	{
+		return this.Find(expression, skip, limit, withCount, orderBy, sortDirection, locale: null);
+	}
+	
+	public IPaginationCollection<dynamic> Find(
+		Expression<Func<dynamic, bool>> expression,
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		Sorting sorting = null)
+	{
+		return this.Find(expression, skip, limit, withCount, sorting, locale: null);
+	}
+
+	public async Task<IPaginationCollection<dynamic>> FindAsync(
+		Expression<Func<dynamic, bool>> expression,
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		string orderBy = null,
+		SortDirection? sortDirection = null,
+		CancellationToken cancellationToken = default)
+	{
+		return await this.FindAsync(expression, skip, limit, withCount, orderBy, sortDirection, locale: null, cancellationToken: cancellationToken);
+	}
+	
+	public async Task<IPaginationCollection<dynamic>> FindAsync(
+		Expression<Func<dynamic, bool>> expression,
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		Sorting sorting = null, 
+		CancellationToken cancellationToken = default)
+	{
+		return await this.FindAsync(expression, skip, limit, withCount, sorting, locale: null, cancellationToken: cancellationToken);
+	}
+
+	public IPaginationCollection<dynamic> Find(
+		string query,
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		string orderBy = null,
+		SortDirection? sortDirection = null)
+	{
+		return this.Find(query, skip, limit, withCount, orderBy, sortDirection, locale: null);
+	}
+	
+	public IPaginationCollection<dynamic> Find(
+		string query,
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		Sorting sorting = null)
+	{
+		return this.Find(query, skip, limit, withCount, sorting, locale: null);
+	}
+
+	public async Task<IPaginationCollection<dynamic>> FindAsync(
+		string query,
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		string orderBy = null,
+		SortDirection? sortDirection = null,
+		CancellationToken cancellationToken = default)
+	{
+		return await this.FindAsync(query, skip, limit, withCount, orderBy, sortDirection, locale: null, cancellationToken: cancellationToken);
+	}
+	
+	public async Task<IPaginationCollection<dynamic>> FindAsync(
+		string query,
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		Sorting sorting = null, 
+		CancellationToken cancellationToken = default)
+	{
+		return await this.FindAsync(query, skip, limit, withCount, sorting, locale: null, cancellationToken: cancellationToken);
+	}
+
+	public IPaginationCollection<dynamic> Find(
+		int? skip = null, 
+		int? limit = null, 
+		bool? withCount = null,
+		string orderBy = null, 
+		SortDirection? sortDirection = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null)
+	{
+		return this.Find(
+			expression: null,
+			skip,
+			limit,
+			withCount,
+			orderBy,
+			sortDirection,
+			indexOptions, 
+			locale);
+	}
+	
+	public IPaginationCollection<dynamic> Find(
+		int? skip = null, 
+		int? limit = null, 
+		bool? withCount = null,
+		Sorting sorting = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null)
+	{
+		return this.Find(
+			expression: null,
+			skip,
+			limit,
+			withCount,
+			sorting,
+			indexOptions, 
+			locale);
+	}
+
+	public async Task<IPaginationCollection<dynamic>> FindAsync(
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		string orderBy = null,
+		SortDirection? sortDirection = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null, 
+		CancellationToken cancellationToken = default)
+	{
+		return await this.FindAsync(
+			expression: null,
+			skip,
+			limit,
+			withCount,
+			orderBy,
+			sortDirection, 
+			indexOptions, 
+			locale, 
+			cancellationToken: cancellationToken);
+	}
+	
+	public async Task<IPaginationCollection<dynamic>> FindAsync(
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		Sorting sorting = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null, 
+		CancellationToken cancellationToken = default)
+	{
+		return await this.FindAsync(
+			expression: null,
+			skip,
+			limit,
+			withCount,
+			sorting, 
+			indexOptions, 
+			locale, 
+			cancellationToken: cancellationToken);
+	}
+	
+	public IPaginationCollection<dynamic> Find(
+		Expression<Func<dynamic, bool>> expression, 
+		int? skip = null, 
+		int? limit = null, 
+		bool? withCount = null, 
+		string orderBy = null, 
+		SortDirection? sortDirection = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null)
+	{
+		var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+		return this.Filter(filterExpression, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, locale);
+	}
+	
+	public IPaginationCollection<dynamic> Find(
+		Expression<Func<dynamic, bool>> expression, 
+		int? skip = null, 
+		int? limit = null, 
+		bool? withCount = null, 
+		Sorting sorting = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null)
+	{
+		var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+		return this.Filter(filterExpression, skip, limit, withCount, sorting, indexOptions, locale);
+	}
+	
+	public async Task<IPaginationCollection<dynamic>> FindAsync(
+		Expression<Func<dynamic, bool>> expression, 
+		int? skip = null, 
+		int? limit = null, 
+		bool? withCount = null, 
+		string orderBy = null, 
+		SortDirection? sortDirection = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null, 
+		CancellationToken cancellationToken = default)
+	{
+		var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+		return await this.FilterAsync(filterExpression, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, locale, cancellationToken: cancellationToken);
+	}
+	
+	public async Task<IPaginationCollection<dynamic>> FindAsync(
+		Expression<Func<dynamic, bool>> expression, 
+		int? skip = null, 
+		int? limit = null, 
+		bool? withCount = null, 
+		Sorting sorting = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null, 
+		CancellationToken cancellationToken = default)
+	{
+		var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+		return await this.FilterAsync(filterExpression, skip, limit, withCount, sorting, indexOptions, locale, cancellationToken: cancellationToken);
+	}
+	
+	public IPaginationCollection<dynamic> Find(
+		string query, 
+		int? skip = null, 
+		int? limit = null, 
+		bool? withCount = null, 
+		string orderBy = null, 
+		SortDirection? sortDirection = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null)
+	{
+		query = QueryHelper.EnsureObjectIdsAndISODates(query);
+		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+		return this.Filter(filterDefinition, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, locale);
+	}
+	
+	public IPaginationCollection<dynamic> Find(
+		string query, 
+		int? skip = null, 
+		int? limit = null, 
+		bool? withCount = null, 
+		Sorting sorting = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null)
+	{
+		query = QueryHelper.EnsureObjectIdsAndISODates(query);
+		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+		return this.Filter(filterDefinition, skip, limit, withCount, sorting, indexOptions, locale);
+	}
+	
+	public async Task<IPaginationCollection<dynamic>> FindAsync(
+		string query, 
+		int? skip = null, 
+		int? limit = null, 
+		bool? withCount = null, 
+		string orderBy = null, 
+		SortDirection? sortDirection = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null, 
+		CancellationToken cancellationToken = default)
+	{
+		query = QueryHelper.EnsureObjectIdsAndISODates(query);
+		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+		return await this.FilterAsync(filterDefinition, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, locale, cancellationToken: cancellationToken);
+	}
+	
+	public async Task<IPaginationCollection<dynamic>> FindAsync(
+		string query, 
+		int? skip = null, 
+		int? limit = null, 
+		bool? withCount = null, 
+		Sorting sorting = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null, 
+		CancellationToken cancellationToken = default)
+	{
+		query = QueryHelper.EnsureObjectIdsAndISODates(query);
+		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+		return await this.FilterAsync(filterDefinition, skip, limit, withCount, sorting, indexOptions, locale, cancellationToken: cancellationToken);
+	}
+	
+	private IPaginationCollection<dynamic> Filter(
+		FilterDefinition<dynamic> predicate, 
+		int? skip = null, 
+		int? limit = null, 
+		bool? withCount = null, 
+		Sorting sorting = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null)
+	{
+		var collection = this.ExecuteFilter(predicate, skip, limit, sorting, indexOptions, locale);
+
+		long totalCount = 0;
+		if (withCount != null && withCount.Value)
 		{
-			this._settings = settings;
+			totalCount = this.Collection.CountDocuments(predicate);
+		}
+
+		return new PaginationCollection<dynamic>
+		{
+			Count = totalCount,
+			Items = collection.ToList()
+		};
+	}
+	
+	private async Task<IPaginationCollection<dynamic>> FilterAsync(
+		FilterDefinition<dynamic> predicate, 
+		int? skip = null, 
+		int? limit = null, 
+		bool? withCount = null, 
+		Sorting sorting = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null, 
+		CancellationToken cancellationToken = default)
+	{
+		var collection = this.ExecuteFilter(predicate, skip, limit, sorting, indexOptions, locale);
+
+		long totalCount = 0;
+		if (withCount != null && withCount.Value)
+		{
+			totalCount = await this.Collection.CountDocumentsAsync(predicate, cancellationToken: cancellationToken);
+		}
+
+		return new PaginationCollection<dynamic>
+		{
+			Count = totalCount,
+			Items = await collection.ToListAsync(cancellationToken: cancellationToken)
+		};
+	}
+	
+	private IFindFluent<dynamic, dynamic> ExecuteFilter(
+		FilterDefinition<dynamic> predicate,
+		int? skip = null,
+		int? limit = null,
+		Sorting sorting = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null)
+	{
+		predicate ??= new ExpressionFilterDefinition<dynamic>(item => true);
+
+		SortDefinition<dynamic> sortDefinition = null;
+		if (sorting != null && sorting.Any())
+		{
+			var sortDefinitionBuilder = new SortDefinitionBuilder<dynamic>();
+			var sortDefinitions = new List<SortDefinition<dynamic>>();
+			foreach (var sortField in sorting)
+			{
+				if (sortField.OrderBy != null && !string.IsNullOrEmpty(sortField.OrderBy.Trim()))
+				{
+					var fieldDefinition = new StringFieldDefinition<dynamic>(sortField.OrderBy);
+					sortDefinitions.Add(sortField.SortDirection is null or SortDirection.Ascending 
+						? sortDefinitionBuilder.Ascending(fieldDefinition) 
+						: sortDefinitionBuilder.Descending(fieldDefinition));
+				}
+			}
 			
-			var database = clientProvider.Client.GetDatabase(settings.DefaultAuthDatabase);
-
-			this.CollectionName = collectionName;
-			this.Collection = database.GetCollection<dynamic>(collectionName);
-			this.DocumentCollection = database.GetCollection<BsonDocument>(collectionName);
-			
-			this._actionBinder = actionBinder;
-		}
-
-		#endregion
-		
-		#region Find Methods
-
-		public dynamic FindOne(string id)
-		{
-			return this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id))).FirstOrDefault();
+			sortDefinition = sortDefinitionBuilder.Combine(sortDefinitions);
 		}
 		
-		// ReSharper disable once UnusedMember.Local
-		private dynamic FindOne(ObjectId objectId)
+		var options = this.GetFindOptions(sorting, indexOptions, locale);
+		var collection = this.Collection.Find(predicate, options);
+		if (sortDefinition != null)
 		{
-			return this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", objectId)).FirstOrDefault();
+			collection = collection.Sort(sortDefinition);
 		}
 		
-		public async Task<dynamic> FindOneAsync(string id, CancellationToken cancellationToken = default)
+		if (skip != null && limit != null)
 		{
-			return await this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id))).FirstOrDefaultAsync(cancellationToken: cancellationToken);
+			collection = collection.Skip(skip).Limit(limit);
 		}
-		
-		// ReSharper disable once UnusedMember.Local
-		private async Task<dynamic> FindOneAsync(ObjectId objectId, CancellationToken cancellationToken = default)
+		else if (skip != null)
 		{
-			return await this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", objectId)).FirstOrDefaultAsync(cancellationToken: cancellationToken);
+			collection = collection.Skip(skip);
+		}
+		else if (limit != null)
+		{
+			collection = collection.Limit(limit);
 		}
 
-		public dynamic FindOne(Expression<Func<dynamic, bool>> expression)
+		return collection;
+	}
+	
+	private FindOptions GetFindOptions(Sorting sorting = null, IndexOptions indexOptions = null, Locale? locale = null)
+	{
+		if (sorting != null && sorting.Any(x => x.OrderBy != "_id") && locale != null)
 		{
-			var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-			return this.Collection.Find(filterDefinition).FirstOrDefault();
+			var collation = new Collation(LocaleHelper.GetLanguageCode(locale.Value));
+			return new FindOptions
+			{
+				AllowDiskUse = this._settings.AllowDiskUse, 
+				Collation = collation,
+				Hint = indexOptions != null && !string.IsNullOrEmpty(indexOptions.Hint) ? new BsonDocument(indexOptions.Hint, 1) : null
+			};
 		}
+		else if (this._settings.AllowDiskUse == true)
+		{
+			return new FindOptions
+			{
+				AllowDiskUse = true,
+				Hint = indexOptions != null && !string.IsNullOrEmpty(indexOptions.Hint) ? new BsonDocument(indexOptions.Hint, 1) : null
+			};
+		}
+		
+		return null;
+	}
+	
+	#endregion
 
-		public async Task<dynamic> FindOneAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
-		{
-			var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-			return await (await this.Collection.FindAsync(filterDefinition, cancellationToken: cancellationToken)).FirstOrDefaultAsync(cancellationToken: cancellationToken);	
-		}
-		
-		public IPaginationCollection<dynamic> Find(
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			string orderBy = null,
-			SortDirection? sortDirection = null)
-		{
-			return this.Find(skip, limit, withCount, orderBy, sortDirection, locale: null);
-		}
-		
-		public IPaginationCollection<dynamic> Find(
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			Sorting sorting = null)
-		{
-			return this.Find(skip, limit, withCount, sorting, locale: null);
-		}
+	#region Query Methods
 
-		public async Task<IPaginationCollection<dynamic>> FindAsync(
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			string orderBy = null,
-			SortDirection? sortDirection = null,
-			CancellationToken cancellationToken = default)
+	public IPaginationCollection<dynamic> Query(
+		string query,
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		Sorting sorting = null, 
+		IDictionary<string, bool> selectFields = null,
+		IndexOptions indexOptions = null,
+		Locale? locale = null)
+	{
+		try
 		{
-			return await this.FindAsync(skip, limit, withCount, orderBy, sortDirection, locale: null, cancellationToken: cancellationToken);
-		}
-		
-		public async Task<IPaginationCollection<dynamic>> FindAsync(
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			Sorting sorting = null, 
-			CancellationToken cancellationToken = default)
-		{
-			return await this.FindAsync(skip, limit, withCount, sorting, locale: null, cancellationToken: cancellationToken);
-		}
-
-		public IPaginationCollection<dynamic> Find(
-			Expression<Func<dynamic, bool>> expression,
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			string orderBy = null,
-			SortDirection? sortDirection = null)
-		{
-			return this.Find(expression, skip, limit, withCount, orderBy, sortDirection, locale: null);
-		}
-		
-		public IPaginationCollection<dynamic> Find(
-			Expression<Func<dynamic, bool>> expression,
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			Sorting sorting = null)
-		{
-			return this.Find(expression, skip, limit, withCount, sorting, locale: null);
-		}
-
-		public async Task<IPaginationCollection<dynamic>> FindAsync(
-			Expression<Func<dynamic, bool>> expression,
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			string orderBy = null,
-			SortDirection? sortDirection = null,
-			CancellationToken cancellationToken = default)
-		{
-			return await this.FindAsync(expression, skip, limit, withCount, orderBy, sortDirection, locale: null, cancellationToken: cancellationToken);
-		}
-		
-		public async Task<IPaginationCollection<dynamic>> FindAsync(
-			Expression<Func<dynamic, bool>> expression,
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			Sorting sorting = null, 
-			CancellationToken cancellationToken = default)
-		{
-			return await this.FindAsync(expression, skip, limit, withCount, sorting, locale: null, cancellationToken: cancellationToken);
-		}
-
-		public IPaginationCollection<dynamic> Find(
-			string query,
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			string orderBy = null,
-			SortDirection? sortDirection = null)
-		{
-			return this.Find(query, skip, limit, withCount, orderBy, sortDirection, locale: null);
-		}
-		
-		public IPaginationCollection<dynamic> Find(
-			string query,
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			Sorting sorting = null)
-		{
-			return this.Find(query, skip, limit, withCount, sorting, locale: null);
-		}
-
-		public async Task<IPaginationCollection<dynamic>> FindAsync(
-			string query,
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			string orderBy = null,
-			SortDirection? sortDirection = null,
-			CancellationToken cancellationToken = default)
-		{
-			return await this.FindAsync(query, skip, limit, withCount, orderBy, sortDirection, locale: null, cancellationToken: cancellationToken);
-		}
-		
-		public async Task<IPaginationCollection<dynamic>> FindAsync(
-			string query,
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			Sorting sorting = null, 
-			CancellationToken cancellationToken = default)
-		{
-			return await this.FindAsync(query, skip, limit, withCount, sorting, locale: null, cancellationToken: cancellationToken);
-		}
-
-		public IPaginationCollection<dynamic> Find(
-			int? skip = null, 
-			int? limit = null, 
-			bool? withCount = null,
-			string orderBy = null, 
-			SortDirection? sortDirection = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null)
-		{
-			return this.Find(
-				expression: null,
-				skip,
-				limit,
-				withCount,
-				orderBy,
-				sortDirection,
-				indexOptions, 
-				locale);
-		}
-		
-		public IPaginationCollection<dynamic> Find(
-			int? skip = null, 
-			int? limit = null, 
-			bool? withCount = null,
-			Sorting sorting = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null)
-		{
-			return this.Find(
-				expression: null,
-				skip,
-				limit,
-				withCount,
-				sorting,
-				indexOptions, 
-				locale);
-		}
-
-		public async Task<IPaginationCollection<dynamic>> FindAsync(
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			string orderBy = null,
-			SortDirection? sortDirection = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null, 
-			CancellationToken cancellationToken = default)
-		{
-			return await this.FindAsync(
-				expression: null,
-				skip,
-				limit,
-				withCount,
-				orderBy,
-				sortDirection, 
-				indexOptions, 
-				locale, 
-				cancellationToken: cancellationToken);
-		}
-		
-		public async Task<IPaginationCollection<dynamic>> FindAsync(
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			Sorting sorting = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null, 
-			CancellationToken cancellationToken = default)
-		{
-			return await this.FindAsync(
-				expression: null,
+			query = QueryHelper.EnsureObjectIdsAndISODates(query);
+			var filterDefinition = new JsonFilterDefinition<dynamic>(query);
+			return this.ExecuteQuery(
+				filterDefinition,
 				skip,
 				limit,
 				withCount,
 				sorting, 
+				selectFields, 
+				indexOptions, 
+				locale);
+		}
+		catch (MongoCommandException ex)
+		{
+			switch (ex.Code)
+			{
+				case 31249:
+					throw new SelectQueryPathCollisionException(ex);
+				case 31254:
+					throw new SelectQueryInclusionException(ex);
+				default:
+					throw;
+			}
+		}
+	}
+
+	public IPaginationCollection<dynamic> Query(
+		string query, 
+		int? skip = null, 
+		int? limit = null, 
+		bool? withCount = null, 
+		string orderBy = null, 
+		SortDirection? sortDirection = null,
+		IDictionary<string, bool> selectFields = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null)
+	{
+		return this.Query(
+			query,
+			skip,
+			limit,
+			withCount,
+			new Sorting(orderBy, sortDirection), 
+			selectFields,
+			indexOptions, 
+			locale);
+	}
+
+	public IPaginationCollection<dynamic> Query(
+		Expression<Func<dynamic, bool>> expression,
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		Sorting sorting = null, 
+		IDictionary<string, bool> selectFields = null,
+		IndexOptions indexOptions = null,
+		Locale? locale = null)
+	{
+		try
+		{
+			var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+			return this.ExecuteQuery(
+				filterDefinition,
+				skip,
+				limit,
+				withCount,
+				sorting,
+				selectFields, 
+				indexOptions, 
+				locale);
+		}
+		catch (MongoCommandException ex)
+		{
+			switch (ex.Code)
+			{
+				case 31249:
+					throw new SelectQueryPathCollisionException(ex);
+				case 31254:
+					throw new SelectQueryInclusionException(ex);
+				default:
+					throw;
+			}
+		}
+	}
+
+	public IPaginationCollection<dynamic> Query(
+		Expression<Func<dynamic, bool>> expression,
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		string orderBy = null,
+		SortDirection? sortDirection = null,
+		IDictionary<string, bool> selectFields = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null)
+	{
+		return this.Query(
+			expression,
+			skip,
+			limit,
+			withCount,
+			new Sorting(orderBy, sortDirection), 
+			selectFields,
+			indexOptions, 
+			locale);
+	}
+
+	public async Task<IPaginationCollection<dynamic>> QueryAsync(
+		string query,
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		Sorting sorting = null, 
+		IDictionary<string, bool> selectFields = null,
+		IndexOptions indexOptions = null,
+		Locale? locale = null,
+		CancellationToken cancellationToken = default)
+	{
+		try
+		{
+			query = QueryHelper.EnsureObjectIdsAndISODates(query);
+			var filterDefinition = new JsonFilterDefinition<dynamic>(query);
+			return await this.ExecuteQueryAsync(
+				filterDefinition,
+				skip,
+				limit,
+				withCount,
+				sorting, 
+				selectFields, 
 				indexOptions, 
 				locale, 
 				cancellationToken: cancellationToken);
 		}
-		
-		public IPaginationCollection<dynamic> Find(
-			Expression<Func<dynamic, bool>> expression, 
-			int? skip = null, 
-			int? limit = null, 
-			bool? withCount = null, 
-			string orderBy = null, 
-			SortDirection? sortDirection = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null)
+		catch (MongoCommandException ex)
 		{
-			var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-			return this.Filter(filterExpression, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, locale);
+			switch (ex.Code)
+			{
+				case 31249:
+					throw new SelectQueryPathCollisionException(ex);
+				case 31254:
+					throw new SelectQueryInclusionException(ex);
+				default:
+					throw;
+			}
 		}
-		
-		public IPaginationCollection<dynamic> Find(
-			Expression<Func<dynamic, bool>> expression, 
-			int? skip = null, 
-			int? limit = null, 
-			bool? withCount = null, 
-			Sorting sorting = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null)
-		{
-			var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-			return this.Filter(filterExpression, skip, limit, withCount, sorting, indexOptions, locale);
-		}
-		
-		public async Task<IPaginationCollection<dynamic>> FindAsync(
-			Expression<Func<dynamic, bool>> expression, 
-			int? skip = null, 
-			int? limit = null, 
-			bool? withCount = null, 
-			string orderBy = null, 
-			SortDirection? sortDirection = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null, 
-			CancellationToken cancellationToken = default)
-		{
-			var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-			return await this.FilterAsync(filterExpression, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, locale, cancellationToken: cancellationToken);
-		}
-		
-		public async Task<IPaginationCollection<dynamic>> FindAsync(
-			Expression<Func<dynamic, bool>> expression, 
-			int? skip = null, 
-			int? limit = null, 
-			bool? withCount = null, 
-			Sorting sorting = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null, 
-			CancellationToken cancellationToken = default)
-		{
-			var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-			return await this.FilterAsync(filterExpression, skip, limit, withCount, sorting, indexOptions, locale, cancellationToken: cancellationToken);
-		}
-		
-		public IPaginationCollection<dynamic> Find(
-			string query, 
-			int? skip = null, 
-			int? limit = null, 
-			bool? withCount = null, 
-			string orderBy = null, 
-			SortDirection? sortDirection = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null)
-		{
-			query = QueryHelper.EnsureObjectIdsAndISODates(query);
-			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-			return this.Filter(filterDefinition, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, locale);
-		}
-		
-		public IPaginationCollection<dynamic> Find(
-			string query, 
-			int? skip = null, 
-			int? limit = null, 
-			bool? withCount = null, 
-			Sorting sorting = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null)
-		{
-			query = QueryHelper.EnsureObjectIdsAndISODates(query);
-			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-			return this.Filter(filterDefinition, skip, limit, withCount, sorting, indexOptions, locale);
-		}
-		
-		public async Task<IPaginationCollection<dynamic>> FindAsync(
-			string query, 
-			int? skip = null, 
-			int? limit = null, 
-			bool? withCount = null, 
-			string orderBy = null, 
-			SortDirection? sortDirection = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null, 
-			CancellationToken cancellationToken = default)
-		{
-			query = QueryHelper.EnsureObjectIdsAndISODates(query);
-			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-			return await this.FilterAsync(filterDefinition, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, locale, cancellationToken: cancellationToken);
-		}
-		
-		public async Task<IPaginationCollection<dynamic>> FindAsync(
-			string query, 
-			int? skip = null, 
-			int? limit = null, 
-			bool? withCount = null, 
-			Sorting sorting = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null, 
-			CancellationToken cancellationToken = default)
-		{
-			query = QueryHelper.EnsureObjectIdsAndISODates(query);
-			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-			return await this.FilterAsync(filterDefinition, skip, limit, withCount, sorting, indexOptions, locale, cancellationToken: cancellationToken);
-		}
-		
-		private IPaginationCollection<dynamic> Filter(
-			FilterDefinition<dynamic> predicate, 
-			int? skip = null, 
-			int? limit = null, 
-			bool? withCount = null, 
-			Sorting sorting = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null)
-		{
-			var collection = this.ExecuteFilter(predicate, skip, limit, sorting, indexOptions, locale);
+	}
+	
+	public async Task<IPaginationCollection<dynamic>> QueryAsync(
+		string query, 
+		int? skip = null, 
+		int? limit = null, 
+		bool? withCount = null, 
+		string orderBy = null, 
+		SortDirection? sortDirection = null,
+		IDictionary<string, bool> selectFields = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null, 
+		CancellationToken cancellationToken = default)
+	{
+		return await this.QueryAsync(
+			query,
+			skip,
+			limit,
+			withCount,
+			new Sorting(orderBy, sortDirection), 
+			selectFields,
+			indexOptions, 
+			locale,
+			cancellationToken: cancellationToken);
+	}
 
+	public async Task<IPaginationCollection<dynamic>> QueryAsync(
+		Expression<Func<dynamic, bool>> expression,
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		string orderBy = null,
+		SortDirection? sortDirection = null,
+		IDictionary<string, bool> selectFields = null,
+		IndexOptions indexOptions = null,
+		Locale? locale = null,
+		CancellationToken cancellationToken = default)
+	{
+		return await this.QueryAsync(
+			expression,
+			skip,
+			limit,
+			withCount,
+			new Sorting(orderBy, sortDirection),
+			selectFields,
+			indexOptions, 
+			locale,
+			cancellationToken: cancellationToken);
+	}
+
+	public async Task<IPaginationCollection<dynamic>> QueryAsync(
+		Expression<Func<dynamic, bool>> expression,
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		Sorting sorting = null, 
+		IDictionary<string, bool> selectFields = null,
+		IndexOptions indexOptions = null,
+		Locale? locale = null, 
+		CancellationToken cancellationToken = default)
+	{
+		try
+		{
+			var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+			return await this.ExecuteQueryAsync(
+				filterDefinition,
+				skip,
+				limit,
+				withCount,
+				sorting,
+				selectFields, 
+				indexOptions, 
+				locale, 
+				cancellationToken: cancellationToken);
+		}
+		catch (MongoCommandException ex)
+		{
+			switch (ex.Code)
+			{
+				case 31249:
+					throw new SelectQueryPathCollisionException(ex);
+				case 31254:
+					throw new SelectQueryInclusionException(ex);
+				default:
+					throw;
+			}
+		}
+	}
+
+	private IPaginationCollection<dynamic> ExecuteQuery(
+		FilterDefinition<dynamic> filterDefinition,
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		Sorting sorting = null, 
+		IDictionary<string, bool> selectFields = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null)
+	{
+		try
+		{
+			var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, indexOptions, locale);
+			var projectionDefinition = ExecuteSelectQuery<dynamic>(selectFields);
+			var collection = filterResult.Project(projectionDefinition);
+		
 			long totalCount = 0;
 			if (withCount != null && withCount.Value)
 			{
-				totalCount = this.Collection.CountDocuments(predicate);
+				totalCount = this.Collection.CountDocuments(filterDefinition);
 			}
+
+			var documents = collection.ToList();
+			var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
 
 			return new PaginationCollection<dynamic>
 			{
 				Count = totalCount,
-				Items = collection.ToList()
-			};
+				Items = objects
+			};	
 		}
-		
-		private async Task<IPaginationCollection<dynamic>> FilterAsync(
-			FilterDefinition<dynamic> predicate, 
-			int? skip = null, 
-			int? limit = null, 
-			bool? withCount = null, 
-			Sorting sorting = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null, 
-			CancellationToken cancellationToken = default)
+		catch (MongoCommandException ex)
 		{
-			var collection = this.ExecuteFilter(predicate, skip, limit, sorting, indexOptions, locale);
-
+			switch (ex.Code)
+			{
+				case 31249:
+					throw new SelectQueryPathCollisionException(ex);
+				case 31254:
+					throw new SelectQueryInclusionException(ex);
+				default:
+					throw;
+			}
+		}
+	}
+	
+	private async Task<IPaginationCollection<dynamic>> ExecuteQueryAsync(
+		FilterDefinition<dynamic> filterDefinition,
+		int? skip = null,
+		int? limit = null,
+		bool? withCount = null,
+		Sorting sorting = null, 
+		IDictionary<string, bool> selectFields = null, 
+		IndexOptions indexOptions = null,
+		Locale? locale = null, 
+		CancellationToken cancellationToken = default)
+	{
+		try
+		{
+			var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, indexOptions, locale);
+			var projectionDefinition = ExecuteSelectQuery<dynamic>(selectFields);
+			var collection = filterResult.Project(projectionDefinition);
+		
 			long totalCount = 0;
 			if (withCount != null && withCount.Value)
 			{
-				totalCount = await this.Collection.CountDocumentsAsync(predicate, cancellationToken: cancellationToken);
+				totalCount = await this.Collection.CountDocumentsAsync(filterDefinition, cancellationToken: cancellationToken);
 			}
+
+			var documents = await collection.ToListAsync(cancellationToken: cancellationToken);
+			var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
 
 			return new PaginationCollection<dynamic>
 			{
 				Count = totalCount,
-				Items = await collection.ToListAsync(cancellationToken: cancellationToken)
-			};
+				Items = objects
+			};	
+		}
+		catch (MongoCommandException ex)
+		{
+			switch (ex.Code)
+			{
+				case 31249:
+					throw new SelectQueryPathCollisionException(ex);
+				case 31254:
+					throw new SelectQueryInclusionException(ex);
+				default:
+					throw;
+			}
+		}
+	}
+
+	#endregion
+	
+	#region Distinct Methods
+
+	public TField[] Distinct<TField>(string distinctBy, string query = null)
+	{
+		FieldDefinition<dynamic, TField> fieldDefinition = new StringFieldDefinition<dynamic, TField>(distinctBy);
+		query = QueryHelper.EnsureObjectIdsAndISODates(query);
+		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+		var cursor = this.Collection.Distinct(fieldDefinition, filterDefinition);
+		return cursor.Current.ToArray();
+	}
+	
+	public async Task<TField[]> DistinctAsync<TField>(string distinctBy, string query = null, CancellationToken cancellationToken = default)
+	{
+		FieldDefinition<dynamic, TField> fieldDefinition = new StringFieldDefinition<dynamic, TField>(distinctBy);
+		query = QueryHelper.EnsureObjectIdsAndISODates(query);
+		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+		var cursor = await this.Collection.DistinctAsync(fieldDefinition, filterDefinition, cancellationToken: cancellationToken);
+		var result = await cursor.ToListAsync(cancellationToken: cancellationToken);
+		return result.ToArray();
+	}
+	
+	public TField[] Distinct<TField>(string distinctBy, Expression<Func<dynamic, bool>> expression)
+	{
+		var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+		return this.DistinctCore<TField>(distinctBy, filterExpression);
+	}
+	
+	public async Task<TField[]> DistinctAsync<TField>(string distinctBy, Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
+	{
+		var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+		return await this.DistinctCoreAsync<TField>(distinctBy, filterExpression, cancellationToken: cancellationToken);
+	}
+	
+	private TField[] DistinctCore<TField>(string distinctBy, FilterDefinition<dynamic> predicate)
+	{
+		predicate ??= new ExpressionFilterDefinition<dynamic>(item => true);
+		FieldDefinition<dynamic, TField> fieldDefinition = new StringFieldDefinition<dynamic, TField>(distinctBy);
+		var cursor = this.Collection.Distinct(fieldDefinition, predicate);
+		return cursor.Current.ToArray();
+	}
+	
+	private async Task<TField[]> DistinctCoreAsync<TField>(string distinctBy, FilterDefinition<dynamic> predicate, CancellationToken cancellationToken = default)
+	{
+		predicate ??= new ExpressionFilterDefinition<dynamic>(item => true);
+		FieldDefinition<dynamic, TField> fieldDefinition = new StringFieldDefinition<dynamic, TField>(distinctBy);
+		var cursor = await this.Collection.DistinctAsync(fieldDefinition, predicate, cancellationToken: cancellationToken);
+		var result = await cursor.ToListAsync(cancellationToken: cancellationToken);
+		return result.ToArray();
+	}
+
+	#endregion
+	
+	#region Select Methods
+
+	private static ProjectionDefinition<T> ExecuteSelectQuery<T>(IDictionary<string, bool> selectFields)
+	{
+		if (selectFields != null && selectFields.Any())
+		{
+			var selectDefinition = Builders<T>.Projection.Include("_id");
+			var includedFields = selectFields.Where(x => x.Value);
+			selectDefinition = includedFields.Aggregate(selectDefinition, (current, field) => current.Include(field.Key));
+			var excludedFields = selectFields.Where(x => !x.Value);
+			selectDefinition = excludedFields.Aggregate(selectDefinition, (current, field) => current.Exclude(field.Key));
+			
+			return selectDefinition;
 		}
 		
-		private IFindFluent<dynamic, dynamic> ExecuteFilter(
-			FilterDefinition<dynamic> predicate,
-			int? skip = null,
-			int? limit = null,
-			Sorting sorting = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null)
+		return new ObjectProjectionDefinition<T>(new object());
+	}
+
+	#endregion
+	
+	#region Insert Methods
+
+	public dynamic Insert(object entity, InsertOptions? options = null)
+	{
+		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 		{
-			predicate ??= new ExpressionFilterDefinition<dynamic>(item => true);
+			entity = this._actionBinder.BeforeInsert(entity);
+		}
 
-			SortDefinition<dynamic> sortDefinition = null;
-			if (sorting != null && sorting.Any())
-			{
-				var sortDefinitionBuilder = new SortDefinitionBuilder<dynamic>();
-				var sortDefinitions = new List<SortDefinition<dynamic>>();
-				foreach (var sortField in sorting)
-				{
-					if (sortField.OrderBy != null && !string.IsNullOrEmpty(sortField.OrderBy.Trim()))
-					{
-						var fieldDefinition = new StringFieldDefinition<dynamic>(sortField.OrderBy);
-						sortDefinitions.Add(sortField.SortDirection is null or SortDirection.Ascending 
-							? sortDefinitionBuilder.Ascending(fieldDefinition) 
-							: sortDefinitionBuilder.Descending(fieldDefinition));
-					}
-				}
-				
-				sortDefinition = sortDefinitionBuilder.Combine(sortDefinitions);
-			}
-			
-			var options = this.GetFindOptions(sorting, indexOptions, locale);
-			var collection = this.Collection.Find(predicate, options);
-			if (sortDefinition != null)
-			{
-				collection = collection.Sort(sortDefinition);
-			}
-			
-			if (skip != null && limit != null)
-			{
-				collection = collection.Skip(skip).Limit(limit);
-			}
-			else if (skip != null)
-			{
-				collection = collection.Skip(skip);
-			}
-			else if (limit != null)
-			{
-				collection = collection.Limit(limit);
-			}
+		if (entity is BsonDocument document)
+		{
+			this.DocumentCollection.InsertOne(document);
+		}
+		else
+		{
+			this.Collection.InsertOne(entity);	
+		}
 
-			return collection;
+		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
+		{
+			entity = this._actionBinder.AfterInsert(entity);
 		}
 		
-		private FindOptions GetFindOptions(Sorting sorting = null, IndexOptions indexOptions = null, Locale? locale = null)
+		return entity;
+	}
+	
+	public async Task<dynamic> InsertAsync(object entity, InsertOptions? options = null, CancellationToken cancellationToken = default)
+	{
+		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 		{
-			if (sorting != null && sorting.Any(x => x.OrderBy != "_id") && locale != null)
-			{
-				var collation = new Collation(LocaleHelper.GetLanguageCode(locale.Value));
-				return new FindOptions
-				{
-					AllowDiskUse = this._settings.AllowDiskUse, 
-					Collation = collation,
-					Hint = indexOptions != null && !string.IsNullOrEmpty(indexOptions.Hint) ? new BsonDocument(indexOptions.Hint, 1) : null
-				};
-			}
-			else if (this._settings.AllowDiskUse == true)
-			{
-				return new FindOptions
-				{
-					AllowDiskUse = true,
-					Hint = indexOptions != null && !string.IsNullOrEmpty(indexOptions.Hint) ? new BsonDocument(indexOptions.Hint, 1) : null
-				};
-			}
-			
-			return null;
+			entity = this._actionBinder.BeforeInsert(entity);
 		}
 		
-		#endregion
-
-		#region Query Methods
-
-		public IPaginationCollection<dynamic> Query(
-			string query,
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			Sorting sorting = null, 
-			IDictionary<string, bool> selectFields = null,
-			IndexOptions indexOptions = null,
-			Locale? locale = null)
+		if (entity is BsonDocument document)
 		{
-			try
-			{
-				query = QueryHelper.EnsureObjectIdsAndISODates(query);
-				var filterDefinition = new JsonFilterDefinition<dynamic>(query);
-				return this.ExecuteQuery(
-					filterDefinition,
-					skip,
-					limit,
-					withCount,
-					sorting, 
-					selectFields, 
-					indexOptions, 
-					locale);
-			}
-			catch (MongoCommandException ex)
-			{
-				switch (ex.Code)
-				{
-					case 31249:
-						throw new SelectQueryPathCollisionException(ex);
-					case 31254:
-						throw new SelectQueryInclusionException(ex);
-					default:
-						throw;
-				}
-			}
+			await this.DocumentCollection.InsertOneAsync(document, new InsertOneOptions(), cancellationToken: cancellationToken);
+		}
+		else
+		{
+			await this.Collection.InsertOneAsync(entity, new InsertOneOptions(), cancellationToken: cancellationToken);	
 		}
 
-		public IPaginationCollection<dynamic> Query(
-			string query, 
-			int? skip = null, 
-			int? limit = null, 
-			bool? withCount = null, 
-			string orderBy = null, 
-			SortDirection? sortDirection = null,
-			IDictionary<string, bool> selectFields = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null)
+		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
 		{
-			return this.Query(
-				query,
-				skip,
-				limit,
-				withCount,
-				new Sorting(orderBy, sortDirection), 
-				selectFields,
-				indexOptions, 
-				locale);
+			entity = this._actionBinder.AfterInsert(entity);
 		}
+		
+		return entity;
+	}
 
-		public IPaginationCollection<dynamic> Query(
-			Expression<Func<dynamic, bool>> expression,
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			Sorting sorting = null, 
-			IDictionary<string, bool> selectFields = null,
-			IndexOptions indexOptions = null,
-			Locale? locale = null)
+	public void BulkInsert(IEnumerable<object> entities, InsertOptions? options = null)
+	{
+		var enumerable = entities as object[] ?? entities.ToArray();
+		
+		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 		{
-			try
+			foreach (var entity in enumerable)
 			{
-				var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-				return this.ExecuteQuery(
-					filterDefinition,
-					skip,
-					limit,
-					withCount,
-					sorting,
-					selectFields, 
-					indexOptions, 
-					locale);
-			}
-			catch (MongoCommandException ex)
-			{
-				switch (ex.Code)
-				{
-					case 31249:
-						throw new SelectQueryPathCollisionException(ex);
-					case 31254:
-						throw new SelectQueryInclusionException(ex);
-					default:
-						throw;
-				}
-			}
-		}
-
-		public IPaginationCollection<dynamic> Query(
-			Expression<Func<dynamic, bool>> expression,
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			string orderBy = null,
-			SortDirection? sortDirection = null,
-			IDictionary<string, bool> selectFields = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null)
-		{
-			return this.Query(
-				expression,
-				skip,
-				limit,
-				withCount,
-				new Sorting(orderBy, sortDirection), 
-				selectFields,
-				indexOptions, 
-				locale);
-		}
-
-		public async Task<IPaginationCollection<dynamic>> QueryAsync(
-			string query,
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			Sorting sorting = null, 
-			IDictionary<string, bool> selectFields = null,
-			IndexOptions indexOptions = null,
-			Locale? locale = null,
-			CancellationToken cancellationToken = default)
-		{
-			try
-			{
-				query = QueryHelper.EnsureObjectIdsAndISODates(query);
-				var filterDefinition = new JsonFilterDefinition<dynamic>(query);
-				return await this.ExecuteQueryAsync(
-					filterDefinition,
-					skip,
-					limit,
-					withCount,
-					sorting, 
-					selectFields, 
-					indexOptions, 
-					locale, 
-					cancellationToken: cancellationToken);
-			}
-			catch (MongoCommandException ex)
-			{
-				switch (ex.Code)
-				{
-					case 31249:
-						throw new SelectQueryPathCollisionException(ex);
-					case 31254:
-						throw new SelectQueryInclusionException(ex);
-					default:
-						throw;
-				}
+				this._actionBinder.BeforeInsert(entity);	
 			}
 		}
 		
-		public async Task<IPaginationCollection<dynamic>> QueryAsync(
-			string query, 
-			int? skip = null, 
-			int? limit = null, 
-			bool? withCount = null, 
-			string orderBy = null, 
-			SortDirection? sortDirection = null,
-			IDictionary<string, bool> selectFields = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null, 
-			CancellationToken cancellationToken = default)
-		{
-			return await this.QueryAsync(
-				query,
-				skip,
-				limit,
-				withCount,
-				new Sorting(orderBy, sortDirection), 
-				selectFields,
-				indexOptions, 
-				locale,
-				cancellationToken: cancellationToken);
-		}
+		this.Collection.InsertMany(enumerable);
 
-		public async Task<IPaginationCollection<dynamic>> QueryAsync(
-			Expression<Func<dynamic, bool>> expression,
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			string orderBy = null,
-			SortDirection? sortDirection = null,
-			IDictionary<string, bool> selectFields = null,
-			IndexOptions indexOptions = null,
-			Locale? locale = null,
-			CancellationToken cancellationToken = default)
+		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
 		{
-			return await this.QueryAsync(
-				expression,
-				skip,
-				limit,
-				withCount,
-				new Sorting(orderBy, sortDirection),
-				selectFields,
-				indexOptions, 
-				locale,
-				cancellationToken: cancellationToken);
-		}
-
-		public async Task<IPaginationCollection<dynamic>> QueryAsync(
-			Expression<Func<dynamic, bool>> expression,
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			Sorting sorting = null, 
-			IDictionary<string, bool> selectFields = null,
-			IndexOptions indexOptions = null,
-			Locale? locale = null, 
-			CancellationToken cancellationToken = default)
-		{
-			try
+			foreach (var entity in enumerable)
 			{
-				var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-				return await this.ExecuteQueryAsync(
-					filterDefinition,
-					skip,
-					limit,
-					withCount,
-					sorting,
-					selectFields, 
-					indexOptions, 
-					locale, 
-					cancellationToken: cancellationToken);
-			}
-			catch (MongoCommandException ex)
-			{
-				switch (ex.Code)
-				{
-					case 31249:
-						throw new SelectQueryPathCollisionException(ex);
-					case 31254:
-						throw new SelectQueryInclusionException(ex);
-					default:
-						throw;
-				}
+				this._actionBinder.AfterInsert(entity);	
 			}
 		}
+	}
 
-		private IPaginationCollection<dynamic> ExecuteQuery(
-			FilterDefinition<dynamic> filterDefinition,
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			Sorting sorting = null, 
-			IDictionary<string, bool> selectFields = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null)
+	public async Task BulkInsertAsync(IEnumerable<object> entities, InsertOptions? options = null, CancellationToken cancellationToken = default)
+	{
+		var enumerable = entities as object[] ?? entities.ToArray();
+		
+		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 		{
-			try
+			foreach (var entity in enumerable)
 			{
-				var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, indexOptions, locale);
-				var projectionDefinition = ExecuteSelectQuery<dynamic>(selectFields);
-				var collection = filterResult.Project(projectionDefinition);
-			
-				long totalCount = 0;
-				if (withCount != null && withCount.Value)
-				{
-					totalCount = this.Collection.CountDocuments(filterDefinition);
-				}
-
-				var documents = collection.ToList();
-				var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
-
-				return new PaginationCollection<dynamic>
-				{
-					Count = totalCount,
-					Items = objects
-				};	
-			}
-			catch (MongoCommandException ex)
-			{
-				switch (ex.Code)
-				{
-					case 31249:
-						throw new SelectQueryPathCollisionException(ex);
-					case 31254:
-						throw new SelectQueryInclusionException(ex);
-					default:
-						throw;
-				}
+				this._actionBinder.BeforeInsert(entity);	
 			}
 		}
 		
-		private async Task<IPaginationCollection<dynamic>> ExecuteQueryAsync(
-			FilterDefinition<dynamic> filterDefinition,
-			int? skip = null,
-			int? limit = null,
-			bool? withCount = null,
-			Sorting sorting = null, 
-			IDictionary<string, bool> selectFields = null, 
-			IndexOptions indexOptions = null,
-			Locale? locale = null, 
-			CancellationToken cancellationToken = default)
+		await this.Collection.InsertManyAsync(enumerable, cancellationToken: cancellationToken);
+
+		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
 		{
-			try
+			foreach (var entity in enumerable)
 			{
-				var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, indexOptions, locale);
-				var projectionDefinition = ExecuteSelectQuery<dynamic>(selectFields);
-				var collection = filterResult.Project(projectionDefinition);
-			
-				long totalCount = 0;
-				if (withCount != null && withCount.Value)
-				{
-					totalCount = await this.Collection.CountDocumentsAsync(filterDefinition, cancellationToken: cancellationToken);
-				}
-
-				var documents = await collection.ToListAsync(cancellationToken: cancellationToken);
-				var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
-
-				return new PaginationCollection<dynamic>
-				{
-					Count = totalCount,
-					Items = objects
-				};	
-			}
-			catch (MongoCommandException ex)
-			{
-				switch (ex.Code)
-				{
-					case 31249:
-						throw new SelectQueryPathCollisionException(ex);
-					case 31254:
-						throw new SelectQueryInclusionException(ex);
-					default:
-						throw;
-				}
+				this._actionBinder.AfterInsert(entity);	
 			}
 		}
+	}
 
-		#endregion
-		
-		#region Distinct Methods
-
-		public TField[] Distinct<TField>(string distinctBy, string query = null)
+	// ReSharper disable once UnusedMember.Global
+	public ICollection<dynamic> InsertMany(ICollection<object> entities, InsertOptions? options = null)
+	{
+		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 		{
-			FieldDefinition<dynamic, TField> fieldDefinition = new StringFieldDefinition<dynamic, TField>(distinctBy);
-			query = QueryHelper.EnsureObjectIdsAndISODates(query);
-			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-			var cursor = this.Collection.Distinct(fieldDefinition, filterDefinition);
-			return cursor.Current.ToArray();
-		}
-		
-		public async Task<TField[]> DistinctAsync<TField>(string distinctBy, string query = null, CancellationToken cancellationToken = default)
-		{
-			FieldDefinition<dynamic, TField> fieldDefinition = new StringFieldDefinition<dynamic, TField>(distinctBy);
-			query = QueryHelper.EnsureObjectIdsAndISODates(query);
-			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-			var cursor = await this.Collection.DistinctAsync(fieldDefinition, filterDefinition, cancellationToken: cancellationToken);
-			var result = await cursor.ToListAsync(cancellationToken: cancellationToken);
-			return result.ToArray();
-		}
-		
-		public TField[] Distinct<TField>(string distinctBy, Expression<Func<dynamic, bool>> expression)
-		{
-			var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-			return this.DistinctCore<TField>(distinctBy, filterExpression);
-		}
-		
-		public async Task<TField[]> DistinctAsync<TField>(string distinctBy, Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
-		{
-			var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-			return await this.DistinctCoreAsync<TField>(distinctBy, filterExpression, cancellationToken: cancellationToken);
-		}
-		
-		private TField[] DistinctCore<TField>(string distinctBy, FilterDefinition<dynamic> predicate)
-		{
-			predicate ??= new ExpressionFilterDefinition<dynamic>(item => true);
-			FieldDefinition<dynamic, TField> fieldDefinition = new StringFieldDefinition<dynamic, TField>(distinctBy);
-			var cursor = this.Collection.Distinct(fieldDefinition, predicate);
-			return cursor.Current.ToArray();
-		}
-		
-		private async Task<TField[]> DistinctCoreAsync<TField>(string distinctBy, FilterDefinition<dynamic> predicate, CancellationToken cancellationToken = default)
-		{
-			predicate ??= new ExpressionFilterDefinition<dynamic>(item => true);
-			FieldDefinition<dynamic, TField> fieldDefinition = new StringFieldDefinition<dynamic, TField>(distinctBy);
-			var cursor = await this.Collection.DistinctAsync(fieldDefinition, predicate, cancellationToken: cancellationToken);
-			var result = await cursor.ToListAsync(cancellationToken: cancellationToken);
-			return result.ToArray();
-		}
-
-		#endregion
-		
-		#region Select Methods
-
-		private static ProjectionDefinition<T> ExecuteSelectQuery<T>(IDictionary<string, bool> selectFields)
-		{
-			if (selectFields != null && selectFields.Any())
-			{
-				var selectDefinition = Builders<T>.Projection.Include("_id");
-				var includedFields = selectFields.Where(x => x.Value);
-				selectDefinition = includedFields.Aggregate(selectDefinition, (current, field) => current.Include(field.Key));
-				var excludedFields = selectFields.Where(x => !x.Value);
-				selectDefinition = excludedFields.Aggregate(selectDefinition, (current, field) => current.Exclude(field.Key));
-				
-				return selectDefinition;
-			}
-			
-			return new ObjectProjectionDefinition<T>(new object());
-		}
-
-		#endregion
-		
-		#region Insert Methods
-
-		public dynamic Insert(object entity, InsertOptions? options = null)
-		{
-			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
-			{
-				entity = this._actionBinder.BeforeInsert(entity);
-			}
-
-			if (entity is BsonDocument document)
-			{
-				this.DocumentCollection.InsertOne(document);
-			}
-			else
-			{
-				this.Collection.InsertOne(entity);	
-			}
-
-			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
-			{
-				entity = this._actionBinder.AfterInsert(entity);
-			}
-			
-			return entity;
-		}
-		
-		public async Task<dynamic> InsertAsync(object entity, InsertOptions? options = null, CancellationToken cancellationToken = default)
-		{
-			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
-			{
-				entity = this._actionBinder.BeforeInsert(entity);
-			}
-			
-			if (entity is BsonDocument document)
-			{
-				await this.DocumentCollection.InsertOneAsync(document, new InsertOneOptions(), cancellationToken: cancellationToken);
-			}
-			else
-			{
-				await this.Collection.InsertOneAsync(entity, new InsertOneOptions(), cancellationToken: cancellationToken);	
-			}
-
-			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
-			{
-				entity = this._actionBinder.AfterInsert(entity);
-			}
-			
-			return entity;
-		}
-
-		public void BulkInsert(IEnumerable<object> entities, InsertOptions? options = null)
-		{
-			var enumerable = entities as object[] ?? entities.ToArray();
-			
-			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
-			{
-				foreach (var entity in enumerable)
-				{
-					this._actionBinder.BeforeInsert(entity);	
-				}
-			}
-			
-			this.Collection.InsertMany(enumerable);
-
-			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
-			{
-				foreach (var entity in enumerable)
-				{
-					this._actionBinder.AfterInsert(entity);	
-				}
-			}
-		}
-
-		public async Task BulkInsertAsync(IEnumerable<object> entities, InsertOptions? options = null, CancellationToken cancellationToken = default)
-		{
-			var enumerable = entities as object[] ?? entities.ToArray();
-			
-			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
-			{
-				foreach (var entity in enumerable)
-				{
-					this._actionBinder.BeforeInsert(entity);	
-				}
-			}
-			
-			await this.Collection.InsertManyAsync(enumerable, cancellationToken: cancellationToken);
-
-			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
-			{
-				foreach (var entity in enumerable)
-				{
-					this._actionBinder.AfterInsert(entity);	
-				}
-			}
-		}
-
-		// ReSharper disable once UnusedMember.Global
-		public ICollection<dynamic> InsertMany(ICollection<object> entities, InsertOptions? options = null)
-		{
-			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
-			{
-				foreach (var entity in entities)
-				{
-					this._actionBinder.BeforeInsert(entity);	
-				}
-			}
-			
-			this.Collection.InsertMany(entities);
-			
-			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
-			{
-				foreach (var entity in entities)
-				{
-					this._actionBinder.AfterInsert(entity);	
-				}
-			}
-			
-			return entities;
-		}
-		
-		// ReSharper disable once UnusedMember.Global
-		public async Task<ICollection<dynamic>> InsertManyAsync(ICollection<object> entities, InsertOptions? options = null, CancellationToken cancellationToken = default)
-		{
-			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
-			{
-				foreach (var entity in entities)
-				{
-					this._actionBinder.BeforeInsert(entity);	
-				}
-			}
-			
-			await this.Collection.InsertManyAsync(entities, cancellationToken: cancellationToken);
-			
-			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
-			{
-				foreach (var entity in entities)
-				{
-					this._actionBinder.AfterInsert(entity);	
-				}
-			}
-			
-			return entities;
-		}
-
-		#endregion
-		
-		#region Update Methods
-
-		public dynamic Update(object entity, string id = null, UpdateOptions? options = null)
-		{
-			if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerBeforeActionBinder)
-			{
-				entity = this._actionBinder.BeforeUpdate(entity);
-			}
-
-			if (entity is BsonDocument document)
-			{
-				this.DocumentCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(id)), document);
-			}
-			else
-			{
-				this.Collection.ReplaceOne(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)), entity);	
-			}
-
-			if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerAfterActionBinder)
-			{
-				entity = this._actionBinder.AfterUpdate(entity);
-			}
-			
-			return entity;
-		}
-		
-		public async Task<dynamic> UpdateAsync(object entity, string id = null, UpdateOptions? options = null, CancellationToken cancellationToken = default)
-		{
-			if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerBeforeActionBinder)
-			{
-				entity = this._actionBinder.BeforeUpdate(entity);
-			}
-
-			if (entity is BsonDocument document)
-			{
-				await this.DocumentCollection.ReplaceOneAsync(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(id)), document, cancellationToken: cancellationToken);
-			}
-			else
-			{
-				await this.Collection.ReplaceOneAsync(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)), entity, cancellationToken: cancellationToken);	
-			}
-
-			if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerAfterActionBinder)
-			{
-				entity = this._actionBinder.AfterUpdate(entity);
-			}
-			
-			return entity;
-		}
-
-		[SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
-		public dynamic Upsert(dynamic entity, string id = null)
-		{
-			if (string.IsNullOrEmpty(id))
-			{
-				return this.Insert(entity);
-			}
-			else
-			{
-				var item = this.FindOne(id);
-				return item == null ? this.Insert(entity) : this.Update(entity, id);
-			}
-		}
-		
-		[SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
-		public async Task<dynamic> UpsertAsync(dynamic entity, string id = null, CancellationToken cancellationToken = default)
-		{
-			if (string.IsNullOrEmpty(id))
-			{
-				return await this.InsertAsync(entity, cancellationToken: cancellationToken);
-			}
-			else
-			{
-				var item = await this.FindOneAsync(id, cancellationToken: cancellationToken);
-				return item == null ? await this.InsertAsync(entity, cancellationToken: cancellationToken) : await this.UpdateAsync(entity, id, cancellationToken: cancellationToken);
-			}
-		}
-
-		#endregion
-		
-		#region Delete Methods
-
-		public bool Delete(string id)
-		{
-			var result = this.Collection.DeleteOne(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)));
-			return result.IsAcknowledged && result.DeletedCount == 1;
-		}
-		
-		public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
-		{
-			var result = await this.Collection.DeleteOneAsync(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)), cancellationToken: cancellationToken);
-			return result.IsAcknowledged && result.DeletedCount == 1;
-		}
-
-		public bool BulkDelete(IEnumerable<dynamic> entities)
-		{
-			return entities.Aggregate(true, (current, entity) => (bool) (current & this.Delete(entity)));
-		}
-		
-		public async Task<bool> BulkDeleteAsync(IEnumerable<dynamic> entities, CancellationToken cancellationToken = default)
-		{
-			var isDeletedAll = true;
 			foreach (var entity in entities)
 			{
-				isDeletedAll &= await this.DeleteAsync(entity, cancellationToken: cancellationToken);
-			}
-
-			return isDeletedAll;
-		}
-		
-		public bool DeleteMany(Expression<Func<dynamic, bool>> expression)
-		{
-			var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-			var result = this.Collection.DeleteMany(filterDefinition);
-			return result.IsAcknowledged && result.DeletedCount == 1;
-		}
-		
-		public async Task<bool> DeleteManyAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
-		{
-			var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-			var result = await this.Collection.DeleteManyAsync(filterDefinition, cancellationToken: cancellationToken);
-			return result.IsAcknowledged && result.DeletedCount == 1;
-		}
-		
-		public bool DeleteMany(string query)
-		{
-			query = QueryHelper.EnsureObjectIdsAndISODates(query);
-			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-			var result = this.Collection.DeleteMany(filterDefinition);
-			return result.IsAcknowledged && result.DeletedCount == 1;
-		}
-		
-		public async Task<bool> DeleteManyAsync(string query, CancellationToken cancellationToken = default)
-		{
-			query = QueryHelper.EnsureObjectIdsAndISODates(query);
-			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-			var result = await this.Collection.DeleteManyAsync(filterDefinition, cancellationToken: cancellationToken);
-			return result.IsAcknowledged && result.DeletedCount == 1;
-		}
-		
-		public bool Clear()
-		{
-			var result = this.Collection.DeleteMany(Builders<dynamic>.Filter.Empty);
-			return result.IsAcknowledged && result.DeletedCount == 1;
-		}
-		
-		public async Task<bool> ClearAsync(CancellationToken cancellationToken = default)
-		{
-			var result = await this.Collection.DeleteManyAsync(Builders<dynamic>.Filter.Empty, cancellationToken: cancellationToken);
-			return result.IsAcknowledged && result.DeletedCount == 1;
-		}
-		
-		#endregion
-		
-		#region Count Methods
-
-		public long Count()
-		{
-			return this.Count(item => true);
-		}
-		
-		public long Count(IndexOptions indexOptions = null)
-		{
-			return this.Count(item => true, indexOptions);
-		}
-		
-		public async Task<long> CountAsync(CancellationToken cancellationToken = default)
-		{
-			return await this.CountAsync(item => true, cancellationToken: cancellationToken);
-		}
-		
-		public async Task<long> CountAsync(IndexOptions indexOptions = null, CancellationToken cancellationToken = default)
-		{
-			return await this.CountAsync(item => true, indexOptions, cancellationToken: cancellationToken);
-		}
-		
-		public long Count(Expression<Func<dynamic, bool>> expression)
-		{
-			FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
-			return this.Count(filterExpression);
-		}
-		
-		public long Count(Expression<Func<dynamic, bool>> expression, IndexOptions indexOptions = null)
-		{
-			FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
-			return this.Count(filterExpression, indexOptions);
-		}
-		
-		public async Task<long> CountAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
-		{
-			FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
-			return await this.CountAsync(filterExpression, cancellationToken: cancellationToken);
-		}
-		
-		public async Task<long> CountAsync(Expression<Func<dynamic, bool>> expression, IndexOptions indexOptions = null, CancellationToken cancellationToken = default)
-		{
-			FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
-			return await this.CountAsync(filterExpression, indexOptions, cancellationToken: cancellationToken);
-		}
-		
-		public long Count(string query)
-		{
-			query = QueryHelper.EnsureObjectIdsAndISODates(query);
-			var filterDefinition = new JsonFilterDefinition<dynamic>(query);
-			return this.Count(filterDefinition);
-		}
-		
-		public long Count(string query, IndexOptions indexOptions = null)
-		{
-			query = QueryHelper.EnsureObjectIdsAndISODates(query);
-			var filterDefinition = new JsonFilterDefinition<dynamic>(query);
-			return this.Count(filterDefinition, indexOptions);
-		}
-		
-		public async Task<long> CountAsync(string query, CancellationToken cancellationToken = default)
-		{
-			query = QueryHelper.EnsureObjectIdsAndISODates(query);
-			var filterDefinition = new JsonFilterDefinition<dynamic>(query);
-			return await this.CountAsync(filterDefinition, cancellationToken: cancellationToken);
-		}
-		
-		public async Task<long> CountAsync(string query, IndexOptions indexOptions = null, CancellationToken cancellationToken = default)
-		{
-			query = QueryHelper.EnsureObjectIdsAndISODates(query);
-			var filterDefinition = new JsonFilterDefinition<dynamic>(query);
-			return await this.CountAsync(filterDefinition, indexOptions, cancellationToken: cancellationToken);
-		}
-		
-		private long Count(FilterDefinition<dynamic> filterDefinition, IndexOptions indexOptions = null)
-		{
-			var countOptions = new CountOptions { Hint = indexOptions != null && !string.IsNullOrEmpty(indexOptions.Hint) ? new BsonDocument(indexOptions.Hint, 1) : null };
-			return this.Collection.CountDocuments(filterDefinition, countOptions);
-		}
-		
-		private async Task<long> CountAsync(FilterDefinition<dynamic> filterDefinition, IndexOptions indexOptions = null, CancellationToken cancellationToken = default)
-		{
-			var countOptions = new CountOptions { Hint = indexOptions != null && !string.IsNullOrEmpty(indexOptions.Hint) ? new BsonDocument(indexOptions.Hint, 1) : null };
-			return await this.Collection.CountDocumentsAsync(filterDefinition, countOptions, cancellationToken: cancellationToken);
-		}
-		
-		#endregion
-
-		#region Aggregation Methods
-
-		public dynamic Aggregate(string query)
-		{
-			try
-			{
-				query = QueryHelper.EnsureObjectIdsAndISODates(query);
-
-				using var jsonReader = new JsonReader(query);
-				var serializer = new BsonArraySerializer();
-				var bsonArray = serializer.Deserialize(BsonDeserializationContext.CreateRoot(jsonReader));
-				var bsonDocuments = bsonArray.Select(x => BsonDocument.Parse(x.ToString()));
-				var pipelineDefinition = PipelineDefinition<dynamic, BsonDocument>.Create(bsonDocuments);
-				var aggregationResultCursor = this.Collection.Aggregate(pipelineDefinition);
-				var documents = aggregationResultCursor.ToList();
-				var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
-				return objects;
-			}
-			catch (MongoCommandException ex)
-			{
-				switch (ex.Code)
-				{
-					case 31249:
-						throw new SelectQueryPathCollisionException(ex);
-					case 31254:
-						throw new SelectQueryInclusionException(ex);
-					default:
-						throw;
-				}
+				this._actionBinder.BeforeInsert(entity);	
 			}
 		}
 		
-		public async Task<dynamic> AggregateAsync(string query, CancellationToken cancellationToken = default)
+		this.Collection.InsertMany(entities);
+		
+		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
 		{
-			try
+			foreach (var entity in entities)
 			{
-				query = QueryHelper.EnsureObjectIdsAndISODates(query);
-				
-				using var jsonReader = new JsonReader(query);
-				var serializer = new BsonArraySerializer();
-				var bsonArray = serializer.Deserialize(BsonDeserializationContext.CreateRoot(jsonReader));
-				var bsonDocuments = bsonArray.Select(x => BsonDocument.Parse(x.ToString()));
-				var pipelineDefinition = PipelineDefinition<dynamic, BsonDocument>.Create(bsonDocuments);
-				var aggregationResultCursor = await this.Collection.AggregateAsync(pipelineDefinition, cancellationToken: cancellationToken);
-				var documents = await aggregationResultCursor.ToListAsync(cancellationToken: cancellationToken);
-				var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
-				return objects;
-			}
-			catch (MongoCommandException ex)
-			{
-				switch (ex.Code)
-				{
-					case 31249:
-						throw new SelectQueryPathCollisionException(ex);
-					case 31254:
-						throw new SelectQueryInclusionException(ex);
-					default:
-						throw;
-				}
+				this._actionBinder.AfterInsert(entity);	
 			}
 		}
-
-		#endregion
 		
-		#region Index Methods
-
-		public async Task<IEnumerable<IIndexDefinition>> GetIndexesAsync(CancellationToken cancellationToken = default)
-	    {
-	        var indexesCursor = await this.Collection.Indexes.ListAsync(cancellationToken: cancellationToken);
-	        var indexes = await indexesCursor.ToListAsync(cancellationToken: cancellationToken);
-	        var indexDefinitions = new List<IIndexDefinition>();
-	        foreach (var index in indexes)
-	        {
-	            if (index.Contains("key") && index["key"].IsBsonDocument)
-	            {
-	                var nodes = index["key"].AsBsonDocument.Elements.ToArray();
-	                if (nodes.Length > 0)
-	                {
-	                    if (nodes.Length == 1)
-	                    {
-	                        // Single index
-	                        var node = nodes[0];
-	                        indexDefinitions.Add(new SingleIndexDefinition(node.Name,
-	                            node.Value.IsInt32
-	                                ? node.Value.AsInt32 == -1
-		                                ? SortDirection.Descending
-		                                : SortDirection.Ascending
-	                                : null));
-	                    }
-	                    else
-	                    {
-	                        if (nodes.Any(x => x.Name == "_fts" && x.Value.AsString == "text"))
-	                        {
-	                            // Text index
-	                            if (index.Contains("name"))
-	                            {
-	                                var names = index["name"].AsString;
-	                                if (!string.IsNullOrEmpty(names))
-	                                {
-	                                    var parts = names.Split('_');
-	                                    if (parts.LastOrDefault() == "text")
-	                                    {
-	                                        var weightedFields = parts.SkipLast(1).ToDictionary(x => x, _ => 0);
-	                                        if (weightedFields.Count != 0)
-	                                        {
-	                                            if (index.Contains("weights"))
-	                                            {
-	                                                var weights = index["weights"].AsBsonDocument;
-	                                                foreach (var (field, _) in weightedFields)
-	                                                {
-	                                                    if (weights.Contains(field) && weights[field].IsInt32)
-	                                                    {
-	                                                        var weight = weights[field].AsInt32;
-	                                                        weightedFields[field] = weight;
-	                                                    }
-	                                                }
-	                                            }
-	                                            
-	                                            IndexLocale? locale = null;
-	                                            if (index.Contains("default_language"))
-	                                            {
-	                                                var defaultLocale = index["default_language"].AsString;
-	                                                if (!string.IsNullOrEmpty(defaultLocale) && Enum.TryParse<IndexLocale>(defaultLocale, out var locale_))
-	                                                {
-	                                                    locale = locale_;
-	                                                }
-	                                            }
-	                                            
-	                                            indexDefinitions.Add(new TextIndexDefinition(weightedFields, locale ?? IndexLocale.none));
-	                                        }
-	                                    }
-	                                }
-	                            }
-	                        }
-	                        else
-	                        {
-	                            // Compound index
-	                            var subIndexDefinitions = new List<SingleIndexDefinition>();
-	                            foreach (var node in nodes)
-	                            {
-	                                subIndexDefinitions.Add(new SingleIndexDefinition(node.Name,
-	                                    node.Value.IsInt32
-	                                        ? node.Value.AsInt32 == -1
-		                                        ? SortDirection.Descending
-		                                        : SortDirection.Ascending
-	                                        : null));
-	                            }
-	                            
-	                            indexDefinitions.Add(new CompoundIndexDefinition(subIndexDefinitions.ToArray()));
-	                        }
-	                    }
-	                }
-	                else
-	                {
-	                    return Enumerable.Empty<IIndexDefinition>();
-	                }
-	            }
-	        }
-	        
-	        return indexDefinitions;
-	    }
-		
-		public async Task<string> CreateIndexAsync(IIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
+		return entities;
+	}
+	
+	// ReSharper disable once UnusedMember.Global
+	public async Task<ICollection<dynamic>> InsertManyAsync(ICollection<object> entities, InsertOptions? options = null, CancellationToken cancellationToken = default)
+	{
+		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 		{
-			// ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-			// ReSharper disable once ConvertSwitchStatementToSwitchExpression
-			switch (indexDefinition.Type)
+			foreach (var entity in entities)
 			{
-				case IndexType.Single:
-					return await this.CreateSingleIndexAsync(indexDefinition as SingleIndexDefinition, cancellationToken: cancellationToken);
-				case IndexType.Compound:
-					return await this.CreateCompoundIndexAsync(indexDefinition as CompoundIndexDefinition, cancellationToken: cancellationToken);
-				case IndexType.Text:
-					return await this.CreateTextIndexAsync(indexDefinition as TextIndexDefinition, cancellationToken: cancellationToken);
+				this._actionBinder.BeforeInsert(entity);	
+			}
+		}
+		
+		await this.Collection.InsertManyAsync(entities, cancellationToken: cancellationToken);
+		
+		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
+		{
+			foreach (var entity in entities)
+			{
+				this._actionBinder.AfterInsert(entity);	
+			}
+		}
+		
+		return entities;
+	}
+
+	#endregion
+	
+	#region Update Methods
+
+	public dynamic Update(object entity, string id = null, UpdateOptions? options = null)
+	{
+		if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerBeforeActionBinder)
+		{
+			entity = this._actionBinder.BeforeUpdate(entity);
+		}
+
+		if (entity is BsonDocument document)
+		{
+			this.DocumentCollection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(id)), document);
+		}
+		else
+		{
+			this.Collection.ReplaceOne(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)), entity);	
+		}
+
+		if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerAfterActionBinder)
+		{
+			entity = this._actionBinder.AfterUpdate(entity);
+		}
+		
+		return entity;
+	}
+	
+	public async Task<dynamic> UpdateAsync(object entity, string id = null, UpdateOptions? options = null, CancellationToken cancellationToken = default)
+	{
+		if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerBeforeActionBinder)
+		{
+			entity = this._actionBinder.BeforeUpdate(entity);
+		}
+
+		if (entity is BsonDocument document)
+		{
+			await this.DocumentCollection.ReplaceOneAsync(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(id)), document, cancellationToken: cancellationToken);
+		}
+		else
+		{
+			await this.Collection.ReplaceOneAsync(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)), entity, cancellationToken: cancellationToken);	
+		}
+
+		if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerAfterActionBinder)
+		{
+			entity = this._actionBinder.AfterUpdate(entity);
+		}
+		
+		return entity;
+	}
+
+	[SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
+	public dynamic Upsert(dynamic entity, string id = null)
+	{
+		if (string.IsNullOrEmpty(id))
+		{
+			return this.Insert(entity);
+		}
+		else
+		{
+			var item = this.FindOne(id);
+			return item == null ? this.Insert(entity) : this.Update(entity, id);
+		}
+	}
+	
+	[SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
+	public async Task<dynamic> UpsertAsync(dynamic entity, string id = null, CancellationToken cancellationToken = default)
+	{
+		if (string.IsNullOrEmpty(id))
+		{
+			return await this.InsertAsync(entity, cancellationToken: cancellationToken);
+		}
+		else
+		{
+			var item = await this.FindOneAsync(id, cancellationToken: cancellationToken);
+			return item == null ? await this.InsertAsync(entity, cancellationToken: cancellationToken) : await this.UpdateAsync(entity, id, cancellationToken: cancellationToken);
+		}
+	}
+
+	#endregion
+	
+	#region Delete Methods
+
+	public bool Delete(string id)
+	{
+		var result = this.Collection.DeleteOne(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)));
+		return result.IsAcknowledged && result.DeletedCount == 1;
+	}
+	
+	public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
+	{
+		var result = await this.Collection.DeleteOneAsync(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id)), cancellationToken: cancellationToken);
+		return result.IsAcknowledged && result.DeletedCount == 1;
+	}
+
+	public bool BulkDelete(IEnumerable<dynamic> entities)
+	{
+		return entities.Aggregate(true, (current, entity) => (bool) (current & this.Delete(entity)));
+	}
+	
+	public async Task<bool> BulkDeleteAsync(IEnumerable<dynamic> entities, CancellationToken cancellationToken = default)
+	{
+		var isDeletedAll = true;
+		foreach (var entity in entities)
+		{
+			isDeletedAll &= await this.DeleteAsync(entity, cancellationToken: cancellationToken);
+		}
+
+		return isDeletedAll;
+	}
+	
+	public bool DeleteMany(Expression<Func<dynamic, bool>> expression)
+	{
+		var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+		var result = this.Collection.DeleteMany(filterDefinition);
+		return result.IsAcknowledged && result.DeletedCount == 1;
+	}
+	
+	public async Task<bool> DeleteManyAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
+	{
+		var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+		var result = await this.Collection.DeleteManyAsync(filterDefinition, cancellationToken: cancellationToken);
+		return result.IsAcknowledged && result.DeletedCount == 1;
+	}
+	
+	public bool DeleteMany(string query)
+	{
+		query = QueryHelper.EnsureObjectIdsAndISODates(query);
+		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+		var result = this.Collection.DeleteMany(filterDefinition);
+		return result.IsAcknowledged && result.DeletedCount == 1;
+	}
+	
+	public async Task<bool> DeleteManyAsync(string query, CancellationToken cancellationToken = default)
+	{
+		query = QueryHelper.EnsureObjectIdsAndISODates(query);
+		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+		var result = await this.Collection.DeleteManyAsync(filterDefinition, cancellationToken: cancellationToken);
+		return result.IsAcknowledged && result.DeletedCount == 1;
+	}
+	
+	public bool Clear()
+	{
+		var result = this.Collection.DeleteMany(Builders<dynamic>.Filter.Empty);
+		return result.IsAcknowledged && result.DeletedCount == 1;
+	}
+	
+	public async Task<bool> ClearAsync(CancellationToken cancellationToken = default)
+	{
+		var result = await this.Collection.DeleteManyAsync(Builders<dynamic>.Filter.Empty, cancellationToken: cancellationToken);
+		return result.IsAcknowledged && result.DeletedCount == 1;
+	}
+	
+	#endregion
+	
+	#region Count Methods
+
+	public long Count()
+	{
+		return this.Count(item => true);
+	}
+	
+	public long Count(IndexOptions indexOptions = null)
+	{
+		return this.Count(item => true, indexOptions);
+	}
+	
+	public async Task<long> CountAsync(CancellationToken cancellationToken = default)
+	{
+		return await this.CountAsync(item => true, cancellationToken: cancellationToken);
+	}
+	
+	public async Task<long> CountAsync(IndexOptions indexOptions = null, CancellationToken cancellationToken = default)
+	{
+		return await this.CountAsync(item => true, indexOptions, cancellationToken: cancellationToken);
+	}
+	
+	public long Count(Expression<Func<dynamic, bool>> expression)
+	{
+		FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
+		return this.Count(filterExpression);
+	}
+	
+	public long Count(Expression<Func<dynamic, bool>> expression, IndexOptions indexOptions = null)
+	{
+		FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
+		return this.Count(filterExpression, indexOptions);
+	}
+	
+	public async Task<long> CountAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
+	{
+		FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
+		return await this.CountAsync(filterExpression, cancellationToken: cancellationToken);
+	}
+	
+	public async Task<long> CountAsync(Expression<Func<dynamic, bool>> expression, IndexOptions indexOptions = null, CancellationToken cancellationToken = default)
+	{
+		FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
+		return await this.CountAsync(filterExpression, indexOptions, cancellationToken: cancellationToken);
+	}
+	
+	public long Count(string query)
+	{
+		query = QueryHelper.EnsureObjectIdsAndISODates(query);
+		var filterDefinition = new JsonFilterDefinition<dynamic>(query);
+		return this.Count(filterDefinition);
+	}
+	
+	public long Count(string query, IndexOptions indexOptions = null)
+	{
+		query = QueryHelper.EnsureObjectIdsAndISODates(query);
+		var filterDefinition = new JsonFilterDefinition<dynamic>(query);
+		return this.Count(filterDefinition, indexOptions);
+	}
+	
+	public async Task<long> CountAsync(string query, CancellationToken cancellationToken = default)
+	{
+		query = QueryHelper.EnsureObjectIdsAndISODates(query);
+		var filterDefinition = new JsonFilterDefinition<dynamic>(query);
+		return await this.CountAsync(filterDefinition, cancellationToken: cancellationToken);
+	}
+	
+	public async Task<long> CountAsync(string query, IndexOptions indexOptions = null, CancellationToken cancellationToken = default)
+	{
+		query = QueryHelper.EnsureObjectIdsAndISODates(query);
+		var filterDefinition = new JsonFilterDefinition<dynamic>(query);
+		return await this.CountAsync(filterDefinition, indexOptions, cancellationToken: cancellationToken);
+	}
+	
+	private long Count(FilterDefinition<dynamic> filterDefinition, IndexOptions indexOptions = null)
+	{
+		var countOptions = new CountOptions { Hint = indexOptions != null && !string.IsNullOrEmpty(indexOptions.Hint) ? new BsonDocument(indexOptions.Hint, 1) : null };
+		return this.Collection.CountDocuments(filterDefinition, countOptions);
+	}
+	
+	private async Task<long> CountAsync(FilterDefinition<dynamic> filterDefinition, IndexOptions indexOptions = null, CancellationToken cancellationToken = default)
+	{
+		var countOptions = new CountOptions { Hint = indexOptions != null && !string.IsNullOrEmpty(indexOptions.Hint) ? new BsonDocument(indexOptions.Hint, 1) : null };
+		return await this.Collection.CountDocumentsAsync(filterDefinition, countOptions, cancellationToken: cancellationToken);
+	}
+	
+	#endregion
+
+	#region Aggregation Methods
+
+	public dynamic Aggregate(string query)
+	{
+		try
+		{
+			query = QueryHelper.EnsureObjectIdsAndISODates(query);
+
+			using var jsonReader = new JsonReader(query);
+			var serializer = new BsonArraySerializer();
+			var bsonArray = serializer.Deserialize(BsonDeserializationContext.CreateRoot(jsonReader));
+			var bsonDocuments = bsonArray.Select(x => BsonDocument.Parse(x.ToString()));
+			var pipelineDefinition = PipelineDefinition<dynamic, BsonDocument>.Create(bsonDocuments);
+			var aggregationResultCursor = this.Collection.Aggregate(pipelineDefinition);
+			var documents = aggregationResultCursor.ToList();
+			var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
+			return objects;
+		}
+		catch (MongoCommandException ex)
+		{
+			switch (ex.Code)
+			{
+				case 31249:
+					throw new SelectQueryPathCollisionException(ex);
+				case 31254:
+					throw new SelectQueryInclusionException(ex);
 				default:
-					throw new NotImplementedException("Not implemented yet for this index type");
+					throw;
 			}
 		}
-
-		public async Task<string[]> CreateManyIndexAsync(IEnumerable<IIndexDefinition> indexDefinitions, CancellationToken cancellationToken = default)
+	}
+	
+	public async Task<dynamic> AggregateAsync(string query, CancellationToken cancellationToken = default)
+	{
+		try
 		{
-			var results = new List<string>();
-			foreach (var indexDefinition in indexDefinitions)
+			query = QueryHelper.EnsureObjectIdsAndISODates(query);
+			
+			using var jsonReader = new JsonReader(query);
+			var serializer = new BsonArraySerializer();
+			var bsonArray = serializer.Deserialize(BsonDeserializationContext.CreateRoot(jsonReader));
+			var bsonDocuments = bsonArray.Select(x => BsonDocument.Parse(x.ToString()));
+			var pipelineDefinition = PipelineDefinition<dynamic, BsonDocument>.Create(bsonDocuments);
+			var aggregationResultCursor = await this.Collection.AggregateAsync(pipelineDefinition, cancellationToken: cancellationToken);
+			var documents = await aggregationResultCursor.ToListAsync(cancellationToken: cancellationToken);
+			var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
+			return objects;
+		}
+		catch (MongoCommandException ex)
+		{
+			switch (ex.Code)
 			{
-				results.Add(await this.CreateIndexAsync(indexDefinition, cancellationToken: cancellationToken));
+				case 31249:
+					throw new SelectQueryPathCollisionException(ex);
+				case 31254:
+					throw new SelectQueryInclusionException(ex);
+				default:
+					throw;
 			}
-
-			return results.ToArray();
 		}
-		
-		public async Task<string> CreateSingleIndexAsync(string fieldName, SortDirection? direction = null, CancellationToken cancellationToken = default)
+	}
+
+	#endregion
+	
+	#region Index Methods
+
+	public async Task<IEnumerable<IIndexDefinition>> GetIndexesAsync(CancellationToken cancellationToken = default)
+    {
+        var indexesCursor = await this.Collection.Indexes.ListAsync(cancellationToken: cancellationToken);
+        var indexes = await indexesCursor.ToListAsync(cancellationToken: cancellationToken);
+        var indexDefinitions = new List<IIndexDefinition>();
+        foreach (var index in indexes)
+        {
+            if (index.Contains("key") && index["key"].IsBsonDocument)
+            {
+                var nodes = index["key"].AsBsonDocument.Elements.ToArray();
+                if (nodes.Length > 0)
+                {
+                    if (nodes.Length == 1)
+                    {
+                        // Single index
+                        var node = nodes[0];
+                        indexDefinitions.Add(new SingleIndexDefinition(node.Name,
+                            node.Value.IsInt32
+                                ? node.Value.AsInt32 == -1
+	                                ? SortDirection.Descending
+	                                : SortDirection.Ascending
+                                : null));
+                    }
+                    else
+                    {
+                        if (nodes.Any(x => x.Name == "_fts" && x.Value.AsString == "text"))
+                        {
+                            // Text index
+                            if (index.Contains("name"))
+                            {
+                                var names = index["name"].AsString;
+                                if (!string.IsNullOrEmpty(names))
+                                {
+                                    var parts = names.Split('_');
+                                    if (parts.LastOrDefault() == "text")
+                                    {
+                                        var weightedFields = parts.SkipLast(1).ToDictionary(x => x, _ => 0);
+                                        if (weightedFields.Count != 0)
+                                        {
+                                            if (index.Contains("weights"))
+                                            {
+                                                var weights = index["weights"].AsBsonDocument;
+                                                foreach (var (field, _) in weightedFields)
+                                                {
+                                                    if (weights.Contains(field) && weights[field].IsInt32)
+                                                    {
+                                                        var weight = weights[field].AsInt32;
+                                                        weightedFields[field] = weight;
+                                                    }
+                                                }
+                                            }
+                                            
+                                            IndexLocale? locale = null;
+                                            if (index.Contains("default_language"))
+                                            {
+                                                var defaultLocale = index["default_language"].AsString;
+                                                if (!string.IsNullOrEmpty(defaultLocale) && Enum.TryParse<IndexLocale>(defaultLocale, out var locale_))
+                                                {
+                                                    locale = locale_;
+                                                }
+                                            }
+                                            
+                                            indexDefinitions.Add(new TextIndexDefinition(weightedFields, locale ?? IndexLocale.none));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Compound index
+                            var subIndexDefinitions = new List<SingleIndexDefinition>();
+                            foreach (var node in nodes)
+                            {
+                                subIndexDefinitions.Add(new SingleIndexDefinition(node.Name,
+                                    node.Value.IsInt32
+                                        ? node.Value.AsInt32 == -1
+	                                        ? SortDirection.Descending
+	                                        : SortDirection.Ascending
+                                        : null));
+                            }
+                            
+                            indexDefinitions.Add(new CompoundIndexDefinition(subIndexDefinitions.ToArray()));
+                        }
+                    }
+                }
+                else
+                {
+                    return Enumerable.Empty<IIndexDefinition>();
+                }
+            }
+        }
+        
+        return indexDefinitions;
+    }
+	
+	public async Task<string> CreateIndexAsync(IIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
+	{
+		// ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+		// ReSharper disable once ConvertSwitchStatementToSwitchExpression
+		switch (indexDefinition.Type)
 		{
-			var indexKeysDefinition = direction is SortDirection.Descending ?
+			case IndexType.Single:
+				return await this.CreateSingleIndexAsync(indexDefinition as SingleIndexDefinition, cancellationToken: cancellationToken);
+			case IndexType.Compound:
+				return await this.CreateCompoundIndexAsync(indexDefinition as CompoundIndexDefinition, cancellationToken: cancellationToken);
+			case IndexType.Text:
+				return await this.CreateTextIndexAsync(indexDefinition as TextIndexDefinition, cancellationToken: cancellationToken);
+			default:
+				throw new NotImplementedException("Not implemented yet for this index type");
+		}
+	}
+
+	public async Task<string[]> CreateManyIndexAsync(IEnumerable<IIndexDefinition> indexDefinitions, CancellationToken cancellationToken = default)
+	{
+		var results = new List<string>();
+		foreach (var indexDefinition in indexDefinitions)
+		{
+			results.Add(await this.CreateIndexAsync(indexDefinition, cancellationToken: cancellationToken));
+		}
+
+		return results.ToArray();
+	}
+	
+	public async Task<string> CreateSingleIndexAsync(string fieldName, SortDirection? direction = null, CancellationToken cancellationToken = default)
+	{
+		var indexKeysDefinition = direction is SortDirection.Descending ?
+			Builders<dynamic>.IndexKeys.Descending(fieldName) :
+			Builders<dynamic>.IndexKeys.Ascending(fieldName);
+		
+		return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(indexKeysDefinition), cancellationToken: cancellationToken);
+	}
+	
+	public async Task<string> CreateSingleIndexAsync(SingleIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
+	{
+		return await this.CreateSingleIndexAsync(indexDefinition.Field, indexDefinition.Direction, cancellationToken: cancellationToken);
+	}
+	
+	public async Task<string> CreateCompoundIndexAsync(IDictionary<string, SortDirection> indexFieldDefinitions, CancellationToken cancellationToken = default)
+	{
+		var indexKeyDefinitions = new List<IndexKeysDefinition<dynamic>>();
+		foreach (var (fieldName, direction) in indexFieldDefinitions)
+		{
+			indexKeyDefinitions.Add(direction is SortDirection.Descending ?
 				Builders<dynamic>.IndexKeys.Descending(fieldName) :
-				Builders<dynamic>.IndexKeys.Ascending(fieldName);
-			
-			return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(indexKeysDefinition), cancellationToken: cancellationToken);
+				Builders<dynamic>.IndexKeys.Ascending(fieldName));
 		}
 		
-		public async Task<string> CreateSingleIndexAsync(SingleIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
+		var combinedIndexDefinition = Builders<dynamic>.IndexKeys.Combine(indexKeyDefinitions);
+		return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(combinedIndexDefinition), cancellationToken: cancellationToken);
+	}
+	
+	public async Task<string> CreateCompoundIndexAsync(CompoundIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
+	{
+		var indexKeyDefinitions = new List<IndexKeysDefinition<dynamic>>();
+		foreach (var index in indexDefinition.Indexes)
 		{
-			return await this.CreateSingleIndexAsync(indexDefinition.Field, indexDefinition.Direction, cancellationToken: cancellationToken);
+			indexKeyDefinitions.Add(index.Direction is SortDirection.Descending ?
+				Builders<dynamic>.IndexKeys.Descending(index.Field) :
+				Builders<dynamic>.IndexKeys.Ascending(index.Field));
 		}
 		
-		public async Task<string> CreateCompoundIndexAsync(IDictionary<string, SortDirection> indexFieldDefinitions, CancellationToken cancellationToken = default)
+		var combinedIndexDefinition = Builders<dynamic>.IndexKeys.Combine(indexKeyDefinitions);
+		return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(combinedIndexDefinition), cancellationToken: cancellationToken);
+	}
+	
+	public async Task<string> CreateTextIndexAsync(TextIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
+	{
+		if (indexDefinition.WeightedFields != null && indexDefinition.WeightedFields.Count != 0)
 		{
-			var indexKeyDefinitions = new List<IndexKeysDefinition<dynamic>>();
-			foreach (var (fieldName, direction) in indexFieldDefinitions)
+			var indexOptions = new CreateIndexOptions
 			{
-				indexKeyDefinitions.Add(direction is SortDirection.Descending ?
-					Builders<dynamic>.IndexKeys.Descending(fieldName) :
-					Builders<dynamic>.IndexKeys.Ascending(fieldName));
+				DefaultLanguage = indexDefinition.Locale.ToString()
+			};
+			
+			var isWeighted = indexDefinition.WeightedFields.Any(x => x.Value > 1) && indexDefinition.WeightedFields.Count > 1;
+			if (isWeighted)
+			{
+				indexOptions.Weights = new BsonDocument(indexDefinition.WeightedFields);
+				var indexKeys = Builders<dynamic>.IndexKeys.Combine(indexDefinition.Fields.Select(field => Builders<dynamic>.IndexKeys.Text(field)));
+				var index = new CreateIndexModel<dynamic>(indexKeys, indexOptions);
+				return await this.Collection.Indexes.CreateOneAsync(index, cancellationToken: cancellationToken);
 			}
-			
-			var combinedIndexDefinition = Builders<dynamic>.IndexKeys.Combine(indexKeyDefinitions);
-			return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(combinedIndexDefinition), cancellationToken: cancellationToken);
-		}
-		
-		public async Task<string> CreateCompoundIndexAsync(CompoundIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
-		{
-			var indexKeyDefinitions = new List<IndexKeysDefinition<dynamic>>();
-			foreach (var index in indexDefinition.Indexes)
+			else if (indexDefinition.Fields.Length > 1)
 			{
-				indexKeyDefinitions.Add(index.Direction is SortDirection.Descending ?
-					Builders<dynamic>.IndexKeys.Descending(index.Field) :
-					Builders<dynamic>.IndexKeys.Ascending(index.Field));
-			}
-			
-			var combinedIndexDefinition = Builders<dynamic>.IndexKeys.Combine(indexKeyDefinitions);
-			return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(combinedIndexDefinition), cancellationToken: cancellationToken);
-		}
-		
-		public async Task<string> CreateTextIndexAsync(TextIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
-		{
-			if (indexDefinition.WeightedFields != null && indexDefinition.WeightedFields.Count != 0)
-			{
-				var indexOptions = new CreateIndexOptions
-				{
-					DefaultLanguage = indexDefinition.Locale.ToString()
-				};
-				
-				var isWeighted = indexDefinition.WeightedFields.Any(x => x.Value > 1) && indexDefinition.WeightedFields.Count > 1;
-				if (isWeighted)
-				{
-					indexOptions.Weights = new BsonDocument(indexDefinition.WeightedFields);
-					var indexKeys = Builders<dynamic>.IndexKeys.Combine(indexDefinition.Fields.Select(field => Builders<dynamic>.IndexKeys.Text(field)));
-					var index = new CreateIndexModel<dynamic>(indexKeys, indexOptions);
-					return await this.Collection.Indexes.CreateOneAsync(index, cancellationToken: cancellationToken);
-				}
-				else if (indexDefinition.Fields.Length > 1)
-				{
-					var indexKeys = Builders<dynamic>.IndexKeys.Combine(indexDefinition.Fields.Select(field => Builders<dynamic>.IndexKeys.Text(field)));
-					var index = new CreateIndexModel<dynamic>(indexKeys, indexOptions);
-					return await this.Collection.Indexes.CreateOneAsync(index, cancellationToken: cancellationToken);
-				}
-				else
-				{
-					var field = indexDefinition.Fields.FirstOrDefault();
-					var indexKeys = Builders<dynamic>.IndexKeys.Text(field);
-					var index = new CreateIndexModel<dynamic>(indexKeys, indexOptions);
-					return await this.Collection.Indexes.CreateOneAsync(index, cancellationToken: cancellationToken);
-				}
+				var indexKeys = Builders<dynamic>.IndexKeys.Combine(indexDefinition.Fields.Select(field => Builders<dynamic>.IndexKeys.Text(field)));
+				var index = new CreateIndexModel<dynamic>(indexKeys, indexOptions);
+				return await this.Collection.Indexes.CreateOneAsync(index, cancellationToken: cancellationToken);
 			}
 			else
 			{
-				throw new IndexException("No fields defined");
+				var field = indexDefinition.Fields.FirstOrDefault();
+				var indexKeys = Builders<dynamic>.IndexKeys.Text(field);
+				var index = new CreateIndexModel<dynamic>(indexKeys, indexOptions);
+				return await this.Collection.Indexes.CreateOneAsync(index, cancellationToken: cancellationToken);
 			}
 		}
-
-		#endregion
+		else
+		{
+			throw new IndexException("No fields defined");
+		}
 	}
+
+	#endregion
 }

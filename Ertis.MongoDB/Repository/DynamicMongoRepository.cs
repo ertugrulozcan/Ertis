@@ -488,7 +488,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		predicate ??= new ExpressionFilterDefinition<dynamic>(item => true);
 
 		SortDefinition<dynamic> sortDefinition = null;
-		if (sorting != null && sorting.Any())
+		if (sorting is { Count: > 0 })
 		{
 			var sortDefinitionBuilder = new SortDefinitionBuilder<dynamic>();
 			var sortDefinitions = new List<SortDefinition<dynamic>>();
@@ -506,7 +506,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			sortDefinition = sortDefinitionBuilder.Combine(sortDefinitions);
 		}
 		
-		var options = this.GetFindOptions(sorting, indexOptions, locale);
+		var options = this.GetFindOptions(indexOptions, locale);
 		var collection = this.Collection.Find(predicate, options);
 		if (sortDefinition != null)
 		{
@@ -529,28 +529,14 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		return collection;
 	}
 	
-	private FindOptions GetFindOptions(Sorting sorting = null, IndexOptions indexOptions = null, Locale? locale = null)
+	private FindOptions GetFindOptions(IndexOptions indexOptions = null, Locale? locale = null)
 	{
-		if (sorting != null && sorting.Any(x => x.OrderBy != "_id") && locale != null)
+		return new FindOptions
 		{
-			var collation = new Collation(LocaleHelper.GetLanguageCode(locale.Value));
-			return new FindOptions
-			{
-				AllowDiskUse = this._settings.AllowDiskUse, 
-				Collation = collation,
-				Hint = indexOptions != null && !string.IsNullOrEmpty(indexOptions.Hint) ? new BsonDocument(indexOptions.Hint, 1) : null
-			};
-		}
-		else if (this._settings.AllowDiskUse == true)
-		{
-			return new FindOptions
-			{
-				AllowDiskUse = true,
-				Hint = indexOptions != null && !string.IsNullOrEmpty(indexOptions.Hint) ? new BsonDocument(indexOptions.Hint, 1) : null
-			};
-		}
-		
-		return null;
+			AllowDiskUse = this._settings.AllowDiskUse, 
+			Collation = locale != null ? new Collation(LocaleHelper.GetLanguageCode(locale.Value)) : null,
+			Hint = indexOptions?.GetIndexHint()
+		};
 	}
 	
 	#endregion
@@ -1344,13 +1330,13 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	
 	private long Count(FilterDefinition<dynamic> filterDefinition, IndexOptions indexOptions = null)
 	{
-		var countOptions = new CountOptions { Hint = indexOptions != null && !string.IsNullOrEmpty(indexOptions.Hint) ? new BsonDocument(indexOptions.Hint, 1) : null };
+		var countOptions = new CountOptions { Hint = indexOptions?.GetIndexHint() };
 		return this.Collection.CountDocuments(filterDefinition, countOptions);
 	}
 	
 	private async Task<long> CountAsync(FilterDefinition<dynamic> filterDefinition, IndexOptions indexOptions = null, CancellationToken cancellationToken = default)
 	{
-		var countOptions = new CountOptions { Hint = indexOptions != null && !string.IsNullOrEmpty(indexOptions.Hint) ? new BsonDocument(indexOptions.Hint, 1) : null };
+		var countOptions = new CountOptions { Hint = indexOptions?.GetIndexHint() };
 		return await this.Collection.CountDocumentsAsync(filterDefinition, countOptions, cancellationToken: cancellationToken);
 	}
 	

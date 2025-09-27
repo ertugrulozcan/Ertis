@@ -9,6 +9,8 @@ using Ertis.Data.Repository;
 using Ertis.MongoDB.Models;
 using Ertis.MongoDB.Queries;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMemberInSuper.Global
 namespace Ertis.MongoDB.Repository
 {
 	public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where TEntity : IEntity<string>
@@ -21,6 +23,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			string orderBy = null, 
 			SortDirection? sortDirection = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null);
 		
 		IPaginationCollection<TEntity> Find(
@@ -28,6 +31,7 @@ namespace Ertis.MongoDB.Repository
 			int? limit = null, 
 			bool? withCount = null, 
 			Sorting sorting = null, 
+			IndexOptions indexOptions = null, 
 			Locale? locale = null);
 		
 		Task<IPaginationCollection<TEntity>> FindAsync(
@@ -36,6 +40,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			string orderBy = null, 
 			SortDirection? sortDirection = null, 
+			IndexOptions indexOptions = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
@@ -44,6 +49,7 @@ namespace Ertis.MongoDB.Repository
 			int? limit = null, 
 			bool? withCount = null, 
 			Sorting sorting = null, 
+			IndexOptions indexOptions = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
@@ -54,6 +60,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			string orderBy = null, 
 			SortDirection? sortDirection = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null);
 		
 		IPaginationCollection<TEntity> Find(
@@ -62,6 +69,7 @@ namespace Ertis.MongoDB.Repository
 			int? limit = null, 
 			bool? withCount = null, 
 			Sorting sorting = null, 
+			IndexOptions indexOptions = null, 
 			Locale? locale = null);
 		
 		Task<IPaginationCollection<TEntity>> FindAsync(
@@ -71,6 +79,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			string orderBy = null, 
 			SortDirection? sortDirection = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
@@ -80,6 +89,7 @@ namespace Ertis.MongoDB.Repository
 			int? limit = null, 
 			bool? withCount = null, 
 			Sorting sorting = null, 
+			IndexOptions indexOptions = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 
@@ -90,6 +100,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			string orderBy = null, 
 			SortDirection? sortDirection = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null);
 		
 		IPaginationCollection<TEntity> Find(
@@ -98,6 +109,7 @@ namespace Ertis.MongoDB.Repository
 			int? limit = null, 
 			bool? withCount = null, 
 			Sorting sorting = null, 
+			IndexOptions indexOptions = null, 
 			Locale? locale = null);
 
 		Task<IPaginationCollection<TEntity>> FindAsync(
@@ -107,6 +119,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			string orderBy = null, 
 			SortDirection? sortDirection = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
@@ -115,7 +128,8 @@ namespace Ertis.MongoDB.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			Sorting sorting = null, 
+			Sorting sorting = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
@@ -127,6 +141,7 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null, 
 			SortDirection? sortDirection = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null);
 		
 		IPaginationCollection<T> Query<T>(
@@ -137,6 +152,7 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null, 
 			SortDirection? sortDirection = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null);
 		
 		IPaginationCollection<dynamic> Query(
@@ -146,6 +162,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			Sorting sorting = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null);
 		
 		IPaginationCollection<T> Query<T>(
@@ -155,6 +172,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			Sorting sorting = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null);
 
 		IPaginationCollection<dynamic> Query(
@@ -165,6 +183,7 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null, 
 			SortDirection? sortDirection = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null);
 		
 		IPaginationCollection<T> Query<T>(
@@ -175,6 +194,7 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null, 
 			SortDirection? sortDirection = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null);
 		
 		IPaginationCollection<dynamic> Query(
@@ -184,6 +204,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			Sorting sorting = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null);
 		
 		IPaginationCollection<T> Query<T>(
@@ -193,6 +214,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			Sorting sorting = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null);
 		
 		Task<IPaginationCollection<dynamic>> QueryAsync(
@@ -203,6 +225,7 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null, 
 			SortDirection? sortDirection = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
@@ -214,6 +237,7 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null, 
 			SortDirection? sortDirection = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
@@ -224,6 +248,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			Sorting sorting = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
@@ -234,6 +259,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			Sorting sorting = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
@@ -245,6 +271,7 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null, 
 			SortDirection? sortDirection = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
@@ -256,6 +283,7 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null, 
 			SortDirection? sortDirection = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
@@ -266,6 +294,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			Sorting sorting = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
 		
@@ -276,9 +305,22 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			Sorting sorting = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null, 
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default);
+		
+		long Count(IndexOptions indexOptions = null);
+		
+		Task<long> CountAsync(IndexOptions indexOptions = null, CancellationToken cancellationToken = default);
+		
+		long Count(string query, IndexOptions indexOptions = null);
+		
+		Task<long> CountAsync(string query, IndexOptions indexOptions = null, CancellationToken cancellationToken = default);
 
+		long Count(Expression<Func<TEntity, bool>> expression, IndexOptions indexOptions = null);
+		
+		Task<long> CountAsync(Expression<Func<TEntity, bool>> expression, IndexOptions indexOptions = null, CancellationToken cancellationToken = default);
+		
 		TEntity Increment(string id, string field, int value = 1);
 		
 		TEntity Increment(string id, string field, long value = 1);

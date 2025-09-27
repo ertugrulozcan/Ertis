@@ -38,7 +38,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 		[Test]
 		public void FindTest()
 		{
-			var paginationCollection = this.mockDatabaseRepository.Find(null, null, null, null, null);
+			var paginationCollection = this.mockDatabaseRepository.Find(null, null, null, null, null, null);
 			foreach (var item in paginationCollection.Items)
 			{
 				Console.WriteLine($"{item.Id} - {item.Text}");
@@ -96,7 +96,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 		public void DeleteTest()
 		{
 			const string id = "5fc65c27dd7283e0b912f660";
-			bool isDeleted = this.mockDatabaseRepository.Delete(id);
+			var isDeleted = this.mockDatabaseRepository.Delete(id);
 
 			if (isDeleted)
 			{
@@ -116,7 +116,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 			try
 			{
 				const string query = "{'int_field': {'$gte': 10}}";
-				Dictionary<string, bool> selectFields = new Dictionary<string, bool>
+				var selectFields = new Dictionary<string, bool>
 				{
 					{ "_id", true },
 					{ "array_field", true },
@@ -124,7 +124,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 				};
 				
 				var paginationResult = this.mockDatabaseRepository.Query(query, null, null, null, null, null, selectFields:selectFields);
-				string json = JsonConvert.SerializeObject(paginationResult);
+				var json = JsonConvert.SerializeObject(paginationResult);
 				Console.WriteLine(json);
 			}
 			catch (Exception ex)
@@ -141,10 +141,10 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 		{
 			try
 			{
-				string query = "{ \"sys.created_at\": { \"$gte\": \"2021-01-24T00:00:00.000Z\" } }";
+				var query = "{ \"sys.created_at\": { \"$gte\": \"2021-01-24T00:00:00.000Z\" } }";
 
-				var paginationResult = this.mockDatabaseRepository.Query(query, null, null, null, null, null, null);
-				string json = JsonConvert.SerializeObject(paginationResult);
+				var paginationResult = this.mockDatabaseRepository.Query(query, null, null, null, null, null, null, null);
+				var json = JsonConvert.SerializeObject(paginationResult);
 				Console.WriteLine(json);
 			}
 			catch (Exception ex)
@@ -159,7 +159,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 		[Test]
 		public void CountTest()
 		{
-			long count = this.mockDatabaseRepository.Count();
+			var count = this.mockDatabaseRepository.Count();
 			Console.WriteLine($"Total count: {count}");
 			
 			Assert.Pass();
@@ -169,7 +169,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 		public void CountByQueryTest()
 		{
 			const string query = "{'int_field': {'$gte': 15}}";
-			long count = this.mockDatabaseRepository.Count(query);
+			var count = this.mockDatabaseRepository.Count(query);
 			Console.WriteLine($"Total count: {count}");
 			
 			Assert.Pass();
@@ -178,7 +178,7 @@ namespace Ertis.Tests.Ertis.MongoDB.Tests
 		[Test]
 		public void CountByExpressionTest()
 		{
-			long count = this.mockDatabaseRepository.Count(x => x.Integer >= 15);
+			var count = this.mockDatabaseRepository.Count(x => x.Integer >= 15);
 			Console.WriteLine($"Total count: {count}");
 			
 			Assert.Pass();

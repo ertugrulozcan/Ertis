@@ -21,9 +21,11 @@ using MongoDB.Driver;
 using SortDirection = Ertis.Core.Collections.SortDirection;
 using UpdateOptions = Ertis.Data.Models.UpdateOptions;
 
+// ReSharper disable MethodOverloadWithOptionalParameter
 namespace Ertis.MongoDB.Repository
 {
-    public abstract class DynamicMongoRepository : IDynamicMongoRepository
+	// ReSharper disable once UnusedType.Global
+	public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	{
 		#region Services
 
@@ -236,7 +238,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null,
 			string orderBy = null, 
 			SortDirection? sortDirection = null, 
-			// ReSharper disable once MethodOverloadWithOptionalParameter
+			IndexOptions indexOptions = null,
 			Locale? locale = null)
 		{
 			return this.Find(
@@ -246,6 +248,7 @@ namespace Ertis.MongoDB.Repository
 				withCount,
 				orderBy,
 				sortDirection,
+				indexOptions, 
 				locale);
 		}
 		
@@ -254,7 +257,7 @@ namespace Ertis.MongoDB.Repository
 			int? limit = null, 
 			bool? withCount = null,
 			Sorting sorting = null, 
-			// ReSharper disable once MethodOverloadWithOptionalParameter
+			IndexOptions indexOptions = null,
 			Locale? locale = null)
 		{
 			return this.Find(
@@ -263,6 +266,7 @@ namespace Ertis.MongoDB.Repository
 				limit,
 				withCount,
 				sorting,
+				indexOptions, 
 				locale);
 		}
 
@@ -272,6 +276,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null,
 			string orderBy = null,
 			SortDirection? sortDirection = null, 
+			IndexOptions indexOptions = null,
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default)
 		{
@@ -282,6 +287,7 @@ namespace Ertis.MongoDB.Repository
 				withCount,
 				orderBy,
 				sortDirection, 
+				indexOptions, 
 				locale, 
 				cancellationToken: cancellationToken);
 		}
@@ -291,6 +297,7 @@ namespace Ertis.MongoDB.Repository
 			int? limit = null,
 			bool? withCount = null,
 			Sorting sorting = null, 
+			IndexOptions indexOptions = null,
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default)
 		{
@@ -300,6 +307,7 @@ namespace Ertis.MongoDB.Repository
 				limit,
 				withCount,
 				sorting, 
+				indexOptions, 
 				locale, 
 				cancellationToken: cancellationToken);
 		}
@@ -311,11 +319,11 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			string orderBy = null, 
 			SortDirection? sortDirection = null, 
-			// ReSharper disable once MethodOverloadWithOptionalParameter
+			IndexOptions indexOptions = null,
 			Locale? locale = null)
 		{
 			var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-			return this.Filter(filterExpression, skip, limit, withCount, new Sorting(orderBy, sortDirection), locale);
+			return this.Filter(filterExpression, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, locale);
 		}
 		
 		public IPaginationCollection<dynamic> Find(
@@ -324,11 +332,11 @@ namespace Ertis.MongoDB.Repository
 			int? limit = null, 
 			bool? withCount = null, 
 			Sorting sorting = null, 
-			// ReSharper disable once MethodOverloadWithOptionalParameter
+			IndexOptions indexOptions = null,
 			Locale? locale = null)
 		{
 			var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-			return this.Filter(filterExpression, skip, limit, withCount, sorting, locale);
+			return this.Filter(filterExpression, skip, limit, withCount, sorting, indexOptions, locale);
 		}
 		
 		public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -338,11 +346,12 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			string orderBy = null, 
 			SortDirection? sortDirection = null, 
+			IndexOptions indexOptions = null,
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default)
 		{
 			var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-			return await this.FilterAsync(filterExpression, skip, limit, withCount, new Sorting(orderBy, sortDirection), locale, cancellationToken: cancellationToken);
+			return await this.FilterAsync(filterExpression, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, locale, cancellationToken: cancellationToken);
 		}
 		
 		public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -351,11 +360,12 @@ namespace Ertis.MongoDB.Repository
 			int? limit = null, 
 			bool? withCount = null, 
 			Sorting sorting = null, 
+			IndexOptions indexOptions = null,
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default)
 		{
 			var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-			return await this.FilterAsync(filterExpression, skip, limit, withCount, sorting, locale, cancellationToken: cancellationToken);
+			return await this.FilterAsync(filterExpression, skip, limit, withCount, sorting, indexOptions, locale, cancellationToken: cancellationToken);
 		}
 		
 		public IPaginationCollection<dynamic> Find(
@@ -365,12 +375,12 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			string orderBy = null, 
 			SortDirection? sortDirection = null, 
-			// ReSharper disable once MethodOverloadWithOptionalParameter
+			IndexOptions indexOptions = null,
 			Locale? locale = null)
 		{
 			query = QueryHelper.EnsureObjectIdsAndISODates(query);
 			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-			return this.Filter(filterDefinition, skip, limit, withCount, new Sorting(orderBy, sortDirection), locale);
+			return this.Filter(filterDefinition, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, locale);
 		}
 		
 		public IPaginationCollection<dynamic> Find(
@@ -379,12 +389,12 @@ namespace Ertis.MongoDB.Repository
 			int? limit = null, 
 			bool? withCount = null, 
 			Sorting sorting = null, 
-			// ReSharper disable once MethodOverloadWithOptionalParameter
+			IndexOptions indexOptions = null,
 			Locale? locale = null)
 		{
 			query = QueryHelper.EnsureObjectIdsAndISODates(query);
 			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-			return this.Filter(filterDefinition, skip, limit, withCount, sorting, locale);
+			return this.Filter(filterDefinition, skip, limit, withCount, sorting, indexOptions, locale);
 		}
 		
 		public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -394,12 +404,13 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null, 
 			string orderBy = null, 
 			SortDirection? sortDirection = null, 
+			IndexOptions indexOptions = null,
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default)
 		{
 			query = QueryHelper.EnsureObjectIdsAndISODates(query);
 			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-			return await this.FilterAsync(filterDefinition, skip, limit, withCount, new Sorting(orderBy, sortDirection), locale, cancellationToken: cancellationToken);
+			return await this.FilterAsync(filterDefinition, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, locale, cancellationToken: cancellationToken);
 		}
 		
 		public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -407,13 +418,14 @@ namespace Ertis.MongoDB.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			Sorting sorting = null,  
+			Sorting sorting = null, 
+			IndexOptions indexOptions = null,
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default)
 		{
 			query = QueryHelper.EnsureObjectIdsAndISODates(query);
 			var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-			return await this.FilterAsync(filterDefinition, skip, limit, withCount, sorting, locale, cancellationToken: cancellationToken);
+			return await this.FilterAsync(filterDefinition, skip, limit, withCount, sorting, indexOptions, locale, cancellationToken: cancellationToken);
 		}
 		
 		private IPaginationCollection<dynamic> Filter(
@@ -421,10 +433,11 @@ namespace Ertis.MongoDB.Repository
 			int? skip = null, 
 			int? limit = null, 
 			bool? withCount = null, 
-			Sorting sorting = null,  
+			Sorting sorting = null, 
+			IndexOptions indexOptions = null,
 			Locale? locale = null)
 		{
-			var collection = this.ExecuteFilter(predicate, skip, limit, sorting, locale);
+			var collection = this.ExecuteFilter(predicate, skip, limit, sorting, indexOptions, locale);
 
 			long totalCount = 0;
 			if (withCount != null && withCount.Value)
@@ -445,10 +458,11 @@ namespace Ertis.MongoDB.Repository
 			int? limit = null, 
 			bool? withCount = null, 
 			Sorting sorting = null, 
+			IndexOptions indexOptions = null,
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default)
 		{
-			var collection = this.ExecuteFilter(predicate, skip, limit, sorting, locale);
+			var collection = this.ExecuteFilter(predicate, skip, limit, sorting, indexOptions, locale);
 
 			long totalCount = 0;
 			if (withCount != null && withCount.Value)
@@ -468,6 +482,7 @@ namespace Ertis.MongoDB.Repository
 			int? skip = null,
 			int? limit = null,
 			Sorting sorting = null, 
+			IndexOptions indexOptions = null,
 			Locale? locale = null)
 		{
 			predicate ??= new ExpressionFilterDefinition<dynamic>(item => true);
@@ -491,7 +506,7 @@ namespace Ertis.MongoDB.Repository
 				sortDefinition = sortDefinitionBuilder.Combine(sortDefinitions);
 			}
 			
-			var options = this.GetFindOptions(sorting, locale);
+			var options = this.GetFindOptions(sorting, indexOptions, locale);
 			var collection = this.Collection.Find(predicate, options);
 			if (sortDefinition != null)
 			{
@@ -514,18 +529,27 @@ namespace Ertis.MongoDB.Repository
 			return collection;
 		}
 		
-		private FindOptions GetFindOptions(Sorting sorting = null, Locale? locale = null)
+		private FindOptions GetFindOptions(Sorting sorting = null, IndexOptions indexOptions = null, Locale? locale = null)
 		{
 			if (sorting != null && sorting.Any(x => x.OrderBy != "_id") && locale != null)
 			{
 				var collation = new Collation(LocaleHelper.GetLanguageCode(locale.Value));
-				return new FindOptions { AllowDiskUse = this._settings.AllowDiskUse, Collation = collation };
+				return new FindOptions
+				{
+					AllowDiskUse = this._settings.AllowDiskUse, 
+					Collation = collation,
+					Hint = indexOptions != null && !string.IsNullOrEmpty(indexOptions.Hint) ? new BsonDocument(indexOptions.Hint, 1) : null
+				};
 			}
 			else if (this._settings.AllowDiskUse == true)
 			{
-				return new FindOptions { AllowDiskUse = true };
+				return new FindOptions
+				{
+					AllowDiskUse = true,
+					Hint = indexOptions != null && !string.IsNullOrEmpty(indexOptions.Hint) ? new BsonDocument(indexOptions.Hint, 1) : null
+				};
 			}
-
+			
 			return null;
 		}
 		
@@ -540,6 +564,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null,
 			Sorting sorting = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null,
 			Locale? locale = null)
 		{
 			try
@@ -553,6 +578,7 @@ namespace Ertis.MongoDB.Repository
 					withCount,
 					sorting, 
 					selectFields, 
+					indexOptions, 
 					locale);
 			}
 			catch (MongoCommandException ex)
@@ -577,6 +603,7 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null, 
 			SortDirection? sortDirection = null,
 			IDictionary<string, bool> selectFields = null, 
+			IndexOptions indexOptions = null,
 			Locale? locale = null)
 		{
 			return this.Query(
@@ -586,6 +613,7 @@ namespace Ertis.MongoDB.Repository
 				withCount,
 				new Sorting(orderBy, sortDirection), 
 				selectFields,
+				indexOptions, 
 				locale);
 		}
 
@@ -596,6 +624,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null,
 			Sorting sorting = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null,
 			Locale? locale = null)
 		{
 			try
@@ -608,6 +637,7 @@ namespace Ertis.MongoDB.Repository
 					withCount,
 					sorting,
 					selectFields, 
+					indexOptions, 
 					locale);
 			}
 			catch (MongoCommandException ex)
@@ -632,6 +662,7 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null,
 			SortDirection? sortDirection = null,
 			IDictionary<string, bool> selectFields = null, 
+			IndexOptions indexOptions = null,
 			Locale? locale = null)
 		{
 			return this.Query(
@@ -641,6 +672,7 @@ namespace Ertis.MongoDB.Repository
 				withCount,
 				new Sorting(orderBy, sortDirection), 
 				selectFields,
+				indexOptions, 
 				locale);
 		}
 
@@ -651,6 +683,7 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null,
 			Sorting sorting = null, 
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null,
 			Locale? locale = null,
 			CancellationToken cancellationToken = default)
 		{
@@ -665,6 +698,7 @@ namespace Ertis.MongoDB.Repository
 					withCount,
 					sorting, 
 					selectFields, 
+					indexOptions, 
 					locale, 
 					cancellationToken: cancellationToken);
 			}
@@ -690,6 +724,7 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null, 
 			SortDirection? sortDirection = null,
 			IDictionary<string, bool> selectFields = null, 
+			IndexOptions indexOptions = null,
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default)
 		{
@@ -700,6 +735,7 @@ namespace Ertis.MongoDB.Repository
 				withCount,
 				new Sorting(orderBy, sortDirection), 
 				selectFields,
+				indexOptions, 
 				locale,
 				cancellationToken: cancellationToken);
 		}
@@ -712,6 +748,7 @@ namespace Ertis.MongoDB.Repository
 			string orderBy = null,
 			SortDirection? sortDirection = null,
 			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null,
 			Locale? locale = null,
 			CancellationToken cancellationToken = default)
 		{
@@ -722,6 +759,7 @@ namespace Ertis.MongoDB.Repository
 				withCount,
 				new Sorting(orderBy, sortDirection),
 				selectFields,
+				indexOptions, 
 				locale,
 				cancellationToken: cancellationToken);
 		}
@@ -732,7 +770,8 @@ namespace Ertis.MongoDB.Repository
 			int? limit = null,
 			bool? withCount = null,
 			Sorting sorting = null, 
-			IDictionary<string, bool> selectFields = null, 
+			IDictionary<string, bool> selectFields = null,
+			IndexOptions indexOptions = null,
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default)
 		{
@@ -746,6 +785,7 @@ namespace Ertis.MongoDB.Repository
 					withCount,
 					sorting,
 					selectFields, 
+					indexOptions, 
 					locale, 
 					cancellationToken: cancellationToken);
 			}
@@ -770,11 +810,12 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null,
 			Sorting sorting = null, 
 			IDictionary<string, bool> selectFields = null, 
+			IndexOptions indexOptions = null,
 			Locale? locale = null)
 		{
 			try
 			{
-				var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, locale);
+				var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, indexOptions, locale);
 				var projectionDefinition = ExecuteSelectQuery<dynamic>(selectFields);
 				var collection = filterResult.Project(projectionDefinition);
 			
@@ -814,12 +855,13 @@ namespace Ertis.MongoDB.Repository
 			bool? withCount = null,
 			Sorting sorting = null, 
 			IDictionary<string, bool> selectFields = null, 
+			IndexOptions indexOptions = null,
 			Locale? locale = null, 
 			CancellationToken cancellationToken = default)
 		{
 			try
 			{
-				var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, locale);
+				var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, indexOptions, locale);
 				var projectionDefinition = ExecuteSelectQuery<dynamic>(selectFields);
 				var collection = filterResult.Project(projectionDefinition);
 			
@@ -1022,6 +1064,7 @@ namespace Ertis.MongoDB.Repository
 			}
 		}
 
+		// ReSharper disable once UnusedMember.Global
 		public ICollection<dynamic> InsertMany(ICollection<object> entities, InsertOptions? options = null)
 		{
 			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
@@ -1045,6 +1088,7 @@ namespace Ertis.MongoDB.Repository
 			return entities;
 		}
 		
+		// ReSharper disable once UnusedMember.Global
 		public async Task<ICollection<dynamic>> InsertManyAsync(ICollection<object> entities, InsertOptions? options = null, CancellationToken cancellationToken = default)
 		{
 			if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
@@ -1072,7 +1116,7 @@ namespace Ertis.MongoDB.Repository
 		
 		#region Update Methods
 
-		public dynamic Update(object entity, string id = default, UpdateOptions? options = null)
+		public dynamic Update(object entity, string id = null, UpdateOptions? options = null)
 		{
 			if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerBeforeActionBinder)
 			{
@@ -1096,7 +1140,7 @@ namespace Ertis.MongoDB.Repository
 			return entity;
 		}
 		
-		public async Task<dynamic> UpdateAsync(object entity, string id = default, UpdateOptions? options = null, CancellationToken cancellationToken = default)
+		public async Task<dynamic> UpdateAsync(object entity, string id = null, UpdateOptions? options = null, CancellationToken cancellationToken = default)
 		{
 			if (this._actionBinder != null && (options ?? UpdateOptions.Default).TriggerBeforeActionBinder)
 			{
@@ -1121,7 +1165,7 @@ namespace Ertis.MongoDB.Repository
 		}
 
 		[SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
-		public dynamic Upsert(dynamic entity, string id = default)
+		public dynamic Upsert(dynamic entity, string id = null)
 		{
 			if (string.IsNullOrEmpty(id))
 			{
@@ -1135,7 +1179,7 @@ namespace Ertis.MongoDB.Repository
 		}
 		
 		[SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
-		public async Task<dynamic> UpsertAsync(dynamic entity, string id = default, CancellationToken cancellationToken = default)
+		public async Task<dynamic> UpsertAsync(dynamic entity, string id = null, CancellationToken cancellationToken = default)
 		{
 			if (string.IsNullOrEmpty(id))
 			{
@@ -1228,38 +1272,86 @@ namespace Ertis.MongoDB.Repository
 
 		public long Count()
 		{
-			return this.DocumentCollection.CountDocuments(item => true);
+			return this.Count(item => true);
+		}
+		
+		public long Count(IndexOptions indexOptions = null)
+		{
+			return this.Count(item => true, indexOptions);
 		}
 		
 		public async Task<long> CountAsync(CancellationToken cancellationToken = default)
 		{
-			return await this.DocumentCollection.CountDocumentsAsync(item => true, cancellationToken: cancellationToken);
+			return await this.CountAsync(item => true, cancellationToken: cancellationToken);
+		}
+		
+		public async Task<long> CountAsync(IndexOptions indexOptions = null, CancellationToken cancellationToken = default)
+		{
+			return await this.CountAsync(item => true, indexOptions, cancellationToken: cancellationToken);
 		}
 		
 		public long Count(Expression<Func<dynamic, bool>> expression)
 		{
 			FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
-			return this.Collection.CountDocuments(filterExpression);
+			return this.Count(filterExpression);
+		}
+		
+		public long Count(Expression<Func<dynamic, bool>> expression, IndexOptions indexOptions = null)
+		{
+			FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
+			return this.Count(filterExpression, indexOptions);
 		}
 		
 		public async Task<long> CountAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
 		{
 			FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
-			return await this.Collection.CountDocumentsAsync(filterExpression, cancellationToken: cancellationToken);
+			return await this.CountAsync(filterExpression, cancellationToken: cancellationToken);
+		}
+		
+		public async Task<long> CountAsync(Expression<Func<dynamic, bool>> expression, IndexOptions indexOptions = null, CancellationToken cancellationToken = default)
+		{
+			FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
+			return await this.CountAsync(filterExpression, indexOptions, cancellationToken: cancellationToken);
 		}
 		
 		public long Count(string query)
 		{
 			query = QueryHelper.EnsureObjectIdsAndISODates(query);
 			var filterDefinition = new JsonFilterDefinition<dynamic>(query);
-			return this.Collection.CountDocuments(filterDefinition);
+			return this.Count(filterDefinition);
+		}
+		
+		public long Count(string query, IndexOptions indexOptions = null)
+		{
+			query = QueryHelper.EnsureObjectIdsAndISODates(query);
+			var filterDefinition = new JsonFilterDefinition<dynamic>(query);
+			return this.Count(filterDefinition, indexOptions);
 		}
 		
 		public async Task<long> CountAsync(string query, CancellationToken cancellationToken = default)
 		{
 			query = QueryHelper.EnsureObjectIdsAndISODates(query);
 			var filterDefinition = new JsonFilterDefinition<dynamic>(query);
-			return await this.Collection.CountDocumentsAsync(filterDefinition, cancellationToken: cancellationToken);
+			return await this.CountAsync(filterDefinition, cancellationToken: cancellationToken);
+		}
+		
+		public async Task<long> CountAsync(string query, IndexOptions indexOptions = null, CancellationToken cancellationToken = default)
+		{
+			query = QueryHelper.EnsureObjectIdsAndISODates(query);
+			var filterDefinition = new JsonFilterDefinition<dynamic>(query);
+			return await this.CountAsync(filterDefinition, indexOptions, cancellationToken: cancellationToken);
+		}
+		
+		private long Count(FilterDefinition<dynamic> filterDefinition, IndexOptions indexOptions = null)
+		{
+			var countOptions = new CountOptions { Hint = indexOptions != null && !string.IsNullOrEmpty(indexOptions.Hint) ? new BsonDocument(indexOptions.Hint, 1) : null };
+			return this.Collection.CountDocuments(filterDefinition, countOptions);
+		}
+		
+		private async Task<long> CountAsync(FilterDefinition<dynamic> filterDefinition, IndexOptions indexOptions = null, CancellationToken cancellationToken = default)
+		{
+			var countOptions = new CountOptions { Hint = indexOptions != null && !string.IsNullOrEmpty(indexOptions.Hint) ? new BsonDocument(indexOptions.Hint, 1) : null };
+			return await this.Collection.CountDocumentsAsync(filterDefinition, countOptions, cancellationToken: cancellationToken);
 		}
 		
 		#endregion
@@ -1271,18 +1363,16 @@ namespace Ertis.MongoDB.Repository
 			try
 			{
 				query = QueryHelper.EnsureObjectIdsAndISODates(query);
-				
-				using (var jsonReader = new JsonReader(query))
-				{
-					var serializer = new BsonArraySerializer();
-					var bsonArray = serializer.Deserialize(BsonDeserializationContext.CreateRoot(jsonReader));
-					var bsonDocuments = bsonArray.Select(x => BsonDocument.Parse(x.ToString()));
-					var pipelineDefinition = PipelineDefinition<dynamic, BsonDocument>.Create(bsonDocuments);
-					var aggregationResultCursor = this.Collection.Aggregate(pipelineDefinition);
-					var documents = aggregationResultCursor.ToList();
-					var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
-					return objects;
-				}
+
+				using var jsonReader = new JsonReader(query);
+				var serializer = new BsonArraySerializer();
+				var bsonArray = serializer.Deserialize(BsonDeserializationContext.CreateRoot(jsonReader));
+				var bsonDocuments = bsonArray.Select(x => BsonDocument.Parse(x.ToString()));
+				var pipelineDefinition = PipelineDefinition<dynamic, BsonDocument>.Create(bsonDocuments);
+				var aggregationResultCursor = this.Collection.Aggregate(pipelineDefinition);
+				var documents = aggregationResultCursor.ToList();
+				var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
+				return objects;
 			}
 			catch (MongoCommandException ex)
 			{
@@ -1304,17 +1394,15 @@ namespace Ertis.MongoDB.Repository
 			{
 				query = QueryHelper.EnsureObjectIdsAndISODates(query);
 				
-				using (var jsonReader = new JsonReader(query))
-				{
-					var serializer = new BsonArraySerializer();
-					var bsonArray = serializer.Deserialize(BsonDeserializationContext.CreateRoot(jsonReader));
-					var bsonDocuments = bsonArray.Select(x => BsonDocument.Parse(x.ToString()));
-					var pipelineDefinition = PipelineDefinition<dynamic, BsonDocument>.Create(bsonDocuments);
-					var aggregationResultCursor = await this.Collection.AggregateAsync(pipelineDefinition, cancellationToken: cancellationToken);
-					var documents = await aggregationResultCursor.ToListAsync(cancellationToken: cancellationToken);
-					var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
-					return objects;
-				}
+				using var jsonReader = new JsonReader(query);
+				var serializer = new BsonArraySerializer();
+				var bsonArray = serializer.Deserialize(BsonDeserializationContext.CreateRoot(jsonReader));
+				var bsonDocuments = bsonArray.Select(x => BsonDocument.Parse(x.ToString()));
+				var pipelineDefinition = PipelineDefinition<dynamic, BsonDocument>.Create(bsonDocuments);
+				var aggregationResultCursor = await this.Collection.AggregateAsync(pipelineDefinition, cancellationToken: cancellationToken);
+				var documents = await aggregationResultCursor.ToListAsync(cancellationToken: cancellationToken);
+				var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
+				return objects;
 			}
 			catch (MongoCommandException ex)
 			{

@@ -38,5 +38,6 @@ namespace Ertis.Schema.Models
 		number,
 		date,
 		boolean,
+		array
 	}
 }

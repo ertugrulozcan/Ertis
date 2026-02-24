@@ -40,7 +40,7 @@ namespace Ertis.MongoDB.Helpers
 
 			try
 			{
-				if (node is JValue jValue && (node.Path == "_id" || node.Path.StartsWith("_id.")))
+				if (node is JValue jValue && (node.Path == "_id" || node.Path.StartsWith("_id.") || node.Path.EndsWith("._id")))
 				{
 					var nodeValue = node.Value<string>();
 					if (node.Type == JTokenType.String && ObjectId.TryParse(nodeValue, out _))

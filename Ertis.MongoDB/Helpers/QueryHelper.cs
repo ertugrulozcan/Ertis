@@ -42,7 +42,7 @@ public static class QueryHelper
 		{
 			switch (node)
 			{
-				case JValue jValue when node.Path == "_id" || node.Path.StartsWith("_id."):
+				case JValue jValue when node.Path == "_id" || node.Path.StartsWith("_id.") || node.Path.EndsWith("._id"):
 				{
 					var nodeValue = node.Value<string>();
 					if (node.Type == JTokenType.String && ObjectId.TryParse(nodeValue, out _))

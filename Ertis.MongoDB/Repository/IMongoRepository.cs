@@ -23,16 +23,16 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		string orderBy = null, 
 		SortDirection? sortDirection = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	IPaginationCollection<TEntity> Find(
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting sorting = null, 
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	Task<IPaginationCollection<TEntity>> FindAsync(
 		int? skip = null, 
@@ -40,8 +40,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	Task<IPaginationCollection<TEntity>> FindAsync(
@@ -49,8 +49,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting sorting = null, 
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	IPaginationCollection<TEntity> Find(
@@ -60,8 +60,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		string orderBy = null, 
 		SortDirection? sortDirection = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	IPaginationCollection<TEntity> Find(
 		Expression<Func<TEntity, bool>> expression, 
@@ -69,8 +69,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting sorting = null, 
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	Task<IPaginationCollection<TEntity>> FindAsync(
 		Expression<Func<TEntity, bool>> expression, 
@@ -79,8 +79,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		string orderBy = null, 
 		SortDirection? sortDirection = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	Task<IPaginationCollection<TEntity>> FindAsync(
@@ -89,8 +89,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting sorting = null, 
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 
 	IPaginationCollection<TEntity> Find(
@@ -100,8 +100,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		string orderBy = null, 
 		SortDirection? sortDirection = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	IPaginationCollection<TEntity> Find(
 		string query, 
@@ -109,8 +109,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting sorting = null, 
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 
 	Task<IPaginationCollection<TEntity>> FindAsync(
 		string query, 
@@ -119,8 +119,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		string orderBy = null, 
 		SortDirection? sortDirection = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	Task<IPaginationCollection<TEntity>> FindAsync(
@@ -129,8 +129,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting sorting = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	IPaginationCollection<dynamic> Query(
@@ -141,8 +141,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	IPaginationCollection<T> Query<T>(
 		string query, 
@@ -152,8 +152,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	IPaginationCollection<dynamic> Query(
 		string query, 
@@ -162,8 +162,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	IPaginationCollection<T> Query<T>(
 		string query, 
@@ -172,8 +172,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 
 	IPaginationCollection<dynamic> Query(
 		Expression<Func<TEntity, bool>> expression, 
@@ -183,8 +183,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	IPaginationCollection<T> Query<T>(
 		Expression<Func<TEntity, bool>> expression, 
@@ -194,8 +194,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	IPaginationCollection<dynamic> Query(
 		Expression<Func<TEntity, bool>> expression, 
@@ -204,8 +204,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	IPaginationCollection<T> Query<T>(
 		Expression<Func<TEntity, bool>> expression, 
@@ -214,8 +214,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	Task<IPaginationCollection<dynamic>> QueryAsync(
 		string query, 
@@ -225,8 +225,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	Task<IPaginationCollection<T>> QueryAsync<T>(
@@ -237,8 +237,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	Task<IPaginationCollection<dynamic>> QueryAsync(
@@ -248,8 +248,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	Task<IPaginationCollection<T>> QueryAsync<T>(
@@ -259,8 +259,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	Task<IPaginationCollection<dynamic>> QueryAsync(
@@ -271,8 +271,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	Task<IPaginationCollection<T>> QueryAsync<T>(
@@ -283,8 +283,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	Task<IPaginationCollection<dynamic>> QueryAsync(
@@ -294,8 +294,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	Task<IPaginationCollection<T>> QueryAsync<T>(
@@ -305,8 +305,8 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	long Count(IndexOptions indexOptions = null);

@@ -21,16 +21,16 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		bool? withCount = null, 
 		string orderBy = null, 
 		SortDirection? sortDirection = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
     
     IPaginationCollection<dynamic> Find(
         int? skip = null, 
         int? limit = null, 
         bool? withCount = null, 
         Sorting sorting = null, 
-        IndexOptions indexOptions = null, 
-        Locale? locale = null);
+        IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	Task<IPaginationCollection<dynamic>> FindAsync(
 		int? skip = null, 
@@ -38,8 +38,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		bool? withCount = null, 
 		string orderBy = null, 
 		SortDirection? sortDirection = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	Task<IPaginationCollection<dynamic>> FindAsync(
@@ -47,8 +47,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting sorting = null, 
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	IPaginationCollection<dynamic> Find(
@@ -58,8 +58,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		bool? withCount = null, 
 		string orderBy = null, 
 		SortDirection? sortDirection = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	IPaginationCollection<dynamic> Find(
 		Expression<Func<dynamic, bool>> expression, 
@@ -67,8 +67,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting sorting = null, 
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	Task<IPaginationCollection<dynamic>> FindAsync(
 		Expression<Func<dynamic, bool>> expression, 
@@ -77,8 +77,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		bool? withCount = null, 
 		string orderBy = null, 
 		SortDirection? sortDirection = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	Task<IPaginationCollection<dynamic>> FindAsync(
@@ -87,8 +87,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting sorting = null, 
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 
 	IPaginationCollection<dynamic> Find(
@@ -98,8 +98,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		bool? withCount = null, 
 		string orderBy = null, 
 		SortDirection? sortDirection = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	IPaginationCollection<dynamic> Find(
 		string query, 
@@ -107,8 +107,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting sorting = null, 
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 
 	Task<IPaginationCollection<dynamic>> FindAsync(
 		string query, 
@@ -117,8 +117,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		bool? withCount = null, 
 		string orderBy = null, 
 		SortDirection? sortDirection = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	Task<IPaginationCollection<dynamic>> FindAsync(
@@ -127,8 +127,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting sorting = null, 
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	IPaginationCollection<dynamic> Query(
@@ -139,8 +139,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	IPaginationCollection<dynamic> Query(
 		string query, 
@@ -149,8 +149,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		bool? withCount = null, 
 		Sorting sorting = null,  
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 
 	IPaginationCollection<dynamic> Query(
 		Expression<Func<dynamic, bool>> expression, 
@@ -160,8 +160,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	IPaginationCollection<dynamic> Query(
 		Expression<Func<dynamic, bool>> expression, 
@@ -170,8 +170,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null);
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null);
 	
 	Task<IPaginationCollection<dynamic>> QueryAsync(
 		string query, 
@@ -181,8 +181,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	Task<IPaginationCollection<dynamic>> QueryAsync(
@@ -192,8 +192,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	Task<IPaginationCollection<dynamic>> QueryAsync(
@@ -204,8 +204,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
 	Task<IPaginationCollection<dynamic>> QueryAsync(
@@ -215,8 +215,8 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null,
-		IndexOptions indexOptions = null, 
-		Locale? locale = null, 
+		IndexOptions indexOptions = null,
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default);
     
 	long Count(IndexOptions indexOptions = null);

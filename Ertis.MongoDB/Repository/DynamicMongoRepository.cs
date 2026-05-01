@@ -111,7 +111,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		string orderBy = null,
 		SortDirection? sortDirection = null)
 	{
-		return this.Find(skip, limit, withCount, orderBy, sortDirection, locale: null);
+		return this.Find(skip, limit, withCount, orderBy, sortDirection, collationOptions: null);
 	}
 	
 	public IPaginationCollection<dynamic> Find(
@@ -120,7 +120,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		bool? withCount = null,
 		Sorting sorting = null)
 	{
-		return this.Find(skip, limit, withCount, sorting, locale: null);
+		return this.Find(skip, limit, withCount, sorting, collationOptions: null);
 	}
 
 	public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -131,7 +131,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		SortDirection? sortDirection = null,
 		CancellationToken cancellationToken = default)
 	{
-		return await this.FindAsync(skip, limit, withCount, orderBy, sortDirection, locale: null, cancellationToken: cancellationToken);
+		return await this.FindAsync(skip, limit, withCount, orderBy, sortDirection, collationOptions: null, cancellationToken: cancellationToken);
 	}
 	
 	public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -141,7 +141,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		Sorting sorting = null, 
 		CancellationToken cancellationToken = default)
 	{
-		return await this.FindAsync(skip, limit, withCount, sorting, locale: null, cancellationToken: cancellationToken);
+		return await this.FindAsync(skip, limit, withCount, sorting, collationOptions: null, cancellationToken: cancellationToken);
 	}
 
 	public IPaginationCollection<dynamic> Find(
@@ -152,7 +152,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		string orderBy = null,
 		SortDirection? sortDirection = null)
 	{
-		return this.Find(expression, skip, limit, withCount, orderBy, sortDirection, locale: null);
+		return this.Find(expression, skip, limit, withCount, orderBy, sortDirection, collationOptions: null);
 	}
 	
 	public IPaginationCollection<dynamic> Find(
@@ -162,7 +162,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		bool? withCount = null,
 		Sorting sorting = null)
 	{
-		return this.Find(expression, skip, limit, withCount, sorting, locale: null);
+		return this.Find(expression, skip, limit, withCount, sorting, collationOptions: null);
 	}
 
 	public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -174,7 +174,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		SortDirection? sortDirection = null,
 		CancellationToken cancellationToken = default)
 	{
-		return await this.FindAsync(expression, skip, limit, withCount, orderBy, sortDirection, locale: null, cancellationToken: cancellationToken);
+		return await this.FindAsync(expression, skip, limit, withCount, orderBy, sortDirection, collationOptions: null, cancellationToken: cancellationToken);
 	}
 	
 	public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -185,7 +185,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		Sorting sorting = null, 
 		CancellationToken cancellationToken = default)
 	{
-		return await this.FindAsync(expression, skip, limit, withCount, sorting, locale: null, cancellationToken: cancellationToken);
+		return await this.FindAsync(expression, skip, limit, withCount, sorting, collationOptions: null, cancellationToken: cancellationToken);
 	}
 
 	public IPaginationCollection<dynamic> Find(
@@ -196,7 +196,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		string orderBy = null,
 		SortDirection? sortDirection = null)
 	{
-		return this.Find(query, skip, limit, withCount, orderBy, sortDirection, locale: null);
+		return this.Find(query, skip, limit, withCount, orderBy, sortDirection, collationOptions: null);
 	}
 	
 	public IPaginationCollection<dynamic> Find(
@@ -206,7 +206,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		bool? withCount = null,
 		Sorting sorting = null)
 	{
-		return this.Find(query, skip, limit, withCount, sorting, locale: null);
+		return this.Find(query, skip, limit, withCount, sorting, collationOptions: null);
 	}
 
 	public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -218,7 +218,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		SortDirection? sortDirection = null,
 		CancellationToken cancellationToken = default)
 	{
-		return await this.FindAsync(query, skip, limit, withCount, orderBy, sortDirection, locale: null, cancellationToken: cancellationToken);
+		return await this.FindAsync(query, skip, limit, withCount, orderBy, sortDirection, collationOptions: null, cancellationToken: cancellationToken);
 	}
 	
 	public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -229,7 +229,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		Sorting sorting = null, 
 		CancellationToken cancellationToken = default)
 	{
-		return await this.FindAsync(query, skip, limit, withCount, sorting, locale: null, cancellationToken: cancellationToken);
+		return await this.FindAsync(query, skip, limit, withCount, sorting, collationOptions: null, cancellationToken: cancellationToken);
 	}
 
 	public IPaginationCollection<dynamic> Find(
@@ -239,7 +239,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null)
+		CollationOptions collationOptions = null)
 	{
 		return this.Find(
 			expression: null,
@@ -248,8 +248,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			withCount,
 			orderBy,
 			sortDirection,
-			indexOptions, 
-			locale);
+			indexOptions,
+			collationOptions);
 	}
 	
 	public IPaginationCollection<dynamic> Find(
@@ -258,7 +258,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		bool? withCount = null,
 		Sorting sorting = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null)
+		CollationOptions collationOptions = null)
 	{
 		return this.Find(
 			expression: null,
@@ -266,8 +266,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			limit,
 			withCount,
 			sorting,
-			indexOptions, 
-			locale);
+			indexOptions,
+			collationOptions);
 	}
 
 	public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -277,7 +277,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		string orderBy = null,
 		SortDirection? sortDirection = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null, 
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default)
 	{
 		return await this.FindAsync(
@@ -287,8 +287,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			withCount,
 			orderBy,
 			sortDirection, 
-			indexOptions, 
-			locale, 
+			indexOptions,
+			collationOptions, 
 			cancellationToken: cancellationToken);
 	}
 	
@@ -298,7 +298,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		bool? withCount = null,
 		Sorting sorting = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null, 
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default)
 	{
 		return await this.FindAsync(
@@ -307,8 +307,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			limit,
 			withCount,
 			sorting, 
-			indexOptions, 
-			locale, 
+			indexOptions,
+			collationOptions, 
 			cancellationToken: cancellationToken);
 	}
 	
@@ -320,10 +320,10 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null)
+		CollationOptions collationOptions = null)
 	{
 		var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-		return this.Filter(filterExpression, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, locale);
+		return this.Filter(filterExpression, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, collationOptions);
 	}
 	
 	public IPaginationCollection<dynamic> Find(
@@ -333,10 +333,10 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null)
+		CollationOptions collationOptions = null)
 	{
 		var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-		return this.Filter(filterExpression, skip, limit, withCount, sorting, indexOptions, locale);
+		return this.Filter(filterExpression, skip, limit, withCount, sorting, indexOptions, collationOptions);
 	}
 	
 	public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -347,11 +347,11 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null, 
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default)
 	{
 		var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-		return await this.FilterAsync(filterExpression, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, locale, cancellationToken: cancellationToken);
+		return await this.FilterAsync(filterExpression, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, collationOptions, cancellationToken: cancellationToken);
 	}
 	
 	public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -361,11 +361,11 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null, 
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default)
 	{
 		var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-		return await this.FilterAsync(filterExpression, skip, limit, withCount, sorting, indexOptions, locale, cancellationToken: cancellationToken);
+		return await this.FilterAsync(filterExpression, skip, limit, withCount, sorting, indexOptions, collationOptions, cancellationToken: cancellationToken);
 	}
 	
 	public IPaginationCollection<dynamic> Find(
@@ -376,11 +376,11 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null)
+		CollationOptions collationOptions = null)
 	{
 		query = QueryHelper.EnsureObjectIdsAndISODates(query);
 		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-		return this.Filter(filterDefinition, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, locale);
+		return this.Filter(filterDefinition, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, collationOptions);
 	}
 	
 	public IPaginationCollection<dynamic> Find(
@@ -390,11 +390,11 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null)
+		CollationOptions collationOptions = null)
 	{
 		query = QueryHelper.EnsureObjectIdsAndISODates(query);
 		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-		return this.Filter(filterDefinition, skip, limit, withCount, sorting, indexOptions, locale);
+		return this.Filter(filterDefinition, skip, limit, withCount, sorting, indexOptions, collationOptions);
 	}
 	
 	public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -405,12 +405,12 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		string orderBy = null, 
 		SortDirection? sortDirection = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null, 
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default)
 	{
 		query = QueryHelper.EnsureObjectIdsAndISODates(query);
 		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-		return await this.FilterAsync(filterDefinition, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, locale, cancellationToken: cancellationToken);
+		return await this.FilterAsync(filterDefinition, skip, limit, withCount, new Sorting(orderBy, sortDirection), indexOptions, collationOptions, cancellationToken: cancellationToken);
 	}
 	
 	public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -420,12 +420,12 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null, 
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default)
 	{
 		query = QueryHelper.EnsureObjectIdsAndISODates(query);
 		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-		return await this.FilterAsync(filterDefinition, skip, limit, withCount, sorting, indexOptions, locale, cancellationToken: cancellationToken);
+		return await this.FilterAsync(filterDefinition, skip, limit, withCount, sorting, indexOptions, collationOptions, cancellationToken: cancellationToken);
 	}
 	
 	private IPaginationCollection<dynamic> Filter(
@@ -435,9 +435,9 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null)
+		CollationOptions collationOptions = null)
 	{
-		var collection = this.ExecuteFilter(predicate, skip, limit, sorting, indexOptions, locale);
+		var collection = this.ExecuteFilter(predicate, skip, limit, sorting, indexOptions, collationOptions);
 
 		long totalCount = 0;
 		if (withCount != null && withCount.Value)
@@ -459,10 +459,10 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		bool? withCount = null, 
 		Sorting sorting = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null, 
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default)
 	{
-		var collection = this.ExecuteFilter(predicate, skip, limit, sorting, indexOptions, locale);
+		var collection = this.ExecuteFilter(predicate, skip, limit, sorting, indexOptions, collationOptions);
 
 		long totalCount = 0;
 		if (withCount != null && withCount.Value)
@@ -483,7 +483,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		int? limit = null,
 		Sorting sorting = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null)
+		CollationOptions collationOptions = null)
 	{
 		predicate ??= new ExpressionFilterDefinition<dynamic>(item => true);
 
@@ -506,7 +506,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			sortDefinition = sortDefinitionBuilder.Combine(sortDefinitions);
 		}
 		
-		var options = this.GetFindOptions(indexOptions, locale);
+		var options = this.GetFindOptions(indexOptions, collationOptions);
 		var collection = this.Collection.Find(predicate, options);
 		if (sortDefinition != null)
 		{
@@ -529,12 +529,21 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		return collection;
 	}
 	
-	private FindOptions GetFindOptions(IndexOptions indexOptions = null, Locale? locale = null)
+	private FindOptions GetFindOptions(IndexOptions indexOptions = null, CollationOptions collationOptions = null)
 	{
+		Collation collation = null;
+		if (collationOptions is { Locale: not null })
+		{
+			collation = new Collation(
+				LocaleHelper.GetLanguageCode(collationOptions.Locale.Value),
+				strength: collationOptions.CaseInsensitive ? CollationStrength.Primary : null
+			);
+		}
+		
 		return new FindOptions
 		{
-			AllowDiskUse = this._settings.AllowDiskUse, 
-			Collation = locale != null ? new Collation(LocaleHelper.GetLanguageCode(locale.Value)) : null,
+			AllowDiskUse = this._settings.AllowDiskUse,
+			Collation = collation,
 			Hint = indexOptions?.GetIndexHint()
 		};
 	}
@@ -551,7 +560,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null,
 		IndexOptions indexOptions = null,
-		Locale? locale = null)
+		CollationOptions collationOptions = null)
 	{
 		try
 		{
@@ -564,8 +573,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 				withCount,
 				sorting, 
 				selectFields, 
-				indexOptions, 
-				locale);
+				indexOptions,
+				collationOptions);
 		}
 		catch (MongoCommandException ex)
 		{
@@ -590,7 +599,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		SortDirection? sortDirection = null,
 		IDictionary<string, bool> selectFields = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null)
+		CollationOptions collationOptions = null)
 	{
 		return this.Query(
 			query,
@@ -599,8 +608,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			withCount,
 			new Sorting(orderBy, sortDirection), 
 			selectFields,
-			indexOptions, 
-			locale);
+			indexOptions,
+			collationOptions);
 	}
 
 	public IPaginationCollection<dynamic> Query(
@@ -611,7 +620,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null,
 		IndexOptions indexOptions = null,
-		Locale? locale = null)
+		CollationOptions collationOptions = null)
 	{
 		try
 		{
@@ -623,8 +632,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 				withCount,
 				sorting,
 				selectFields, 
-				indexOptions, 
-				locale);
+				indexOptions,
+				collationOptions);
 		}
 		catch (MongoCommandException ex)
 		{
@@ -649,7 +658,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		SortDirection? sortDirection = null,
 		IDictionary<string, bool> selectFields = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null)
+		CollationOptions collationOptions = null)
 	{
 		return this.Query(
 			expression,
@@ -658,8 +667,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			withCount,
 			new Sorting(orderBy, sortDirection), 
 			selectFields,
-			indexOptions, 
-			locale);
+			indexOptions,
+			collationOptions);
 	}
 
 	public async Task<IPaginationCollection<dynamic>> QueryAsync(
@@ -670,7 +679,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null,
 		IndexOptions indexOptions = null,
-		Locale? locale = null,
+		CollationOptions collationOptions = null,
 		CancellationToken cancellationToken = default)
 	{
 		try
@@ -684,8 +693,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 				withCount,
 				sorting, 
 				selectFields, 
-				indexOptions, 
-				locale, 
+				indexOptions,
+				collationOptions, 
 				cancellationToken: cancellationToken);
 		}
 		catch (MongoCommandException ex)
@@ -711,7 +720,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		SortDirection? sortDirection = null,
 		IDictionary<string, bool> selectFields = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null, 
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default)
 	{
 		return await this.QueryAsync(
@@ -721,8 +730,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			withCount,
 			new Sorting(orderBy, sortDirection), 
 			selectFields,
-			indexOptions, 
-			locale,
+			indexOptions,
+			collationOptions,
 			cancellationToken: cancellationToken);
 	}
 
@@ -735,7 +744,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		SortDirection? sortDirection = null,
 		IDictionary<string, bool> selectFields = null,
 		IndexOptions indexOptions = null,
-		Locale? locale = null,
+		CollationOptions collationOptions = null,
 		CancellationToken cancellationToken = default)
 	{
 		return await this.QueryAsync(
@@ -745,8 +754,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			withCount,
 			new Sorting(orderBy, sortDirection),
 			selectFields,
-			indexOptions, 
-			locale,
+			indexOptions,
+			collationOptions,
 			cancellationToken: cancellationToken);
 	}
 
@@ -758,7 +767,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null,
 		IndexOptions indexOptions = null,
-		Locale? locale = null, 
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default)
 	{
 		try
@@ -771,8 +780,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 				withCount,
 				sorting,
 				selectFields, 
-				indexOptions, 
-				locale, 
+				indexOptions,
+				collationOptions, 
 				cancellationToken: cancellationToken);
 		}
 		catch (MongoCommandException ex)
@@ -797,11 +806,11 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null)
+		CollationOptions collationOptions = null)
 	{
 		try
 		{
-			var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, indexOptions, locale);
+			var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, indexOptions, collationOptions);
 			var projectionDefinition = ExecuteSelectQuery<dynamic>(selectFields);
 			var collection = filterResult.Project(projectionDefinition);
 		
@@ -842,12 +851,12 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		Sorting sorting = null, 
 		IDictionary<string, bool> selectFields = null, 
 		IndexOptions indexOptions = null,
-		Locale? locale = null, 
+		CollationOptions collationOptions = null, 
 		CancellationToken cancellationToken = default)
 	{
 		try
 		{
-			var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, indexOptions, locale);
+			var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, indexOptions, collationOptions);
 			var projectionDefinition = ExecuteSelectQuery<dynamic>(selectFields);
 			var collection = filterResult.Project(projectionDefinition);
 		

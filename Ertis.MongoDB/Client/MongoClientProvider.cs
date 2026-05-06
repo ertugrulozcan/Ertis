@@ -1,5 +1,4 @@
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Events;
 
 namespace Ertis.MongoDB.Client;
 
@@ -17,17 +16,8 @@ public class MongoClientProvider : IMongoClientProvider
 	/// Constructor
 	/// </summary>
 	/// <param name="mongoClientSettings"></param>
-	/// <param name="eventSubscriber"></param>
-	public MongoClientProvider(MongoClientSettings mongoClientSettings, IEventSubscriber eventSubscriber = null)
+	public MongoClientProvider(MongoClientSettings mongoClientSettings)
 	{
-		if (eventSubscriber != null)
-		{
-			mongoClientSettings.ClusterConfigurator = builder =>
-			{
-				builder.Subscribe(eventSubscriber);
-			};
-		}
-
 		this.Client = new MongoClient(mongoClientSettings);
 	}
 

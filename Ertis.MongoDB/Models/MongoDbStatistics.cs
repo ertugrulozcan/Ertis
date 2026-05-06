@@ -5,25 +5,6 @@ namespace Ertis.MongoDB.Models
 {
 	public class MongoDbStatistics
 	{
-		/*
-		{
-		    "db" : "ertisauth",
-		    "collections" : 5,
-		    "views" : 0,
-		    "objects" : 9,
-		    "avgObjSize" : 741.333333333333,
-		    "dataSize" : 6672.0,
-		    "storageSize" : 135168.0,
-		    "indexes" : 5,
-		    "indexSize" : 118784.0,
-		    "totalSize" : 253952.0,
-		    "scaleFactor" : 1.0,
-		    "fsUsedSize" : 32510013440.0,
-		    "fsTotalSize" : 62725623808.0,
-		    "ok" : 1.0
-		}
-		*/
-		
 		#region Properties
 
 		[JsonProperty("db")]

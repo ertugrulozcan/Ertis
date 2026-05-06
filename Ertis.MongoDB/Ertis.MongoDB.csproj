@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <PackageId>Ertis.MongoDB</PackageId>
-        <PackageVersion>9.1.7</PackageVersion>
+        <PackageVersion>9.1.8</PackageVersion>
         <Authors>Ertuğrul Özcan</Authors>
         <Description>Ertis.MongoDB</Description>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -13,12 +13,13 @@
         <Title>Ertis.MongoDB</Title>
         <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>9.1.7</AssemblyVersion>
-        <FileVersion>9.1.7</FileVersion>
+        <AssemblyVersion>9.1.8</AssemblyVersion>
+        <FileVersion>9.1.8</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="MongoDB.Driver" Version="3.6.0" />
+      <PackageReference Include="DnsClient" Version="1.8.0" />
+      <PackageReference Include="MongoDB.Driver" Version="3.8.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     </ItemGroup>
 

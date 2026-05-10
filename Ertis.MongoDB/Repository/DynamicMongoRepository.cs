@@ -1525,6 +1525,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 				return await this.CreateCompoundIndexAsync(indexDefinition as CompoundIndexDefinition, cancellationToken: cancellationToken);
 			case IndexType.Text:
 				return await this.CreateTextIndexAsync(indexDefinition as TextIndexDefinition, cancellationToken: cancellationToken);
+			case IndexType.TTL:
+				return await this.CreateTTLIndexAsync(indexDefinition as TTLIndexDefinition, cancellationToken: cancellationToken);
 			default:
 				throw new NotImplementedException("Not implemented yet for this index type");
 		}
@@ -1553,6 +1555,15 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	public async Task<string> CreateSingleIndexAsync(SingleIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
 	{
 		return await this.CreateSingleIndexAsync(indexDefinition.Field, indexDefinition.Direction, cancellationToken: cancellationToken);
+	}
+	
+	public async Task<string> CreateTTLIndexAsync(TTLIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
+	{
+		var indexKeysDefinition = indexDefinition.Direction is SortDirection.Descending ?
+			Builders<dynamic>.IndexKeys.Descending(indexDefinition.Field) :
+			Builders<dynamic>.IndexKeys.Ascending(indexDefinition.Field);
+		
+		return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(indexKeysDefinition, new CreateIndexOptions { ExpireAfter = indexDefinition.ExpireAfter }), cancellationToken: cancellationToken);
 	}
 	
 	public async Task<string> CreateCompoundIndexAsync(IDictionary<string, SortDirection> indexFieldDefinitions, CancellationToken cancellationToken = default)

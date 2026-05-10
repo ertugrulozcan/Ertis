@@ -14,7 +14,8 @@ public enum IndexType
 	Text,
 	Clustered,
 	Geospatial,
-	Hashed
+	Hashed,
+	TTL
 }
 
 public interface IIndexDefinition
@@ -90,7 +91,33 @@ public class SingleIndexDefinition : IndexDefinitionBase
 		this.Field = field;
 		this.Direction = direction;
 	}
+	
+	#endregion
+}
 
+public class TTLIndexDefinition : SingleIndexDefinition
+{
+	#region Properties
+	
+	public override IndexType Type => IndexType.TTL;
+	
+	public TimeSpan ExpireAfter { get; }
+	
+	#endregion
+	
+	#region Constructors
+	
+	/// <summary>
+	/// Constructor
+	/// </summary>
+	/// <param name="field"></param>
+	/// <param name="direction"></param>
+	/// <param name="ttl"></param>
+	public TTLIndexDefinition(string field, SortDirection direction, TimeSpan ttl) : base(field, direction)
+	{
+		this.ExpireAfter = ttl;
+	}
+	
 	#endregion
 }
 

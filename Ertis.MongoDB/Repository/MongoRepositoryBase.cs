@@ -177,6 +177,8 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 				return await this.CreateCompoundIndexAsync(indexDefinition as CompoundIndexDefinition, cancellationToken: cancellationToken);
 			case IndexType.Text:
 				return await this.CreateTextIndexAsync(indexDefinition as TextIndexDefinition, cancellationToken: cancellationToken);
+			case IndexType.TTL:
+				return await this.CreateTTLIndexAsync(indexDefinition as TTLIndexDefinition, cancellationToken: cancellationToken);
 			default:
 				throw new NotImplementedException("Not implemented yet for this index type");
 		}
@@ -214,6 +216,15 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	public async Task<string> CreateSingleIndexAsync(SingleIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
 	{
 		return await this.CreateSingleIndexAsync(indexDefinition.Field, indexDefinition.Direction, cancellationToken: cancellationToken);
+	}
+	
+	public async Task<string> CreateTTLIndexAsync(TTLIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
+	{
+		var indexKeysDefinition = indexDefinition.Direction is SortDirection.Descending ?
+			Builders<TEntity>.IndexKeys.Descending(indexDefinition.Field) :
+			Builders<TEntity>.IndexKeys.Ascending(indexDefinition.Field);
+		
+		return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<TEntity>(indexKeysDefinition, new CreateIndexOptions { ExpireAfter = indexDefinition.ExpireAfter }), cancellationToken: cancellationToken);
 	}
 	
 	public async Task<string> CreateCompoundIndexAsync(IDictionary<string, SortDirection> indexFieldDefinitions, CancellationToken cancellationToken = default)

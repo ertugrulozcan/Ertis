@@ -388,4 +388,6 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 	Task<string> CreateCompoundIndexAsync(CompoundIndexDefinition indexDefinition, CancellationToken cancellationToken = default);
 	
 	Task<string> CreateTextIndexAsync(TextIndexDefinition indexDefinition, CancellationToken cancellationToken = default);
+	
+	Task<string> CreateTTLIndexAsync(TTLIndexDefinition indexDefinition, CancellationToken cancellationToken = default);
 }

@@ -1339,6 +1339,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	
 	private long Count(FilterDefinition<dynamic> filterDefinition, IndexOptions indexOptions = null)
 	{
+		// estimatedDocumentCount
 		var countOptions = new CountOptions { Hint = indexOptions?.GetIndexHint() };
 		return this.Collection.CountDocuments(filterDefinition, countOptions);
 	}
@@ -1347,6 +1348,16 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	{
 		var countOptions = new CountOptions { Hint = indexOptions?.GetIndexHint() };
 		return await this.Collection.CountDocumentsAsync(filterDefinition, countOptions, cancellationToken: cancellationToken);
+	}
+	
+	public long EstimatedCount()
+	{
+		return this.Collection.EstimatedDocumentCount();
+	}
+	
+	public async Task<long> EstimatedCountAsync(CancellationToken cancellationToken = default)
+	{
+		return await this.Collection.EstimatedDocumentCountAsync(cancellationToken: cancellationToken);
 	}
 	
 	#endregion

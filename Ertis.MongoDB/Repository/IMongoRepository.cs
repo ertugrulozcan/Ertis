@@ -321,6 +321,10 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 	
 	Task<long> CountAsync(Expression<Func<TEntity, bool>> expression, IndexOptions indexOptions = null, CancellationToken cancellationToken = default);
 	
+	long EstimatedCount();
+	
+	Task<long> EstimatedCountAsync(CancellationToken cancellationToken = default);
+	
 	TEntity Increment(string id, string field, int value = 1);
 	
 	TEntity Increment(string id, string field, long value = 1);

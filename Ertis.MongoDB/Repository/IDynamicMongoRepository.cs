@@ -231,6 +231,10 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 	
 	Task<long> CountAsync(Expression<Func<dynamic, bool>> expression, IndexOptions indexOptions = null, CancellationToken cancellationToken = default);
 	
+	long EstimatedCount();
+	
+	Task<long> EstimatedCountAsync(CancellationToken cancellationToken = default);
+	
     TField[] Distinct<TField>(string distinctBy, string query = null);
 	
     Task<TField[]> DistinctAsync<TField>(string distinctBy, string query = null, CancellationToken cancellationToken = default);

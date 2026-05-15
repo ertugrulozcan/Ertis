@@ -1952,6 +1952,16 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		return await this.Collection.CountDocumentsAsync(filterDefinition, countOptions, cancellationToken: cancellationToken);
 	}
 	
+	public long EstimatedCount()
+	{
+		return this.Collection.EstimatedDocumentCount();
+	}
+	
+	public async Task<long> EstimatedCountAsync(CancellationToken cancellationToken = default)
+	{
+		return await this.Collection.EstimatedDocumentCountAsync(cancellationToken: cancellationToken);
+	}
+	
 	#endregion
 
 	#region Increment Methods

@@ -1,8 +1,8 @@
-namespace Ertis.Core.Collections
+// ReSharper disable UnusedMember.Global
+namespace Ertis.Core.Collections;
+
+public enum SortDirection
 {
-	public enum SortDirection
-	{
-		Ascending,
-		Descending
-	}
+	Ascending,
+	Descending
 }

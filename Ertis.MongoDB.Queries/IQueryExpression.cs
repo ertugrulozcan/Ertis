@@ -1,7 +1,6 @@
-namespace Ertis.MongoDB.Queries
+namespace Ertis.MongoDB.Queries;
+
+public interface IQueryExpression : IQuery
 {
-    public interface IQueryExpression : IQuery
-    {
-        string Field { get; }
-    }
+	string Field { get; }
 }

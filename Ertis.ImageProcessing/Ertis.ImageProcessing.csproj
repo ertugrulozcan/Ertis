@@ -1,29 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <PackageId>Ertis.ImageProcessing</PackageId>
-        <PackageVersion>9.0.8</PackageVersion>
-        <Authors>Ertuğrul Özcan</Authors>
-        <Description>Ertis.ImageProcessing</Description>
-        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        <Copyright>Ertuğrul Özcan | Copyright 2025 (c)</Copyright>
-        <PackageReleaseNotes>.Net 9</PackageReleaseNotes>
-        <PackageTags>Ertis.ImageProcessing</PackageTags>
-        <Title>Ertis.ImageProcessing</Title>
-        <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>9.0.8</AssemblyVersion>
-        <FileVersion>9.0.8</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+        <ProjectReference Include="..\Ertis.Core\Ertis.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Ertis.Core\Ertis.Core.csproj" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="4.0.0" />
     </ItemGroup>
-
 </Project>

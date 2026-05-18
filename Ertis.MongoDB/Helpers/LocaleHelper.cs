@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Ertis.MongoDB.Models;
 
 namespace Ertis.MongoDB.Helpers;
@@ -7,7 +5,7 @@ namespace Ertis.MongoDB.Helpers;
 public static class LocaleHelper
 {
 	#region Properties
-
+	
 	private static readonly Dictionary<string, string> Locales = new()
 	{
 		{ "Afrikaans", "af" }, 
@@ -117,13 +115,13 @@ public static class LocaleHelper
 		{ "Welsh", "cy" }, 
 		{ "Yiddish", "yi" }, 
 		{ "Yoruba", "yo" }, 
-		{ "Zulu", "zu" }, 
+		{ "Zulu", "zu" }
 	};
-
+	
 	#endregion
-
+	
 	#region Methods
-
+	
 	public static string GetLanguageCode(Locale locale)
 	{
 		if (Locales.TryGetValue(locale.ToString(), out var languageCode))
@@ -135,6 +133,6 @@ public static class LocaleHelper
 			throw new Exception("Locale not supported");
 		}
 	}
-
+	
 	#endregion
 }

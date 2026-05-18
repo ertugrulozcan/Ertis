@@ -1,7 +1,6 @@
-namespace Ertis.MongoDB.Queries
+namespace Ertis.MongoDB.Queries;
+
+public interface IQuery
 {
-    public interface IQuery
-    {
-        string ToString();
-    }
+	string ToString();
 }

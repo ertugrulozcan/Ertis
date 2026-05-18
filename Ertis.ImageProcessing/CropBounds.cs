@@ -3,12 +3,13 @@ using SixLabors.ImageSharp;
 using ImageProcessingException = Ertis.ImageProcessing.Exceptions.ImageProcessingException;
 
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.ImageProcessing;
 
 public class CropBounds
 {
 	#region Properties
-
+	
 	public int? X { get; init; }
 	
 	public int? Y { get; init; }
@@ -16,11 +17,11 @@ public class CropBounds
 	public int? Width { get; init; }
 	
 	public int? Height { get; init; }
-
+	
 	#endregion
-
+	
 	#region Methods
-
+	
 	public Rectangle ToRectangle(int originalWidth, int originalHeight)
 	{
 		var width = this.Width ?? 0;
@@ -35,6 +36,6 @@ public class CropBounds
 		
 		return new Rectangle(x, y, this.Width ?? originalWidth - x, this.Height ?? originalHeight - y);
 	}
-
+	
 	#endregion
 }

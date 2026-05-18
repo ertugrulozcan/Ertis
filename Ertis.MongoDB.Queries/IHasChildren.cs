@@ -1,11 +1,9 @@
-using System.Collections.Generic;
+// ReSharper disable UnusedMemberInSuper.Global
+namespace Ertis.MongoDB.Queries;
 
-namespace Ertis.MongoDB.Queries
+internal interface IHasChildren
 {
-    internal interface IHasChildren
-    {
-        List<IQuery> Children { get; }
-
-        void AddQuery(IQuery query);
-    }
+	List<IQuery> Children { get; }
+	
+	void AddQuery(IQuery query);
 }

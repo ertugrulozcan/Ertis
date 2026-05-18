@@ -6,7 +6,7 @@ namespace Ertis.ImageProcessing;
 public class SamplerAlgorithm
 {
 	#region Statics
-
+	
 	public static readonly SamplerAlgorithm Bicubic = new(SamplerAlgorithmEnum.Bicubic);
 	public static readonly SamplerAlgorithm Box = new(SamplerAlgorithmEnum.Box);
 	public static readonly SamplerAlgorithm Cubic = new(SamplerAlgorithmEnum.Cubic);
@@ -18,13 +18,13 @@ public class SamplerAlgorithm
 	#endregion
 	
 	#region Properties
-
+	
 	private SamplerAlgorithmEnum Value { get; }
-
+	
 	#endregion
 	
 	#region Constructors
-
+	
 	/// <summary>
 	/// Constructor
 	/// </summary>
@@ -33,12 +33,11 @@ public class SamplerAlgorithm
 	{
 		this.Value = value;
 	}
-
+	
 	#endregion
-
+	
 	#region Methods
-
-	// ReSharper disable once IdentifierTypo
+	
 	public IResampler? ToResampler()
 	{
 		return this.Value switch
@@ -54,6 +53,7 @@ public class SamplerAlgorithm
 		};
 	}
 	
+	// ReSharper disable once UnusedMember.Global
 	public static SamplerAlgorithm? Parse(string key)
 	{
 		if (Enum.TryParse<SamplerAlgorithmEnum>(key, true, out var enumValue))
@@ -70,14 +70,14 @@ public class SamplerAlgorithm
 				_ => null
 			};
 		}
-
+		
 		return null;
 	}
-
+	
 	#endregion
-
+	
 	#region Enum
-
+	
 	private enum SamplerAlgorithmEnum
 	{
 		Bicubic,
@@ -88,6 +88,6 @@ public class SamplerAlgorithm
 		Welch,
 		NearestNeighbor
 	}
-
+	
 	#endregion
 }

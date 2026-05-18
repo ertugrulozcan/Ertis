@@ -1,43 +1,48 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
-namespace Ertis.Schema.Models
+// ReSharper disable UnusedMember.Global
+namespace Ertis.Schema.Models;
+
+public class DynamicQueryParameter
 {
-	public class DynamicQueryParameter
-	{
-		#region Properties
-		
-		[JsonProperty("name")]
-		public string Name { get; set; }
-		
-		[JsonProperty("slug")]
-		public string Slug { get; set; }
-		
-		[JsonProperty("description")]
-		public string Description { get; set; }
-		
-		[JsonProperty("type")]
-		[JsonConverter(typeof(StringEnumConverter))]
-		public DynamicQueryParameterType Type { get; set; }
-		
-		[JsonProperty("defaultValue")]
-		public object DefaultValue { get; set; }
-		
-		[JsonProperty("isRequired")]
-		public bool IsRequired { get; set; }
-		
-		[JsonProperty("isNullable")]
-		public bool IsNullable { get; set; }
+	#region Properties
+	
+	[JsonPropertyName("name")]
+	public string? Name { get; set; }
+	
+	[JsonPropertyName("slug")]
+	public string? Slug { get; set; }
+	
+	[JsonPropertyName("description")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public string? Description { get; set; }
+	
+	[JsonPropertyName("type")]
+	[JsonConverter(typeof(JsonStringEnumConverter))]
+	public DynamicQueryParameterType Type { get; set; }
+	
+	[JsonPropertyName("defaultValue")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public object? DefaultValue { get; set; }
+	
+	[JsonPropertyName("isRequired")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+	public bool IsRequired { get; set; }
+	
+	[JsonPropertyName("isNullable")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+	public bool IsNullable { get; set; }
+	
+	#endregion
+}
 
-		#endregion
-	}
-    
-	public enum DynamicQueryParameterType
-	{
-		@string,
-		number,
-		date,
-		boolean,
-		array
-	}
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
+public enum DynamicQueryParameterType
+{
+	@string,
+	number,
+	date,
+	boolean,
+	array
 }

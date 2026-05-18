@@ -1,7 +1,7 @@
-namespace Ertis.TemplateEngine
+// ReSharper disable UnusedMember.Global
+namespace Ertis.TemplateEngine;
+
+public interface ITemplateSegment
 {
-    public interface ITemplateSegment
-    {
-        SegmentType Type { get; }
-    }
+	SegmentType Type { get; }
 }

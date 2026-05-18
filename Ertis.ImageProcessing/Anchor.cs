@@ -1,11 +1,12 @@
 using AnchorEnum = SixLabors.ImageSharp.Processing.AnchorPositionMode;
+
 namespace Ertis.ImageProcessing;
 
 // ReSharper disable MemberCanBePrivate.Global
 public class Anchor
 {
 	#region Statics
-
+	
 	public static readonly Anchor Center = new(AnchorEnum.Center);
 	public static readonly Anchor Top = new(AnchorEnum.Top);
 	public static readonly Anchor Bottom = new(AnchorEnum.Bottom);
@@ -15,17 +16,17 @@ public class Anchor
 	public static readonly Anchor TopRight = new(AnchorEnum.TopRight);
 	public static readonly Anchor BottomLeft = new(AnchorEnum.BottomLeft);
 	public static readonly Anchor BottomRight = new(AnchorEnum.BottomRight);
-
+	
 	#endregion
 	
 	#region Properties
-
+	
 	private AnchorEnum Value { get; }
-
+	
 	#endregion
 	
 	#region Constructors
-
+	
 	/// <summary>
 	/// Constructor
 	/// </summary>
@@ -34,17 +35,18 @@ public class Anchor
 	{
 		this.Value = value;
 	}
-
+	
 	#endregion
 	
 	#region Operators
-
+	
 	public static implicit operator AnchorEnum(Anchor d) => d.Value;
-
+	
 	#endregion
 	
 	#region Methods
-
+	
+	// ReSharper disable once UnusedMember.Global
 	public static Anchor? Parse(string key)
 	{
 		if (Enum.TryParse<AnchorEnum>(key, true, out var enumValue))
@@ -63,9 +65,9 @@ public class Anchor
 				_ => null
 			};
 		}
-
+		
 		return null;
 	}
-
+	
 	#endregion
 }

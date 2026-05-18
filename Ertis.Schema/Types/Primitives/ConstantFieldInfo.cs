@@ -1,108 +1,88 @@
-using System;
 using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
-namespace Ertis.Schema.Types.Primitives
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+namespace Ertis.Schema.Types.Primitives;
+
+public class ConstantFieldInfo : FieldInfo<object>
 {
-    public class ConstantFieldInfo : FieldInfo<object>
+    #region Properties
+    
+    [JsonPropertyName("type")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public override FieldType Type => FieldType.@const;
+    
+    [JsonPropertyName("value")]
+    public object? Value { get; set; }
+    
+    [JsonPropertyName("valueType")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public ConstantType ValueType { get; set; }
+    
+    #endregion
+    
+    #region Methods
+    
+    protected internal override bool Validate(object? obj, IValidationContext validationContext)
     {
-        #region Properties
-
-        [JsonProperty("type")]
-        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
-        [JsonPropertyName("type")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
-        public override FieldType Type => FieldType.@const;
+        var isValid = base.Validate(obj, validationContext);
         
-        [JsonProperty("value")]
-        [JsonPropertyName("value")]
-        public object Value { get; set; }
-        
-        [JsonProperty("valueType")]
-        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
-        [JsonPropertyName("valueType")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
-        public ConstantType ValueType { get; set; }
-        
-        #endregion
-        
-        #region Methods
-        
-        protected internal override bool Validate(object obj, IValidationContext validationContext)
+        if (obj != null)
         {
-            var isValid = base.Validate(obj, validationContext);
-            
-            if (obj != null)
+            var type = obj.GetType();
+            var incompatibleType = this.ValueType switch
             {
-                bool incompatibleType;
-                var type = obj.GetType();
-                switch (this.ValueType)
-                {
-                    case ConstantType.@string:
-                        incompatibleType = type != typeof(string);
-                        break;
-                    case ConstantType.integer:
-                        incompatibleType = !int.TryParse(obj.ToString(), out _);
-                        break;
-                    case ConstantType.@float:
-                        incompatibleType = !double.TryParse(obj.ToString(), out _);
-                        break;
-                    case ConstantType.boolean:
-                        incompatibleType = !bool.TryParse(obj.ToString(), out _);
-                        break;
-                    case ConstantType.date:
-                    case ConstantType.datetime:
-                        incompatibleType = !DateTime.TryParse(obj.ToString(), out _);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                if (incompatibleType)
-                {
-                    isValid = false;
-                    validationContext.Errors.Add(new FieldValidationException($"Constant value is must be {this.ValueType}", this));
-                }
-            }
-
-            return isValid;
-        }
-
-        public override object Clone()
-        {
-            return new ConstantFieldInfo
-            {
-                Name = this.Name,
-                Description = this.Description,
-                DisplayName = this.DisplayName,
-                Parent = this.Parent,
-                IsRequired = this.IsRequired,
-                IsVirtual = this.IsVirtual,
-                IsHidden = this.IsHidden,
-                IsReadonly = this.IsReadonly,
-                DefaultValue = this.DefaultValue,
-                Value = this.Value,
-                ValueType = this.ValueType
+                ConstantType.@string => type != typeof(string),
+                ConstantType.integer => !int.TryParse(obj.ToString(), out _),
+                ConstantType.@float => !double.TryParse(obj.ToString(), out _),
+                ConstantType.boolean => !bool.TryParse(obj.ToString(), out _),
+                ConstantType.date or ConstantType.datetime => !DateTime.TryParse(obj.ToString(), out _),
+                _ => throw new ArgumentOutOfRangeException()
             };
+            
+            if (incompatibleType)
+            {
+                isValid = false;
+                validationContext.Errors.Add(new FieldValidationException($"Constant value is must be {this.ValueType}", this));
+            }
         }
-
-        #endregion
-
-        #region Enums
-
-        public enum ConstantType
-        {
-            @string,
-            integer,
-            @float,
-            boolean,
-            date,
-            datetime
-        }
-
-        #endregion
+        
+        return isValid;
     }
+    
+    public override object Clone()
+    {
+        return new ConstantFieldInfo
+        {
+            Name = this.Name,
+            Description = this.Description,
+            DisplayName = this.DisplayName,
+            Parent = this.Parent,
+            IsRequired = this.IsRequired,
+            IsVirtual = this.IsVirtual,
+            IsHidden = this.IsHidden,
+            IsReadonly = this.IsReadonly,
+            DefaultValue = this.DefaultValue,
+            Value = this.Value,
+            ValueType = this.ValueType
+        };
+    }
+    
+    #endregion
+    
+    #region Enums
+    
+    public enum ConstantType
+    {
+        @string,
+        integer,
+        @float,
+        boolean,
+        date,
+        datetime
+    }
+    
+    #endregion
 }

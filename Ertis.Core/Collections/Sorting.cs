@@ -1,31 +1,36 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
+// ReSharper disable UnusedMember.Global
 namespace Ertis.Core.Collections;
 
+// ReSharper disable once UnusedType.Global
 public class Sorting : ICollection<SortField>
 {
 	#region Properties
-
+	
 	private List<SortField> Fields { get; } = new();
-
-	public int Count => this.Fields?.Count ?? 0;
-
+	
+	public int Count => this.Fields.Count;
+	
 	public bool IsReadOnly => false;
-
+	
 	#endregion
-
+	
 	#region Constructors
 	
+	/// <summary>
+	/// Constructor with multiple fields
+	/// </summary>
+	/// <param name="fields"></param>
 	public Sorting(IEnumerable<SortField> fields)
 	{
 		this.Fields = new List<SortField>(fields);
 	}
 	
+	/// <summary>
+	/// Constructor with single field
+	/// </summary>
+	/// <param name="sortField"></param>
 	// ReSharper disable once MemberCanBePrivate.Global
 	public Sorting(SortField sortField)
 	{
@@ -35,7 +40,12 @@ public class Sorting : ICollection<SortField>
 		};
 	}
 	
-	public Sorting(string orderBy = null, SortDirection? sortDirection = null)
+	/// <summary>
+	/// Constructor with props
+	/// </summary>
+	/// <param name="orderBy"></param>
+	/// <param name="sortDirection"></param>
+	public Sorting(string? orderBy = null, SortDirection? sortDirection = null)
 	{
 		if (!string.IsNullOrEmpty(orderBy))
 		{
@@ -45,94 +55,53 @@ public class Sorting : ICollection<SortField>
 			};
 		}
 	}
-
+	
 	#endregion
 	
 	#region Operators
 	
-	public SortField this[int index] => this.Fields?[index];
-
+	public SortField this[int index] => this.Fields[index];
+	
 	public static implicit operator Sorting(SortField sortField) => new (sortField);
-
+	
 	#endregion
-
+	
 	#region Methods
 	
 	public IEnumerator<SortField> GetEnumerator()
 	{
 		return this.Fields.GetEnumerator();
 	}
-
+	
 	IEnumerator IEnumerable.GetEnumerator()
 	{
 		return GetEnumerator();
 	}
-
+	
 	public void Add(SortField item)
 	{
 		this.Fields.Add(item);
 	}
-
+	
 	public void Clear()
 	{
 		this.Fields.Clear();
 	}
-
+	
 	public bool Contains(SortField item)
 	{
 		return this.Fields.Contains(item);
 	}
-
+	
 	public void CopyTo(SortField[] array, int arrayIndex)
 	{
 		this.Fields.CopyTo(array, arrayIndex);
 	}
-
+	
 	public bool Remove(SortField item)
 	{
 		return this.Fields.Remove(item);
 	}
 	
-	#endregion
-}
-
-// ReSharper disable once ClassNeverInstantiated.Global
-[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-public class SortField
-{
-	#region Properties
-
-	[JsonProperty("orderBy")]
-	[JsonPropertyName("orderBy")]
-	public string OrderBy { get; set; }
-	
-	[JsonProperty("sortDirection")]
-	[JsonPropertyName("sortDirection")]
-	[Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
-	public SortDirection? SortDirection { get; set; }
-
-	#endregion
-	
-	#region Constructors
-
-	/// <summary>
-	/// Parameterless Constructor
-	/// </summary>
-	public SortField()
-	{
-		// NOP (For serialization)
-	}
-	
-	/// <summary>
-	/// Constructor
-	/// </summary>
-	/// <param name="orderBy"></param>
-	/// <param name="sortDirection"></param>
-	public SortField(string orderBy = null, SortDirection? sortDirection = null)
-	{
-		this.OrderBy = orderBy;
-		this.SortDirection = sortDirection;
-	}
-
 	#endregion
 }

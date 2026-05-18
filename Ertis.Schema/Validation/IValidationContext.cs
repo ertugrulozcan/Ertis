@@ -1,13 +1,12 @@
-using System.Collections.Generic;
-using Ertis.Schema.Dynamics.Legacy;
+using Ertis.Schema.Dynamics;
 using Ertis.Schema.Exceptions;
 
-namespace Ertis.Schema.Validation
+// ReSharper disable UnusedMemberInSuper.Global
+namespace Ertis.Schema.Validation;
+
+public interface IValidationContext
 {
-    public interface IValidationContext
-    {
-        DynamicObject Content { get; }
-        
-        IList<FieldValidationException> Errors { get; }
-    }
+	DynamicObject? Content { get; }
+	
+	IList<FieldValidationException> Errors { get; }
 }

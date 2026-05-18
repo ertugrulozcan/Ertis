@@ -1,147 +1,152 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.Collections;
+using Ertis.Schema.Dynamics;
 
-namespace Ertis.TemplateEngine
+namespace Ertis.TemplateEngine;
+
+// ReSharper disable once UnusedType.Global
+public class Formatter
 {
-    public class Formatter
+    #region Properties
+    
+    private Parser Parser { get; }
+    
+    #endregion
+    
+    #region Constructors
+    
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="options"></param>
+    public Formatter(ParserOptions? options = null)
     {
-        #region Properties
-
-        private Parser Parser { get; }
-
-        #endregion
-        
-        #region Constructors
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="options"></param>
-        public Formatter(ParserOptions options = null)
+        this.Parser = new Parser(options);
+    }
+    
+    #endregion
+    
+    #region Methods
+    
+    // ReSharper disable once UnusedMember.Global
+    public string Format(string template, object? data)
+    {
+        if (string.IsNullOrEmpty(template) || data == null)
         {
-            this.Parser = new Parser(options);
+            return template;
         }
-
-        #endregion
-
-        #region Methods
-
-        public string Format(string template, object data)
+        
+        var dynamicObject = new DynamicObject(data);
+        var dataDictionary = dynamicObject.ToDictionary();
+        var segments = this.Parser.Parse(template);
+        var stringBuilder = new StringBuilder();
+        
+        foreach (var segment in segments)
         {
-            if (string.IsNullOrEmpty(template) || data == null)
+            if (segment is PlaceHolder placeHolder)
             {
-                return template;
-            }
-
-            var dataDictionary = data.ToDictionary();
-            var segments = this.Parser.Parse(template);
-            var stringBuilder = new StringBuilder();
-            
-            foreach (var segment in segments)
-            {
-                if (segment is PlaceHolder placeHolder)
+                var value = ExtractData(placeHolder.Value, dataDictionary);
+                if (value != null)
                 {
-                    var value = ExtractData(placeHolder.Value, dataDictionary);
-                    if (value != null)
-                    {
-                        stringBuilder.Append(value);
-                    }
-                    else
-                    {
-                        // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-                        switch (this.Parser.Options.UndefinedStrategy)
-                        {
-                            case UndefinedStrategy.Ignore:
-                                stringBuilder.Append(segment);
-                                break;
-                            case UndefinedStrategy.Remove:
-                                break;
-                            case UndefinedStrategy.Throw:
-                                throw new ArgumentException($"{placeHolder.Value} is undefined");
-                            case UndefinedStrategy.Swap:
-                                if (!string.IsNullOrEmpty(this.Parser.Options.Fallback))
-                                {
-                                    stringBuilder.Append(this.Parser.Options.Fallback);
-                                }
-                                break;
-                        }
-                    }
+                    stringBuilder.Append(value);
                 }
                 else
                 {
-                    stringBuilder.Append(segment);
-                }
-            }
-
-            return stringBuilder.ToString();
-        }
-
-        public ITemplateSegment[] LookUp(string template)
-        {
-            return this.Parser.Parse(template).ToArray();
-        }
-
-        private static object ExtractData(string path, IDictionary<string, object> dictionary)
-        {
-            if (string.IsNullOrEmpty(path))
-            {
-                return null;
-            }
-            
-            var pathParts = path.Split('.');
-            var key = pathParts.First();
-            if (dictionary.ContainsKey(key))
-            {
-                if (pathParts.Length == 1)
-                {
-                    return dictionary[key];
-                }
-                else if (dictionary[key] is IDictionary<string, object> subDictionary)
-                {
-                    return ExtractData(string.Join(".", pathParts.Skip(1)), subDictionary);
-                }
-            }
-            else if (key.Contains('[') && key.Contains(']'))
-            {
-                var arrayStartIndex = key.IndexOf('[');
-                var arrayEndIndex = key.IndexOf(']');
-                var indexLength = arrayEndIndex - arrayStartIndex;
-                if (arrayStartIndex > 0 && indexLength > 1)
-                {
-                    if (int.TryParse(key.AsSpan(arrayStartIndex + 1, indexLength - 1), out var index))
+                    switch (this.Parser.Options.UndefinedStrategy)
                     {
-                        var fieldKey = key[..arrayStartIndex];
-                        if (dictionary.TryGetValue(fieldKey, out var obj) && obj is IList array)
+                        case UndefinedStrategy.Ignore:
+                            stringBuilder.Append(segment);
+                            break;
+                        case UndefinedStrategy.Remove:
+                            break;
+                        case UndefinedStrategy.Throw:
+                            throw new ArgumentException($"{placeHolder.Value} is undefined");
+                        case UndefinedStrategy.Swap:
                         {
-                            if (index < 0)
+                            if (!string.IsNullOrEmpty(this.Parser.Options.Fallback))
                             {
-                                index = array.Count - index;
-                            }
-
-                            if (index > array.Count)
-                            {
-                                throw new ArgumentOutOfRangeException(fieldKey, array, "The index parameter was greater than array length");
+                                stringBuilder.Append(this.Parser.Options.Fallback);
                             }
                             
-                            if (pathParts.Length == 1)
-                            {
-                                return array[index];
-                            }
-                            else if (array[index] is IDictionary<string, object> subDictionary)
-                            {
-                                return ExtractData(string.Join(".", pathParts.Skip(1)), subDictionary);
-                            }
+                            break;
                         }
                     }
                 }
             }
-            
+            else
+            {
+                stringBuilder.Append(segment);
+            }
+        }
+        
+        return stringBuilder.ToString();
+    }
+    
+    // ReSharper disable once UnusedMember.Global
+    public ITemplateSegment[] LookUp(string template)
+    {
+        return this.Parser.Parse(template).ToArray();
+    }
+    
+    private static object? ExtractData(string? path, IDictionary<string, object?> dictionary)
+    {
+        if (string.IsNullOrEmpty(path))
+        {
             return null;
         }
         
-        #endregion
+        var pathParts = path.Split('.');
+        var key = pathParts.First();
+        if (dictionary.ContainsKey(key))
+        {
+            if (pathParts.Length == 1)
+            {
+                return dictionary[key];
+            }
+            else if (dictionary[key] is IDictionary<string, object?> subDictionary)
+            {
+                // ReSharper disable once TailRecursiveCall
+                return ExtractData(string.Join(".", pathParts.Skip(1)), subDictionary);
+            }
+        }
+        else if (key.Contains('[') && key.Contains(']'))
+        {
+            var arrayStartIndex = key.IndexOf('[');
+            var arrayEndIndex = key.IndexOf(']');
+            var indexLength = arrayEndIndex - arrayStartIndex;
+            if (arrayStartIndex > 0 && indexLength > 1)
+            {
+                if (int.TryParse(key.AsSpan(arrayStartIndex + 1, indexLength - 1), out var index))
+                {
+                    var fieldKey = key[..arrayStartIndex];
+                    if (dictionary.TryGetValue(fieldKey, out var obj) && obj is IList array)
+                    {
+                        if (index < 0)
+                        {
+                            index = array.Count - index;
+                        }
+                        
+                        if (index > array.Count)
+                        {
+                            throw new ArgumentOutOfRangeException(fieldKey, array, "The index parameter was greater than array length");
+                        }
+                        
+                        if (pathParts.Length == 1)
+                        {
+                            return array[index];
+                        }
+                        else if (array[index] is IDictionary<string, object?> subDictionary)
+                        {
+                            // ReSharper disable once TailRecursiveCall
+                            return ExtractData(string.Join(".", pathParts.Skip(1)), subDictionary);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return null;
     }
+    
+    #endregion
 }

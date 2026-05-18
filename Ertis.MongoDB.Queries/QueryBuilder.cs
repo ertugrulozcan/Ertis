@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-// ReSharper disable UnusedMember.Global
+﻿// ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.MongoDB.Queries;
 
+// ReSharper disable once UnusedType.Global
 public static class QueryBuilder
 {
     #region BuildIn Operators
@@ -593,7 +590,7 @@ public static class QueryBuilder
             Operator = MongoOperator.Nor
         };
     }
-
+    
     /// <summary>
     /// Not ($not)
     /// </summary>
@@ -615,7 +612,7 @@ public static class QueryBuilder
             }
         };
     }
-
+    
     /// <summary>
     /// Not ($not)
     /// </summary>
@@ -768,7 +765,7 @@ public static class QueryBuilder
                 Value = new QueryValue<string>(regexOptions)
             });
         }
-
+        
         return queryExpression;
     }
     
@@ -777,7 +774,7 @@ public static class QueryBuilder
     /// </summary>
     /// <param name="keyword">Search Keyword</param>
     /// <param name="language">The language that determines the list of stop words for the search and the rules for the stemmer and tokenizer.</param>
-    /// <param name="isCaseSensitive">A boolean flag to enable or disable case sensitive search.</param>
+    /// <param name="isCaseSensitive">A boolean flag to enable or disable case-sensitive search.</param>
     /// <param name="isDiacriticSensitive">A boolean flag to enable or disable diacritic sensitive search against version 3 text indexes.</param>
     public static IQuery FullTextSearch(string keyword, string language = "none", bool isCaseSensitive = false, bool isDiacriticSensitive = false)
     {
@@ -790,7 +787,7 @@ public static class QueryBuilder
                 Value = new QueryValue<string>(keyword)
             }
         };
-
+        
         if (!string.IsNullOrEmpty(language) && language != "none")
         {
             query.AddQuery(new Query
@@ -799,7 +796,7 @@ public static class QueryBuilder
                 Value = new QueryValue<string>(language)
             });
         }
-
+        
         if (isCaseSensitive)
         {
             query.AddQuery(new Query
@@ -808,7 +805,7 @@ public static class QueryBuilder
                 Value = new QueryValue<bool>(true)
             });
         }
-
+        
         if (isDiacriticSensitive)
         {
             query.AddQuery(new Query
@@ -817,7 +814,7 @@ public static class QueryBuilder
                 Value = new QueryValue<bool>(true)
             });
         }
-
+        
         return query;
     }
     

@@ -1,476 +1,442 @@
-using System;
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
-namespace Ertis.Schema.Types.CustomTypes
+// ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+namespace Ertis.Schema.Types.CustomTypes;
+
+public sealed class ImageFieldInfo : ObjectFieldInfoBase
 {
-	public sealed class ImageFieldInfo : ObjectFieldInfoBase
-	{
-        #region Fields
-
-        private readonly int? maxSize;
-        private readonly int? minCount;
-        private readonly int? maxCount;
-        private readonly int? maxWidth;
-        private readonly int? maxHeight;
-        private readonly int? minWidth;
-        private readonly int? minHeight;
-        
-        #endregion
-        
-		#region Properties
-        
-        [JsonProperty("type")]
-        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
-        [JsonPropertyName("type")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
-        public override FieldType Type => FieldType.image;
-        
-        [Newtonsoft.Json.JsonIgnore]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public override IReadOnlyCollection<IFieldInfo> Properties { get; init; }
-        
-        [JsonProperty("multiple", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonPropertyName("multiple")]
-        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public bool Multiple { get; set; }
-        
-        [JsonProperty("maxSize", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonPropertyName("maxSize")]
-        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? MaxSize
+    #region Properties
+    
+    [JsonPropertyName("type")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public override FieldType Type => FieldType.image;
+    
+    [JsonIgnore]
+    public override IReadOnlyCollection<IFieldInfo> Properties { get; init; }
+    
+    [JsonPropertyName("multiple")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool Multiple { get; set; }
+    
+    [JsonPropertyName("maxSize")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? MaxSize
+    {
+        get;
+        init
         {
-            get => this.maxSize;
-            init
+            field = value;
+            
+            if (!this.ValidateMaxSize(out var exception))
             {
-                this.maxSize = value;
-                
-                if (!this.ValidateMaxSize(out var exception))
-                {
-                    throw exception;
-                }
+                throw exception!;
             }
         }
-        
-        [JsonProperty("minCount", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonPropertyName("minCount")]
-        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? MinCount
+    }
+    
+    [JsonPropertyName("minCount")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? MinCount
+    {
+        get;
+        init
         {
-            get => this.minCount;
-            init
+            field = value;
+            
+            if (!this.ValidateMinCount(out var exception))
             {
-                this.minCount = value;
-                
-                if (!this.ValidateMinCount(out var exception))
-                {
-                    throw exception;
-                }
+                throw exception!;
             }
         }
-        
-        [JsonProperty("maxCount", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonPropertyName("maxCount")]
-        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? MaxCount
+    }
+    
+    [JsonPropertyName("maxCount")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? MaxCount
+    {
+        get;
+        init
         {
-            get => this.maxCount;
-            init
+            field = value;
+            
+            if (!this.ValidateMaxCount(out var exception))
             {
-                this.maxCount = value;
-                
-                if (!this.ValidateMaxCount(out var exception))
-                {
-                    throw exception;
-                }
+                throw exception!;
             }
         }
-        
-        [JsonProperty("minWidth", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonPropertyName("minWidth")]
-        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? MinWidth
+    }
+    
+    [JsonPropertyName("minWidth")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? MinWidth
+    {
+        get;
+        init
         {
-            get => this.minWidth;
-            init
+            field = value;
+            
+            if (!this.ValidateMinWidth(out var exception))
             {
-                this.minWidth = value;
-                
-                if (!this.ValidateMinWidth(out var exception))
-                {
-                    throw exception;
-                }
+                throw exception!;
             }
         }
-        
-        [JsonProperty("minHeight", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonPropertyName("minHeight")]
-        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? MinHeight
+    }
+    
+    [JsonPropertyName("minHeight")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? MinHeight
+    {
+        get;
+        init
         {
-            get => this.minHeight;
-            init
+            field = value;
+            
+            if (!this.ValidateMinHeight(out var exception))
             {
-                this.minHeight = value;
-                
-                if (!this.ValidateMinHeight(out var exception))
-                {
-                    throw exception;
-                }
+                throw exception!;
             }
         }
-        
-        [JsonProperty("maxWidth", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonPropertyName("maxWidth")]
-        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? MaxWidth
+    }
+    
+    [JsonPropertyName("maxWidth")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? MaxWidth
+    {
+        get;
+        init
         {
-            get => this.maxWidth;
-            init
+            field = value;
+            
+            if (!this.ValidateMaxWidth(out var exception))
             {
-                this.maxWidth = value;
-                
-                if (!this.ValidateMaxWidth(out var exception))
-                {
-                    throw exception;
-                }
+                throw exception!;
             }
         }
-        
-        [JsonProperty("maxHeight", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonPropertyName("maxHeight")]
-        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? MaxHeight
+    }
+    
+    [JsonPropertyName("maxHeight")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? MaxHeight
+    {
+        get;
+        init
         {
-            get => this.maxHeight;
-            init
+            field = value;
+            
+            if (!this.ValidateMaxHeight(out var exception))
             {
-                this.maxHeight = value;
-                
-                if (!this.ValidateMaxHeight(out var exception))
-                {
-                    throw exception;
-                }
+                throw exception!;
             }
         }
-        
-        [JsonProperty("recommendedWidth", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonPropertyName("recommendedWidth")]
-        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? RecommendedWidth { get; set; }
-        
-        [JsonProperty("recommendedHeight", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonPropertyName("recommendedHeight")]
-        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public int? RecommendedHeight { get; set; }
-        
-        [JsonProperty("maxSizesRequired")]
-        [JsonPropertyName("maxSizesRequired")]
-        public bool MaxSizesRequired { get; set; }
-        
-        [JsonProperty("minSizesRequired")]
-        [JsonPropertyName("minSizesRequired")]
-        public bool MinSizesRequired { get; set; }
-        
-        [JsonProperty("aspectRatioRequired")]
-        [JsonPropertyName("aspectRatioRequired")]
-        public bool AspectRatioRequired { get; set; }
-        
-        [JsonProperty("formWidth", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonPropertyName("formWidth")]
-        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string FormWidth { get; set; }
-        
-        [JsonProperty("formHeight", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonPropertyName("formHeight")]
-        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string FormHeight { get; set; }
-        
-        [JsonProperty("maxFormWidth", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonPropertyName("maxFormWidth")]
-        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string MaxFormWidth { get; set; }
-        
-        [JsonProperty("maxFormHeight", NullValueHandling = NullValueHandling.Ignore)]
-        [JsonPropertyName("maxFormHeight")]
-        [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public string MaxFormHeight { get; set; }
-
-        #endregion
-        
-        #region Constructors
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public ImageFieldInfo()
+    }
+    
+    [JsonPropertyName("recommendedWidth")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? RecommendedWidth { get; set; }
+    
+    [JsonPropertyName("recommendedHeight")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? RecommendedHeight { get; set; }
+    
+    [JsonPropertyName("maxSizesRequired")]
+    public bool MaxSizesRequired { get; set; }
+    
+    [JsonPropertyName("minSizesRequired")]
+    public bool MinSizesRequired { get; set; }
+    
+    [JsonPropertyName("aspectRatioRequired")]
+    public bool AspectRatioRequired { get; set; }
+    
+    [JsonPropertyName("formWidth")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? FormWidth { get; set; }
+    
+    [JsonPropertyName("formHeight")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? FormHeight { get; set; }
+    
+    [JsonPropertyName("maxFormWidth")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? MaxFormWidth { get; set; }
+    
+    [JsonPropertyName("maxFormHeight")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? MaxFormHeight { get; set; }
+    
+    #endregion
+    
+    #region Constructors
+    
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    public ImageFieldInfo()
+    {
+        this.Properties = new FieldInfo[]
         {
-            this.Properties = new FieldInfo[]
+            new StringFieldInfo
             {
-                new StringFieldInfo
-                {
-                    Name = "id",
-                    DisplayName = "Id",
-                    Description = "File Id",
-                    IsRequired = true
-                },
-                new StringFieldInfo
-                {
-                    Name = "name",
-                    DisplayName = "File Name",
-                    Description = "File Name",
-                    IsRequired = true
-                },
-                new StringFieldInfo
-                {
-                    Name = "path",
-                    DisplayName = "File Path",
-                    Description = "File Path",
-                    IsRequired = true
-                },
-                new StringFieldInfo
-                {
-                    Name = "fullPath",
-                    DisplayName = "Full Path",
-                    Description = "File Full Path",
-                    IsRequired = true
-                },
-                new StringFieldInfo
-                {
-                    Name = "mimeType",
-                    DisplayName = "Mime Type",
-                    Description = "File Mime Type",
-                    IsRequired = true
-                },
-                new FloatFieldInfo
-                {
-                    Name = "size",
-                    DisplayName = "File Size",
-                    Description = "File Size (bytes)",
-                    IsRequired = false
-                },
-                new StringFieldInfo
-                {
-                    Name = "url",
-                    DisplayName = "Url",
-                    Description = "Url",
-                    IsRequired = true
-                }
-            };
-        }
-
-        #endregion
-
-        #region Methods
-
-        public override bool ValidateSchema(out Exception exception)
-        {
-            base.ValidateSchema(out exception);
-            this.ValidateMinCount(out exception);
-            this.ValidateMaxCount(out exception);
-            this.ValidateMaxSize(out exception);
-
-            return exception == null;
-        }
-
-        protected internal override bool Validate(object obj, IValidationContext validationContext)
-        {
-            var isValid = base.Validate(obj, validationContext);
-
-            if (obj is object[] array)
+                Name = "id",
+                DisplayName = "Id",
+                Description = "File Id",
+                IsRequired = true
+            },
+            new StringFieldInfo
             {
-                if (this.MaxCount != null && array.Length > this.MaxCount.Value)
-                {
-                    isValid = false;
-                    validationContext.Errors.Add(new FieldValidationException($"File count can not be greater than {this.MaxCount}", this));
-                }
-                
-                if (this.MinCount != null && array.Length < this.MinCount.Value)
-                {
-                    isValid = false;
-                    validationContext.Errors.Add(new FieldValidationException($"File count can not be less than {this.MinCount}", this));
-                }
+                Name = "name",
+                DisplayName = "File Name",
+                Description = "File Name",
+                IsRequired = true
+            },
+            new StringFieldInfo
+            {
+                Name = "path",
+                DisplayName = "File Path",
+                Description = "File Path",
+                IsRequired = true
+            },
+            new StringFieldInfo
+            {
+                Name = "fullPath",
+                DisplayName = "Full Path",
+                Description = "File Full Path",
+                IsRequired = true
+            },
+            new StringFieldInfo
+            {
+                Name = "mimeType",
+                DisplayName = "Mime Type",
+                Description = "File Mime Type",
+                IsRequired = true
+            },
+            new FloatFieldInfo
+            {
+                Name = "size",
+                DisplayName = "File Size",
+                Description = "File Size (bytes)",
+                IsRequired = false
+            },
+            new StringFieldInfo
+            {
+                Name = "url",
+                DisplayName = "Url",
+                Description = "Url",
+                IsRequired = true
+            }
+        };
+    }
+    
+    #endregion
+    
+    #region Methods
+    
+    public override bool ValidateSchema(out Exception? exception)
+    {
+        base.ValidateSchema(out exception);
+        this.ValidateMinCount(out exception);
+        this.ValidateMaxCount(out exception);
+        this.ValidateMaxSize(out exception);
+        
+        return exception == null;
+    }
+    
+    protected internal override bool Validate(object? obj, IValidationContext validationContext)
+    {
+        var isValid = base.Validate(obj, validationContext);
+        
+        if (obj is object[] array)
+        {
+            if (this.MaxCount != null && array.Length > this.MaxCount.Value)
+            {
+                isValid = false;
+                validationContext.Errors.Add(new FieldValidationException($"File count can not be greater than {this.MaxCount}", this));
             }
             
-            return isValid;
+            if (this.MinCount != null && array.Length < this.MinCount.Value)
+            {
+                isValid = false;
+                validationContext.Errors.Add(new FieldValidationException($"File count can not be less than {this.MinCount}", this));
+            }
         }
         
-        private bool ValidateMaxSize(out Exception exception)
+        return isValid;
+    }
+    
+    private bool ValidateMaxSize(out Exception? exception)
+    {
+        if (this.MaxSize < 0)
         {
-            if (this.MaxSize < 0)
+            exception = new FieldValidationException("MaxSize can not be less than zero", this);
+            return false;
+        }
+        
+        exception = null;
+        return true;
+    }
+    
+    private bool ValidateMinCount(out Exception? exception)
+    {
+        if (this.MinCount != null)
+        {
+            if (this.MinCount < 0)
             {
-                exception = new FieldValidationException("MaxSize can not be less than zero", this);
+                exception = new FieldValidationException($"The 'minCount' value can not be less than zero ('{this.Name}')", this);
                 return false;
             }
             
-            exception = null;
-            return true;
-        }
-
-        private bool ValidateMinCount(out Exception exception)
-        {
-            if (this.MinCount != null)
+            if (this.MaxCount != null && this.MinCount != null && this.MaxCount < this.MinCount)
             {
-                if (this.MinCount < 0)
-                {
-                    exception = new FieldValidationException($"The 'minCount' value can not be less than zero ('{this.Name}')", this);
-                    return false;
-                }
-
-                if (this.MaxCount != null && this.MinCount != null && this.MaxCount < this.MinCount)
-                {
-                    exception = new FieldValidationException($"The 'minCount' value can not be greater than the 'maxCount' value ('{this.Name}')", this);
-                    return false;
-                }
+                exception = new FieldValidationException($"The 'minCount' value can not be greater than the 'maxCount' value ('{this.Name}')", this);
+                return false;
             }
-            
-            exception = null;
-            return true;
         }
         
-        private bool ValidateMaxCount(out Exception exception)
+        exception = null;
+        return true;
+    }
+    
+    private bool ValidateMaxCount(out Exception? exception)
+    {
+        if (this.MaxCount != null)
         {
-            if (this.MaxCount != null)
+            if (this.MaxCount < 0)
             {
-                if (this.MaxCount < 0)
-                {
-                    exception = new FieldValidationException($"The 'maxCount' value can not be less than zero ('{this.Name}')", this);
-                    return false;
-                }
-
-                if (this.MinCount != null && this.MaxCount != null && this.MinCount > this.MaxCount)
-                {
-                    exception = new FieldValidationException($"The 'minCount' value can not be greater than the 'maxCount' value ('{this.Name}')", this);
-                    return false;
-                }
+                exception = new FieldValidationException($"The 'maxCount' value can not be less than zero ('{this.Name}')", this);
+                return false;
             }
             
-            exception = null;
-            return true;
+            if (this.MinCount != null && this.MaxCount != null && this.MinCount > this.MaxCount)
+            {
+                exception = new FieldValidationException($"The 'minCount' value can not be greater than the 'maxCount' value ('{this.Name}')", this);
+                return false;
+            }
         }
         
-        private bool ValidateMinWidth(out Exception exception)
+        exception = null;
+        return true;
+    }
+    
+    private bool ValidateMinWidth(out Exception? exception)
+    {
+        if (this.MinWidth != null)
         {
-            if (this.MinWidth != null)
+            if (this.MinWidth < 0)
             {
-                if (this.MinWidth < 0)
-                {
-                    exception = new FieldValidationException($"The 'minWidth' value can not be less than zero ('{this.Name}')", this);
-                    return false;
-                }
-
-                if (this.MaxWidth != null && this.MinWidth != null && this.MaxWidth < this.MinWidth)
-                {
-                    exception = new FieldValidationException($"The 'minWidth' value can not be greater than the 'maxWidth' value ('{this.Name}')", this);
-                    return false;
-                }
+                exception = new FieldValidationException($"The 'minWidth' value can not be less than zero ('{this.Name}')", this);
+                return false;
             }
             
-            exception = null;
-            return true;
+            if (this.MaxWidth != null && this.MinWidth != null && this.MaxWidth < this.MinWidth)
+            {
+                exception = new FieldValidationException($"The 'minWidth' value can not be greater than the 'maxWidth' value ('{this.Name}')", this);
+                return false;
+            }
         }
         
-        private bool ValidateMinHeight(out Exception exception)
+        exception = null;
+        return true;
+    }
+    
+    private bool ValidateMinHeight(out Exception? exception)
+    {
+        if (this.MinHeight != null)
         {
-            if (this.MinHeight != null)
+            if (this.MinHeight < 0)
             {
-                if (this.MinHeight < 0)
-                {
-                    exception = new FieldValidationException($"The 'minHeight' value can not be less than zero ('{this.Name}')", this);
-                    return false;
-                }
-
-                if (this.MaxHeight != null && this.MinHeight != null && this.MaxHeight < this.MinHeight)
-                {
-                    exception = new FieldValidationException($"The 'minHeight' value can not be greater than the 'maxHeight' value ('{this.Name}')", this);
-                    return false;
-                }
+                exception = new FieldValidationException($"The 'minHeight' value can not be less than zero ('{this.Name}')", this);
+                return false;
             }
             
-            exception = null;
-            return true;
+            if (this.MaxHeight != null && this.MinHeight != null && this.MaxHeight < this.MinHeight)
+            {
+                exception = new FieldValidationException($"The 'minHeight' value can not be greater than the 'maxHeight' value ('{this.Name}')", this);
+                return false;
+            }
         }
         
-        private bool ValidateMaxWidth(out Exception exception)
+        exception = null;
+        return true;
+    }
+    
+    private bool ValidateMaxWidth(out Exception? exception)
+    {
+        if (this.MaxWidth != null)
         {
-            if (this.MaxWidth != null)
+            if (this.MaxWidth < 0)
             {
-                if (this.MaxWidth < 0)
-                {
-                    exception = new FieldValidationException($"The 'maxWidth' value can not be less than zero ('{this.Name}')", this);
-                    return false;
-                }
-
-                if (this.MinWidth != null && this.MaxWidth != null && this.MinWidth > this.MaxWidth)
-                {
-                    exception = new FieldValidationException($"The 'minWidth' value can not be greater than the 'maxWidth' value ('{this.Name}')", this);
-                    return false;
-                }
+                exception = new FieldValidationException($"The 'maxWidth' value can not be less than zero ('{this.Name}')", this);
+                return false;
             }
             
-            exception = null;
-            return true;
+            if (this.MinWidth != null && this.MaxWidth != null && this.MinWidth > this.MaxWidth)
+            {
+                exception = new FieldValidationException($"The 'minWidth' value can not be greater than the 'maxWidth' value ('{this.Name}')", this);
+                return false;
+            }
         }
         
-        private bool ValidateMaxHeight(out Exception exception)
+        exception = null;
+        return true;
+    }
+    
+    private bool ValidateMaxHeight(out Exception? exception)
+    {
+        if (this.MaxHeight != null)
         {
-            if (this.MaxHeight != null)
+            if (this.MaxHeight < 0)
             {
-                if (this.MaxHeight < 0)
-                {
-                    exception = new FieldValidationException($"The 'maxHeight' value can not be less than zero ('{this.Name}')", this);
-                    return false;
-                }
-
-                if (this.MinHeight != null && this.MaxHeight != null && this.MinHeight > this.MaxHeight)
-                {
-                    exception = new FieldValidationException($"The 'minHeight' value can not be greater than the 'maxHeight' value ('{this.Name}')", this);
-                    return false;
-                }
+                exception = new FieldValidationException($"The 'maxHeight' value can not be less than zero ('{this.Name}')", this);
+                return false;
             }
             
-            exception = null;
-            return true;
+            if (this.MinHeight != null && this.MaxHeight != null && this.MinHeight > this.MaxHeight)
+            {
+                exception = new FieldValidationException($"The 'minHeight' value can not be greater than the 'maxHeight' value ('{this.Name}')", this);
+                return false;
+            }
         }
         
-        public override object Clone()
+        exception = null;
+        return true;
+    }
+    
+    public override object Clone()
+    {
+        return new ImageFieldInfo
         {
-            return new ImageFieldInfo
-            {
-                Name = this.Name,
-                Description = this.Description,
-                DisplayName = this.DisplayName,
-                Parent = this.Parent,
-                IsRequired = this.IsRequired,
-                IsVirtual = this.IsVirtual,
-                IsHidden = this.IsHidden,
-                IsReadonly = this.IsReadonly,
-                DefaultValue = this.DefaultValue,
-                Properties = this.Properties,
-                MaxSize = this.MaxSize,
-                MinCount = this.MinCount,
-                MaxCount = this.MaxCount,
-                MinWidth = this.MinWidth,
-                MinHeight = this.MinHeight,
-                MaxWidth = this.MaxWidth,
-                MaxHeight = this.MaxHeight,
-                RecommendedWidth = this.RecommendedWidth,
-                RecommendedHeight = this.RecommendedHeight,
-                MinSizesRequired = this.MinSizesRequired,
-                MaxSizesRequired = this.MaxSizesRequired,
-                AspectRatioRequired = this.AspectRatioRequired,
-                FormWidth = this.FormWidth,
-                FormHeight = this.FormHeight,
-                MaxFormWidth = this.MaxFormWidth,
-                MaxFormHeight = this.MaxFormHeight
-            };
-        }
-
-        #endregion
-	}
+            Name = this.Name,
+            Description = this.Description,
+            DisplayName = this.DisplayName,
+            Parent = this.Parent,
+            IsRequired = this.IsRequired,
+            IsVirtual = this.IsVirtual,
+            IsHidden = this.IsHidden,
+            IsReadonly = this.IsReadonly,
+            DefaultValue = this.DefaultValue,
+            Properties = this.Properties,
+            MaxSize = this.MaxSize,
+            MinCount = this.MinCount,
+            MaxCount = this.MaxCount,
+            MinWidth = this.MinWidth,
+            MinHeight = this.MinHeight,
+            MaxWidth = this.MaxWidth,
+            MaxHeight = this.MaxHeight,
+            RecommendedWidth = this.RecommendedWidth,
+            RecommendedHeight = this.RecommendedHeight,
+            MinSizesRequired = this.MinSizesRequired,
+            MaxSizesRequired = this.MaxSizesRequired,
+            AspectRatioRequired = this.AspectRatioRequired,
+            FormWidth = this.FormWidth,
+            FormHeight = this.FormHeight,
+            MaxFormWidth = this.MaxFormWidth,
+            MaxFormHeight = this.MaxFormHeight
+        };
+    }
+    
+    #endregion
 }

@@ -1,27 +1,26 @@
-namespace Ertis.MongoDB.Queries
+namespace Ertis.MongoDB.Queries;
+
+internal enum MongoOperator
 {
-    internal enum MongoOperator
-    {
-        Equals,
-        NotEquals,
-        GreaterThan,
-        GreaterThanOrEqual,
-        LessThan,
-        LessThanOrEqual,
-        Contains,
-        NotContains,
-        And,
-        Or,
-        Nor,
-        Not,
-        Exist,
-        TypeOf,
-        Regex,
-        Text,
-        RegexOptions,
-        TextSearch,
-        TextSearchLanguage,
-        TextSearchCaseSensitive,
-        TextSearchDiacriticSensitive
-    }
+	Equals,
+	NotEquals,
+	GreaterThan,
+	GreaterThanOrEqual,
+	LessThan,
+	LessThanOrEqual,
+	Contains,
+	NotContains,
+	And,
+	Or,
+	Nor,
+	Not,
+	Exist,
+	TypeOf,
+	Regex,
+	Text,
+	RegexOptions,
+	TextSearch,
+	TextSearchLanguage,
+	TextSearchCaseSensitive,
+	TextSearchDiacriticSensitive
 }

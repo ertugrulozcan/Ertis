@@ -1,5 +1,3 @@
-using System;
-
 namespace Ertis.MongoDB.Queries;
 
 public class ISODate : QueryValue<DateTime>
@@ -9,9 +7,9 @@ public class ISODate : QueryValue<DateTime>
     private DateTime Date { get; }
     
     #endregion
-        
+    
     #region Constructors
-
+    
     /// <summary>
     /// Constructor
     /// </summary>
@@ -20,15 +18,15 @@ public class ISODate : QueryValue<DateTime>
     {
         this.Date = date;
     }
-
+    
     #endregion
-        
+    
     #region Methods
-
+    
     public override string ToString()
     {
         return $"ISODate(\"{this.Date:yyyy-MM-ddTHH:mm:ssZ}\")";
     }
-
+    
     #endregion
 }

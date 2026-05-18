@@ -1,11 +1,12 @@
-namespace Ertis.Data.Models
+namespace Ertis.Data.Models;
+
+// ReSharper disable once UnusedType.Global
+public interface IEntity<out TIdentifier> where TIdentifier : notnull
 {
-	public interface IEntity<out TIdentifier> where TIdentifier : notnull
-	{
-		#region Properties
-
-		TIdentifier Id { get; }
-
-		#endregion
-	}
+	#region Properties
+	
+	// ReSharper disable once UnusedMember.Global
+	TIdentifier Id { get; }
+	
+	#endregion
 }

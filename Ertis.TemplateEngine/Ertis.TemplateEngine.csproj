@@ -1,24 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <PackageId>Ertis.TemplateEngine</PackageId>
-        <PackageVersion>9.0.5</PackageVersion>
-        <Authors>Ertuğrul Özcan</Authors>
-        <Description>Ertis.TemplateEngine</Description>
-        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        <Copyright>Ertuğrul Özcan | Copyright 2025 (c)</Copyright>
-        <PackageReleaseNotes>.Net 9</PackageReleaseNotes>
-        <PackageTags>Ertis.TemplateEngine</PackageTags>
-        <Title>Ertis.TemplateEngine</Title>
-        <PackageProjectUrl>https://github.com/ertugrulozcan/Ertis</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/ertugrulozcan/Ertis</RepositoryUrl>
-        <AssemblyVersion>9.0.5</AssemblyVersion>
-        <FileVersion>9.0.5</FileVersion>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+        <ProjectReference Include="..\Ertis.Schema\Ertis.Schema.csproj" />
     </ItemGroup>
-
 </Project>

@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 
 namespace Ertis.Net.Http;
 
+// ReSharper disable once UnusedType.Global
 public class TextRequestBody : IRequestBody
 {
     #region Properties
@@ -17,9 +18,9 @@ public class TextRequestBody : IRequestBody
     public string? ContentType { get; set; }
     
     #endregion
-
+    
     #region Constructors
-
+    
     /// <summary>
     /// Constructor
     /// </summary>
@@ -28,11 +29,11 @@ public class TextRequestBody : IRequestBody
     {
         this.Body = body;
     }
-
+    
     #endregion
-
+    
     #region Methods
-
+    
     public HttpContent GetHttpContent()
     {
         if (!string.IsNullOrEmpty(this.Body))
@@ -47,6 +48,6 @@ public class TextRequestBody : IRequestBody
             return new StringContent(string.Empty);
         }
     }
-
+    
     #endregion
 }

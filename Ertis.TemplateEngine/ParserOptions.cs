@@ -1,17 +1,18 @@
-namespace Ertis.TemplateEngine
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
+namespace Ertis.TemplateEngine;
+
+public class ParserOptions
 {
-    public class ParserOptions
-    {
-        #region Properties
-
-        public string OpenBrackets { get; init; }
-        
-        public string CloseBrackets { get; init; }
-
-        public UndefinedStrategy UndefinedStrategy { get; init; } = UndefinedStrategy.Ignore;
-        
-        public string Fallback { get; init; }
-
-        #endregion
-    }
+	#region Properties
+	
+	public string? OpenBrackets { get; init; }
+	
+	public string? CloseBrackets { get; init; }
+	
+	public UndefinedStrategy UndefinedStrategy { get; init; } = UndefinedStrategy.Ignore;
+	
+	public string? Fallback { get; init; }
+	
+	#endregion
 }

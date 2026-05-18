@@ -1,7 +1,3 @@
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-
-using System.Collections.Generic;
-using System.Linq;
 using Ertis.Core.Collections;
 using MongoDB.Bson;
 
@@ -11,15 +7,17 @@ public class IndexOptions
 {
 	#region Properties
 	
-	public IEnumerable<SingleIndexDefinition> Hint { get; set; }
+	// ReSharper disable once UnusedAutoPropertyAccessor.Global
+	public IEnumerable<SingleIndexDefinition>? Hint { get; set; }
 	
 	#endregion
-
+	
 	#region Methods
 	
-	internal BsonValue GetIndexHint()
+	// ReSharper disable once UnusedMember.Global
+	internal BsonValue? GetIndexHint()
 	{
-		BsonValue hint = null;
+		BsonValue? hint = null;
 		if (this.Hint != null && this.Hint.Any())
 		{
 			var hintDocument = new BsonDocument();

@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -7,21 +6,22 @@ using SixLabors.ImageSharp.Metadata;
 using SixLabors.ImageSharp.Processing;
 using ResizeModeEnum = SixLabors.ImageSharp.Processing.ResizeMode;
 
+// ReSharper disable UnusedMember.Global
 namespace Ertis.ImageProcessing;
 
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
 // ReSharper disable once UnusedType.Global
 public static class ImageProcessor
 {
 	#region Methods
 	
-	[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 	public static void Crop(Stream imageStream, Stream outputStream, CropBounds bounds, ImageFormat destinationFormat, int? quality = null)
 	{
 		try
 		{
 			using var image = Image.Load(imageStream);
-			image.Mutate(x => x.Crop(bounds.ToRectangle(image.Width, image.Height))); 
+			var imageWidth = image.Width;
+			var imageHeight = image.Height;
+			image.Mutate(x => x.Crop(bounds.ToRectangle(imageWidth, imageHeight))); 
 			image.Save(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality));
 		}
 		catch (Exception ex)
@@ -30,13 +30,14 @@ public static class ImageProcessor
 		}
 	}
 	
-	[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
 	public static async Task CropAsync(Stream imageStream, Stream outputStream, CropBounds bounds, ImageFormat destinationFormat, int? quality = null, CancellationToken cancellationToken = default)
 	{
 		try
 		{
 			using var image = await Image.LoadAsync(imageStream, cancellationToken: cancellationToken);
-			image.Mutate(x => x.Crop(bounds.ToRectangle(image.Width, image.Height))); 
+			var imageWidth = image.Width;
+			var imageHeight = image.Height;
+			image.Mutate(x => x.Crop(bounds.ToRectangle(imageWidth, imageHeight))); 
 			await image.SaveAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality), cancellationToken: cancellationToken);
 		}
 		catch (Exception ex)
@@ -51,7 +52,7 @@ public static class ImageProcessor
 		{
 			return;
 		}
-
+		
 		try
 		{
 			using var image = Image.Load(imageStream);
@@ -78,7 +79,7 @@ public static class ImageProcessor
 		{
 			return;
 		}
-
+		
 		try
 		{
 			using var image = await Image.LoadAsync(imageStream, cancellationToken: cancellationToken);

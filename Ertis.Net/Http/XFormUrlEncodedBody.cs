@@ -1,19 +1,20 @@
 namespace Ertis.Net.Http;
 
+// ReSharper disable once UnusedType.Global
 public class XFormUrlEncodedBody : IRequestBody
 {
 	#region Properties
-
+	
 	private IDictionary<string, string> Dictionary { get; }
-
+	
 	public object Payload => this.Dictionary;
 	
 	public BodyTypes Type => BodyTypes.UrlEncoded;
-
+	
 	#endregion
-
+	
 	#region Constructors
-
+	
 	/// <summary>
 	/// Constructor
 	/// </summary>
@@ -22,15 +23,15 @@ public class XFormUrlEncodedBody : IRequestBody
 	{
 		this.Dictionary = dictionary;
 	}
-
+	
 	#endregion
-
+	
 	#region Methods
-
+	
 	public HttpContent GetHttpContent()
 	{
 		return new FormUrlEncodedContent(this.Dictionary.ToArray());
 	}
-
+	
 	#endregion
 }

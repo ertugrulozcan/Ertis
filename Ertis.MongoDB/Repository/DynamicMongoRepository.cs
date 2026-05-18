@@ -75,7 +75,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		return this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", objectId)).FirstOrDefault();
 	}
 	
-	public async Task<dynamic> FindOneAsync(string id, CancellationToken cancellationToken = default)
+	public async Task<dynamic?> FindOneAsync(string id, CancellationToken cancellationToken = default)
 	{
 		return await this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", ObjectId.Parse(id))).FirstOrDefaultAsync(cancellationToken: cancellationToken);
 	}
@@ -92,7 +92,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		return this.Collection.Find(filterDefinition).FirstOrDefault();
 	}
 	
-	public async Task<dynamic> FindOneAsync(Expression<Func<dynamic, bool>>? expression, CancellationToken cancellationToken = default)
+	public async Task<dynamic?> FindOneAsync(Expression<Func<dynamic, bool>>? expression, CancellationToken cancellationToken = default)
 	{
 		var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
 		return await (await this.Collection.FindAsync(filterDefinition, cancellationToken: cancellationToken)).FirstOrDefaultAsync(cancellationToken: cancellationToken);	

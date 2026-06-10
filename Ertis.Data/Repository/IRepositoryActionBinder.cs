@@ -1,7 +1,5 @@
-// ReSharper disable UnusedMember.Global
 namespace Ertis.Data.Repository;
 
-// ReSharper disable once UnusedType.Global
 public interface IRepositoryActionBinder
 {
 	TEntity BeforeInsert<TEntity>(TEntity entity);

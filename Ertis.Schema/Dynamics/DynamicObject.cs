@@ -3,23 +3,19 @@ using System.Text.Json;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
 
-// ReSharper disable UnusedMember.Global
-// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.Schema.Dynamics;
 
-// ReSharper disable once UnusedType.Global
 public class DynamicObject : ICloneable, IDisposable
 {
     #region Properties
     
-    private IDictionary<string, object?> PropertyDictionary { get; init; }
+    private IDictionary<string, object> PropertyDictionary { get; set; }
     
     #endregion
     
     #region Indexer Overloading
     
-    // ReSharper disable once UnusedMember.Global
-    public object? this[string path]
+    public object this[string path]
     {
         get => this.GetValue(path);
         set => this.SetValue(path, value);
@@ -34,7 +30,7 @@ public class DynamicObject : ICloneable, IDisposable
     /// </summary>
     private DynamicObject()
     {
-        this.PropertyDictionary = new Dictionary<string, object?>();
+        this.PropertyDictionary = new Dictionary<string, object>();
     }
     
     /// <summary>
@@ -56,7 +52,7 @@ public class DynamicObject : ICloneable, IDisposable
     
     #region Methods
     
-    public static DynamicObject Create(IDictionary<string, object?> dictionary)
+    public static DynamicObject Create(IDictionary<string, object> dictionary)
     {
         object model = dictionary.ToDynamic();
         return new DynamicObject
@@ -67,14 +63,13 @@ public class DynamicObject : ICloneable, IDisposable
     
     public static DynamicObject Parse(string json)
     {
-        throw new NotImplementedException();
         return new DynamicObject
         {
-            // PropertyDictionary = Json.Linq.JToken.Parse(json).ToDictionary()
+            PropertyDictionary = Newtonsoft.Json.Linq.JToken.Parse(json).ToDictionary()
         };
     }
     
-    public static T? Cast<T>(dynamic obj) where T : class
+    public static T Cast<T>(dynamic obj) where T : class
     {
         if (obj == null)
         {
@@ -86,7 +81,7 @@ public class DynamicObject : ICloneable, IDisposable
     }
     
     // ReSharper disable once MemberCanBePrivate.Global
-    public static object? Cast(dynamic obj, Type type)
+    public static object Cast(dynamic obj, Type type)
     {
         if (obj == null)
         {
@@ -97,7 +92,7 @@ public class DynamicObject : ICloneable, IDisposable
         return dynamicObject.Deserialize(type);
     }
     
-    public IDictionary<string, object?> ToDictionary()
+    public IDictionary<string, object> ToDictionary()
     {
         return this.PropertyDictionary;
     }
@@ -113,24 +108,24 @@ public class DynamicObject : ICloneable, IDisposable
         return this.ToJson();
     }
     
-    public T? Deserialize<T>()
+    public T Deserialize<T>()
     {
         return JsonSerializer.Deserialize<T>(this.ToJson());
     }
     
-    public object? Deserialize(Type type)
+    public object Deserialize(Type type)
     {
         return JsonSerializer.Deserialize(this.ToJson(), type);
     }
     
     public dynamic ToDynamic()
     {
-        IDictionary<string, object?> expandoDictionary = new ExpandoObject();
+        IDictionary<string, object> expandoDictionary = new ExpandoObject();
         foreach (var pair in this.PropertyDictionary)
         {
-            if (pair.Value is IDictionary<string, object?> childDictionary)
+            if (pair.Value is IDictionary<string, object> childDictionary)
             {
-                expandoDictionary.Add(new KeyValuePair<string, object?>(pair.Key, childDictionary.ToDynamic()));
+                expandoDictionary.Add(new KeyValuePair<string, object>(pair.Key, childDictionary.ToDynamic()));
             }
             else
             {
@@ -142,12 +137,12 @@ public class DynamicObject : ICloneable, IDisposable
         return dynamicObject;
     }
     
-    public object? GetValue(string path)
+    public object GetValue(string path)
     {
         return GetValueCore(path, this.PropertyDictionary);
     }
     
-    public object? GetValue(string path, object defaultValue)
+    public object GetValue(string path, object defaultValue)
     {
         try
         {
@@ -159,17 +154,10 @@ public class DynamicObject : ICloneable, IDisposable
         }
     }
     
-    public T? GetValue<T>(string path)
+    public T GetValue<T>(string path)
     {
         var value = GetValueCore(path, this.PropertyDictionary);
-        
-        // ReSharper disable once ConvertIfStatementToSwitchStatement
-        if (value == null)
-        {
-            return default;
-        }
-        
-        if (value is IDictionary<string, object?> dictionary)
+        if (value is IDictionary<string, object> dictionary)
         {
             return Create(dictionary).Deserialize<T>();
         }
@@ -211,7 +199,7 @@ public class DynamicObject : ICloneable, IDisposable
         }
     }
     
-    public T? GetValue<T>(string path, T defaultValue)
+    public T GetValue<T>(string path, T defaultValue)
     {
         try
         {
@@ -223,7 +211,7 @@ public class DynamicObject : ICloneable, IDisposable
         }
     }
     
-    public bool TryGetValue(string path, out object? value)
+    public bool TryGetValue(string path, out object value)
     {
         try
         {
@@ -232,13 +220,12 @@ public class DynamicObject : ICloneable, IDisposable
         }
         catch
         {
-            value = null;
+            value = default;
             return false;
         }
     }
     
-    // ReSharper disable once OutParameterValueIsAlwaysDiscarded.Global
-    public bool TryGetValue(string path, out object? value, out Exception? exception)
+    public bool TryGetValue(string path, out object value, out Exception exception)
     {
         try
         {
@@ -248,13 +235,13 @@ public class DynamicObject : ICloneable, IDisposable
         }
         catch (Exception ex)
         {
-            value = null;
+            value = default;
             exception = ex;
             return false;
         }
     }
     
-    public bool TryGetValue<T>(string path, out T? value)
+    public bool TryGetValue<T>(string path, out T value)
     {
         try
         {
@@ -268,8 +255,7 @@ public class DynamicObject : ICloneable, IDisposable
         }
     }
     
-    // ReSharper disable once OutParameterValueIsAlwaysDiscarded.Global
-    public bool TryGetValue<T>(string path, out T? value, out Exception? exception)
+    public bool TryGetValue<T>(string path, out T value, out Exception exception)
     {
         try
         {
@@ -285,7 +271,7 @@ public class DynamicObject : ICloneable, IDisposable
         }
     }
     
-    private static object? GetValueCore(string path, IDictionary<string, object?> dictionary)
+    private static object GetValueCore(string path, IDictionary<string, object> dictionary)
     {
         if (string.IsNullOrEmpty(path))
         {
@@ -298,7 +284,7 @@ public class DynamicObject : ICloneable, IDisposable
         {
             if (segments.Length > 1)
             {
-                if (value is IDictionary<string, object?> subDictionary)
+                if (value is IDictionary<string, object> subDictionary)
                 {
                     var subPath = string.Join(".", segments.Skip(1));
                     return GetValueCore(subPath, subDictionary);
@@ -317,11 +303,9 @@ public class DynamicObject : ICloneable, IDisposable
         {
             if (segments.Length > 1)
             {
-                if (foundValue is IDictionary<string, object?> subDictionary)
+                if (foundValue is IDictionary<string, object> subDictionary)
                 {
                     var subPath = string.Join(".", segments.Skip(1));
-                    
-                    // ReSharper disable once TailRecursiveCall
                     return GetValueCore(subPath, subDictionary);
                 }
                 else
@@ -340,7 +324,7 @@ public class DynamicObject : ICloneable, IDisposable
         }
     }
     
-    private static bool TryGetValueFromArray(string key, IDictionary<string, object?> dictionary, out object? foundValue)
+    private static bool TryGetValueFromArray(string key, IDictionary<string, object> dictionary, out object foundValue)
     {
         if (key.Contains('[') && key.EndsWith(']'))
         {
@@ -372,7 +356,7 @@ public class DynamicObject : ICloneable, IDisposable
                 }
                 else
                 {
-                    throw new InvalidOperationException("Indexed node is not an array");
+                    throw new InvalidOperationException($"Indexed node is not an array");
                 }
             }
             else
@@ -385,14 +369,12 @@ public class DynamicObject : ICloneable, IDisposable
         return false;
     }
     
-    public void SetValue(string path, object? value, bool createIfNotExist = false)
+    public void SetValue(string path, object value, bool createIfNotExist = false)
     {
         SetValueCore(path, value, this.PropertyDictionary, createIfNotExist);
     }
     
-    // ReSharper disable once OutParameterValueIsAlwaysDiscarded.Global
-    // ReSharper disable once UnusedMethodReturnValue.Global
-    public bool TrySetValue(string path, object? value, out Exception? exception, bool createIfNotExist = false)
+    public bool TrySetValue(string path, object value, out Exception exception, bool createIfNotExist = false)
     {
         try
         {
@@ -407,7 +389,7 @@ public class DynamicObject : ICloneable, IDisposable
         }
     }
     
-    private static void SetValueCore(string path, object? obj, IDictionary<string, object?> dictionary, bool createIfNotExist)
+    private static void SetValueCore(string path, object obj, IDictionary<string, object> dictionary, bool createIfNotExist)
     {
         if (string.IsNullOrEmpty(path))
         {
@@ -421,11 +403,9 @@ public class DynamicObject : ICloneable, IDisposable
             var value = dictionary[key];
             if (segments.Length > 1)
             {
-                if (value is IDictionary<string, object?> subDictionary)
+                if (value is IDictionary<string, object> subDictionary)
                 {
                     var subPath = string.Join(".", segments.Skip(1));
-                    
-                    // ReSharper disable once TailRecursiveCall
                     SetValueCore(subPath, obj, subDictionary, createIfNotExist);
                 }
                 else
@@ -447,9 +427,7 @@ public class DynamicObject : ICloneable, IDisposable
             if (segments.Length > 1)
             {
                 var subPath = string.Join(".", segments.Skip(1));
-                
-                // ReSharper disable once TailRecursiveCall
-                SetValueCore(subPath, obj, new Dictionary<string, object?>(), true);
+                SetValueCore(subPath, obj, new Dictionary<string, object>(), true);
             }
             else
             {
@@ -462,7 +440,7 @@ public class DynamicObject : ICloneable, IDisposable
         }
     }
     
-    private static bool TrySetValueOnArray(string key, IDictionary<string, object?> dictionary, object? setValue)
+    private static bool TrySetValueOnArray(string key, IDictionary<string, object> dictionary, object setValue)
     {
         var indexerStartIndex = key.IndexOf('[');
         var indexerCloseIndex = key.IndexOf(']');
@@ -481,7 +459,7 @@ public class DynamicObject : ICloneable, IDisposable
                         {
                             var indexerPath = $"{originalKey}[{index}]";
                             var arrayItem = array.GetValue(index);
-                            if (key.Length > indexerPath.Length && arrayItem is IDictionary<string, object?> subDictionary)
+                            if (key.Length > indexerPath.Length && arrayItem is IDictionary<string, object> subDictionary)
                             {
                                 SetValueCore(key[indexerPath.Length..].TrimStart('.'), setValue, subDictionary, false);
                                 return true;
@@ -504,7 +482,7 @@ public class DynamicObject : ICloneable, IDisposable
                 }
                 else
                 {
-                    throw new InvalidOperationException("Indexed node is not an array");
+                    throw new InvalidOperationException($"Indexed node is not an array");
                 }
             }
             else
@@ -521,7 +499,7 @@ public class DynamicObject : ICloneable, IDisposable
         RemovePropertyCore(path, this.PropertyDictionary);
     }
     
-    private static void RemovePropertyCore(string path, IDictionary<string, object?> dictionary)
+    private static void RemovePropertyCore(string path, IDictionary<string, object> dictionary)
     {
         if (string.IsNullOrEmpty(path))
         {
@@ -535,11 +513,9 @@ public class DynamicObject : ICloneable, IDisposable
             var value = dictionary[key];
             if (segments.Length > 1)
             {
-                if (value is IDictionary<string, object?> subDictionary)
+                if (value is IDictionary<string, object> subDictionary)
                 {
                     var subPath = string.Join(".", segments.Skip(1));
-                    
-                    // ReSharper disable once TailRecursiveCall
                     RemovePropertyCore(subPath, subDictionary);
                 }
             }
@@ -558,13 +534,9 @@ public class DynamicObject : ICloneable, IDisposable
             {
                 return false;
             }
-            else if (exception != null)
-            {
-                throw exception;
-            }
             else
             {
-                throw new Exception("Unknown dynamic object exception");
+                throw exception;
             }
         }
         
@@ -601,6 +573,7 @@ public class DynamicObject : ICloneable, IDisposable
             if (disposing)
             {
                 this.PropertyDictionary.Clear();
+                this.PropertyDictionary = null;
             }
             
             // Free unmanaged resources (unmanaged objects) and override finalizer, set large fields to null

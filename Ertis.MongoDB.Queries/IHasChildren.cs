@@ -1,4 +1,3 @@
-// ReSharper disable UnusedMemberInSuper.Global
 namespace Ertis.MongoDB.Queries;
 
 internal interface IHasChildren

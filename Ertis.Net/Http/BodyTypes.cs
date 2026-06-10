@@ -1,8 +1,6 @@
-using System.Diagnostics.CodeAnalysis;
-
+// ReSharper disable UnusedMember.Global
 namespace Ertis.Net.Http;
 
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public enum BodyTypes
 {
 	None,

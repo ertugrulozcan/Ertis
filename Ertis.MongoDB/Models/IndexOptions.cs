@@ -7,17 +7,15 @@ public class IndexOptions
 {
 	#region Properties
 	
-	// ReSharper disable once UnusedAutoPropertyAccessor.Global
-	public IEnumerable<SingleIndexDefinition>? Hint { get; set; }
+	public IEnumerable<SingleIndexDefinition> Hint { get; set; }
 	
 	#endregion
 	
 	#region Methods
 	
-	// ReSharper disable once UnusedMember.Global
-	internal BsonValue? GetIndexHint()
+	internal BsonValue GetIndexHint()
 	{
-		BsonValue? hint = null;
+		BsonValue hint = null;
 		if (this.Hint != null && this.Hint.Any())
 		{
 			var hintDocument = new BsonDocument();

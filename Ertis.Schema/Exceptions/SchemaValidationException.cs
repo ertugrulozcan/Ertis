@@ -1,6 +1,5 @@
 namespace Ertis.Schema.Exceptions;
 
-// ReSharper disable once UnusedType.Global
 public class SchemaValidationException : ErtisSchemaValidationException
 {
 	#region Constructors

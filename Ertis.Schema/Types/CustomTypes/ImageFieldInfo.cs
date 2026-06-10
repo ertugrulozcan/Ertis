@@ -2,171 +2,202 @@ using System.Text.Json.Serialization;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
-// ReSharper disable UnusedMember.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
 namespace Ertis.Schema.Types.CustomTypes;
 
 public sealed class ImageFieldInfo : ObjectFieldInfoBase
 {
-    #region Properties
+    #region Fields
     
+    private readonly int? maxSize;
+    private readonly int? minCount;
+    private readonly int? maxCount;
+    private readonly int? maxWidth;
+    private readonly int? maxHeight;
+    private readonly int? minWidth;
+    private readonly int? minHeight;
+    
+    #endregion
+    
+	#region Properties
+    
+    [JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
     public override FieldType Type => FieldType.image;
     
-    [JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public override IReadOnlyCollection<IFieldInfo> Properties { get; init; }
     
+    [JsonProperty("multiple", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("multiple")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool Multiple { get; set; }
     
+    [JsonProperty("maxSize", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxSize")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxSize
     {
-        get;
+        get => this.maxSize;
         init
         {
-            field = value;
+            this.maxSize = value;
             
             if (!this.ValidateMaxSize(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("minCount", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minCount")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MinCount
     {
-        get;
+        get => this.minCount;
         init
         {
-            field = value;
+            this.minCount = value;
             
             if (!this.ValidateMinCount(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("maxCount", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxCount")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxCount
     {
-        get;
+        get => this.maxCount;
         init
         {
-            field = value;
+            this.maxCount = value;
             
             if (!this.ValidateMaxCount(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("minWidth", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minWidth")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MinWidth
     {
-        get;
+        get => this.minWidth;
         init
         {
-            field = value;
+            this.minWidth = value;
             
             if (!this.ValidateMinWidth(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("minHeight", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minHeight")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MinHeight
     {
-        get;
+        get => this.minHeight;
         init
         {
-            field = value;
+            this.minHeight = value;
             
             if (!this.ValidateMinHeight(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("maxWidth", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxWidth")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxWidth
     {
-        get;
+        get => this.maxWidth;
         init
         {
-            field = value;
+            this.maxWidth = value;
             
             if (!this.ValidateMaxWidth(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("maxHeight", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxHeight")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxHeight
     {
-        get;
+        get => this.maxHeight;
         init
         {
-            field = value;
+            this.maxHeight = value;
             
             if (!this.ValidateMaxHeight(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("recommendedWidth", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("recommendedWidth")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? RecommendedWidth { get; set; }
     
+    [JsonProperty("recommendedHeight", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("recommendedHeight")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? RecommendedHeight { get; set; }
     
+    [JsonProperty("maxSizesRequired")]
     [JsonPropertyName("maxSizesRequired")]
     public bool MaxSizesRequired { get; set; }
     
+    [JsonProperty("minSizesRequired")]
     [JsonPropertyName("minSizesRequired")]
     public bool MinSizesRequired { get; set; }
     
+    [JsonProperty("aspectRatioRequired")]
     [JsonPropertyName("aspectRatioRequired")]
     public bool AspectRatioRequired { get; set; }
     
+    [JsonProperty("formWidth", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("formWidth")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? FormWidth { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string FormWidth { get; set; }
     
+    [JsonProperty("formHeight", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("formHeight")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? FormHeight { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string FormHeight { get; set; }
     
+    [JsonProperty("maxFormWidth", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxFormWidth")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? MaxFormWidth { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string MaxFormWidth { get; set; }
     
+    [JsonProperty("maxFormHeight", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxFormHeight")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? MaxFormHeight { get; set; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string MaxFormHeight { get; set; }
     
     #endregion
     
@@ -235,7 +266,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception? exception)
+    public override bool ValidateSchema(out Exception exception)
     {
         base.ValidateSchema(out exception);
         this.ValidateMinCount(out exception);
@@ -245,7 +276,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
         return exception == null;
     }
     
-    protected internal override bool Validate(object? obj, IValidationContext validationContext)
+    protected internal override bool Validate(object obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
@@ -267,7 +298,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
         return isValid;
     }
     
-    private bool ValidateMaxSize(out Exception? exception)
+    private bool ValidateMaxSize(out Exception exception)
     {
         if (this.MaxSize < 0)
         {
@@ -279,7 +310,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
         return true;
     }
     
-    private bool ValidateMinCount(out Exception? exception)
+    private bool ValidateMinCount(out Exception exception)
     {
         if (this.MinCount != null)
         {
@@ -300,7 +331,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
         return true;
     }
     
-    private bool ValidateMaxCount(out Exception? exception)
+    private bool ValidateMaxCount(out Exception exception)
     {
         if (this.MaxCount != null)
         {
@@ -321,7 +352,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
         return true;
     }
     
-    private bool ValidateMinWidth(out Exception? exception)
+    private bool ValidateMinWidth(out Exception exception)
     {
         if (this.MinWidth != null)
         {
@@ -342,7 +373,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
         return true;
     }
     
-    private bool ValidateMinHeight(out Exception? exception)
+    private bool ValidateMinHeight(out Exception exception)
     {
         if (this.MinHeight != null)
         {
@@ -363,7 +394,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
         return true;
     }
     
-    private bool ValidateMaxWidth(out Exception? exception)
+    private bool ValidateMaxWidth(out Exception exception)
     {
         if (this.MaxWidth != null)
         {
@@ -384,7 +415,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
         return true;
     }
     
-    private bool ValidateMaxHeight(out Exception? exception)
+    private bool ValidateMaxHeight(out Exception exception)
     {
         if (this.MaxHeight != null)
         {

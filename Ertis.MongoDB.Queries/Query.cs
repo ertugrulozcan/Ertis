@@ -2,20 +2,23 @@ namespace Ertis.MongoDB.Queries;
 
 internal class Query : IQuery, IHasChildren
 {
+    #region Fields
+    
+    private readonly IQuery _query;
+    
+    #endregion
+    
     #region Properties
     
     internal MongoOperator? Operator { get; init; }
     
-    internal IQuery? Value
+    internal IQuery Value 
     {
-        get;
+        get => this._query;
         init
         {
-            field = value;
-            if (value != null)
-            {
-                this.Children.Insert(0, value);
-            }
+            this._query = value;
+            this.Children.Insert(0, value);
         }
     }
     
@@ -32,7 +35,7 @@ internal class Query : IQuery, IHasChildren
     
     public override string ToString()
     {
-        if (this.Children.Count == 1 && this.Value != null)
+        if (this.Children.Count == 1)
         {
             if (this.Operator != null)
             {

@@ -1,8 +1,6 @@
 using System.Net;
 
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMemberInSuper.Global
-namespace Ertis.Core.Models;
+namespace Ertis.Core.Models.Response;
 
 public interface IResponseResult
 {
@@ -12,15 +10,15 @@ public interface IResponseResult
 	
 	HttpStatusCode? StatusCode { get; }
 	
-	IDictionary<string, string>? Headers { get; }
+	IDictionary<string, string> Headers { get; }
 	
-	string? Message { get; set; }
+	string Message { get; set; }
 	
-	byte[]? RawData { get; set; }
+	byte[] RawData { get; set; }
 	
-	string? Json { get; set; }
+	string Json { get; set; }
 	
-	Exception? Exception { get; set; }
+	Exception Exception { get; set; }
 	
 	#endregion
 }
@@ -29,7 +27,7 @@ public interface IResponseResult<out T> : IResponseResult
 {
 	#region Properties
 	
-	T? Data { get; }
+	T Data { get; }
 	
 	#endregion
 }
@@ -51,14 +49,15 @@ public class ResponseResult<T> : IResponseResult<T>
 		{
 			if (this.StatusCode != null)
 			{
-				var code = (int)this.StatusCode;
-				return code is >= 200 and < 300;
+				int code = (int)this.StatusCode;
+				return code >= 200 && code < 300;
 			}
 			else
 			{
 				return this.isSuccess;
 			}
 		}
+		
 		private set
 		{
 			this.isSuccess = value;
@@ -75,17 +74,17 @@ public class ResponseResult<T> : IResponseResult<T>
 	
 	public HttpStatusCode? StatusCode { get; private set; }
 	
-	public IDictionary<string, string>? Headers { get; set; }
+	public IDictionary<string, string> Headers { get; set; }
 	
-	public string? Message { get; set; }
+	public string Message { get; set; }
 	
-	public T? Data { get; set; }
+	public T Data { get; set; }
 	
-	public byte[]? RawData { get; set; }
+	public byte[] RawData { get; set; }
 	
-	public string? Json { get; set; }
+	public string Json { get; set; }
 	
-	public Exception? Exception { get; set; }
+	public Exception Exception { get; set; }
 	
 	#endregion
 	
@@ -137,7 +136,7 @@ public class ResponseResult<T> : IResponseResult<T>
 	
 	public override string ToString()
 	{
-		return this.Message ?? $"No error message (Status {this.StatusCode?.ToString() ?? "No status code"})";
+		return this.Message;
 	}
 	
 	#endregion
@@ -153,7 +152,7 @@ public class ResponseResult : ResponseResult<object>
 	/// </summary>
 	/// <param name="isSuccess"></param>
 	public ResponseResult(bool isSuccess) : base(isSuccess)
-	{ }
+	{}
 	
 	/// <summary>
 	/// Constructor 2
@@ -161,14 +160,14 @@ public class ResponseResult : ResponseResult<object>
 	/// <param name="isSuccess"></param>
 	/// <param name="message"></param>
 	public ResponseResult(bool isSuccess, string message) : base(isSuccess, message)
-	{ }
+	{}
 	
 	/// <summary>
 	/// Constructor 3
 	/// </summary>
 	/// <param name="httpCode"></param>
 	public ResponseResult(HttpStatusCode httpCode) : base(httpCode)
-	{ }
+	{}
 	
 	/// <summary>
 	/// Constructor 4
@@ -176,7 +175,7 @@ public class ResponseResult : ResponseResult<object>
 	/// <param name="httpCode"></param>
 	/// <param name="message"></param>
 	public ResponseResult(HttpStatusCode httpCode, string message) : base(httpCode, message)
-	{ }
+	{}
 	
 	#endregion
 }

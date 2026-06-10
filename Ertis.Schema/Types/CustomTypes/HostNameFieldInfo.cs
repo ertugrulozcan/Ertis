@@ -2,6 +2,8 @@ using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.CustomTypes;
 
@@ -9,15 +11,17 @@ public class HostNameFieldInfo : StringFieldInfo
 {
     #region Properties
     
+    [JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
     public override FieldType Type => FieldType.hostname;
     
     #endregion
     
     #region Methods
     
-    protected internal override bool Validate(object? obj, IValidationContext validationContext)
+    protected internal override bool Validate(object obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
@@ -26,7 +30,7 @@ public class HostNameFieldInfo : StringFieldInfo
             if (!IsValidHostName(hostName))
             {
                 isValid = false;
-                validationContext.Errors.Add(new FieldValidationException("Hostname is not valid", this));
+                validationContext.Errors.Add(new FieldValidationException($"Hostname is not valid", this));
             }
         }
         

@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
+using Newtonsoft.Json;
 
 namespace Ertis.Schema.Types.CustomTypes;
 
@@ -10,12 +11,14 @@ public interface IDateTimeFieldInfo
 {
     #region Properties
     
+    [JsonProperty("minValue", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minValue")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public DateTime? MinValue { get; init; }
     
+    [JsonProperty("maxValue", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxValue")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public DateTime? MaxValue { get; init; }
     
     #endregion
@@ -23,43 +26,53 @@ public interface IDateTimeFieldInfo
 
 public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeFieldInfo where T : StringFieldInfo, IDateTimeFieldInfo, new()
 {
+    #region Fields
+    
+    private readonly DateTime? minValue;
+    private readonly DateTime? maxValue;
+    
+    #endregion
+    
     #region Abstract Properties
     
-    [JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     protected abstract string StringFormat { get; }
     
     #endregion
     
     #region Properties
     
+    [JsonProperty("minValue", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minValue")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public DateTime? MinValue
     {
-        get;
+        get => this.minValue;
         init
         {
-            field = value;
+            this.minValue = value;
             
             if (!this.ValidateMinValue(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("maxValue", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxValue")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public DateTime? MaxValue
     {
-        get;
+        get => this.maxValue;
         init
         {
-            field = value;
+            this.maxValue = value;
             
             if (!this.ValidateMaxValue(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
@@ -68,7 +81,7 @@ public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeField
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception? exception)
+    public override bool ValidateSchema(out Exception exception)
     {
         base.ValidateSchema(out exception);
         this.ValidateMinValue(out exception);
@@ -77,7 +90,7 @@ public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeField
         return exception == null;
     }
     
-    protected internal override bool Validate(object? obj, IValidationContext validationContext)
+    protected internal override bool Validate(object obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
@@ -94,7 +107,7 @@ public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeField
                     isValid = false;
                     validationContext.Errors.Add(new FieldValidationException($"Datetime is not valid. Datetime values must be '{this.StringFormat}' format.", this));
                 }
-                
+
                 break;
             }
         }
@@ -117,7 +130,7 @@ public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeField
         return isValid;
     }
     
-    private bool ValidateMinValue(out Exception? exception)
+    private bool ValidateMinValue(out Exception exception)
     {
         if (this.MinValue != null)
         {
@@ -132,7 +145,7 @@ public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeField
         return true;
     }
     
-    private bool ValidateMaxValue(out Exception? exception)
+    private bool ValidateMaxValue(out Exception exception)
     {
         if (this.MaxValue != null)
         {

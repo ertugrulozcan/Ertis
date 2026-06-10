@@ -1,16 +1,18 @@
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
-// ReSharper disable UnusedMember.Global
 namespace Ertis.Core.Collections;
 
-// ReSharper disable once UnusedType.Global
 public class Sorting : ICollection<SortField>
 {
 	#region Properties
 	
 	private List<SortField> Fields { get; } = new();
 	
-	public int Count => this.Fields.Count;
+	public int Count => this.Fields?.Count ?? 0;
 	
 	public bool IsReadOnly => false;
 	
@@ -19,7 +21,7 @@ public class Sorting : ICollection<SortField>
 	#region Constructors
 	
 	/// <summary>
-	/// Constructor with multiple fields
+	/// Constructor
 	/// </summary>
 	/// <param name="fields"></param>
 	public Sorting(IEnumerable<SortField> fields)
@@ -28,10 +30,9 @@ public class Sorting : ICollection<SortField>
 	}
 	
 	/// <summary>
-	/// Constructor with single field
+	/// Constructor
 	/// </summary>
 	/// <param name="sortField"></param>
-	// ReSharper disable once MemberCanBePrivate.Global
 	public Sorting(SortField sortField)
 	{
 		this.Fields = new List<SortField>
@@ -41,11 +42,11 @@ public class Sorting : ICollection<SortField>
 	}
 	
 	/// <summary>
-	/// Constructor with props
+	/// Constructor
 	/// </summary>
 	/// <param name="orderBy"></param>
 	/// <param name="sortDirection"></param>
-	public Sorting(string? orderBy = null, SortDirection? sortDirection = null)
+	public Sorting(string orderBy = null, SortDirection? sortDirection = null)
 	{
 		if (!string.IsNullOrEmpty(orderBy))
 		{
@@ -60,7 +61,7 @@ public class Sorting : ICollection<SortField>
 	
 	#region Operators
 	
-	public SortField this[int index] => this.Fields[index];
+	public SortField this[int index] => this.Fields?[index];
 	
 	public static implicit operator Sorting(SortField sortField) => new (sortField);
 	
@@ -101,6 +102,47 @@ public class Sorting : ICollection<SortField>
 	public bool Remove(SortField item)
 	{
 		return this.Fields.Remove(item);
+	}
+	
+	#endregion
+}
+
+// ReSharper disable once ClassNeverInstantiated.Global
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+public class SortField
+{
+	#region Properties
+	
+	[JsonProperty("orderBy")]
+	[JsonPropertyName("orderBy")]
+	public string OrderBy { get; set; }
+	
+	[JsonProperty("sortDirection")]
+	[JsonPropertyName("sortDirection")]
+	[Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+	public SortDirection? SortDirection { get; set; }
+	
+	#endregion
+	
+	#region Constructors
+	
+	/// <summary>
+	/// Parameterless Constructor
+	/// </summary>
+	public SortField()
+	{
+		// NOP (For serialization)
+	}
+	
+	/// <summary>
+	/// Constructor
+	/// </summary>
+	/// <param name="orderBy"></param>
+	/// <param name="sortDirection"></param>
+	public SortField(string orderBy = null, SortDirection? sortDirection = null)
+	{
+		this.OrderBy = orderBy;
+		this.SortDirection = sortDirection;
 	}
 	
 	#endregion

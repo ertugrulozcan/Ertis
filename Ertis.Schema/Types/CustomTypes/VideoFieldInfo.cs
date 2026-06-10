@@ -1,33 +1,44 @@
 using System.Text.Json.Serialization;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Exceptions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
-// ReSharper disable UnusedMember.Global
 namespace Ertis.Schema.Types.CustomTypes;
 
 public sealed class VideoFieldInfo : ObjectFieldInfoBase
 {
+	#region Fields
+    
+    private readonly int? maxSize;
+    
+    #endregion
+    
 	#region Properties
     
+    [JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
     public override FieldType Type => FieldType.video;
     
-    [JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public override IReadOnlyCollection<IFieldInfo> Properties { get; init; }
     
+    [JsonProperty("maxSize", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxSize")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxSize
     {
-        get;
+        get => this.maxSize;
         init
         {
-            field = value;
+            this.maxSize = value;
             
             if (!this.ValidateMaxSize(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
@@ -99,7 +110,7 @@ public sealed class VideoFieldInfo : ObjectFieldInfoBase
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception? exception)
+    public override bool ValidateSchema(out Exception exception)
     {
         base.ValidateSchema(out exception);
         this.ValidateMaxSize(out exception);
@@ -107,7 +118,7 @@ public sealed class VideoFieldInfo : ObjectFieldInfoBase
         return exception == null;
     }
     
-    private bool ValidateMaxSize(out Exception? exception)
+    private bool ValidateMaxSize(out Exception exception)
     {
         if (this.MaxSize < 0)
         {

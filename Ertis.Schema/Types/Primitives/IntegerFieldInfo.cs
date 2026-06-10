@@ -1,33 +1,47 @@
 using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
-// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.Schema.Types.Primitives;
 
 public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
 {
+    #region Fields
+    
+    private readonly int? minimum;
+    private readonly int? maximum;
+    private readonly int? exclusiveMinimum;
+    private readonly int? exclusiveMaximum;
+    private readonly int? multipleOf;
+    
+    #endregion
+    
     #region Properties
     
+    [JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
     public override FieldType Type => FieldType.integer;
     
     /// <summary>
     /// Greater than or equal
     /// </summary>
+    [JsonProperty("minimum", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minimum")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? Minimum
     {
-        get;
+        get => this.minimum;
         init
         {
-            field = value;
+            this.minimum = value;
             
             if (!this.ValidateMinimum(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
@@ -35,18 +49,19 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
     /// <summary>
     /// Less than or equal
     /// </summary>
+    [JsonProperty("maximum", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maximum")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? Maximum
     {
-        get;
+        get => this.maximum;
         init
         {
-            field = value;
+            this.maximum = value;
             
             if (!this.ValidateMaximum(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
@@ -54,18 +69,19 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
     /// <summary>
     /// Greater than
     /// </summary>
+    [JsonProperty("exclusiveMinimum", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("exclusiveMinimum")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? ExclusiveMinimum
     {
-        get;
+        get => this.exclusiveMinimum;
         init
         {
-            field = value;
+            this.exclusiveMinimum = value;
             
             if (!this.ValidateExclusiveMinimum(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
@@ -73,18 +89,19 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
     /// <summary>
     /// Less than or equal
     /// </summary>
+    [JsonProperty("exclusiveMaximum", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("exclusiveMaximum")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? ExclusiveMaximum
     {
-        get;
+        get => this.exclusiveMaximum;
         init
         {
-            field = value;
+            this.exclusiveMaximum = value;
             
             if (!this.ValidateExclusiveMaximum(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
@@ -92,31 +109,33 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
     /// <summary>
     /// A numeric instance is valid only if division by this keyword's value results in an integer.
     /// </summary>
+    [JsonProperty("multipleOf", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("multipleOf")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MultipleOf
     {
-        get;
+        get => this.multipleOf;
         init
         {
-            field = value;
+            this.multipleOf = value;
             
             if (!this.ValidateMultipleOf(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("isUnique", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("isUnique")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public bool IsUnique { get; init; }
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool IsUnique { get; set; }
     
     #endregion
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception? exception)
+    public override bool ValidateSchema(out Exception exception)
     {
         base.ValidateSchema(out exception);
         this.ValidateMinimum(out exception);
@@ -128,7 +147,7 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
         return exception == null;
     }
     
-    protected internal override bool Validate(object? obj, IValidationContext validationContext)
+    protected internal override bool Validate(object obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
@@ -168,7 +187,7 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
         return isValid;
     }
     
-    private bool ValidateMinimum(out Exception? exception)
+    private bool ValidateMinimum(out Exception exception)
     {
         if (this.Maximum != null && this.Minimum != null && this.Maximum < this.Minimum)
         {
@@ -186,7 +205,7 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
         return true;
     }
     
-    private bool ValidateMaximum(out Exception? exception)
+    private bool ValidateMaximum(out Exception exception)
     {
         if (this.Minimum != null && this.Maximum != null && this.Minimum > this.Maximum)
         {
@@ -204,7 +223,7 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
         return true;
     }
     
-    private bool ValidateExclusiveMinimum(out Exception? exception)
+    private bool ValidateExclusiveMinimum(out Exception exception)
     {
         if (this.Maximum != null && this.ExclusiveMinimum != null && this.Maximum < this.ExclusiveMinimum)
         {
@@ -222,7 +241,7 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
         return true;
     }
     
-    private bool ValidateExclusiveMaximum(out Exception? exception)
+    private bool ValidateExclusiveMaximum(out Exception exception)
     {
         if (this.Minimum != null && this.ExclusiveMaximum != null && this.Minimum > this.ExclusiveMaximum)
         {
@@ -240,7 +259,7 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
         return true;
     }
     
-    private bool ValidateMultipleOf(out Exception? exception)
+    private bool ValidateMultipleOf(out Exception exception)
     {
         if (this.MultipleOf <= 0)
         {

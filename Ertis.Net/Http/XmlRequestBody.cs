@@ -4,7 +4,6 @@ using System.Xml.Serialization;
 
 namespace Ertis.Net.Http;
 
-// ReSharper disable once UnusedType.Global
 public class XmlRequestBody : IRequestBody
 {
 	#region Properties
@@ -23,11 +22,15 @@ public class XmlRequestBody : IRequestBody
 				return null;
 			}
 			
-			using var stringWriter = new StringWriter();
-			using var xmlWriter = XmlWriter.Create(stringWriter);
-			var xmlSerializer = new XmlSerializer(this.Payload.GetType());
-			xmlSerializer.Serialize(xmlWriter, this.Payload);
-			return stringWriter.ToString();
+			using(var stringWriter = new StringWriter())
+			{
+				using(var xmlWriter = XmlWriter.Create(stringWriter))
+				{
+					var xmlSerializer = new XmlSerializer(this.Payload.GetType());
+					xmlSerializer.Serialize(xmlWriter, this.Payload);
+					return stringWriter.ToString();
+				}
+			}
 		}
 	}
 	

@@ -38,6 +38,7 @@ public class SamplerAlgorithm
 	
 	#region Methods
 	
+	// ReSharper disable once IdentifierTypo
 	public IResampler? ToResampler()
 	{
 		return this.Value switch
@@ -53,7 +54,6 @@ public class SamplerAlgorithm
 		};
 	}
 	
-	// ReSharper disable once UnusedMember.Global
 	public static SamplerAlgorithm? Parse(string key)
 	{
 		if (Enum.TryParse<SamplerAlgorithmEnum>(key, true, out var enumValue))

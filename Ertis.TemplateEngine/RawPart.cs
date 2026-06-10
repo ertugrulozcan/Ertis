@@ -6,15 +6,15 @@ public class RawPart : ITemplateSegment
 	
 	public SegmentType Type => SegmentType.RawPart;
 	
-	public string? RawValue { get; init; }
+	public string RawValue { get; init; }
 	
 	#endregion
 	
 	#region Methods
 	
-	public override string? ToString()
+	public override string ToString()
 	{
-		return this.RawValue ?? base.ToString();
+		return this.RawValue;
 	}
 	
 	#endregion

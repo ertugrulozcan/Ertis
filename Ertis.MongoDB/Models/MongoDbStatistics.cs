@@ -1,65 +1,79 @@
 using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
-// ReSharper disable UnusedMember.Global
 namespace Ertis.MongoDB.Models;
 
 public class MongoDbStatistics
 {
 	#region Properties
 	
+	[JsonProperty("db")]
 	[JsonPropertyName("db")]
-	public string? DatabaseName { get; set; }
+	public string DatabaseName { get; set; }
 	
+	[JsonProperty("collections", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("collections")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? CollectionCount { get; set; }
 	
+	[JsonProperty("views", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("views")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? ViewCount { get; set; }
 	
+	[JsonProperty("objects", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("objects")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? ObjectCount { get; set; }
 	
+	[JsonProperty("avgObjSize", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("avgObjSize")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public double? AverageObjectSize { get; set; }
 	
+	[JsonProperty("dataSize", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("dataSize")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public double? DataSize { get; set; }
 	
+	[JsonProperty("storageSize", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("storageSize")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public double? StorageSize { get; set; }
 	
+	[JsonProperty("indexes", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("indexes")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public int? IndexCount { get; set; }
 	
+	[JsonProperty("indexSize", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("indexSize")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public double? IndexSize { get; set; }
 	
+	[JsonProperty("totalSize", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("totalSize")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public double? TotalSize { get; set; }
 	
+	[JsonProperty("scaleFactor", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("scaleFactor")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public double? ScaleFactor { get; set; }
 	
+	[JsonProperty("fsUsedSize", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("fsUsedSize")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public double? FileStorageUsedSize { get; set; }
 	
+	[JsonProperty("fsTotalSize", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("fsTotalSize")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public double? FileStorageTotalSize { get; set; }
 	
+	[JsonProperty("ok", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("ok")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public double? State { get; set; }
 	
 	#endregion

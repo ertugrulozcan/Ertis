@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 using Ertis.Schema.Types.Primitives;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.CustomTypes;
 
@@ -7,11 +9,14 @@ public sealed class LocationFieldInfo : ObjectFieldInfoBase
 {
     #region Properties
     
+    [JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
     public override FieldType Type => FieldType.location;
     
-    [JsonIgnore]
+    [Newtonsoft.Json.JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
     public override IReadOnlyCollection<IFieldInfo> Properties { get; init; }
     
     #endregion
@@ -59,7 +64,7 @@ public sealed class LocationFieldInfo : ObjectFieldInfoBase
             IsHidden = this.IsHidden,
             IsReadonly = this.IsReadonly,
             DefaultValue = this.DefaultValue,
-            Properties = this.Properties
+            Properties = this.Properties,
         };
     }
     

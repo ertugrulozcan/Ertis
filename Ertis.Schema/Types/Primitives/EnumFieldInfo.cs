@@ -1,49 +1,58 @@
 using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
-// ReSharper disable UnusedMember.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.Schema.Types.Primitives;
 
 public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
 {
+    #region Fields
+    
+    private EnumItem[] items;
+    
+    #endregion
+    
     #region Properties
     
+    [JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
     public override FieldType Type => FieldType.@enum;
     
+    [JsonProperty("items")]
     [JsonPropertyName("items")]
-    public EnumItem[]? Items
+    public EnumItem[] Items
     {
-        get;
+        get => this.items;
         set
         {
-            field = value;
+            this.items = value;
             
             if (!this.ValidateItems(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("isUnique", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("isUnique")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool IsUnique { get; set; }
     
+    [JsonProperty("isMultiple", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("isMultiple")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool IsMultiple { get; set; }
     
     #endregion
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception? exception)
+    public override bool ValidateSchema(out Exception exception)
     {
         base.ValidateSchema(out exception);
         this.ValidateItems(out exception);
@@ -51,15 +60,9 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
         return exception == null;
     }
     
-    protected internal override bool Validate(object? obj, IValidationContext validationContext)
+    protected internal override bool Validate(object obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
-        
-        if (this.Items == null)
-        {
-            validationContext.Errors.Add(new FieldValidationException($"Enum items is required ('{this.Name}')", this));
-            return false;
-        }
         
         var isExistInEnums = false;
         if (obj != null)
@@ -68,7 +71,7 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
             {
                 if (obj is object[] array)
                 {
-                    isExistInEnums = array.All(item => this.Items.Any(x => x.Value != null && x.Value.Equals(item)));
+                    isExistInEnums = array.All(item => this.Items.Any(x => x?.Value != null && x.Value.Equals(item)));
                 }
                 else
                 {
@@ -81,7 +84,7 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
                 var type = obj.GetType();
                 if (type.IsPrimitive || type == typeof(string))
                 {
-                    isExistInEnums = this.Items.Any(x => x.Value != null && x.Value.Equals(obj));
+                    isExistInEnums = this.Items.Any(x => x?.Value != null && x.Value.Equals(obj));
                 }
                 else
                 {
@@ -94,14 +97,14 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
         if (isValid && obj != null && !isExistInEnums)
         {
             isValid = false;
-            var enumValues = string.Join(", ", this.Items.Select(x => x.Value == null ? "null" : $"'{x.Value}'"));
+            var enumValues = string.Join(", ", this.Items.Select(x => x?.Value == null ? "null" : $"'{x.Value}'"));
             validationContext.Errors.Add(new FieldValidationException($"The value does not exist in the enum items. The '{this.Name}' value must be one of them [{enumValues}]", this));   
         }
         
         return isValid;
     }
     
-    private bool ValidateItems(out Exception? exception)
+    private bool ValidateItems(out Exception exception)
     {
         if (this.Items == null)
         {
@@ -114,7 +117,7 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
             throw new FieldValidationException("Enum items can not be empty", this);
         }
         
-        if (this.Items.Any(x => x.Value != null && x.Value.GetType().IsPrimitive && x.Value.GetType() != typeof(string)))
+        if (this.Items.Any(x => x?.Value != null && !x.Value.GetType().IsPrimitive && x.Value.GetType() != typeof(string)))
         {
             throw new FieldValidationException("Enum item values must be primitive type", this);
         }
@@ -156,11 +159,13 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
     {
         #region Properties
         
+        [JsonProperty("displayName")]
         [JsonPropertyName("displayName")]
-        public string? DisplayName { get; set; }
+        public string DisplayName { get; set; }
         
+        [JsonProperty("value")]
         [JsonPropertyName("value")]
-        public string? Value { get; set; }
+        public string Value { get; set; }
         
         #endregion
     }

@@ -3,7 +3,6 @@ using Ertis.Core.Exceptions;
 
 namespace Ertis.MongoDB.Exceptions;
 
-// ReSharper disable once UnusedType.Global
 public class SelectQueryPathCollisionException : ErtisException
 {
 	#region Constructors
@@ -12,14 +11,14 @@ public class SelectQueryPathCollisionException : ErtisException
 		HttpStatusCode.BadRequest,
 		"Path collision error, you can not attempts to project both nested fields. " + $"({innerMessage})",
 		"SelectQueryPathCollisionError")
-	{ }
+	{}
 	
 	public SelectQueryPathCollisionException(Exception innerException) : base(
 		HttpStatusCode.BadRequest,
 		"Path collision error, you can not attempts to project both nested fields. " + $"({innerException.Message})",
 		"SelectQueryPathCollisionError",
 		innerException)
-	{ }
+	{}
 	
 	#endregion
 }

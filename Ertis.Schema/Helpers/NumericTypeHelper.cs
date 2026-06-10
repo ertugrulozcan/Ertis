@@ -4,97 +4,93 @@ internal static class NumericTypeHelper
 {
     #region Methods
     
-    extension(Type type1)
+    internal static bool? IsAssignableTo(this Type type1, Type type2, bool allowNullableTypes = true)
     {
-        internal bool? IsAssignableTo(Type type2, bool allowNullableTypes = true)
+        if (allowNullableTypes)
         {
-            if (allowNullableTypes)
+            var type1UnderlyingType = Nullable.GetUnderlyingType(type1);
+            if (type1UnderlyingType != null)
             {
-                var type1UnderlyingType = Nullable.GetUnderlyingType(type1);
-                if (type1UnderlyingType != null)
-                {
-                    type1 = type1UnderlyingType;
-                }
-                
-                var type2UnderlyingType = Nullable.GetUnderlyingType(type2);
-                if (type2UnderlyingType != null)
-                {
-                    type2 = type2UnderlyingType;
-                }
+                type1 = type1UnderlyingType;
             }
             
-            if (!type1.IsNumericType() || !type2.IsNumericType())
+            var type2UnderlyingType = Nullable.GetUnderlyingType(type2);
+            if (type2UnderlyingType != null)
+            {
+                type2 = type2UnderlyingType;
+            }
+        }
+        
+        if (!IsNumericType(type1) || !IsNumericType(type2))
+        {
+            return null;
+        }
+        
+        if (type1.IsIntegralNumericType() && type2.IsIntegralNumericType())
+        {
+            var size1 = SizeOf(type1);
+            var size2 = SizeOf(type2);
+            if (size1 == null || size2 == null)
             {
                 return null;
             }
             
-            if (type1.IsIntegralNumericType() && type2.IsIntegralNumericType())
+            return size1 < size2;
+        }
+        else if (type1.IsFloatingPointNumericType() && type2.IsFloatingPointNumericType())
+        {
+            if (type1 == typeof(decimal) || type2 == typeof(decimal))
             {
-                var size1 = SizeOf(type1);
-                var size2 = SizeOf(type2);
-                if (size1 == null || size2 == null)
-                {
-                    return null;
-                }
-                
-                return size1 < size2;
-            }
-            else if (type1.IsFloatingPointNumericType() && type2.IsFloatingPointNumericType())
-            {
-                if (type1 == typeof(decimal) || type2 == typeof(decimal))
-                {
-                    return false;
-                }
-                
-                var size1 = SizeOf(type1);
-                var size2 = SizeOf(type2);
-                if (size1 == null || size2 == null)
-                {
-                    return null;
-                }
-                
-                return size1 < size2;
-            }
-            else if (type1.IsIntegralNumericType() && type2.IsFloatingPointNumericType())
-            {
-                return true;
-            }
-            else if (type1.IsFloatingPointNumericType() && type2.IsIntegralNumericType())
-            {
-                // ReSharper disable once DuplicatedStatements
                 return false;
             }
             
+            var size1 = SizeOf(type1);
+            var size2 = SizeOf(type2);
+            if (size1 == null || size2 == null)
+            {
+                return null;
+            }
+            
+            return size1 < size2;
+        }
+        else if (type1.IsIntegralNumericType() && type2.IsFloatingPointNumericType())
+        {
+            return true;
+        }
+        else if (type1.IsFloatingPointNumericType() && type2.IsIntegralNumericType())
+        {
             return false;
         }
         
-        private bool IsNumericType()
-        {
-            return type1.IsIntegralNumericType() || type1.IsFloatingPointNumericType();
-        }
-        
-        private bool IsIntegralNumericType()
-        {
-            return
-                type1 == typeof(byte) ||
-                type1 == typeof(sbyte) ||
-                type1 == typeof(short) ||
-                type1 == typeof(ushort) ||
-                type1 == typeof(int) ||
-                type1 == typeof(uint) ||
-                type1 == typeof(nint) ||
-                type1 == typeof(nuint) ||
-                type1 == typeof(long) ||
-                type1 == typeof(ulong);
-        }
-        
-        private bool IsFloatingPointNumericType()
-        {
-            return
-                type1 == typeof(float) ||
-                type1 == typeof(double) ||
-                type1 == typeof(decimal);
-        }
+        return false;
+    }
+    
+    private static bool IsNumericType(this Type type)
+    {
+        return IsIntegralNumericType(type) || IsFloatingPointNumericType(type);
+    }
+    
+    private static bool IsIntegralNumericType(this Type type)
+    {
+        return
+            type == typeof(byte) ||
+            type == typeof(sbyte) ||
+            type == typeof(short) ||
+            type == typeof(ushort) ||
+            type == typeof(int) ||
+            type == typeof(uint) ||
+            type == typeof(nint) ||
+            type == typeof(nuint) ||
+            type == typeof(long) ||
+            type == typeof(ulong);
+    }
+    
+    private static bool IsFloatingPointNumericType(this Type type)
+    {
+        return
+            type == typeof(float) ||
+            type == typeof(double) ||
+            type == typeof(decimal);
     }
     
     private static int? SizeOf(Type type)

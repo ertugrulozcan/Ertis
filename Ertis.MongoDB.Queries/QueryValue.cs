@@ -4,7 +4,6 @@ public class QueryValue<T> : IQuery
 {
     #region Properties
     
-    // ReSharper disable once MemberCanBePrivate.Global
     protected T Value { get; }
     
     #endregion
@@ -40,7 +39,7 @@ public class QueryValue<T> : IQuery
         }
         else if (typeof(T) == typeof(bool) || this.Value is bool)
         {
-            return this.Value.ToString()?.ToLower() ?? string.Empty;
+            return this.Value.ToString()?.ToLower();
         }
         else if (typeof(T) == typeof(DateTime) || this.Value is DateTime)
         {
@@ -49,11 +48,11 @@ public class QueryValue<T> : IQuery
         }
         else if (IsNumericType(typeof(T)))
         {
-            return this.Value.ToString()?.Replace(',', '.') ?? string.Empty;
+            return this.Value.ToString()?.Replace(',', '.');
         }
         else
         {
-            return this.Value.ToString() ?? string.Empty;
+            return this.Value.ToString();
         }
     }
     

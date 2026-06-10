@@ -6,7 +6,6 @@ public abstract class HttpStatusCodeException : Exception
 {
 	#region Properties
 	
-	// ReSharper disable once MemberCanBeProtected.Global
 	public HttpStatusCode StatusCode { get; }
 	
 	#endregion
@@ -38,7 +37,7 @@ public abstract class HttpStatusCodeException : Exception
 	/// <param name="statusCode"></param>
 	/// <param name="message"></param>
 	/// <param name="innerException"></param>
-	protected HttpStatusCodeException(HttpStatusCode statusCode, string message, Exception? innerException) : base(message, innerException)
+	protected HttpStatusCodeException(HttpStatusCode statusCode, string message, Exception innerException) : base(message, innerException)
 	{
 		this.StatusCode = statusCode;
 	}

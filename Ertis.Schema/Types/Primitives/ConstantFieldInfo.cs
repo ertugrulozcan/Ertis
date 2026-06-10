@@ -1,46 +1,64 @@
 using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
 namespace Ertis.Schema.Types.Primitives;
 
 public class ConstantFieldInfo : FieldInfo<object>
 {
     #region Properties
     
+    [JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
     public override FieldType Type => FieldType.@const;
     
+    [JsonProperty("value")]
     [JsonPropertyName("value")]
-    public object? Value { get; set; }
+    public object Value { get; set; }
     
+    [JsonProperty("valueType")]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("valueType")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
     public ConstantType ValueType { get; set; }
     
     #endregion
     
     #region Methods
     
-    protected internal override bool Validate(object? obj, IValidationContext validationContext)
+    protected internal override bool Validate(object obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
         if (obj != null)
         {
+            bool incompatibleType;
             var type = obj.GetType();
-            var incompatibleType = this.ValueType switch
+            switch (this.ValueType)
             {
-                ConstantType.@string => type != typeof(string),
-                ConstantType.integer => !int.TryParse(obj.ToString(), out _),
-                ConstantType.@float => !double.TryParse(obj.ToString(), out _),
-                ConstantType.boolean => !bool.TryParse(obj.ToString(), out _),
-                ConstantType.date or ConstantType.datetime => !DateTime.TryParse(obj.ToString(), out _),
-                _ => throw new ArgumentOutOfRangeException()
-            };
+                case ConstantType.@string:
+                    incompatibleType = type != typeof(string);
+                    break;
+                case ConstantType.integer:
+                    incompatibleType = !int.TryParse(obj.ToString(), out _);
+                    break;
+                case ConstantType.@float:
+                    incompatibleType = !double.TryParse(obj.ToString(), out _);
+                    break;
+                case ConstantType.boolean:
+                    incompatibleType = !bool.TryParse(obj.ToString(), out _);
+                    break;
+                case ConstantType.date:
+                case ConstantType.datetime:
+                    incompatibleType = !DateTime.TryParse(obj.ToString(), out _);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
             
             if (incompatibleType)
             {

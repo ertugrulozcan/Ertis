@@ -2,6 +2,8 @@ using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.CustomTypes;
 
@@ -9,15 +11,17 @@ public class UriFieldInfo : StringFieldInfo
 {
     #region Properties
     
+    [JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
     public override FieldType Type => FieldType.uri;
     
     #endregion
     
     #region Methods
     
-    protected internal override bool Validate(object? obj, IValidationContext validationContext)
+    protected internal override bool Validate(object obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
@@ -26,7 +30,7 @@ public class UriFieldInfo : StringFieldInfo
             if (!IsValidUri(uri))
             {
                 isValid = false;
-                validationContext.Errors.Add(new FieldValidationException("Uri is not valid", this));
+                validationContext.Errors.Add(new FieldValidationException($"Uri is not valid", this));
             }
         }
         
@@ -36,7 +40,9 @@ public class UriFieldInfo : StringFieldInfo
     private static bool IsValidUri(string uri)
     {
         if (string.IsNullOrWhiteSpace(uri))
+        {
             return false;
+        }
         
         return Uri.IsWellFormedUriString(uri, UriKind.Absolute) && Uri.TryCreate(uri, UriKind.Absolute, out _);
     }

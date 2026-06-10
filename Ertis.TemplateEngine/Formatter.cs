@@ -1,10 +1,8 @@
-using System.Text;
 using System.Collections;
-using Ertis.Schema.Dynamics;
+using System.Text;
 
 namespace Ertis.TemplateEngine;
 
-// ReSharper disable once UnusedType.Global
 public class Formatter
 {
     #region Properties
@@ -19,7 +17,7 @@ public class Formatter
     /// Constructor
     /// </summary>
     /// <param name="options"></param>
-    public Formatter(ParserOptions? options = null)
+    public Formatter(ParserOptions options = null)
     {
         this.Parser = new Parser(options);
     }
@@ -28,16 +26,14 @@ public class Formatter
     
     #region Methods
     
-    // ReSharper disable once UnusedMember.Global
-    public string Format(string template, object? data)
+    public string Format(string template, object data)
     {
         if (string.IsNullOrEmpty(template) || data == null)
         {
             return template;
         }
         
-        var dynamicObject = new DynamicObject(data);
-        var dataDictionary = dynamicObject.ToDictionary();
+        var dataDictionary = data.ToDictionary();
         var segments = this.Parser.Parse(template);
         var stringBuilder = new StringBuilder();
         
@@ -52,24 +48,22 @@ public class Formatter
                 }
                 else
                 {
+                    // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
                     switch (this.Parser.Options.UndefinedStrategy)
                     {
                         case UndefinedStrategy.Ignore:
                             stringBuilder.Append(segment);
-                            break;
+                        break;
                         case UndefinedStrategy.Remove:
-                            break;
+                        break;
                         case UndefinedStrategy.Throw:
                             throw new ArgumentException($"{placeHolder.Value} is undefined");
                         case UndefinedStrategy.Swap:
-                        {
                             if (!string.IsNullOrEmpty(this.Parser.Options.Fallback))
                             {
                                 stringBuilder.Append(this.Parser.Options.Fallback);
                             }
-                            
-                            break;
-                        }
+                        break;
                     }
                 }
             }
@@ -82,13 +76,12 @@ public class Formatter
         return stringBuilder.ToString();
     }
     
-    // ReSharper disable once UnusedMember.Global
     public ITemplateSegment[] LookUp(string template)
     {
         return this.Parser.Parse(template).ToArray();
     }
     
-    private static object? ExtractData(string? path, IDictionary<string, object?> dictionary)
+    private static object ExtractData(string path, IDictionary<string, object> dictionary)
     {
         if (string.IsNullOrEmpty(path))
         {
@@ -103,9 +96,8 @@ public class Formatter
             {
                 return dictionary[key];
             }
-            else if (dictionary[key] is IDictionary<string, object?> subDictionary)
+            else if (dictionary[key] is IDictionary<string, object> subDictionary)
             {
-                // ReSharper disable once TailRecursiveCall
                 return ExtractData(string.Join(".", pathParts.Skip(1)), subDictionary);
             }
         }
@@ -135,9 +127,8 @@ public class Formatter
                         {
                             return array[index];
                         }
-                        else if (array[index] is IDictionary<string, object?> subDictionary)
+                        else if (array[index] is IDictionary<string, object> subDictionary)
                         {
-                            // ReSharper disable once TailRecursiveCall
                             return ExtractData(string.Join(".", pathParts.Skip(1)), subDictionary);
                         }
                     }

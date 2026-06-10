@@ -1,7 +1,5 @@
 using Ertis.Schema.Types;
 
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.Schema.Exceptions;
 
 public class FieldValidationException : ErtisSchemaValidationException

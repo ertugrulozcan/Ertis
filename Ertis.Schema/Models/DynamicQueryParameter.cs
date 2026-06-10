@@ -1,5 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 // ReSharper disable UnusedMember.Global
 namespace Ertis.Schema.Models;
@@ -8,36 +8,31 @@ public class DynamicQueryParameter
 {
 	#region Properties
 	
-	[JsonPropertyName("name")]
-	public string? Name { get; set; }
+	[JsonProperty("name")]
+	public string Name { get; set; }
 	
-	[JsonPropertyName("slug")]
-	public string? Slug { get; set; }
+	[JsonProperty("slug")]
+	public string Slug { get; set; }
 	
-	[JsonPropertyName("description")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public string? Description { get; set; }
+	[JsonProperty("description")]
+	public string Description { get; set; }
 	
-	[JsonPropertyName("type")]
-	[JsonConverter(typeof(JsonStringEnumConverter))]
+	[JsonProperty("type")]
+	[JsonConverter(typeof(StringEnumConverter))]
 	public DynamicQueryParameterType Type { get; set; }
 	
-	[JsonPropertyName("defaultValue")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	public object? DefaultValue { get; set; }
+	[JsonProperty("defaultValue")]
+	public object DefaultValue { get; set; }
 	
-	[JsonPropertyName("isRequired")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+	[JsonProperty("isRequired")]
 	public bool IsRequired { get; set; }
 	
-	[JsonPropertyName("isNullable")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+	[JsonProperty("isNullable")]
 	public bool IsNullable { get; set; }
 	
 	#endregion
 }
 
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public enum DynamicQueryParameterType
 {
 	@string,

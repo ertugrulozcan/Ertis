@@ -115,7 +115,7 @@ public static class LocaleHelper
 		{ "Welsh", "cy" }, 
 		{ "Yiddish", "yi" }, 
 		{ "Yoruba", "yo" }, 
-		{ "Zulu", "zu" }
+		{ "Zulu", "zu" }, 
 	};
 	
 	#endregion

@@ -1,9 +1,7 @@
-using System.Diagnostics.CodeAnalysis;
-
+// ReSharper disable UnusedMember.Global
 namespace Ertis.MongoDB.Queries;
 
 [Flags]
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public enum RegexOptions
 {
 	/// <summary>
@@ -22,7 +20,7 @@ public enum RegexOptions
 	Extended = 4,
 	
 	/// <summary>
-	/// 's' - Allows the dot character to match all characters including newline characters.
+	/// 's' - Allows the dot character (i.e. .) to match all characters including newline characters.
 	/// </summary>
 	AllowDot = 8
 }

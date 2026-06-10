@@ -1,8 +1,6 @@
-using System.Diagnostics.CodeAnalysis;
-
+// ReSharper disable UnusedMember.Global
 namespace Ertis.MongoDB.Queries;
 
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public enum BsonType
 {
 	Double,

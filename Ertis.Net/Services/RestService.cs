@@ -1,11 +1,9 @@
-using Ertis.Core.Models;
+using Ertis.Core.Models.Response;
 using Ertis.Net.Http;
 using Ertis.Net.Rest;
 
-// ReSharper disable UnusedMember.Global
 namespace Ertis.Net.Services;
 
-// ReSharper disable once UnusedType.Global
 public abstract class RestService
 {
 	#region Services

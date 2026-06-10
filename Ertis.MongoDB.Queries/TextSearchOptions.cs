@@ -1,7 +1,5 @@
-// ReSharper disable UnusedMember.Global
 namespace Ertis.MongoDB.Queries;
 
-// ReSharper disable once UnusedType.Global
 public class TextSearchOptions
 {
 	#region Properties

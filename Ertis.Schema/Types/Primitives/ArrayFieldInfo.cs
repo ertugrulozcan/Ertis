@@ -1,89 +1,111 @@
 using System.Text.Json.Serialization;
-using Ertis.Schema.Dynamics;
+using Ertis.Schema.Dynamics.Legacy;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
+using Ertis.Schema.Serialization;
 using Ertis.Schema.Validation;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
-// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.Schema.Types.Primitives;
 
 public class ArrayFieldInfo : FieldInfo<Array>
 {
+    #region Fields
+    
+    private readonly int? minCount;
+    private readonly int? maxCount;
+    private readonly IFieldInfo itemSchema;
+    private readonly IEnumerable<string> uniqueBy;
+    
+    #endregion
+    
     #region Properties
     
+    [JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
     public override FieldType Type => FieldType.array;
     
+    [JsonProperty("itemSchema")]
     [JsonPropertyName("itemSchema")]
-    public required IFieldInfo ItemSchema
+    [Newtonsoft.Json.JsonConverter(typeof(FieldInfoJsonConverter))]
+    public IFieldInfo ItemSchema
     {
-        get;
+        get => this.itemSchema;
         init
         {
-            field = value;
-            value.Parent = this;
+            this.itemSchema = value;
+            if (value != null)
+            {
+                value.Parent = this;
+            }
             
             if (!this.ValidateItemSchema(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
             
             if (!this.ValidateUniqueBy(out var exception2))
             {
-                throw exception2!;
+                throw exception2;
             }
         }
     }
     
+    [JsonProperty("minCount", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minCount")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MinCount
     {
-        get;
+        get => this.minCount;
         init
         {
-            field = value;
+            this.minCount = value;
             
             if (!this.ValidateMinCount(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("maxCount", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxCount")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxCount
     {
-        get;
+        get => this.maxCount;
         init
         {
-            field = value;
+            this.maxCount = value;
             
             if (!this.ValidateMaxCount(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("uniqueItems", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("uniqueItems")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool UniqueItems { get; init; }
     
+    [JsonProperty("uniqueBy", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("uniqueBy")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public IEnumerable<string>? UniqueBy
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public IEnumerable<string> UniqueBy
     {
-        get;
+        get => this.uniqueBy;
         init
         {
-            field = value;
+            this.uniqueBy = value;
             
             if (!this.ValidateUniqueBy(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
@@ -96,11 +118,11 @@ public class ArrayFieldInfo : FieldInfo<Array>
     {
         if (propertyName == nameof(this.Name) && !this.ValidateUniqueBy(out var exception))
         {
-            throw exception!;
+            throw exception;
         }
     }
     
-    public override bool ValidateSchema(out Exception? exception)
+    public override bool ValidateSchema(out Exception exception)
     {
         base.ValidateSchema(out exception);
         this.ValidateItemSchema(out exception);
@@ -110,10 +132,10 @@ public class ArrayFieldInfo : FieldInfo<Array>
         return exception == null;
     }
     
-    protected internal override bool Validate(object? obj, IValidationContext validationContext)
+    protected internal override bool Validate(object obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
-        
+
         if (obj is Array array)
         {
             if (this.MaxCount != null && array.Length > this.MaxCount.Value)
@@ -150,7 +172,7 @@ public class ArrayFieldInfo : FieldInfo<Array>
             {
                 foreach (var uniqueByPath in this.UniqueBy)
                 {
-                    var values = new List<object?>();
+                    var values = new List<object>();
                     foreach (var item in array)
                     {
                         var dynamicObject = new DynamicObject(item);
@@ -172,13 +194,19 @@ public class ArrayFieldInfo : FieldInfo<Array>
         return isValid;
     }
     
-    private bool ValidateItemSchema(out Exception? exception)
+    private bool ValidateItemSchema(out Exception exception)
     {
+        if (this.ItemSchema == null)
+        {
+            exception = new FieldValidationException($"Item schema is required for array ('{this.Name}')", this);
+            return false;
+        }
+        
         this.ItemSchema.ValidateSchema(out exception);
         return exception == null;
     }
     
-    private bool ValidateMinCount(out Exception? exception)
+    private bool ValidateMinCount(out Exception exception)
     {
         if (this.MinCount != null)
         {
@@ -199,7 +227,7 @@ public class ArrayFieldInfo : FieldInfo<Array>
         return true;
     }
     
-    private bool ValidateMaxCount(out Exception? exception)
+    private bool ValidateMaxCount(out Exception exception)
     {
         if (this.MaxCount != null)
         {
@@ -220,9 +248,9 @@ public class ArrayFieldInfo : FieldInfo<Array>
         return true;
     }
     
-    private bool ValidateUniqueBy(out Exception? exception)
+    private bool ValidateUniqueBy(out Exception exception)
     {
-        if (this.UniqueBy != null)
+        if (this.ItemSchema != null && this.UniqueBy != null && this.Name != null)
         {
             if (this.UniqueBy.Any() && this.ItemSchema.Type != FieldType.@object)
             {
@@ -281,7 +309,7 @@ public class ArrayFieldInfo : FieldInfo<Array>
             MinCount = this.MinCount,
             MaxCount = this.MaxCount,
             UniqueItems = this.UniqueItems,
-            ItemSchema = (IFieldInfo) this.ItemSchema.Clone(),
+            ItemSchema = this.ItemSchema.Clone() as IFieldInfo,
             UniqueBy = this.UniqueBy,
             Appearance = this.Appearance
         };

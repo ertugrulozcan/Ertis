@@ -1,16 +1,15 @@
-using Ertis.Schema.Dynamics;
+using Ertis.Schema.Dynamics.Legacy;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types;
 using Ertis.Schema.Types.CustomTypes;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
 
-// ReSharper disable UnusedMember.Global
 namespace Ertis.Schema.Extensions;
 
 public static class SchemaExtensions
 {
-	#region Schema & Field Methods
+    #region Schema & Field Methods
     
     /// <summary>
     /// Return field path without schema segment
@@ -18,7 +17,6 @@ public static class SchemaExtensions
     /// <param name="fieldInfo"></param>
     /// <param name="schema"></param>
     /// <returns></returns>
-    // ReSharper disable once MemberCanBePrivate.Global
     public static string GetSelfPath(this IFieldInfo fieldInfo, ISchema schema)
     {
         var path = fieldInfo.Path;
@@ -35,76 +33,78 @@ public static class SchemaExtensions
     
     #region Validation Methods
     
-    extension(ISchema schema)
+    public static void Validate(this ISchema schema, out Exception exception)
     {
-        public void Validate(out Exception? exception)
+        schema.ValidateProperties(out exception);
+    }
+    
+    internal static bool ValidateProperties(this ISchema schema, out Exception exception)
+    {
+        if (schema.Properties == null)
         {
-            schema.ValidateProperties(out exception);
+            exception = new SchemaValidationException($"Properties field is required for schema objects ({schema.Slug})");
+            return false;
         }
         
-        internal bool ValidateProperties(out Exception? exception)
+        foreach (var fieldInfo in schema.Properties)
         {
-            foreach (var fieldInfo in schema.Properties)
+            if (!fieldInfo.ValidateSchema(out exception))
             {
-                if (!fieldInfo.ValidateSchema(out exception))
-                {
-                    return false;
-                }
-            }
-            
-            schema.CheckPropertiesUniqueness(out exception);
-            
-            var uniqueProperties = schema.GetUniqueProperties();
-            foreach (var uniqueProperty in uniqueProperties)
-            {
-                if (uniqueProperty.IsAnArrayItem(out _))
-                {
-                    exception = new SchemaValidationException($"The unique constraints could not use in arrays. Use the 'uniqueBy' feature instead of. ('{uniqueProperty.Name}')");
-                    
-                    return false;
-                }
-            }
-            
-            return exception == null;
-        }
-        
-        public bool ValidateData(DynamicObject model, IValidationContext validationContext)
-        {
-            try
-            {
-                ObjectFieldInfo rootObjectFieldInfo;
-                if (schema is ObjectFieldInfo objectFieldInfo)
-                {
-                    rootObjectFieldInfo = objectFieldInfo;
-                }
-                else
-                {
-                    rootObjectFieldInfo = new ObjectFieldInfo(schema.Properties)
-                    {
-                        Name = schema.Slug,
-                        AllowAdditionalProperties = schema.AllowAdditionalProperties
-                    };
-                }
-                
-                var isValidContent = rootObjectFieldInfo.ValidateContent(model, validationContext);
-                
-                schema.SetDefaultValues(model);
-                schema.SetConstants(model);
-                schema.SetFormatPatterns(model);
-                schema.SetDateTimes(model);
-                
-                if (!isValidContent && !validationContext.Errors.Any())
-                {
-                    validationContext.Errors.Add(new FieldValidationException("Unknown validation error", rootObjectFieldInfo));
-                }
-                
-                return isValidContent;
-            }
-            catch (FieldValidationException ex)
-            {
-                validationContext.Errors.Add(ex);
                 return false;
             }
+        }
+        
+        schema.CheckPropertiesUniqueness(out exception);
+        
+        var uniqueProperties = schema.GetUniqueProperties();
+        foreach (var uniqueProperty in uniqueProperties)
+        {
+            if (uniqueProperty.IsAnArrayItem(out _))
+            {
+                exception = new SchemaValidationException($"The unique constraints could not use in arrays. Use the 'uniqueBy' feature instead of. ('{uniqueProperty.Name}')");
+                return false;
+            }
+        }
+        
+        return exception == null;
+    }
+    
+    public static bool ValidateData(this ISchema schema, DynamicObject model, IValidationContext validationContext)
+    {
+        try
+        {
+            ObjectFieldInfo rootObjectFieldInfo;
+            if (schema is ObjectFieldInfo objectFieldInfo)
+            {
+                rootObjectFieldInfo = objectFieldInfo;
+            }
+            else
+            {
+                rootObjectFieldInfo = new ObjectFieldInfo(schema.Properties)
+                {
+                    Name = schema.Slug,
+                    AllowAdditionalProperties = schema.AllowAdditionalProperties
+                };
+            }
+            
+            var isValidContent = rootObjectFieldInfo.ValidateContent(model, validationContext);
+            
+            schema.SetDefaultValues(model);
+            schema.SetConstants(model);
+            schema.SetFormatPatterns(model);
+            schema.SetDateTimes(model);
+            
+            if (!isValidContent && !validationContext.Errors.Any())
+            {
+                validationContext.Errors.Add(new FieldValidationException("Unknown validation error", rootObjectFieldInfo));
+            }
+            
+            return isValidContent;
+        }
+        catch (FieldValidationException ex)
+        {
+            validationContext.Errors.Add(ex);
+            return false;
         }
     }
     
@@ -153,12 +153,12 @@ public static class SchemaExtensions
     
     #region Schema Tree Methods
     
-    public static IFieldInfo? FindField(this ISchema schema, string path)
+    public static IFieldInfo FindField(this ISchema schema, string path)
     {
         return FindFieldCore(schema.Properties, path);
     }
     
-    private static IFieldInfo? FindFieldCore(IEnumerable<IFieldInfo> properties, string path)
+    private static IFieldInfo FindFieldCore(IEnumerable<IFieldInfo> properties, string path)
     {
         foreach (var property in properties)
         {
@@ -172,21 +172,27 @@ public static class SchemaExtensions
         return null;
     }
     
-    private static IFieldInfo? FindFieldCore(IFieldInfo property, string path)
+    private static IFieldInfo FindFieldCore(IFieldInfo property, string path)
     {
-        return property.Type switch
+        if (property.Type == FieldType.@object && property is ObjectFieldInfo objectFieldInfo)
         {
-            FieldType.@object when property is ObjectFieldInfo objectFieldInfo => FindFieldCore(objectFieldInfo.Properties, path),
-            FieldType.array when property is ArrayFieldInfo arrayFieldInfo => FindFieldCore(arrayFieldInfo.ItemSchema, path),
-            _ => property.Path == path ? property : null
-        };
+            return FindFieldCore(objectFieldInfo.Properties, path);
+        }
+        else if (property.Type == FieldType.array && property is ArrayFieldInfo arrayFieldInfo)
+        {
+            return FindFieldCore(arrayFieldInfo.ItemSchema, path);
+        }
+        else
+        {
+            return property.Path == path ? property : null;
+        }
     }
     
     #endregion
     
     #region Uniqueness Methods
     
-    private static bool CheckPropertiesUniqueness(this ISchema schema, out Exception? exception)
+    private static bool CheckPropertiesUniqueness(this ISchema schema, out Exception exception)
     {
         var fieldInfos = schema.Properties;
         var distinctCount = fieldInfos.Select(x => x.Name).Distinct().Count();
@@ -224,7 +230,6 @@ public static class SchemaExtensions
     
     #region Unique Property Methods
     
-    // ReSharper disable once MemberCanBePrivate.Global
     public static IEnumerable<IFieldInfo> GetUniqueProperties(this ISchema schema)
     {
         var uniqueProperties = new List<IFieldInfo>();
@@ -282,11 +287,10 @@ public static class SchemaExtensions
     {
         var referenceProperties = new List<ReferenceFieldInfo>();
         
-        // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
         switch (fieldInfo.Type)
         {
             case FieldType.reference:
-                referenceProperties.Add((ReferenceFieldInfo)fieldInfo);
+                referenceProperties.Add(fieldInfo as ReferenceFieldInfo);
                 break;
             case FieldType.@object when fieldInfo is ObjectFieldInfo objectFieldInfo:
             {
@@ -414,7 +418,7 @@ public static class SchemaExtensions
     {
         if (fieldInfo is StringFieldInfo stringFieldInfo)
         {
-            string? value = null;
+            string value = null;
             if (stringFieldInfo.CurrentObject != null && !string.IsNullOrEmpty(stringFieldInfo.CurrentObject.ToString()))
             {
                 value = stringFieldInfo.CurrentObject.ToString();

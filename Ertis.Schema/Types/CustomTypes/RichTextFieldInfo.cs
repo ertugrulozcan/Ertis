@@ -3,64 +3,77 @@ using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Models;
 using Ertis.Schema.Validation;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
 namespace Ertis.Schema.Types.CustomTypes;
 
 public class RichTextFieldInfo : StringFieldInfo
 {
+    #region Fields
+    
+    private readonly int? minWordCount;
+    private readonly int? maxWordCount;
+    
+    #endregion
+    
     #region Properties
     
+    [JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
     public override FieldType Type => FieldType.richtext;
     
+    [JsonProperty("minWordCount", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minWordCount")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MinWordCount
     {
-        get;
+        get => this.minWordCount;
         init
         {
-            field = value;
+            this.minWordCount = value;
             
             if (!this.ValidateMinWordCount(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("maxWordCount", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxWordCount")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxWordCount
     {
-        get;
+        get => this.maxWordCount;
         init
         {
-            field = value;
+            this.maxWordCount = value;
             
             if (!this.ValidateMaxWordCount(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("embeddedImageRules", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("embeddedImageRules")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ResolutionRules? EmbeddedImageRules { get; set; }
     
+    [JsonProperty("embeddedImageMaxSize", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("embeddedImageMaxSize")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? EmbeddedImageMaxSize { get; set; }
     
     #endregion
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception? exception)
+    public override bool ValidateSchema(out Exception exception)
     {
         base.ValidateSchema(out exception);
         this.ValidateMinWordCount(out exception);
@@ -69,13 +82,34 @@ public class RichTextFieldInfo : StringFieldInfo
         return exception == null;
     }
     
-    protected internal override bool Validate(object? obj, IValidationContext validationContext)
+    protected internal override bool Validate(object obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
+        
+        /*
+        if (obj is string richText)
+        {
+            // TODO: CalculateTotalWordCount Method Implementation
+            var wordCount = HtmlAgilityPack.CalculateTotalWordCount(richText);
+            
+            if (this.MaxWordCount != null && wordCount > this.MaxWordCount.Value)
+            {
+                isValid = false;
+                validationContext.Errors.Add(new FieldValidationException($"Total word count can not be greater than {this.MaxWordCount}", this));
+            }
+            
+            if (this.MinWordCount != null && wordCount < this.MinWordCount.Value)
+            {
+                isValid = false;
+                validationContext.Errors.Add(new FieldValidationException($"Total word count can not be less than {this.MinWordCount}", this));
+            }
+        }
+        */
+        
         return isValid;
     }
     
-    private bool ValidateMinWordCount(out Exception? exception)
+    private bool ValidateMinWordCount(out Exception exception)
     {
         if (this.MinWordCount != null)
         {
@@ -96,7 +130,7 @@ public class RichTextFieldInfo : StringFieldInfo
         return true;
     }
     
-    private bool ValidateMaxWordCount(out Exception? exception)
+    private bool ValidateMaxWordCount(out Exception exception)
     {
         if (this.MaxWordCount != null)
         {

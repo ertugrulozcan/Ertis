@@ -36,6 +36,7 @@ internal static class QueryHelper
     internal static string? ConvertRegexOptions(RegexOptions? options)
     {
         string? regexOptions = null;
+        
         if (options != null)
         {
             var flagValue = (int) options.Value;

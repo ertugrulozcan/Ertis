@@ -1,78 +1,94 @@
 using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
-// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.Schema.Types.CustomTypes;
 
 public class TagsFieldInfo : FieldInfo<string[]>
 {
+	#region Fields
+    
+	private readonly int? minCount;
+	private readonly int? maxCount;
+    private readonly int? minLength;
+    private readonly int? maxLength;
+    
+	#endregion
+	
 	#region Properties
     
+    [JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
     public override FieldType Type => FieldType.tags;
     
+    [JsonProperty("minCount", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minCount")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MinCount
     {
-        get;
+        get => this.minCount;
         init
         {
-            field = value;
+            this.minCount = value;
             
             if (!this.ValidateMinCount(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("maxCount", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxCount")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxCount
     {
-        get;
+        get => this.maxCount;
         init
         {
-            field = value;
+            this.maxCount = value;
             
             if (!this.ValidateMaxCount(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("minLength", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minLength")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MinLength
     {
-        get;
+        get => this.minLength;
         init
         {
-            field = value;
+            this.minLength = value;
             
             if (!this.ValidateMinLength(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
     
+    [JsonProperty("maxLength", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxLength")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxLength
     {
-        get;
+        get => this.maxLength;
         init
         {
-            field = value;
+            this.maxLength = value;
             
             if (!this.ValidateMaxLength(out var exception))
             {
-                throw exception!;
+                throw exception;
             }
         }
     }
@@ -81,7 +97,7 @@ public class TagsFieldInfo : FieldInfo<string[]>
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception? exception)
+    public override bool ValidateSchema(out Exception exception)
     {
         base.ValidateSchema(out exception);
         this.ValidateMinCount(out exception);
@@ -92,14 +108,14 @@ public class TagsFieldInfo : FieldInfo<string[]>
         return exception == null;
     }
     
-    protected internal override bool Validate(object? obj, IValidationContext validationContext)
+    protected internal override bool Validate(object obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
         var array = obj switch
         {
             string[] stringArray => stringArray,
-            object[] objectArray => objectArray.OfType<string>().ToArray(),
+            object[] objectArray => objectArray.Where(x => x is string).Cast<string>().ToArray(),
             _ => null
         };
         
@@ -159,7 +175,7 @@ public class TagsFieldInfo : FieldInfo<string[]>
         return isValid;
     }
     
-    private bool ValidateMinCount(out Exception? exception)
+    private bool ValidateMinCount(out Exception exception)
     {
         if (this.MinCount != null)
         {
@@ -180,7 +196,7 @@ public class TagsFieldInfo : FieldInfo<string[]>
         return true;
     }
     
-    private bool ValidateMaxCount(out Exception? exception)
+    private bool ValidateMaxCount(out Exception exception)
     {
         if (this.MaxCount != null)
         {
@@ -201,7 +217,7 @@ public class TagsFieldInfo : FieldInfo<string[]>
         return true;
     }
     
-    private bool ValidateMinLength(out Exception? exception)
+    private bool ValidateMinLength(out Exception exception)
     {
         if (this.MinLength < 0)
         {
@@ -219,7 +235,7 @@ public class TagsFieldInfo : FieldInfo<string[]>
         return true;
     }
     
-    private bool ValidateMaxLength(out Exception? exception)
+    private bool ValidateMaxLength(out Exception exception)
     {
         if (this.MaxLength < 0)
         {
@@ -253,7 +269,7 @@ public class TagsFieldInfo : FieldInfo<string[]>
             MinCount = this.MinCount,
             MaxCount = this.MaxCount,
             MinLength = this.MinLength,
-            MaxLength = this.MaxLength
+            MaxLength = this.MaxLength,
         };
     }
     

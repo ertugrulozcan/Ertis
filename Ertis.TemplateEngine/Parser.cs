@@ -21,7 +21,7 @@ public class Parser
     /// Constructor
     /// </summary>
     /// <param name="options"></param>
-    public Parser(ParserOptions? options = null)
+    public Parser(ParserOptions options = null)
     {
         if (options == null)
         {
@@ -64,12 +64,11 @@ public class Parser
             
             if (placeHolder.StartIndex > 0)
             {
-                var rawText = template[..placeHolder.StartIndex];
+                var rawText = template.Substring(0, placeHolder.StartIndex);
                 yield return new RawPart { RawValue = rawText };
             }
             
-            var length = placeHolder.Outer?.Length ?? 0;
-            template = template[(placeHolder.StartIndex + length)..];
+            template = template.Substring(placeHolder.StartIndex + placeHolder.Outer.Length);
             
             yield return placeHolder;
         }
@@ -80,34 +79,31 @@ public class Parser
         }
     }
     
-    private bool TryFindPlaceHolder(string template, out PlaceHolder? placeHolder)
+    private bool TryFindPlaceHolder(string template, out PlaceHolder placeHolder)
     {
         placeHolder = this.FindPlaceHolder(template);
         return placeHolder != null;
     }
     
-    private PlaceHolder? FindPlaceHolder(string template)
+    private PlaceHolder FindPlaceHolder(string template)
     {
-        var openBrackets = this.Options.OpenBrackets ?? DEFAULT_OPEN_BRACKETS;
-        var closeBrackets = this.Options.CloseBrackets ?? DEFAULT_CLOSE_BRACKETS;
-        
-        var startIndex = template.IndexOf(openBrackets, StringComparison.Ordinal);
-        var endIndex = template.IndexOf(closeBrackets, StringComparison.Ordinal);
+        var startIndex = template.IndexOf(this.Options.OpenBrackets, StringComparison.Ordinal);
+        var endIndex = template.IndexOf(this.Options.CloseBrackets, StringComparison.Ordinal);
         if (startIndex < 0 || endIndex < 0 || startIndex >= endIndex)
         {
             return null;
         }
         
-        var placeholder = template.Substring(startIndex + openBrackets.Length, endIndex - startIndex - openBrackets.Length);
+        var placeholder = template.Substring(startIndex + this.Options.OpenBrackets.Length, endIndex - startIndex - this.Options.OpenBrackets.Length);
         return new PlaceHolder
         {
             Inner = placeholder,
-            Outer = $"{openBrackets}{placeholder}{closeBrackets}",
+            Outer = $"{this.Options.OpenBrackets}{placeholder}{this.Options.CloseBrackets}",
             Value = placeholder.Trim(),
             StartIndex = startIndex,
-            Length = endIndex - startIndex + closeBrackets.Length,
-            OpenBrackets = openBrackets,
-            CloseBrackets = closeBrackets
+            Length = endIndex - startIndex + this.Options.CloseBrackets.Length,
+            OpenBrackets = this.Options.OpenBrackets,
+            CloseBrackets = this.Options.CloseBrackets,
         };
     }
     

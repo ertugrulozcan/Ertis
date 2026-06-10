@@ -1,7 +1,5 @@
-// ReSharper disable UnusedMember.Global
 namespace Ertis.MongoDB.Models;
 
-// ReSharper disable once UnusedType.Global
 public class CollationOptions
 {
 	#region Properties

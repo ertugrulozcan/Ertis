@@ -44,7 +44,6 @@ public class ResizeMode
 	
 	#region Methods
 	
-	// ReSharper disable once UnusedMember.Global
 	public static ResizeMode? Parse(string key)
 	{
 		if (Enum.TryParse<ResizeModeEnum>(key, true, out var enumValue))

@@ -3,7 +3,6 @@ using Ertis.Core.Exceptions;
 
 namespace Ertis.MongoDB.Exceptions;
 
-// ReSharper disable once UnusedType.Global
 public class SelectQueryInclusionException : ErtisException
 {
 	#region Constructors
@@ -12,14 +11,14 @@ public class SelectQueryInclusionException : ErtisException
 		HttpStatusCode.BadRequest,
 		"A select query projection cannot contain both include and exclude specifications! (with the exception of the _id field)",
 		"SelectQueryInclusionError")
-	{ }
+	{}
 	
 	public SelectQueryInclusionException(Exception innerException) : base(
 		HttpStatusCode.BadRequest,
 		"A select query projection cannot contain both include and exclude specifications! (with the exception of the _id field)",
 		"SelectQueryInclusionError",
 		innerException)
-	{ }
+	{}
 	
 	#endregion
 }

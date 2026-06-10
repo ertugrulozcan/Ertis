@@ -1,8 +1,5 @@
-﻿// ReSharper disable UnusedMember.Global
-// ReSharper disable MemberCanBePrivate.Global
-namespace Ertis.MongoDB.Queries;
+﻿namespace Ertis.MongoDB.Queries;
 
-// ReSharper disable once UnusedType.Global
 public static class QueryBuilder
 {
     #region BuildIn Operators

@@ -46,7 +46,6 @@ public class Anchor
 	
 	#region Methods
 	
-	// ReSharper disable once UnusedMember.Global
 	public static Anchor? Parse(string key)
 	{
 		if (Enum.TryParse<AnchorEnum>(key, true, out var enumValue))

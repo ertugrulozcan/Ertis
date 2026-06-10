@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using System.Text.Json;
 using Ertis.MongoDB.Client;
 using Ertis.MongoDB.Configuration;
 using Ertis.MongoDB.Models;
@@ -10,7 +9,6 @@ using MongoDriver = MongoDB.Driver;
 
 namespace Ertis.MongoDB.Database;
 
-// ReSharper disable once UnusedType.Global
 public class MongoDatabase : IMongoDatabase
 {
 	#region Properties
@@ -65,7 +63,7 @@ public class MongoDatabase : IMongoDatabase
 		await this.Database.RenameCollectionAsync(oldName, newName, cancellationToken: cancellationToken);
 	}
 	
-	public IEnumerable<string> ListCollections(Expression<Func<BsonDocument, bool>>? filterExpression = null)
+	public IEnumerable<string> ListCollections(Expression<Func<BsonDocument, bool>> filterExpression = null)
 	{
 		if (filterExpression != null)
 		{
@@ -75,19 +73,21 @@ public class MongoDatabase : IMongoDatabase
 			});
 			
 			var collectionNames = new List<string>();
-			result.ForEachAsync(collectionNames.Add);
+			result.ForEachAsync(collectionName => collectionNames.Add(collectionName));
 			return collectionNames;
 		}
 		else
 		{
 			var result = this.Database.ListCollectionNames();
 			var collectionNames = new List<string>();
-			result.ForEachAsync(collectionNames.Add);
+			result.ForEachAsync(collectionName => collectionNames.Add(collectionName));
 			return collectionNames;
 		}
 	}
 	
-	public async Task<IEnumerable<string>> ListCollectionsAsync(Expression<Func<BsonDocument, bool>>? filterExpression = null, CancellationToken cancellationToken = default)
+	public async Task<IEnumerable<string>> ListCollectionsAsync( 
+		Expression<Func<BsonDocument, bool>> filterExpression = null, 
+		CancellationToken cancellationToken = default)
 	{
 		if (filterExpression != null)
 		{
@@ -97,14 +97,14 @@ public class MongoDatabase : IMongoDatabase
 			}, cancellationToken: cancellationToken);
 			
 			var collectionNames = new List<string>();
-			await result.ForEachAsync(collectionNames.Add, cancellationToken: cancellationToken);
+			await result.ForEachAsync(collectionName => collectionNames.Add(collectionName), cancellationToken: cancellationToken);
 			return collectionNames;
 		}
 		else
 		{
 			var result = await this.Database.ListCollectionNamesAsync(cancellationToken: cancellationToken);
 			var collectionNames = new List<string>();
-			await result.ForEachAsync(collectionNames.Add, cancellationToken: cancellationToken);
+			await result.ForEachAsync(collectionName => collectionNames.Add(collectionName), cancellationToken: cancellationToken);
 			return collectionNames;
 		}
 	}
@@ -117,7 +117,7 @@ public class MongoDatabase : IMongoDatabase
 			OutputMode = JsonOutputMode.RelaxedExtendedJson
 		});
 		
-		return JsonSerializer.Deserialize<MongoDbStatistics>(json) ?? new MongoDbStatistics();
+		return Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbStatistics>(json);
 	}
 	
 	public async Task<MongoDbStatistics> GetDatabaseStatisticsAsync(CancellationToken cancellationToken = default)
@@ -128,7 +128,7 @@ public class MongoDatabase : IMongoDatabase
 			OutputMode = JsonOutputMode.RelaxedExtendedJson
 		});
 		
-		return JsonSerializer.Deserialize<MongoDbStatistics>(json) ?? new MongoDbStatistics();
+		return Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbStatistics>(json);
 	}
 	
 	public BsonDocument GetDatabaseStatisticsDocument()
@@ -159,16 +159,18 @@ public class MongoDatabase : IMongoDatabase
 			throw new MongoException($"There is no collection named '{destinationCollectionName}'");
 		}
 		
-		using var cursor = await sourceCollection.Find(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(documentId))).ToCursorAsync();
-		while (await cursor.MoveNextAsync())
+		using (var cursor = await sourceCollection.Find(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(documentId))).ToCursorAsync())
 		{
-			var batch = cursor.Current;
-			foreach (var document in batch)
+			while (await cursor.MoveNextAsync())
 			{
-				await destinationCollection.BulkWriteAsync(new WriteModel<BsonDocument>[]
+				var batch = cursor.Current;
+				foreach (var document in batch)
 				{
-					new InsertOneModel<BsonDocument>(document)
-				});
+					await destinationCollection.BulkWriteAsync(new WriteModel<BsonDocument>[]
+					{
+						new InsertOneModel<BsonDocument>(document)
+					});
+				}
 			}
 		}
 	}
@@ -187,13 +189,15 @@ public class MongoDatabase : IMongoDatabase
 			throw new MongoException($"There is no collection named '{destinationCollectionName}'");
 		}
 		
-		using var cursor = await sourceCollection.Find(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(documentId))).ToCursorAsync();
-		while (await cursor.MoveNextAsync())
+		using (var cursor = await sourceCollection.Find(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(documentId))).ToCursorAsync())
 		{
-			var batch = cursor.Current;
-			foreach (var document in batch)
+			while (await cursor.MoveNextAsync())
 			{
-				await destinationCollection.ReplaceOneAsync(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(documentId)), document);
+				var batch = cursor.Current;
+				foreach (var document in batch)
+				{
+					await destinationCollection.ReplaceOneAsync(Builders<BsonDocument>.Filter.Eq("_id", ObjectId.Parse(documentId)), document);
+				}
 			}
 		}
 	}
@@ -212,16 +216,18 @@ public class MongoDatabase : IMongoDatabase
 			throw new MongoException($"There is no collection named '{destinationCollectionName}'");
 		}
 		
-		using var cursor = await sourceCollection.FindAsync(_ => true);
-		while (await cursor.MoveNextAsync())
+		using (var cursor = await sourceCollection.FindAsync(_ => true))
 		{
-			var batch = cursor.Current;
-			foreach (var document in batch)
+			while (await cursor.MoveNextAsync())
 			{
-				await destinationCollection.BulkWriteAsync(new WriteModel<BsonDocument>[]
+				var batch = cursor.Current;
+				foreach (var document in batch)
 				{
-					new InsertOneModel<BsonDocument>(document)
-				});
+					await destinationCollection.BulkWriteAsync(new WriteModel<BsonDocument>[]
+					{
+						new InsertOneModel<BsonDocument>(document)
+					});
+				}
 			}
 		}
 	}

@@ -1,15 +1,13 @@
 using System.Net;
-using Ertis.Core.Models;
+using Ertis.Core.Models.Response;
 
 namespace Ertis.Core.Exceptions;
 
-// ReSharper disable once UnusedType.Global
 public class ErtisException<T> : ErtisException
 {
 	#region Properties
 	
-	// ReSharper disable once UnusedMember.Global
-	public T? Payload { get; set; }
+	public T Payload { get; set; }
 	
 	#endregion
 	
@@ -21,8 +19,7 @@ public class ErtisException<T> : ErtisException
 	/// <param name="statusCode"></param>
 	/// <param name="errorCode"></param>
 	protected ErtisException(HttpStatusCode statusCode, string errorCode) : base(statusCode, errorCode)
-	{
-	}
+	{}
 	
 	/// <summary>
 	/// Constructor
@@ -31,8 +28,7 @@ public class ErtisException<T> : ErtisException
 	/// <param name="message"></param>
 	/// <param name="errorCode"></param>
 	protected ErtisException(HttpStatusCode statusCode, string message, string errorCode) : base(statusCode, message, errorCode)
-	{
-	}
+	{}
 	
 	/// <summary>
 	/// Constructor
@@ -42,8 +38,7 @@ public class ErtisException<T> : ErtisException
 	/// <param name="errorCode"></param>
 	/// <param name="innerException"></param>
 	protected ErtisException(HttpStatusCode statusCode, string message, string errorCode, Exception innerException) : base(statusCode, message, errorCode, innerException)
-	{
-	}
+	{}
 	
 	#endregion
 }
@@ -52,11 +47,10 @@ public class ErtisException : HttpStatusCodeException, IHasErrorModel
 {
 	#region Properties
 	
-	// ReSharper disable once MemberCanBePrivate.Global
 	public string ErrorCode { get; }
 	
 	public ErrorModel Error =>
-		new()
+		new ErrorModel
 		{
 			Message = this.Message,
 			ErrorCode = this.ErrorCode,
@@ -95,7 +89,7 @@ public class ErtisException : HttpStatusCodeException, IHasErrorModel
 	/// <param name="message"></param>
 	/// <param name="errorCode"></param>
 	/// <param name="innerException"></param>
-	protected ErtisException(HttpStatusCode statusCode, string message, string errorCode, Exception? innerException) : base(statusCode, message, innerException)
+	protected ErtisException(HttpStatusCode statusCode, string message, string errorCode, Exception innerException) : base(statusCode, message, innerException)
 	{
 		this.ErrorCode = errorCode;
 	}

@@ -25,5 +25,6 @@ public enum FieldType
 	code,
 	image,
 	video,
-	nestedType
+	nestedType,
+	photoGallery
 }

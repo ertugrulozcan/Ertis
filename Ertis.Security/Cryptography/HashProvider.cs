@@ -1,8 +1,10 @@
 using System.Security.Cryptography;
 using System.Text;
 
+// ReSharper disable UnusedMember.Global
 namespace Ertis.Security.Cryptography;
 
+// ReSharper disable once UnusedType.Global
 public class HashProvider
 {
 	/*
@@ -50,23 +52,17 @@ public class HashProvider
 				hashAlgorithm = SHA512.Create();
 				break;
 			case HashAlgorithms.SHA2_512_224:
-				throw new NotSupportedException("Not supported hash algorithm :(");
 			case HashAlgorithms.SHA2_512_256:
-				throw new NotSupportedException("Not supported hash algorithm :(");
 			case HashAlgorithms.SHA3_224:
-				throw new NotSupportedException("Not supported hash algorithm :(");
 			case HashAlgorithms.SHA3_256:
-				throw new NotSupportedException("Not supported hash algorithm :(");
 			case HashAlgorithms.SHA3_384:
-				throw new NotSupportedException("Not supported hash algorithm :(");
 			case HashAlgorithms.SHA3_512:
-				throw new NotSupportedException("Not supported hash algorithm :(");
 			default:
 				throw new NotSupportedException("Not supported hash algorithm :(");
 		}
 		
-		byte[] bytes = hashAlgorithm.ComputeHash(encoding.GetBytes(message));
-		string hash = BitConverter.ToString(bytes).Replace("-", string.Empty).ToLower();
+		var bytes = hashAlgorithm.ComputeHash(encoding.GetBytes(message));
+		var hash = Convert.ToHexStringLower(bytes);
 		return hash;
 	}
 	

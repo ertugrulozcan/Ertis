@@ -2,9 +2,10 @@ using Ertis.Core.Models.Response;
 using Ertis.Net.Http;
 using Newtonsoft.Json;
 
+// ReSharper disable UnusedMemberInSuper.Global
 namespace Ertis.Net.Rest;
 
-[Obsolete("This class uses Newtonsoft library for json serialization and is no longer supported. Please use SystemRestHandler.")]
+// [Obsolete("This class uses Newtonsoft library for JSON serialization and is no longer supported. Please use SystemRestHandler.")]
 public interface IRestHandler
 {
 	#region Methods

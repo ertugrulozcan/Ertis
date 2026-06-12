@@ -1,5 +1,6 @@
 using AnchorEnum = SixLabors.ImageSharp.Processing.AnchorPositionMode;
 
+// ReSharper disable UnusedMember.Global
 namespace Ertis.ImageProcessing;
 
 // ReSharper disable MemberCanBePrivate.Global

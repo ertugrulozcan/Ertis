@@ -17,14 +17,6 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
     
     #endregion
     
-    #region Fields
-    
-    private readonly int? minLength;
-    private readonly int? maxLength;
-    private readonly string formatPattern;
-    
-    #endregion
-    
     #region Properties
     
     [JsonProperty("type")]
@@ -38,12 +30,11 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MinLength
     {
-        get => this.minLength;
+        get;
         init
         {
-            this.minLength = value;
-            
-            if (!this.ValidateMinLength(out var exception))
+            field = value;
+            if (!this.ValidateMinLength(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -55,12 +46,11 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxLength
     {
-        get => this.maxLength;
+        get;
         init
         {
-            this.maxLength = value;
-            
-            if (!this.ValidateMaxLength(out var exception))
+            field = value;
+            if (!this.ValidateMaxLength(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -70,14 +60,13 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
     [JsonProperty("formatPattern", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("formatPattern")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public string FormatPattern
+    public string? FormatPattern
     {
-        get => this.formatPattern;
+        get;
         init
         {
-            this.formatPattern = value;
-            
-            if (!this.ValidateFormatPattern(out var exception))
+            field = value;
+            if (!this.ValidateFormatPattern(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -89,12 +78,12 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
     [JsonProperty("regexPattern", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("regexPattern")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public string RegexPattern { get; init; }
+    public string? RegexPattern { get; init; }
     
     [JsonProperty("restrictRegexPattern", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("restrictRegexPattern")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public string RestrictRegexPattern { get; init; }
+    public string? RestrictRegexPattern { get; init; }
     
     [JsonProperty("caseInsensitive", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("caseInsensitive")]
@@ -110,7 +99,7 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception exception)
+    public override bool ValidateSchema(out Exception? exception)
     {
         base.ValidateSchema(out exception);
         this.ValidateMinLength(out exception);
@@ -120,7 +109,7 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
         return exception == null;
     }
     
-    protected internal override bool Validate(object obj, IValidationContext validationContext)
+    protected internal override bool Validate(object? obj, IValidationContext validationContext)
     {
         if (!string.IsNullOrEmpty(this.FormatPattern))
         {
@@ -176,7 +165,7 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
         return isValid;
     }
     
-    private bool ValidateMinLength(out Exception exception)
+    private bool ValidateMinLength(out Exception? exception)
     {
         if (this.MinLength < 0)
         {
@@ -194,7 +183,7 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
         return true;
     }
     
-    private bool ValidateMaxLength(out Exception exception)
+    private bool ValidateMaxLength(out Exception? exception)
     {
         if (this.MaxLength < 0)
         {
@@ -212,7 +201,7 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
         return true;
     }
     
-    private bool ValidateFormatPattern(out Exception exception)
+    private bool ValidateFormatPattern(out Exception? exception)
     {
         if (this.FormatPattern != null)
         {
@@ -229,7 +218,7 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
     }
     
     // ReSharper disable once MemberCanBePrivate.Global
-    public string Format(DynamicObject content)
+    public string? Format(DynamicObject? content)
     {
         if (!string.IsNullOrEmpty(this.FormatPattern) && content != null)
         {
@@ -257,7 +246,7 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
         }
     }
     
-    public bool TryFormat(DynamicObject content, out string value)
+    public bool TryFormat(DynamicObject? content, out string? value)
     {
         try
         {

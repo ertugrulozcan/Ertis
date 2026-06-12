@@ -10,13 +10,6 @@ namespace Ertis.Schema.Types.CustomTypes;
 
 public class RichTextFieldInfo : StringFieldInfo
 {
-    #region Fields
-    
-    private readonly int? minWordCount;
-    private readonly int? maxWordCount;
-    
-    #endregion
-    
     #region Properties
     
     [JsonProperty("type")]
@@ -30,12 +23,11 @@ public class RichTextFieldInfo : StringFieldInfo
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MinWordCount
     {
-        get => this.minWordCount;
+        get;
         init
         {
-            this.minWordCount = value;
-            
-            if (!this.ValidateMinWordCount(out var exception))
+            field = value;
+            if (!this.ValidateMinWordCount(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -47,12 +39,11 @@ public class RichTextFieldInfo : StringFieldInfo
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxWordCount
     {
-        get => this.maxWordCount;
+        get;
         init
         {
-            this.maxWordCount = value;
-            
-            if (!this.ValidateMaxWordCount(out var exception))
+            field = value;
+            if (!this.ValidateMaxWordCount(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -73,7 +64,7 @@ public class RichTextFieldInfo : StringFieldInfo
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception exception)
+    public override bool ValidateSchema(out Exception? exception)
     {
         base.ValidateSchema(out exception);
         this.ValidateMinWordCount(out exception);
@@ -82,7 +73,7 @@ public class RichTextFieldInfo : StringFieldInfo
         return exception == null;
     }
     
-    protected internal override bool Validate(object obj, IValidationContext validationContext)
+    protected internal override bool Validate(object? obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
@@ -109,7 +100,7 @@ public class RichTextFieldInfo : StringFieldInfo
         return isValid;
     }
     
-    private bool ValidateMinWordCount(out Exception exception)
+    private bool ValidateMinWordCount(out Exception? exception)
     {
         if (this.MinWordCount != null)
         {
@@ -130,7 +121,7 @@ public class RichTextFieldInfo : StringFieldInfo
         return true;
     }
     
-    private bool ValidateMaxWordCount(out Exception exception)
+    private bool ValidateMaxWordCount(out Exception? exception)
     {
         if (this.MaxWordCount != null)
         {

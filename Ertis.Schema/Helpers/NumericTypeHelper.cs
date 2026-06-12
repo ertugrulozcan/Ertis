@@ -21,7 +21,7 @@ internal static class NumericTypeHelper
             }
         }
         
-        if (!IsNumericType(type1) || !IsNumericType(type2))
+        if (!type1.IsNumericType() || !type2.IsNumericType())
         {
             return null;
         }
@@ -59,6 +59,7 @@ internal static class NumericTypeHelper
         }
         else if (type1.IsFloatingPointNumericType() && type2.IsIntegralNumericType())
         {
+            // ReSharper disable once DuplicatedStatements
             return false;
         }
         

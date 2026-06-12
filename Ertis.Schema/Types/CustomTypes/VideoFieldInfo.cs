@@ -8,12 +8,6 @@ namespace Ertis.Schema.Types.CustomTypes;
 
 public sealed class VideoFieldInfo : ObjectFieldInfoBase
 {
-	#region Fields
-    
-    private readonly int? maxSize;
-    
-    #endregion
-    
 	#region Properties
     
     [JsonProperty("type")]
@@ -31,12 +25,11 @@ public sealed class VideoFieldInfo : ObjectFieldInfoBase
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxSize
     {
-        get => this.maxSize;
+        get;
         init
         {
-            this.maxSize = value;
-            
-            if (!this.ValidateMaxSize(out var exception))
+            field = value;
+            if (!this.ValidateMaxSize(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -110,7 +103,7 @@ public sealed class VideoFieldInfo : ObjectFieldInfoBase
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception exception)
+    public override bool ValidateSchema(out Exception? exception)
     {
         base.ValidateSchema(out exception);
         this.ValidateMaxSize(out exception);
@@ -118,7 +111,7 @@ public sealed class VideoFieldInfo : ObjectFieldInfoBase
         return exception == null;
     }
     
-    private bool ValidateMaxSize(out Exception exception)
+    private bool ValidateMaxSize(out Exception? exception)
     {
         if (this.MaxSize < 0)
         {
@@ -144,7 +137,7 @@ public sealed class VideoFieldInfo : ObjectFieldInfoBase
             IsReadonly = this.IsReadonly,
             DefaultValue = this.DefaultValue,
             Properties = this.Properties,
-            MaxSize = this.MaxSize,
+            MaxSize = this.MaxSize
         };
     }
     

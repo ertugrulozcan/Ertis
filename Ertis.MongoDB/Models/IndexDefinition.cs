@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using Ertis.Core.Collections;
 
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMemberInSuper.Global
 namespace Ertis.MongoDB.Models;
 
 public enum IndexType
@@ -40,7 +41,7 @@ public enum IndexLocale
 	russian, 
 	spanish, 
 	swedish, 
-	turkish, 
+	turkish
 }
 
 public abstract class IndexDefinitionBase : IIndexDefinition
@@ -178,8 +179,8 @@ public class TextIndexDefinition : IndexDefinitionBase
 {
 	#region Fields
 	
-	private readonly string[] fields;
-	private readonly Dictionary<string, int> weightedFields;
+	private readonly string[]? fields;
+	private readonly Dictionary<string, int>? weightedFields;
 	
 	#endregion
 	
@@ -195,14 +196,14 @@ public class TextIndexDefinition : IndexDefinitionBase
 				return this.weightedFields.Keys.ToArray();
 			}
 			
-			return this.fields;
+			return this.fields ?? Array.Empty<string>();
 		}
 		
 		private init => this.fields = value;
 	}
 	
 	// ReSharper disable once MemberCanBePrivate.Global
-	public Dictionary<string, int> WeightedFields
+	public Dictionary<string, int>? WeightedFields
 	{
 		get
 		{

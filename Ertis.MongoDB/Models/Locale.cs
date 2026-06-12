@@ -110,5 +110,5 @@ public enum Locale
 	Welsh, 
 	Yiddish, 
 	Yoruba, 
-	Zulu, 
+	Zulu 
 }

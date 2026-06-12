@@ -1,6 +1,8 @@
 using System.Net;
 using Ertis.Core.Exceptions;
 
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
 namespace Ertis.Extensions.AspNetCore.Exceptions;
 
 public class QueryBodyNullException : ErtisException

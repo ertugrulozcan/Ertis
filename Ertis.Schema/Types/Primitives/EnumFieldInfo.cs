@@ -8,12 +8,6 @@ namespace Ertis.Schema.Types.Primitives;
 
 public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
 {
-    #region Fields
-    
-    private EnumItem[] items;
-    
-    #endregion
-    
     #region Properties
     
     [JsonProperty("type")]
@@ -26,12 +20,11 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
     [JsonPropertyName("items")]
     public EnumItem[] Items
     {
-        get => this.items;
+        get => field ?? Array.Empty<EnumItem>();
         set
         {
-            this.items = value;
-            
-            if (!this.ValidateItems(out var exception))
+            field = value;
+            if (!this.ValidateItems(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -52,7 +45,7 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception exception)
+    public override bool ValidateSchema(out Exception? exception)
     {
         base.ValidateSchema(out exception);
         this.ValidateItems(out exception);
@@ -60,7 +53,7 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
         return exception == null;
     }
     
-    protected internal override bool Validate(object obj, IValidationContext validationContext)
+    protected internal override bool Validate(object? obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
@@ -71,7 +64,7 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
             {
                 if (obj is object[] array)
                 {
-                    isExistInEnums = array.All(item => this.Items.Any(x => x?.Value != null && x.Value.Equals(item)));
+                    isExistInEnums = array.All(item => this.Items.Any(x => x.Value != null && x.Value.Equals(item)));
                 }
                 else
                 {
@@ -84,7 +77,7 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
                 var type = obj.GetType();
                 if (type.IsPrimitive || type == typeof(string))
                 {
-                    isExistInEnums = this.Items.Any(x => x?.Value != null && x.Value.Equals(obj));
+                    isExistInEnums = this.Items.Any(x => x.Value != null && x.Value.Equals(obj));
                 }
                 else
                 {
@@ -97,27 +90,21 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
         if (isValid && obj != null && !isExistInEnums)
         {
             isValid = false;
-            var enumValues = string.Join(", ", this.Items.Select(x => x?.Value == null ? "null" : $"'{x.Value}'"));
+            var enumValues = string.Join(", ", this.Items.Select(x => x.Value == null ? "null" : $"'{x.Value}'"));
             validationContext.Errors.Add(new FieldValidationException($"The value does not exist in the enum items. The '{this.Name}' value must be one of them [{enumValues}]", this));   
         }
         
         return isValid;
     }
     
-    private bool ValidateItems(out Exception exception)
+    private bool ValidateItems(out Exception? exception)
     {
-        if (this.Items == null)
-        {
-            exception = new FieldValidationException($"Enum items is required ('{this.Name}')", this);
-            return false;
-        }
-        
         if (this.Items.Length == 0)
         {
             throw new FieldValidationException("Enum items can not be empty", this);
         }
         
-        if (this.Items.Any(x => x?.Value != null && !x.Value.GetType().IsPrimitive && x.Value.GetType() != typeof(string)))
+        if (this.Items.Any(x => x.Value != null && !x.Value.GetType().IsPrimitive && x.Value.GetType() != typeof(string)))
         {
             throw new FieldValidationException("Enum item values must be primitive type", this);
         }
@@ -161,11 +148,11 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
         
         [JsonProperty("displayName")]
         [JsonPropertyName("displayName")]
-        public string DisplayName { get; set; }
+        public string? DisplayName { get; set; }
         
         [JsonProperty("value")]
         [JsonPropertyName("value")]
-        public string Value { get; set; }
+        public string? Value { get; set; }
         
         #endregion
     }

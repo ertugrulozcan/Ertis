@@ -2,6 +2,7 @@ using System.Text;
 
 namespace Ertis.Core.Helpers;
 
+// ReSharper disable once UnusedType.Global
 public static class Slugifier
 {
 	#region Helper Classes
@@ -11,7 +12,7 @@ public static class Slugifier
 	{
 		#region Properties
 		
-		private char[] IgnoreCharacters { get; set; }
+		private char[]? IgnoreCharacters { get; set; }
 		
 		#endregion
 		
@@ -27,6 +28,7 @@ public static class Slugifier
 		
 		#region Methods
 		
+		// ReSharper disable once UnusedMember.Global
 		public SlugifierOptions Ignore(params char[] chars)
 		{
 			this.IgnoreCharacters = chars;
@@ -45,13 +47,13 @@ public static class Slugifier
 	
 	#region Statics
 	
-	public static SlugifierOptions Options => new SlugifierOptions();
+	public static SlugifierOptions Options => new();
 	
 	#endregion
 	
 	#region Methods
 	
-	public static string Slugify(string input, SlugifierOptions options = null)
+	public static string Slugify(string input, SlugifierOptions? options = null)
 	{
 		if (string.IsNullOrEmpty(input))
 		{

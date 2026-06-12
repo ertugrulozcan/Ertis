@@ -1,12 +1,13 @@
+// ReSharper disable UnusedMember.Global
 namespace Ertis.MongoDB.Configuration;
 
 public interface IDatabaseSettings
 {
 	#region Properties
 	
-	string ConnectionString { get; }
+	string? ConnectionString { get; }
 	
-	string DefaultAuthDatabase { get; }
+	string? DefaultAuthDatabase { get; }
 	
 	bool? AllowDiskUse { get; }
 	

@@ -1,5 +1,6 @@
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
+// ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.ImageProcessing;
 

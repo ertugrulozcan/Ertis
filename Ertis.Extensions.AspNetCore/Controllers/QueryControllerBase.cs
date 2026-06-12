@@ -16,9 +16,9 @@ public abstract class QueryControllerBase : ControllerBase
 		int? skip,
 		int? limit,
 		bool? withCount,
-		string sortField,
+		string? sortField,
 		SortDirection? sortDirection,
-		IDictionary<string, bool> selectFields,
+		IDictionary<string, bool>? selectFields,
 		CancellationToken cancellationToken = default);
 	
 	[HttpPost("_query")]
@@ -31,14 +31,14 @@ public abstract class QueryControllerBase : ControllerBase
 		
 		try
 		{
-			this.ExtractPaginationParameters(out int? skip, out int? limit, out bool withCount);
+			this.ExtractPaginationParameters(out var skip, out var limit, out var withCount);
 			this.ValidatePaginationParams(skip, limit);
 			
 			var body = await this.ExtractRequestBodyAsync(cancellationToken: cancellationToken);
 			var whereQuery = this.ExtractWhereQuery(body, body);
 			var selectFields = Helpers.QueryHelper.ExtractSelectFields(body);
-			this.ExtractSortingParameters(out string sortField, out SortDirection? sortDirection);
-			var result = await this.GetDataAsync(whereQuery, skip, limit, withCount, sortField, sortDirection, selectFields, cancellationToken: cancellationToken);
+			this.ExtractSortingParameters(out var sortField, out var sortDirection);
+			var result = await this.GetDataAsync(whereQuery ?? string.Empty, skip, limit, withCount, sortField, sortDirection, selectFields, cancellationToken: cancellationToken);
 			
 			return this.Ok(result);
 		}

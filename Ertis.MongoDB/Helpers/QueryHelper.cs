@@ -32,11 +32,6 @@ public static class QueryHelper
 	
 	private static JToken EnsureObjectIdsAndISODates(JToken node)
 	{
-		if (node == null)
-		{
-			return null;
-		}
-		
 		try
 		{
 			switch (node)
@@ -55,7 +50,8 @@ public static class QueryHelper
 				{
 					if (node.Type is JTokenType.String or JTokenType.Date)
 					{
-						if (ISODateHelper.TryParseDateTime(node.Value<string>(), out var dateTime))
+						var nodeValue = node.Value<string>();
+						if (nodeValue != null && ISODateHelper.TryParseDateTime(nodeValue, out var dateTime))
 						{
 							jValue.Replace(new JRaw($"ISODate(\"{dateTime:yyyy-MM-ddTHH:mm:ssZ}\")"));
 						}

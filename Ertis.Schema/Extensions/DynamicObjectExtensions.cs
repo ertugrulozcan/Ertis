@@ -1,7 +1,9 @@
 using Ertis.Schema.Dynamics.Legacy;
 
+// ReSharper disable UnusedMember.Global
 namespace Ertis.Schema.Extensions;
 
+// ReSharper disable once UnusedType.Global
 public static class DynamicObjectExtensions
 {
 	#region Methods
@@ -11,9 +13,9 @@ public static class DynamicObjectExtensions
 		return Merge(dynamicObject1.ToDictionary(), dynamicObject2.ToDictionary());
 	}
 	
-	private static DynamicObject Merge(IDictionary<string, object> dictionary1, IDictionary<string, object> dictionary2)
+	private static DynamicObject Merge(IDictionary<string, object?> dictionary1, IDictionary<string, object?> dictionary2)
 	{
-		var dictionary = new Dictionary<string, object>();
+		var dictionary = new Dictionary<string, object?>();
 		
 		var visitedProperties = new List<string>();
 		foreach (var (propertyName, propertyValue) in dictionary1)
@@ -21,7 +23,7 @@ public static class DynamicObjectExtensions
 			dictionary.Add(propertyName, propertyValue);
 			if (dictionary2.ContainsKey(propertyName))
 			{
-				if (propertyValue is IDictionary<string, object> subDictionary1 && dictionary2[propertyName] is IDictionary<string, object> subDictionary2)
+				if (propertyValue is IDictionary<string, object?> subDictionary1 && dictionary2[propertyName] is IDictionary<string, object?> subDictionary2)
 				{
 					dictionary[propertyName] = Merge(subDictionary1, subDictionary2).ToDictionary();
 				}

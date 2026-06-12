@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 
 namespace Ertis.Net.Http;
 
+// ReSharper disable once UnusedType.Global
 public class SystemJsonRequestBody : IRequestBody
 {
     #region Properties

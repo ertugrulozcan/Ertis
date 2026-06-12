@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 namespace Ertis.Net.Rest;
 
 [Obsolete("This class uses Newtonsoft library for json serialization and is no longer supported. Please use SystemRestHandler.")]
+// ReSharper disable once UnusedType.Global
 public class RestHandler : IRestHandler
 {
 	#region Constants
@@ -37,7 +38,7 @@ public class RestHandler : IRestHandler
 		"TE",
 		"Upgrade",
 		"Via",
-		"Warning",
+		"Warning"
 	};
 	
 	private static readonly string[] ContentHeaders = 
@@ -51,7 +52,7 @@ public class RestHandler : IRestHandler
 		"Content-Range",
 		"Content-Type",
 		"Expires",
-		"Last-Modified",
+		"Last-Modified"
 	};
 	
 	#endregion
@@ -132,7 +133,7 @@ public class RestHandler : IRestHandler
 			{
 				Json = json,
 				RawData = rawData,
-				Data = JsonConvert.DeserializeObject<TResult>(json, converters ?? Array.Empty<JsonConverter>())!,
+				Data = JsonConvert.DeserializeObject<TResult>(json, converters ?? Array.Empty<JsonConverter>())
 			};
 		}
 		else

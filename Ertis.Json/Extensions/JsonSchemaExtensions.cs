@@ -11,17 +11,17 @@ public static class JsonSchemaExtensions
 		var cumulativeValidationErrors = new List<ValidationError>();
 		foreach (var (_, jSchema) in schema.Properties)
 		{
-			IList<ValidationError> validationErrorsForProperty = null;
-			var isValidProperty = jSchema?.Default?.IsValid(jSchema, out validationErrorsForProperty);
-			if (isValidProperty != null && !isValidProperty.Value)
+			IList<ValidationError>? validationErrorsForProperty = null;
+			var isValidProperty = jSchema.Default?.IsValid(jSchema, out validationErrorsForProperty);
+			if (isValidProperty != null && !isValidProperty.Value && validationErrorsForProperty != null)
 			{
 				cumulativeValidationErrors.AddRange(validationErrorsForProperty);
 			}
 		}
 		
-		IList<ValidationError> validationErrorsForSchema = null;
+		IList<ValidationError>? validationErrorsForSchema = null;
 		var isValidSchema = schema.Default?.IsValid(schema, out validationErrorsForSchema);
-		if (isValidSchema != null && !isValidSchema.Value)
+		if (isValidSchema != null && !isValidSchema.Value && validationErrorsForSchema != null)
 		{
 			cumulativeValidationErrors.AddRange(validationErrorsForSchema);
 		}

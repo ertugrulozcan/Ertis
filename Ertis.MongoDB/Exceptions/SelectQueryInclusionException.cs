@@ -3,6 +3,7 @@ using Ertis.Core.Exceptions;
 
 namespace Ertis.MongoDB.Exceptions;
 
+// ReSharper disable once UnusedType.Global
 public class SelectQueryInclusionException : ErtisException
 {
 	#region Constructors

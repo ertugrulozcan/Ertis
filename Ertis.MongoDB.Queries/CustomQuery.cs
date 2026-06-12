@@ -1,42 +1,28 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Ertis.MongoDB.Queries;
 
 internal class CustomQuery : IQuery, IHasChildren
 {
-    #region Fields
-    
-    private readonly IQuery _query;
-    
-    #endregion
-    
     #region Properties
     
-    internal string Operator { get; init; }
+    internal string? Operator { get; init; }
     
-    internal IQuery Value 
+    [field: AllowNull, MaybeNull]
+    // ReSharper disable once UnusedMember.Global
+    internal IQuery Value
     {
-        get => this._query;
+        get;
         init
         {
-            this._query = value;
+            field = value;
             this.Children.Insert(0, value);
         }
     }
     
-    public List<IQuery> Children { get; init; }
+    public List<IQuery> Children { get; init; } = new();
     
     public bool ShowOperatorTag { get; init; } = true;
-    
-    #endregion
-    
-    #region Constructors
-    
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    public CustomQuery()
-    {
-        this.Children = new List<IQuery>();
-    }
     
     #endregion
     

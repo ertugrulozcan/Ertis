@@ -5,7 +5,7 @@ namespace Ertis.Schema.Validation;
 
 public interface IValidationContext
 {
-	DynamicObject Content { get; }
+	DynamicObject? Content { get; }
 	
 	IList<FieldValidationException> Errors { get; }
 }

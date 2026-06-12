@@ -6,34 +6,36 @@ public static class JTokenExtensions
 {
 	#region Methods
 	
-	public static IDictionary<string, object> ToDictionary(this JToken jToken)
+	extension(JToken jToken)
 	{
-		var dictionary = new Dictionary<string, object>();
-		
-		foreach (var childToken in jToken.Children())
+		public IDictionary<string, object?> ToDictionary()
 		{
-			if (childToken is JProperty jProperty)
+			var dictionary = new Dictionary<string, object?>();
+			foreach (var childToken in jToken.Children())
 			{
-				var propertyName = jProperty.Name;
-				dynamic dynamicObject = jProperty.Value;
-				dictionary.Add(propertyName, DynamicExtensions.ToDictionaryCore(dynamicObject));
+				if (childToken is JProperty jProperty)
+				{
+					var propertyName = jProperty.Name;
+					dynamic dynamicObject = jProperty.Value;
+					dictionary.Add(propertyName, DynamicExtensions.ToDictionaryCore(dynamicObject));
+				}
 			}
+			
+			return dictionary;
 		}
 		
-		return dictionary;
-	}
-	
-	public static string GetFullPath(this JToken jToken)
-	{
-		if (jToken.Path.StartsWith("['") && jToken.Path.EndsWith("']"))
+		public string GetFullPath()
 		{
-			return string.Join('.', jToken.AncestorsAndSelf()
-				.OfType<JProperty>()
-				.Select(p => p.Name)
-				.Reverse());
+			if (jToken.Path.StartsWith("['") && jToken.Path.EndsWith("']"))
+			{
+				return string.Join('.', jToken.AncestorsAndSelf()
+					.OfType<JProperty>()
+					.Select(p => p.Name)
+					.Reverse());
+			}
+			
+			return jToken.Path;
 		}
-		
-		return jToken.Path;
 	}
 	
 	#endregion

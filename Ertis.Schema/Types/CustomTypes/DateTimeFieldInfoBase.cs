@@ -26,13 +26,6 @@ public interface IDateTimeFieldInfo
 
 public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeFieldInfo where T : StringFieldInfo, IDateTimeFieldInfo, new()
 {
-    #region Fields
-    
-    private readonly DateTime? minValue;
-    private readonly DateTime? maxValue;
-    
-    #endregion
-    
     #region Abstract Properties
     
     [Newtonsoft.Json.JsonIgnore]
@@ -48,12 +41,11 @@ public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeField
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public DateTime? MinValue
     {
-        get => this.minValue;
+        get;
         init
         {
-            this.minValue = value;
-            
-            if (!this.ValidateMinValue(out var exception))
+            field = value;
+            if (!this.ValidateMinValue(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -65,12 +57,11 @@ public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeField
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public DateTime? MaxValue
     {
-        get => this.maxValue;
+        get;
         init
         {
-            this.maxValue = value;
-            
-            if (!this.ValidateMaxValue(out var exception))
+            field = value;
+            if (!this.ValidateMaxValue(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -81,7 +72,7 @@ public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeField
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception exception)
+    public override bool ValidateSchema(out Exception? exception)
     {
         base.ValidateSchema(out exception);
         this.ValidateMinValue(out exception);
@@ -90,7 +81,7 @@ public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeField
         return exception == null;
     }
     
-    protected internal override bool Validate(object obj, IValidationContext validationContext)
+    protected internal override bool Validate(object? obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
@@ -130,7 +121,7 @@ public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeField
         return isValid;
     }
     
-    private bool ValidateMinValue(out Exception exception)
+    private bool ValidateMinValue(out Exception? exception)
     {
         if (this.MinValue != null)
         {
@@ -145,7 +136,7 @@ public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeField
         return true;
     }
     
-    private bool ValidateMaxValue(out Exception exception)
+    private bool ValidateMaxValue(out Exception? exception)
     {
         if (this.MaxValue != null)
         {

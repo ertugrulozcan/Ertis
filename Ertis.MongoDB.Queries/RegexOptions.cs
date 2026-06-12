@@ -20,7 +20,7 @@ public enum RegexOptions
 	Extended = 4,
 	
 	/// <summary>
-	/// 's' - Allows the dot character (i.e. .) to match all characters including newline characters.
+	/// 's' - Allows the dot character (i.e .) to match all characters including newline characters.
 	/// </summary>
 	AllowDot = 8
 }

@@ -20,7 +20,7 @@ public class JsonFieldInfo : FieldInfo<object>
     
     #region Methods
     
-    public override object GetDefaultValue()
+    public override object? GetDefaultValue()
     {
         var defaultValue = base.GetDefaultValue();
         if (defaultValue is JObject jObject)
@@ -45,7 +45,7 @@ public class JsonFieldInfo : FieldInfo<object>
             IsVirtual = this.IsVirtual,
             IsHidden = this.IsHidden,
             IsReadonly = this.IsReadonly,
-            DefaultValue = this.DefaultValue,
+            DefaultValue = this.DefaultValue
         };
     }
     

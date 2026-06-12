@@ -1,23 +1,20 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Ertis.MongoDB.Queries;
 
 internal class QueryExpression : IQueryExpression, IHasChildren
 {
-    #region Fields
-    
-    private readonly IQuery _query;
-    
-    #endregion
-    
     #region Properties
     
-    public string Field { get; init; }
+    public required string Field { get; init; }
     
-    internal IQuery Value 
+    [field: AllowNull, MaybeNull]
+    internal IQuery Value
     {
-        get => this._query;
+        get;
         init
         {
-            this._query = value;
+            field = value;
             this.Children.Insert(0, value);
         }
     }

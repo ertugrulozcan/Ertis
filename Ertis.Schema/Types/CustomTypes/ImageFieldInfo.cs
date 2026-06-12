@@ -9,19 +9,7 @@ namespace Ertis.Schema.Types.CustomTypes;
 
 public sealed class ImageFieldInfo : ObjectFieldInfoBase
 {
-    #region Fields
-    
-    private readonly int? maxSize;
-    private readonly int? minCount;
-    private readonly int? maxCount;
-    private readonly int? maxWidth;
-    private readonly int? maxHeight;
-    private readonly int? minWidth;
-    private readonly int? minHeight;
-    
-    #endregion
-    
-	#region Properties
+    #region Properties
     
     [JsonProperty("type")]
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
@@ -43,12 +31,11 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxSize
     {
-        get => this.maxSize;
+        get;
         init
         {
-            this.maxSize = value;
-            
-            if (!this.ValidateMaxSize(out var exception))
+            field = value;
+            if (!this.ValidateMaxSize(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -60,12 +47,11 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MinCount
     {
-        get => this.minCount;
+        get;
         init
         {
-            this.minCount = value;
-            
-            if (!this.ValidateMinCount(out var exception))
+            field = value;
+            if (!this.ValidateMinCount(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -77,12 +63,11 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxCount
     {
-        get => this.maxCount;
+        get;
         init
         {
-            this.maxCount = value;
-            
-            if (!this.ValidateMaxCount(out var exception))
+            field = value;
+            if (!this.ValidateMaxCount(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -94,12 +79,11 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MinWidth
     {
-        get => this.minWidth;
+        get;
         init
         {
-            this.minWidth = value;
-            
-            if (!this.ValidateMinWidth(out var exception))
+            field = value;
+            if (!this.ValidateMinWidth(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -111,12 +95,11 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MinHeight
     {
-        get => this.minHeight;
+        get;
         init
         {
-            this.minHeight = value;
-            
-            if (!this.ValidateMinHeight(out var exception))
+            field = value;
+            if (!this.ValidateMinHeight(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -128,12 +111,11 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxWidth
     {
-        get => this.maxWidth;
+        get;
         init
         {
-            this.maxWidth = value;
-            
-            if (!this.ValidateMaxWidth(out var exception))
+            field = value;
+            if (!this.ValidateMaxWidth(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -145,12 +127,11 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxHeight
     {
-        get => this.maxHeight;
+        get;
         init
         {
-            this.maxHeight = value;
-            
-            if (!this.ValidateMaxHeight(out var exception))
+            field = value;
+            if (!this.ValidateMaxHeight(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -182,22 +163,22 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
     [JsonProperty("formWidth", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("formWidth")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string FormWidth { get; set; }
+    public string? FormWidth { get; set; }
     
     [JsonProperty("formHeight", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("formHeight")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string FormHeight { get; set; }
+    public string? FormHeight { get; set; }
     
     [JsonProperty("maxFormWidth", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxFormWidth")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string MaxFormWidth { get; set; }
+    public string? MaxFormWidth { get; set; }
     
     [JsonProperty("maxFormHeight", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxFormHeight")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string MaxFormHeight { get; set; }
+    public string? MaxFormHeight { get; set; }
     
     #endregion
     
@@ -266,7 +247,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception exception)
+    public override bool ValidateSchema(out Exception? exception)
     {
         base.ValidateSchema(out exception);
         this.ValidateMinCount(out exception);
@@ -276,7 +257,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
         return exception == null;
     }
     
-    protected internal override bool Validate(object obj, IValidationContext validationContext)
+    protected internal override bool Validate(object? obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
@@ -298,7 +279,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
         return isValid;
     }
     
-    private bool ValidateMaxSize(out Exception exception)
+    private bool ValidateMaxSize(out Exception? exception)
     {
         if (this.MaxSize < 0)
         {
@@ -310,7 +291,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
         return true;
     }
     
-    private bool ValidateMinCount(out Exception exception)
+    private bool ValidateMinCount(out Exception? exception)
     {
         if (this.MinCount != null)
         {
@@ -331,7 +312,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
         return true;
     }
     
-    private bool ValidateMaxCount(out Exception exception)
+    private bool ValidateMaxCount(out Exception? exception)
     {
         if (this.MaxCount != null)
         {
@@ -352,7 +333,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
         return true;
     }
     
-    private bool ValidateMinWidth(out Exception exception)
+    private bool ValidateMinWidth(out Exception? exception)
     {
         if (this.MinWidth != null)
         {
@@ -373,7 +354,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
         return true;
     }
     
-    private bool ValidateMinHeight(out Exception exception)
+    private bool ValidateMinHeight(out Exception? exception)
     {
         if (this.MinHeight != null)
         {
@@ -394,7 +375,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
         return true;
     }
     
-    private bool ValidateMaxWidth(out Exception exception)
+    private bool ValidateMaxWidth(out Exception? exception)
     {
         if (this.MaxWidth != null)
         {
@@ -415,7 +396,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
         return true;
     }
     
-    private bool ValidateMaxHeight(out Exception exception)
+    private bool ValidateMaxHeight(out Exception? exception)
     {
         if (this.MaxHeight != null)
         {

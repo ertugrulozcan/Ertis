@@ -17,9 +17,9 @@ internal static class ExpressionHelper
 		return expression;
 	}
 	
-	internal static Expression<Func<TEntity, object>> ConvertSortExpression<TEntity>(string sortField)
+	internal static Expression<Func<TEntity, object>>? ConvertSortExpression<TEntity>(string sortField)
 	{
-		Expression<Func<TEntity, object>> sortExpression = null;
+		Expression<Func<TEntity, object>>? sortExpression = null;
 		if (!string.IsNullOrEmpty(sortField))
 		{
 			var type = typeof(TEntity);

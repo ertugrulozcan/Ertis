@@ -17,7 +17,7 @@ public abstract class ObjectFieldInfoBase : FieldInfo<object>, ISchema
     
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
-    public string Slug => this.Name;
+    public string Slug => this.Name ?? string.Empty;
     
     [JsonProperty("allowAdditionalProperties", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("allowAdditionalProperties")]
@@ -44,12 +44,6 @@ public abstract class ObjectFieldInfoBase : FieldInfo<object>, ISchema
 
 public sealed class ObjectFieldInfo : ObjectFieldInfoBase
 {
-    #region Fields
-    
-    private readonly IReadOnlyCollection<IFieldInfo> properties;
-    
-    #endregion
-    
     #region Properties
     
     [JsonProperty("type")]
@@ -63,19 +57,16 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
     [Newtonsoft.Json.JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
     public override IReadOnlyCollection<IFieldInfo> Properties
     {
-        get => this.properties;
+        get;
         init
         {
-            this.properties = value;
-            if (value != null)
+            field = value;
+            foreach (var fieldInfo in value)
             {
-                foreach (var fieldInfo in value)
-                {
-                    fieldInfo.Parent = this;
-                }   
+                fieldInfo.Parent = this;
             }
             
-            if (!this.ValidateProperties(out var exception))
+            if (!this.ValidateProperties(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -99,7 +90,7 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception exception)
+    public override bool ValidateSchema(out Exception? exception)
     {
         base.ValidateSchema(out exception);
         this.Validate(out exception);
@@ -107,11 +98,11 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
         return exception == null;
     }
     
-    protected internal override bool Validate(object obj, IValidationContext validationContext)
+    protected internal override bool Validate(object? obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
-        if (obj != null && this.Properties != null)
+        if (obj != null)
         {
             DynamicObject dynamicObject;
             if (obj is ExpandoObject expandoObject)
@@ -142,7 +133,7 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
             
             foreach (var fieldInfo in this.Properties)
             {
-                if (!validatedProperties.Contains(fieldInfo.Name))
+                if (fieldInfo.Name != null && !validatedProperties.Contains(fieldInfo.Name))
                 {
                     isValid &= ((FieldInfo) fieldInfo).Validate(null, validationContext);
                 }
@@ -154,7 +145,7 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
     
     public override object Clone()
     {
-        return new ObjectFieldInfo(this.Properties.Select(x => x.Clone() as IFieldInfo))
+        return new ObjectFieldInfo(this.Properties.Select(x => (IFieldInfo) x.Clone()))
         {
             Name = this.Name,
             Description = this.Description,
@@ -165,8 +156,7 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
             IsHidden = this.IsHidden,
             IsReadonly = this.IsReadonly,
             DefaultValue = this.DefaultValue,
-            AllowAdditionalProperties = this.AllowAdditionalProperties,
-            // Properties ** From Constructor 
+            AllowAdditionalProperties = this.AllowAdditionalProperties
         };
     }
     

@@ -4,8 +4,10 @@ public interface UpsertOptions
 {
 	#region Properties
 	
+	// ReSharper disable once UnusedMemberInSuper.Global
 	bool TriggerBeforeActionBinder { get; set; }
 	
+	// ReSharper disable once UnusedMemberInSuper.Global
 	bool TriggerAfterActionBinder { get; set; }
 	
 	#endregion

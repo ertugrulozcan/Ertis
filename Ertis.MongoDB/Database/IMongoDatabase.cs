@@ -3,6 +3,8 @@ using Ertis.MongoDB.Models;
 using MongoDB.Bson;
 using MongoDriver = MongoDB.Driver;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMemberInSuper.Global
 namespace Ertis.MongoDB.Database;
 
 public interface IMongoDatabase
@@ -21,13 +23,13 @@ public interface IMongoDatabase
 	
 	Task RenameCollectionAsync(string oldName, string newName, CancellationToken cancellationToken = default);
 	
-	IEnumerable<string> ListCollections(Expression<Func<BsonDocument, bool>> filterExpression = null);
+	IEnumerable<string> ListCollections(Expression<Func<BsonDocument, bool>>? filterExpression = null);
 	
-	Task<IEnumerable<string>> ListCollectionsAsync(Expression<Func<BsonDocument, bool>> filterExpression = null, CancellationToken cancellationToken = default);
+	Task<IEnumerable<string>> ListCollectionsAsync(Expression<Func<BsonDocument, bool>>? filterExpression = null, CancellationToken cancellationToken = default);
 	
-	MongoDbStatistics GetDatabaseStatistics();
+	MongoDbStatistics? GetDatabaseStatistics();
 	
-	Task<MongoDbStatistics> GetDatabaseStatisticsAsync(CancellationToken cancellationToken = default);
+	Task<MongoDbStatistics?> GetDatabaseStatisticsAsync(CancellationToken cancellationToken = default);
 	
 	BsonDocument GetDatabaseStatisticsDocument();
 	

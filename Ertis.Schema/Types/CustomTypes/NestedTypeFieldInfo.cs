@@ -14,12 +14,6 @@ namespace Ertis.Schema.Types.CustomTypes;
 
 public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
 {
-    #region Fields
-    
-    private readonly IReadOnlyCollection<IFieldInfo> properties;
-    
-    #endregion
-    
     #region Properties
     
     [JsonProperty("type")]
@@ -33,19 +27,16 @@ public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
     [Newtonsoft.Json.JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
     public override IReadOnlyCollection<IFieldInfo> Properties
     {
-        get => this.properties;
+        get;
         init
         {
-            this.properties = value;
-            if (value != null)
+            field = value;
+            foreach (var fieldInfo in value)
             {
-                foreach (var fieldInfo in value)
-                {
-                    fieldInfo.Parent = this;
-                }   
+                fieldInfo.Parent = this;
             }
             
-            if (!this.ValidateProperties(out var exception))
+            if (!this.ValidateProperties(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -54,7 +45,7 @@ public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
     
     [JsonProperty("nestedTypeId")]
     [JsonPropertyName("nestedTypeId")]
-    public string NestedTypeId { get; set; }
+    public string? NestedTypeId { get; set; }
     
     #endregion
     
@@ -73,7 +64,7 @@ public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception exception)
+    public override bool ValidateSchema(out Exception? exception)
     {
         base.ValidateSchema(out exception);
         this.Validate(out exception);
@@ -81,11 +72,11 @@ public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
         return exception == null;
     }
     
-    protected internal override bool Validate(object obj, IValidationContext validationContext)
+    protected internal override bool Validate(object? obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
-        if (obj != null && this.Properties != null)
+        if (obj != null)
         {
             DynamicObject dynamicObject;
             if (obj is ExpandoObject expandoObject)
@@ -116,7 +107,7 @@ public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
             
             foreach (var fieldInfo in this.Properties)
             {
-                if (!validatedProperties.Contains(fieldInfo.Name))
+                if (fieldInfo.Name != null && !validatedProperties.Contains(fieldInfo.Name))
                 {
                     isValid &= ((FieldInfo) fieldInfo).Validate(null, validationContext);
                 }
@@ -128,7 +119,7 @@ public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
     
     public override object Clone()
     {
-        return new NestedTypeFieldInfo(this.Properties.Select(x => x.Clone() as IFieldInfo))
+        return new NestedTypeFieldInfo(this.Properties.Select(x => (IFieldInfo) x.Clone()))
         {
             Name = this.Name,
             Description = this.Description,
@@ -140,8 +131,7 @@ public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
             IsReadonly = this.IsReadonly,
             DefaultValue = this.DefaultValue,
             AllowAdditionalProperties = this.AllowAdditionalProperties,
-            NestedTypeId = this.NestedTypeId, 
-            // Properties ** From Constructor
+            NestedTypeId = this.NestedTypeId
         };
     }
     

@@ -6,19 +6,21 @@ using Newtonsoft.Json;
 
 namespace Ertis.MongoDB.Extensions;
 
+// ReSharper disable once UnusedType.Global
 public static class NewtonsoftExtensions
 {
 	#region Methods
 	
-	public static dynamic ExecuteSelectQuery<T>(this IPaginationCollection<T> paginationCollection, IDictionary<string, bool> selectFields)
+	// ReSharper disable once UnusedMember.Global
+	public static dynamic ExecuteSelectQuery<T>(this IPaginationCollection<T> paginationCollection, IDictionary<string, bool>? selectFields)
 	{
-		if (paginationCollection?.Items == null || selectFields == null || !selectFields.Any())
+		if (paginationCollection.Items == null || selectFields == null || !selectFields.Any())
 		{
 			return paginationCollection;
 		}
 		
-		bool isInclude = selectFields.Values.Any(x => x);
-		bool isExclude = selectFields.Values.Any(x => !x);
+		var isInclude = selectFields.Values.Any(x => x);
+		var isExclude = selectFields.Values.Any(x => !x);
 		if (isInclude && isExclude)
 		{
 			throw new SelectQueryInclusionException();	
@@ -34,9 +36,9 @@ public static class NewtonsoftExtensions
 			var jsonPropertyAttribute = propertyInfo.CustomAttributes.FirstOrDefault(x => x.AttributeType == typeof(JsonPropertyAttribute));
 			var constructorArguments = jsonPropertyAttribute?.ConstructorArguments.ToList();
 			var attributeValue = constructorArguments?.Select(x => x.Value?.ToString()).FirstOrDefault(x => !string.IsNullOrEmpty(x));
-			if (attributeValue != null && selectFields.ContainsKey(attributeValue))
+			if (attributeValue != null && selectFields.TryGetValue(attributeValue, out var value))
 			{
-				isSelected = selectFields[attributeValue];
+				isSelected = value;
 			}
 			
 			if (attributeValue != null && !string.IsNullOrEmpty(attributeValue))
@@ -45,6 +47,7 @@ public static class NewtonsoftExtensions
 					In projections that explicitly include fields, the _id field is the only field that you can explicitly exclude.
 					In projections that explicitly excludes fields, the _id field is the only field that you can explicitly include; however, the _id field is included by default.
 				*/
+				
 				if (attributeValue == "_id")
 				{
 					selectedProperties.Add(propertyInfo);
@@ -67,42 +70,41 @@ public static class NewtonsoftExtensions
 					}
 				}
 				
-				if (!jsonFieldNameDictionary.ContainsKey(propertyInfo.Name))
-				{
-					jsonFieldNameDictionary.Add(propertyInfo.Name, attributeValue);
-				}
+				jsonFieldNameDictionary.TryAdd(propertyInfo.Name, attributeValue);
 			}
 		}
 		
 		if (isExclude)
 		{
-			var exludedProperties = new List<PropertyInfo>();
-			exludedProperties.AddRange(selectedProperties);
+			var excludedProperties = new List<PropertyInfo>();
+			excludedProperties.AddRange(selectedProperties);
 			selectedProperties.Clear();
-			selectedProperties.AddRange(properties.Where(propertyInfo => !exludedProperties.Contains(propertyInfo)));
+			selectedProperties.AddRange(properties.Where(propertyInfo => !excludedProperties.Contains(propertyInfo)));
 		}
 		
-		List<ExpandoObject> projectinatedList = new List<ExpandoObject>();
+		var projectionList = new List<ExpandoObject>();
 		foreach (var item in paginationCollection.Items)
 		{
 			dynamic expandoObject = new ExpandoObject();
-			IDictionary<string, object> expandoObjectDictionary = expandoObject as IDictionary<string, object>;
-			foreach (var propertyInfo in selectedProperties)
+			if (expandoObject is IDictionary<string, object?> expandoObjectDictionary)
 			{
-				var propertyName = jsonFieldNameDictionary.ContainsKey(propertyInfo.Name)
-					? jsonFieldNameDictionary[propertyInfo.Name]
-					: propertyInfo.Name;
+				foreach (var propertyInfo in selectedProperties)
+				{
+					var propertyName = jsonFieldNameDictionary.TryGetValue(propertyInfo.Name, out var value)
+						? value
+						: propertyInfo.Name;
+					
+					expandoObjectDictionary.Add(propertyName, propertyInfo.GetValue(item));
+				}
 				
-				expandoObjectDictionary.Add(propertyName, propertyInfo.GetValue(item));
+				projectionList.Add(expandoObject);
 			}
-			
-			projectinatedList.Add(expandoObject);
 		}
 		
 		return new PaginationCollection<dynamic>
 		{
 			Count = paginationCollection.Count,
-			Items = projectinatedList
+			Items = projectionList
 		};
 	}
 	

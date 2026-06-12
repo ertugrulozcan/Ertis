@@ -151,7 +151,7 @@ public class SystemRestHandler : ISystemRestHandler
 		var json = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
 		var responseHeaders = response.Headers
 			.Where(x => x.Value.Any(y => !string.IsNullOrEmpty(y)))
-			.ToDictionary(x => x.Key, y => y.Value.FirstOrDefault());
+			.ToDictionary(x => x.Key, y => y.Value.First());
 		
 		if (response.IsSuccessStatusCode)
 		{
@@ -306,7 +306,7 @@ public class SystemRestHandler : ISystemRestHandler
 		var json = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
 		var responseHeaders = response.Headers
 			.Where(x => x.Value.Any(y => !string.IsNullOrEmpty(y)))
-			.ToDictionary(x => x.Key, y => y.Value.FirstOrDefault());
+			.ToDictionary(x => x.Key, y => y.Value.First());
 		
 		if (response.IsSuccessStatusCode)
 		{

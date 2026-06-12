@@ -1,3 +1,6 @@
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMemberInSuper.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.Extensions.AspNetCore.Versioning;
 
 public interface IApiVersionOptions

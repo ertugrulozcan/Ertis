@@ -3,6 +3,7 @@ using Ertis.Schema.Types.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
+// ReSharper disable UnusedMemberInSuper.Global
 namespace Ertis.Schema.Types;
 
 public interface IFieldInfo : ICloneable
@@ -11,24 +12,24 @@ public interface IFieldInfo : ICloneable
     
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
-    string Name { get; set; }
+    string? Name { get; set; }
     
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
-    string Path { get; }
+    string? Path { get; }
     
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
-    IFieldInfo Parent { get; set; }
+    IFieldInfo? Parent { get; set; }
     
     [JsonProperty("displayName")]
     [JsonPropertyName("displayName")]
-    string DisplayName { get; }
+    string? DisplayName { get; }
     
     [JsonProperty("description", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("description")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    string Description { get; }
+    string? Description { get; }
     
     [JsonProperty("type")]
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
@@ -70,9 +71,9 @@ public interface IFieldInfo : ICloneable
     
     #region Methods
     
-    bool ValidateSchema(out Exception exception);
+    bool ValidateSchema(out Exception? exception);
     
-    bool IsAnArrayItem(out ArrayFieldInfo arrayFieldInfo);
+    bool IsAnArrayItem(out ArrayFieldInfo? arrayFieldInfo);
     
     #endregion
 }

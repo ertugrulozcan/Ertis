@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Newtonsoft.Json;
+using JsonProperty = Newtonsoft.Json.JsonPropertyAttribute;
 
 namespace Ertis.Core.Collections;
 
@@ -13,7 +13,7 @@ public interface IPaginationCollection<out T>
 	
 	[JsonProperty("items")]
 	[JsonPropertyName("items")]
-	IEnumerable<T> Items { get; }
+	IEnumerable<T>? Items { get; }
 	
 	#endregion
 }
@@ -28,7 +28,7 @@ public class PaginationCollection<T> : IPaginationCollection<T>
 	
 	[JsonProperty("items")]
 	[JsonPropertyName("items")]
-	public IEnumerable<T> Items { get; set; }
+	public IEnumerable<T>? Items { get; set; }
 	
 	#endregion
 }

@@ -1,4 +1,6 @@
-﻿namespace Ertis.MongoDB.Queries;
+﻿// ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
+namespace Ertis.MongoDB.Queries;
 
 public static class QueryBuilder
 {

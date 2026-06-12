@@ -38,33 +38,33 @@ public class ReferenceFieldInfo : FieldInfo
     [JsonProperty("contentType", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("contentType")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public string ContentType { get; set; }
+    public string? ContentType { get; set; }
     
     [JsonProperty("singleReferenceOptions", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("singleReferenceOptions")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public SingleReferenceOptions SingleReferenceOptions { get; set; }
+    public SingleReferenceOptions? SingleReferenceOptions { get; set; }
     
     [JsonProperty("multipleReferenceOptions", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("multipleReferenceOptions")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public MultipleReferenceOptions MultipleReferenceOptions { get; set; }
+    public MultipleReferenceOptions? MultipleReferenceOptions { get; set; }
     
     [JsonProperty("collectionReferenceOptions", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("collectionReferenceOptions")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public CollectionReferenceOptions CollectionReferenceOptions { get; set; }
+    public CollectionReferenceOptions? CollectionReferenceOptions { get; set; }
     
     #endregion
     
     #region Methods
     
-    protected override void ValidateSchemaCore(out Exception exception)
+    protected override void ValidateSchemaCore(out Exception? exception)
     {
         exception = null;
     }
     
-    protected override bool ValidateCore(object obj, IValidationContext validationContext)
+    protected override bool ValidateCore(object? obj, IValidationContext validationContext)
     {
         var isValid = true;
         
@@ -109,18 +109,17 @@ public class ReferenceFieldInfo : FieldInfo
         return isValid;
     }
     
-    private static string EnsureReferenceId(object obj)
+    private static string? EnsureReferenceId(object? obj)
     {
         return obj switch
         {
             string referenceId => referenceId,
-            Dictionary<string, object> objectDictionary when objectDictionary.ContainsKey("_id") =>
-                objectDictionary["_id"].ToString(),
+            Dictionary<string, object> objectDictionary when objectDictionary.ContainsKey("_id") => objectDictionary["_id"].ToString(),
             _ => null
         };
     }
     
-    public override object GetDefaultValue()
+    public override object? GetDefaultValue()
     {
         return null;
     }
@@ -138,7 +137,7 @@ public class ReferenceFieldInfo : FieldInfo
             IsVirtual = this.IsVirtual,
             IsHidden = this.IsHidden,
             IsReadonly = this.IsReadonly,
-            ReferenceType = this.ReferenceType,
+            ReferenceType = this.ReferenceType
         };
     }
     
@@ -149,13 +148,6 @@ public class SingleReferenceOptions;
 
 public class MultipleReferenceOptions
 {
-    #region Fields
-    
-    private readonly int? minCount;
-    private readonly int? maxCount;
-    
-    #endregion
-    
     #region Properties
     
     [JsonProperty("minCount", NullValueHandling = NullValueHandling.Ignore)]
@@ -163,12 +155,11 @@ public class MultipleReferenceOptions
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MinCount
     {
-        get => this.minCount;
+        get;
         init
         {
-            this.minCount = value;
-            
-            if (!this.ValidateMinCount(out var exception))
+            field = value;
+            if (!this.ValidateMinCount(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -180,12 +171,11 @@ public class MultipleReferenceOptions
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? MaxCount
     {
-        get => this.maxCount;
+        get;
         init
         {
-            this.maxCount = value;
-            
-            if (!this.ValidateMaxCount(out var exception))
+            field = value;
+            if (!this.ValidateMaxCount(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -196,19 +186,19 @@ public class MultipleReferenceOptions
     
     #region Methods
     
-    private bool ValidateMinCount(out Exception exception)
+    private bool ValidateMinCount(out Exception? exception)
     {
         if (this.MinCount != null)
         {
             if (this.MinCount < 0)
             {
-                exception = new SchemaValidationException($"The multiple reference 'minCount' value can not be less than zero");
+                exception = new SchemaValidationException("The multiple reference 'minCount' value can not be less than zero");
                 return false;
             }
             
             if (this.MaxCount != null && this.MinCount != null && this.MaxCount < this.MinCount)
             {
-                exception = new SchemaValidationException($"The multiple reference 'minCount' value can not be greater than the 'maxCount' value");
+                exception = new SchemaValidationException("The multiple reference 'minCount' value can not be greater than the 'maxCount' value");
                 return false;
             }
         }
@@ -217,19 +207,19 @@ public class MultipleReferenceOptions
         return true;
     }
     
-    private bool ValidateMaxCount(out Exception exception)
+    private bool ValidateMaxCount(out Exception? exception)
     {
         if (this.MaxCount != null)
         {
             if (this.MaxCount < 0)
             {
-                exception = new SchemaValidationException($"The multiple reference 'maxCount' value can not be less than zero");
+                exception = new SchemaValidationException("The multiple reference 'maxCount' value can not be less than zero");
                 return false;
             }
             
             if (this.MinCount != null && this.MaxCount != null && this.MinCount > this.MaxCount)
             {
-                exception = new SchemaValidationException($"The multiple reference 'minCount' value can not be greater than the 'maxCount' value");
+                exception = new SchemaValidationException("The multiple reference 'minCount' value can not be greater than the 'maxCount' value");
                 return false;
             }
         }
@@ -243,31 +233,23 @@ public class MultipleReferenceOptions
 
 public class CollectionReferenceOptions
 {
-    #region Fields
-    
-    private readonly int? skip;
-    private readonly int? limit;
-    
-    #endregion
-    
     #region Properties
     
     [JsonProperty("collection", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("collection")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string CollectionSlug { get; set; }
+    public string? CollectionSlug { get; set; }
     
     [JsonProperty("skip", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("skip")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? Skip
     {
-        get => this.skip;
+        get;
         init
         {
-            this.skip = value;
-            
-            if (!this.ValidateSkipValue(out var exception))
+            field = value;
+            if (!this.ValidateSkipValue(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -279,12 +261,11 @@ public class CollectionReferenceOptions
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? Limit
     {
-        get => this.limit;
+        get;
         init
         {
-            this.limit = value;
-            
-            if (!this.ValidateLimitValue(out var exception))
+            field = value;
+            if (!this.ValidateLimitValue(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -299,27 +280,27 @@ public class CollectionReferenceOptions
     [JsonProperty("queryParams", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("queryParams")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public CollectionReferenceParameter[] QueryParams { get; set; }
+    public CollectionReferenceParameter[]? QueryParams { get; set; }
     
     [JsonProperty("excludedFields")]
     [JsonPropertyName("excludedFields")]
-    public string[] ExcludedFields { get; set; }
+    public string[]? ExcludedFields { get; set; }
     
     #endregion
     
     #region Methods
     
-    private bool ValidateSkipValue(out Exception exception)
+    private bool ValidateSkipValue(out Exception? exception)
     {
         if (this.Skip != null)
         {
             switch (this.Skip)
             {
                 case < 0:
-                    exception = new SchemaValidationException($"The multiple reference 'skip' value can not be less than zero");
+                    exception = new SchemaValidationException("The multiple reference 'skip' value can not be less than zero");
                     return false;
                 case > 500:
-                    exception = new SchemaValidationException($"The multiple reference 'skip' value can not be greater than 500");
+                    exception = new SchemaValidationException("The multiple reference 'skip' value can not be greater than 500");
                     return false;
             }
         }
@@ -328,17 +309,17 @@ public class CollectionReferenceOptions
         return true;
     }
     
-    private bool ValidateLimitValue(out Exception exception)
+    private bool ValidateLimitValue(out Exception? exception)
     {
         if (this.Limit != null)
         {
             switch (this.Limit)
             {
                 case <= 0:
-                    exception = new SchemaValidationException($"The multiple reference 'limit' value can not be less than or equal zero");
+                    exception = new SchemaValidationException("The multiple reference 'limit' value can not be less than or equal zero");
                     return false;
                 case > 500:
-                    exception = new SchemaValidationException($"The multiple reference 'limit' value can not be greater than 500");
+                    exception = new SchemaValidationException("The multiple reference 'limit' value can not be greater than 500");
                     return false;
             }
         }
@@ -356,7 +337,7 @@ public class CollectionReferenceParameter : DynamicQueryParameter
     
     [JsonProperty("value")]
     [JsonPropertyName("value")]
-    public object Value { get; set; }
+    public object? Value { get; set; }
 	
     [JsonProperty("bindingType")]
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
@@ -366,7 +347,7 @@ public class CollectionReferenceParameter : DynamicQueryParameter
 	
     [JsonProperty("dynamicParameter")]
     [JsonPropertyName("dynamicParameter")]
-    public string DynamicParameter { get; set; }
+    public string? DynamicParameter { get; set; }
 	
     #endregion
 }
@@ -374,5 +355,5 @@ public class CollectionReferenceParameter : DynamicQueryParameter
 public enum BindingTypes
 {
     @static,
-    @dynamic
+    dynamic
 }

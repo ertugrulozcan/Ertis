@@ -9,15 +9,6 @@ namespace Ertis.Schema.Types.Primitives;
 
 public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
 {
-    #region Fields
-    
-    private readonly double? minimum;
-    private readonly double? maximum;
-    private readonly double? exclusiveMinimum;
-    private readonly double? exclusiveMaximum;
-    
-    #endregion
-    
     #region Properties
     
     [JsonProperty("type")]
@@ -34,12 +25,11 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public double? Minimum
     {
-        get => this.minimum;
+        get;
         init
         {
-            this.minimum = value;
-            
-            if (!this.ValidateMinimum(out var exception))
+            field = value;
+            if (!this.ValidateMinimum(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -54,12 +44,11 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public double? Maximum
     {
-        get => this.maximum;
+        get;
         init
         {
-            this.maximum = value;
-            
-            if (!this.ValidateMaximum(out var exception))
+            field = value;
+            if (!this.ValidateMaximum(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -74,12 +63,11 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public double? ExclusiveMinimum
     {
-        get => this.exclusiveMinimum;
+        get;
         init
         {
-            this.exclusiveMinimum = value;
-            
-            if (!this.ValidateExclusiveMinimum(out var exception))
+            field = value;
+            if (!this.ValidateExclusiveMinimum(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -94,12 +82,11 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public double? ExclusiveMaximum
     {
-        get => this.exclusiveMaximum;
+        get;
         init
         {
-            this.exclusiveMaximum = value;
-            
-            if (!this.ValidateExclusiveMaximum(out var exception))
+            field = value;
+            if (!this.ValidateExclusiveMaximum(out var exception) && exception != null)
             {
                 throw exception;
             }
@@ -115,7 +102,7 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception exception)
+    public override bool ValidateSchema(out Exception? exception)
     {
         base.ValidateSchema(out exception);
         this.ValidateMinimum(out exception);
@@ -126,7 +113,7 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
         return exception == null;
     }
     
-    protected internal override bool Validate(object obj, IValidationContext validationContext)
+    protected internal override bool Validate(object? obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
@@ -164,7 +151,7 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
         return isValid;
     }
     
-    private bool ValidateMinimum(out Exception exception)
+    private bool ValidateMinimum(out Exception? exception)
     {
         if (this.Maximum != null && this.Minimum != null && this.Maximum < this.Minimum)
         {
@@ -182,7 +169,7 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
         return true;
     }
     
-    private bool ValidateMaximum(out Exception exception)
+    private bool ValidateMaximum(out Exception? exception)
     {
         if (this.Minimum != null && this.Maximum != null && this.Minimum > this.Maximum)
         {
@@ -200,7 +187,7 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
         return true;
     }
     
-    private bool ValidateExclusiveMinimum(out Exception exception)
+    private bool ValidateExclusiveMinimum(out Exception? exception)
     {
         if (this.Maximum != null && this.ExclusiveMinimum != null && this.Maximum < this.ExclusiveMinimum)
         {
@@ -218,7 +205,7 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
         return true;
     }
     
-    private bool ValidateExclusiveMaximum(out Exception exception)
+    private bool ValidateExclusiveMaximum(out Exception? exception)
     {
         if (this.Minimum != null && this.ExclusiveMaximum != null && this.Minimum > this.ExclusiveMaximum)
         {
@@ -253,7 +240,7 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
             Minimum = this.Minimum,
             Maximum = this.Maximum,
             ExclusiveMinimum = this.ExclusiveMinimum,
-            ExclusiveMaximum = this.ExclusiveMaximum,
+            ExclusiveMaximum = this.ExclusiveMaximum
         };
     }
     

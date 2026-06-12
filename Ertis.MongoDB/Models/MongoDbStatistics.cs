@@ -9,7 +9,7 @@ public class MongoDbStatistics
 	
 	[JsonProperty("db")]
 	[JsonPropertyName("db")]
-	public string DatabaseName { get; set; }
+	public string? DatabaseName { get; set; }
 	
 	[JsonProperty("collections", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("collections")]

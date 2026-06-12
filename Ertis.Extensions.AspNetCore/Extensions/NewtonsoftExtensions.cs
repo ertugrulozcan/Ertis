@@ -6,14 +6,11 @@ public static class NewtonsoftExtensions
 {
 	#region Methods
 	
-	public static bool TryGetValue<T>(this JToken jToken, out T value)
+	public static bool TryGetValue<T>(this JToken jToken, out T? value)
 	{
-		if (jToken == null)
-		{
-			throw new ArgumentNullException(nameof(jToken));
-		}
+        ArgumentNullException.ThrowIfNull(jToken);
 		
-		try
+        try
 		{
 			value = jToken.Value<T>();
 			return true;

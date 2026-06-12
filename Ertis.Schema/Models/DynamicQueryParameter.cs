@@ -9,20 +9,20 @@ public class DynamicQueryParameter
 	#region Properties
 	
 	[JsonProperty("name")]
-	public string Name { get; set; }
+	public required string Name { get; set; }
 	
 	[JsonProperty("slug")]
-	public string Slug { get; set; }
+	public required string Slug { get; set; }
 	
 	[JsonProperty("description")]
-	public string Description { get; set; }
+	public string? Description { get; set; }
 	
 	[JsonProperty("type")]
 	[JsonConverter(typeof(StringEnumConverter))]
 	public DynamicQueryParameterType Type { get; set; }
 	
 	[JsonProperty("defaultValue")]
-	public object DefaultValue { get; set; }
+	public object? DefaultValue { get; set; }
 	
 	[JsonProperty("isRequired")]
 	public bool IsRequired { get; set; }

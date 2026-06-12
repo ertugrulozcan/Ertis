@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ertis.PostgreSQL.Repository;
 
+// ReSharper disable once UnusedType.Global
 public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntity> where TEntity : class, IEntity<int>
 {
 	#region Services
@@ -41,12 +42,13 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		return this.database.Set<TEntity>();
 	}
 	
+	// ReSharper disable once UnusedParameter.Global
 	protected virtual IQueryable<TEntity> ConfigureDbSet(DbContext dbContext)
 	{
 		return this.GetDbSet();
 	}
 	
-	public virtual TEntity FindOne(int id)
+	public virtual TEntity? FindOne(int id)
 	{
 		var dbSet = this.ConfigureDbSet(this.database);
 		return this.TrackingEnabled ? 
@@ -54,7 +56,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 			dbSet.AsNoTracking().FirstOrDefault(x => x.Id == id);
 	}
 	
-	public virtual async Task<TEntity> FindOneAsync(int id, CancellationToken cancellationToken = default)
+	public virtual async Task<TEntity?> FindOneAsync(int id, CancellationToken cancellationToken = default)
 	{
 		var dbSet = this.ConfigureDbSet(this.database);
 		if (this.TrackingEnabled)
@@ -67,7 +69,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		}
 	}
 	
-	public virtual TEntity FindOne(Expression<Func<TEntity, bool>> expression)
+	public virtual TEntity? FindOne(Expression<Func<TEntity, bool>> expression)
 	{
 		var dbSet = this.ConfigureDbSet(this.database);
 		if (this.TrackingEnabled)
@@ -80,7 +82,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		}
 	}
 	
-	public virtual async Task<TEntity> FindOneAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default)
+	public virtual async Task<TEntity?> FindOneAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default)
 	{
 		var dbSet = this.ConfigureDbSet(this.database);
 		if (this.TrackingEnabled)
@@ -97,7 +99,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		string orderBy = null, 
+		string? orderBy = null, 
 		SortDirection? sortDirection = null)
 	{
 		return this.ExecuteWhere(null, skip, limit, withCount, orderBy, sortDirection);
@@ -107,7 +109,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		Sorting sorting = null)
+		Sorting? sorting = null)
 	{
 		return this.ExecuteWhere(null, skip, limit, withCount, sorting);
 	}
@@ -116,7 +118,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		string orderBy = null, 
+		string? orderBy = null, 
 		SortDirection? sortDirection = null, 
 		CancellationToken cancellationToken = default)
 	{
@@ -127,7 +129,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		Sorting sorting = null, 
+		Sorting? sorting = null, 
 		CancellationToken cancellationToken = default)
 	{
 		return await this.ExecuteWhereAsync(null, skip, limit, withCount, sorting, cancellationToken: cancellationToken);
@@ -138,7 +140,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		string orderBy = null, 
+		string? orderBy = null, 
 		SortDirection? sortDirection = null)
 	{
 		return this.ExecuteWhere(expression, skip, limit, withCount, orderBy, sortDirection);
@@ -149,7 +151,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		Sorting sorting = null)
+		Sorting? sorting = null)
 	{
 		return this.ExecuteWhere(expression, skip, limit, withCount, sorting);
 	}
@@ -159,7 +161,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		string orderBy = null, 
+		string? orderBy = null, 
 		SortDirection? sortDirection = null, 
 		CancellationToken cancellationToken = default)
 	{
@@ -171,7 +173,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		Sorting sorting = null,
+		Sorting? sorting = null,
 		CancellationToken cancellationToken = default)
 	{
 		return await this.ExecuteWhereAsync(expression, skip, limit, withCount, sorting, cancellationToken: cancellationToken);
@@ -182,7 +184,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		string orderBy = null, 
+		string? orderBy = null, 
 		SortDirection? sortDirection = null)
 	{
 		var expression = ExpressionHelper.ParseExpression<TEntity>(query);
@@ -194,7 +196,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		Sorting sorting = null)
+		Sorting? sorting = null)
 	{
 		var expression = ExpressionHelper.ParseExpression<TEntity>(query);
 		return this.ExecuteWhere(expression, skip, limit, withCount, sorting);
@@ -205,7 +207,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		string orderBy = null, 
+		string? orderBy = null, 
 		SortDirection? sortDirection = null, 
 		CancellationToken cancellationToken = default)
 	{
@@ -218,7 +220,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		Sorting sorting = null,
+		Sorting? sorting = null,
 		CancellationToken cancellationToken = default)
 	{
 		var expression = await ExpressionHelper.ParseExpressionAsync<TEntity>(query, cancellationToken: cancellationToken);
@@ -226,11 +228,11 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 	}
 	
 	private IPaginationCollection<TEntity> ExecuteWhere(
-		Expression<Func<TEntity, bool>> expression, 
+		Expression<Func<TEntity, bool>>? expression, 
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		string orderBy = null, 
+		string? orderBy = null, 
 		SortDirection? sortDirection = null)
 	{
 		return this.ExecuteWhere(
@@ -238,15 +240,15 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 			skip,
 			limit,
 			withCount,
-			new Sorting(orderBy, sortDirection));
+			orderBy != null ? new Sorting(orderBy, sortDirection) : null);
 	}
 	
 	private IPaginationCollection<TEntity> ExecuteWhere(
-		Expression<Func<TEntity, bool>> expression,
+		Expression<Func<TEntity, bool>>? expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
-		Sorting sorting = null)
+		Sorting? sorting = null)
 	{
 		var db = this.ConfigureDbSet(this.database);
 		var dbSet = this.TrackingEnabled ? db : db.AsNoTracking();
@@ -256,7 +258,8 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		{
 			for (var i = 0; i < sorting.Count; i++)
 			{
-				var sortExpression = ExpressionHelper.ConvertSortExpression<TEntity>(sorting[i].OrderBy);
+				var orderBy = sorting[i].OrderBy;
+				var sortExpression = orderBy != null ? ExpressionHelper.ConvertSortExpression<TEntity>(orderBy) : null;
 				if (sortExpression != null)
 				{
 					if (i > 0 && queryable is IOrderedQueryable<TEntity> orderedQueryable)
@@ -304,11 +307,11 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 	}
 	
 	private async Task<IPaginationCollection<TEntity>> ExecuteWhereAsync(
-		Expression<Func<TEntity, bool>> expression, 
+		Expression<Func<TEntity, bool>>? expression, 
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		string orderBy = null, 
+		string? orderBy = null, 
 		SortDirection? sortDirection = null, 
 		CancellationToken cancellationToken = default)
 	{
@@ -317,16 +320,16 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 			skip,
 			limit,
 			withCount,
-			new Sorting(orderBy, sortDirection),
+			orderBy != null ? new Sorting(orderBy, sortDirection) : null,
 			cancellationToken: cancellationToken);
 	}
 	
 	private async Task<IPaginationCollection<TEntity>> ExecuteWhereAsync(
-		Expression<Func<TEntity, bool>> expression,
+		Expression<Func<TEntity, bool>>? expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
-		Sorting sorting = null,
+		Sorting? sorting = null,
 		CancellationToken cancellationToken = default)
 	{
 		var db = this.ConfigureDbSet(this.database);
@@ -337,7 +340,8 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		{
 			for (var i = 0; i < sorting.Count; i++)
 			{
-				var sortExpression = ExpressionHelper.ConvertSortExpression<TEntity>(sorting[i].OrderBy);
+				var orderBy = sorting[i].OrderBy;
+				var sortExpression = orderBy != null ? ExpressionHelper.ConvertSortExpression<TEntity>(orderBy) : null;
 				if (sortExpression != null)
 				{
 					if (i > 0 && queryable is IOrderedQueryable<TEntity> orderedQueryable)
@@ -392,14 +396,16 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 	{
 		var cursor = this.GetDbSet().Add(entity);
 		this.database.SaveChanges();
-		return this.FindOne(cursor.Entity.Id);
+		var inserted = this.FindOne(cursor.Entity.Id);
+		return inserted ?? throw new Exception($"Entity with id {cursor.Entity.Id} was not found.");
 	}
 	
 	public virtual async Task<TEntity> InsertAsync(TEntity entity, InsertOptions? options = null, CancellationToken cancellationToken = default)
 	{
-		var cursor = (await this.GetDbSet().AddAsync(entity, cancellationToken: cancellationToken));
+		var cursor = await this.GetDbSet().AddAsync(entity, cancellationToken: cancellationToken);
 		await this.database.SaveChangesAsync(cancellationToken: cancellationToken);
-		return await this.FindOneAsync(cursor.Entity.Id, cancellationToken: cancellationToken);
+		var inserted = await this.FindOneAsync(cursor.Entity.Id, cancellationToken: cancellationToken);
+		return inserted ?? throw new Exception($"Entity with id {cursor.Entity.Id} was not found.");
 	}
 	
 	public void BulkInsert(IEnumerable<TEntity> entities, InsertOptions? options = null)
@@ -418,20 +424,21 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 	
 	#region Update Methods
 	
-	public virtual TEntity Update(TEntity entity, int id = default, UpdateOptions? options = null)
+	public virtual TEntity Update(TEntity entity, int id = 0, UpdateOptions? options = null)
 	{
 		if (this.TrackingEnabled)
 		{
 			var cursor = this.GetDbSet().Update(entity);
 			this.database.SaveChanges();
-			return this.FindOne(cursor.Entity.Id);
+			var inserted = this.FindOne(cursor.Entity.Id);
+			return inserted ?? throw new Exception($"Entity with id {id} was not found.");
 		}
 		else
 		{
 			var current = this.GetDbSet().AsNoTracking().FirstOrDefault(x => x.Id == entity.Id);
 			if (current == null)
 			{
-				return null;
+				throw new Exception($"Entity with id {id} was not found.");
 			}
 			
 			var entry = this.database.Entry(current);
@@ -442,7 +449,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 		}
 	}
 	
-	public virtual async Task<TEntity> UpdateAsync(TEntity entity, int id = default, UpdateOptions? options = null, CancellationToken cancellationToken = default)
+	public virtual async Task<TEntity> UpdateAsync(TEntity entity, int id = 0, UpdateOptions? options = null, CancellationToken cancellationToken = default)
 	{
 		if (this.TrackingEnabled)
 		{
@@ -455,7 +462,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 			var current = await this.GetDbSet().AsNoTracking().FirstOrDefaultAsync(x => x.Id == entity.Id, cancellationToken: cancellationToken);
 			if (current == null)
 			{
-				return null;
+				throw new Exception($"Entity with id {id} was not found.");
 			}
 			
 			var entry = this.database.Entry(current);
@@ -469,14 +476,7 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 	public virtual TEntity Upsert(TEntity entity, int id)
 	{
 		var current = this.FindOne(id > 0 ? id : entity.Id);
-		if (current == null)
-		{
-			return this.Insert(entity);
-		}
-		else
-		{
-			return this.Update(entity, id);
-		}
+		return current == null ? this.Insert(entity) : this.Update(entity, id);
 	}
 	
 	public virtual async Task<TEntity> UpsertAsync(TEntity entity, int id, CancellationToken cancellationToken = default)
@@ -689,11 +689,13 @@ public abstract class PostgreRepositoryBase<TEntity> : IPostgreRepository<TEntit
 	
 	#region Cursor Methods
 	
+	// ReSharper disable once UnusedMember.Global
 	protected int SaveChanges()
 	{
 		return this.database.SaveChanges();
 	}
 	
+	// ReSharper disable once UnusedMember.Global
 	protected async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
 	{
 		return await this.database.SaveChangesAsync(cancellationToken: cancellationToken);

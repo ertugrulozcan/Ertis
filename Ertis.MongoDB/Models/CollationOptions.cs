@@ -1,3 +1,4 @@
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.MongoDB.Models;
 
 public class CollationOptions

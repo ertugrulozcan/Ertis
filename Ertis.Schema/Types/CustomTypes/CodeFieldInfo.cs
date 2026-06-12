@@ -53,7 +53,7 @@ public sealed class CodeFieldInfo : ObjectFieldInfoBase
     
     #region Methods
     
-    public override object GetDefaultValue()
+    public override object? GetDefaultValue()
     {
         var defaultValue = base.GetDefaultValue();
         if (defaultValue is JObject jObject)
@@ -79,7 +79,7 @@ public sealed class CodeFieldInfo : ObjectFieldInfoBase
             IsHidden = this.IsHidden,
             IsReadonly = this.IsReadonly,
             DefaultValue = this.DefaultValue,
-            Properties = this.Properties,
+            Properties = this.Properties
         };
     }
     

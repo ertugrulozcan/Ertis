@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Text;
 
+// ReSharper disable UnusedMember.Global
 namespace Ertis.TemplateEngine;
 
+// ReSharper disable once UnusedType.Global
 public class Formatter
 {
     #region Properties
@@ -17,7 +19,7 @@ public class Formatter
     /// Constructor
     /// </summary>
     /// <param name="options"></param>
-    public Formatter(ParserOptions options = null)
+    public Formatter(ParserOptions? options = null)
     {
         this.Parser = new Parser(options);
     }
@@ -26,7 +28,7 @@ public class Formatter
     
     #region Methods
     
-    public string Format(string template, object data)
+    public string Format(string template, object? data)
     {
         if (string.IsNullOrEmpty(template) || data == null)
         {
@@ -81,7 +83,7 @@ public class Formatter
         return this.Parser.Parse(template).ToArray();
     }
     
-    private static object ExtractData(string path, IDictionary<string, object> dictionary)
+    private static object? ExtractData(string path, IDictionary<string, object> dictionary)
     {
         if (string.IsNullOrEmpty(path))
         {

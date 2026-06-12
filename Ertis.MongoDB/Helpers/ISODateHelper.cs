@@ -1,6 +1,7 @@
 using System.Globalization;
 using Newtonsoft.Json.Linq;
 
+// ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.MongoDB.Helpers;
 
@@ -33,18 +34,14 @@ public static class ISODateHelper
 	
 	public static JToken EnsureDatetimeFieldsToISODate(JToken node)
 	{
-		if (node == null)
-		{
-			return null;
-		}
-		
 		try
 		{
 			if (node is JValue jValue)
 			{
-				if (node.Type == JTokenType.String || node.Type == JTokenType.Date)
+				if (node.Type is JTokenType.String or JTokenType.Date)
 				{
-					if (TryParseDateTime(node.Value<string>(), out var dateTime))
+					var nodeValue = node.Value<string>();
+					if (nodeValue != null && TryParseDateTime(nodeValue, out var dateTime))
 					{
 						jValue.Replace(new JRaw($"ISODate(\"{dateTime:yyyy-MM-ddTHH:mm:ssZ}\")"));
 					}

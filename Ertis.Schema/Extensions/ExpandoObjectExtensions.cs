@@ -1,7 +1,10 @@
 using System.Dynamic;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.Schema.Extensions;
 
+// ReSharper disable once UnusedType.Global
 public static class ExpandoObjectExtensions
 {
     #region Methods
@@ -9,12 +12,12 @@ public static class ExpandoObjectExtensions
     public static ExpandoObject ToExpandoObject(this object obj)
     {
         var dictionary = obj.ToDictionary();
-        IDictionary<string, object> expando = new ExpandoObject();
+        IDictionary<string, object?> expando = new ExpandoObject();
         foreach (var pair in dictionary)
         {
-            if (pair.Value is IDictionary<string, object> childDictionary)
+            if (pair.Value is IDictionary<string, object?> childDictionary)
             {
-                expando.Add(new KeyValuePair<string, object>(pair.Key, childDictionary.ToDynamic()));
+                expando.Add(new KeyValuePair<string, object?>(pair.Key, childDictionary.ToDynamic()));
             }
             else
             {
@@ -25,105 +28,96 @@ public static class ExpandoObjectExtensions
         return (ExpandoObject) expando;
     }
     
-    public static T GetProperty<T>(this ExpandoObject expandoObject, string path)
+    extension(ExpandoObject expandoObject)
     {
-        if (string.IsNullOrEmpty(path))
+        public T? GetProperty<T>(string path)
         {
-            throw new ArgumentNullException(nameof(path), "DynamicExtensions.GetProperty(path) path can not be null!");
-        }
-        
-        var segments = path.Split('.');
-        if (segments.Length == 1)
-        {
-            var propertyName = path; 
-            var expandoDictionary = expandoObject as IDictionary<string, object>;
-            if (expandoDictionary.ContainsKey(propertyName))
+            if (string.IsNullOrEmpty(path))
             {
-                return (T) expandoDictionary[propertyName];    
+                throw new ArgumentNullException(nameof(path), "DynamicExtensions.GetProperty(path) path can not be null!");
             }
-        }
-        else
-        {
-            var expandoDictionary = expandoObject as IDictionary<string, object>;
-            if (expandoDictionary.ContainsKey(segments[0]))
+            
+            var segments = path.Split('.');
+            if (segments.Length == 1)
             {
-                var subPath = path[(segments[0].Length + 1)..];
-                return expandoDictionary[segments[0]].ToExpandoObject().GetProperty<T>(subPath);
-            }
-        }
-        
-        return default;
-    }
-    
-    public static ExpandoObject SetProperty(this ExpandoObject expandoObject, string path, object value)
-    {
-        if (string.IsNullOrEmpty(path))
-        {
-            throw new ArgumentNullException(nameof(path), "DynamicExtensions.SetProperty(path) path can not be null!");
-        }
-        
-        var segments = path.Split('.');
-        if (segments.Length == 1)
-        {
-            var propertyName = path; 
-            var expandoDictionary = expandoObject as IDictionary<string, object>;
-            if (expandoDictionary.ContainsKey(propertyName))
-            {
-                expandoDictionary[propertyName] = value;    
+                var propertyName = path;
+                var expandoDictionary = expandoObject as IDictionary<string, object>;
+                if (expandoDictionary.TryGetValue(propertyName, out var value))
+                {
+                    return (T) value;
+                }
             }
             else
             {
-                expandoDictionary.Add(propertyName, value);
+                var expandoDictionary = expandoObject as IDictionary<string, object>;
+                if (expandoDictionary.ContainsKey(segments[0]))
+                {
+                    var subPath = path[(segments[0].Length + 1)..];
+                    return expandoDictionary[segments[0]].ToExpandoObject().GetProperty<T>(subPath);
+                }
             }
             
-            return expandoDictionary.ToDynamic();   
+            return default;
         }
-        else
+        
+        public ExpandoObject SetProperty(string path, object value)
         {
-            var expandoDictionary = expandoObject as IDictionary<string, object>;
-            if (expandoDictionary.ContainsKey(segments[0]))
+            if (string.IsNullOrEmpty(path))
             {
-                var subPath = path[(segments[0].Length + 1)..];
-                var newValue = expandoDictionary[segments[0]].ToExpandoObject().SetProperty(subPath, value);
-                expandoDictionary[segments[0]] = newValue;
+                throw new ArgumentNullException(nameof(path), "DynamicExtensions.SetProperty(path) path can not be null!");
+            }
+            
+            var segments = path.Split('.');
+            if (segments.Length == 1)
+            {
+                var propertyName = path;
+                var expandoDictionary = expandoObject as IDictionary<string, object?>;
+                expandoDictionary[propertyName] = value;
+                return expandoDictionary.ToDynamic();
             }
             else
             {
-                expandoDictionary.Add(segments[0], value);
+                var expandoDictionary = expandoObject as IDictionary<string, object?>;
+                if (expandoDictionary.ContainsKey(segments[0]))
+                {
+                    var subPath = path[(segments[0].Length + 1)..];
+                    var newValue = expandoDictionary[segments[0]]?.ToExpandoObject().SetProperty(subPath, value);
+                    expandoDictionary[segments[0]] = newValue;
+                }
+                else
+                {
+                    expandoDictionary.Add(segments[0], value);
+                }
+                
+                return expandoDictionary.ToDynamic();
             }
-            
+        }
+        
+        public ExpandoObject RemoveProperty(string propertyName)
+        {
+            var expandoDictionary = expandoObject as IDictionary<string, object?>;
+            expandoDictionary.Remove(propertyName);
             return expandoDictionary.ToDynamic();
         }
-    }
-    
-    public static ExpandoObject RemoveProperty(this ExpandoObject expandoObject, string propertyName)
-    {
-        var expandoDictionary = expandoObject as IDictionary<string, object>;
-        if (expandoDictionary.ContainsKey(propertyName))
-        {
-            expandoDictionary.Remove(propertyName);
-        }
         
-        return expandoDictionary.ToDynamic();
-    }
-    
-    public static ExpandoObject Clone(this ExpandoObject expandoObject)
-    {
-        var dictionary = expandoObject.ToDictionary();
-        IDictionary<string, object> expando = new ExpandoObject();
-        foreach (var pair in dictionary)
+        public ExpandoObject Clone()
         {
-            if (pair.Value is IDictionary<string, object> childDictionary)
+            var dictionary = expandoObject.ToDictionary();
+            IDictionary<string, object?> expando = new ExpandoObject();
+            foreach (var pair in dictionary)
             {
-                expando.Add(new KeyValuePair<string, object>(pair.Key, childDictionary.ToDynamic()));
+                if (pair.Value is IDictionary<string, object?> childDictionary)
+                {
+                    expando.Add(new KeyValuePair<string, object?>(pair.Key, childDictionary.ToDynamic()));
+                }
+                else
+                {
+                    expando.Add(pair);
+                }
             }
-            else
-            {
-                expando.Add(pair);   
-            }
+            
+            return (ExpandoObject) expando;
         }
-        
-        return (ExpandoObject) expando;
     }
     
     #endregion

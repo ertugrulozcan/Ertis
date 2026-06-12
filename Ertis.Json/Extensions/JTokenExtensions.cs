@@ -6,7 +6,7 @@ public static class JTokenExtensions
 {
 	#region Methods
 	
-	public static string GetPathFromAnnotation(this JToken jToken)
+	public static string? GetPathFromAnnotation(this JToken jToken)
 	{
 		var annotations = jToken.Annotations<object>();
 		var annotation = annotations.FirstOrDefault(x => x.GetType().Name == "JTokenPathAnnotation");

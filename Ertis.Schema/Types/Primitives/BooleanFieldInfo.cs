@@ -23,7 +23,7 @@ public class BooleanFieldInfo : FieldInfo<bool?>, IPrimitiveType
     
     #region Methods
     
-    public override bool ValidateSchema(out Exception exception)
+    public override bool ValidateSchema(out Exception? exception)
     {
         base.ValidateSchema(out exception);
         return exception == null;
@@ -42,7 +42,7 @@ public class BooleanFieldInfo : FieldInfo<bool?>, IPrimitiveType
             IsVirtual = this.IsVirtual,
             IsHidden = this.IsHidden,
             IsReadonly = this.IsReadonly,
-            DefaultValue = this.DefaultValue,
+            DefaultValue = this.DefaultValue
         };
     }
     

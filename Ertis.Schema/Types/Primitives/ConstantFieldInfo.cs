@@ -18,7 +18,7 @@ public class ConstantFieldInfo : FieldInfo<object>
     
     [JsonProperty("value")]
     [JsonPropertyName("value")]
-    public object Value { get; set; }
+    public object? Value { get; set; }
     
     [JsonProperty("valueType")]
     [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
@@ -30,7 +30,7 @@ public class ConstantFieldInfo : FieldInfo<object>
     
     #region Methods
     
-    protected internal override bool Validate(object obj, IValidationContext validationContext)
+    protected internal override bool Validate(object? obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         

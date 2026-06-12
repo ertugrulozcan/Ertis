@@ -8,12 +8,15 @@ public class FieldInfoCollectionJsonConverter : JsonConverter<IEnumerable<IField
 {
     #region Methods
     
-    public override void WriteJson(JsonWriter writer, IEnumerable<IFieldInfo> value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, IEnumerable<IFieldInfo>? value, JsonSerializer serializer)
     {
-        ToJsonObject(value).WriteTo(writer);
+        if (value != null)
+        {
+            ToJsonObject(value).WriteTo(writer);
+        }
     }
     
-    public override IEnumerable<IFieldInfo> ReadJson(JsonReader reader, Type objectType, IEnumerable<IFieldInfo> existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override IEnumerable<IFieldInfo> ReadJson(JsonReader reader, Type objectType, IEnumerable<IFieldInfo>? existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
         var jObject = JObject.Load(reader);
         return Deserialize(jObject);
@@ -22,12 +25,15 @@ public class FieldInfoCollectionJsonConverter : JsonConverter<IEnumerable<IField
     private static IEnumerable<IFieldInfo> Deserialize(JObject rootNode)
     {
         var fieldInfoList = new List<IFieldInfo>();
-        
         foreach (var (name, jToken) in rootNode)
         {
             if (jToken is JObject jObject)
             {
-                fieldInfoList.Add(FieldInfoJsonConverter.Deserialize(jObject, name));
+                var value = FieldInfoJsonConverter.Deserialize(jObject, name);
+                if (value != null)
+                {
+                    fieldInfoList.Add(value);
+                }
             }
         }
         
@@ -50,12 +56,14 @@ public class FieldInfoCollectionJsonConverter : JsonConverter<IEnumerable<IField
         return rootNode;
     }
     
+    // ReSharper disable once UnusedMember.Global
     public static string Serialize(IEnumerable<IFieldInfo> properties)
     {
         return ToJsonObject(properties).ToString();
     }
     
-    public static IEnumerable<IFieldInfo> Deserialize(string json)
+    // ReSharper disable once UnusedMember.Global
+    public static IEnumerable<IFieldInfo>? Deserialize(string json)
     {
         return string.IsNullOrEmpty(json) ? null : Deserialize(JObject.Parse(json));
     }

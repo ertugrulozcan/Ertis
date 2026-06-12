@@ -30,7 +30,7 @@ internal class QueryArray : List<IQuery>, IQuery
 			// Simplify $and operators
 			if (this.Operator == MongoOperator.And && this.All(x => x is IQueryExpression))
 			{
-				return "{ " + string.Join(", ", this.Select(x => x.ToString()?.Trim().Trim('{').Trim('}').Trim())) + " }";
+				return "{ " + string.Join(", ", this.Select(x => x.ToString().Trim().Trim('{').Trim('}').Trim())) + " }";
 			}
 			
 			var operatorTag = QueryHelper.GetOperatorTag(this.Operator.Value);

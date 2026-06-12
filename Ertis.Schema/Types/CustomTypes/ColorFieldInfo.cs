@@ -33,7 +33,7 @@ public class ColorFieldInfo : StringFieldInfo
     
     #region Methods
     
-    protected internal override bool Validate(object obj, IValidationContext validationContext)
+    protected internal override bool Validate(object? obj, IValidationContext validationContext)
     {
         try
         {

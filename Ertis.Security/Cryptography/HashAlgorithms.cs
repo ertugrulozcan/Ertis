@@ -14,5 +14,5 @@ public enum HashAlgorithms
 	SHA3_224,
 	SHA3_256,
 	SHA3_384,
-	SHA3_512,
+	SHA3_512
 }

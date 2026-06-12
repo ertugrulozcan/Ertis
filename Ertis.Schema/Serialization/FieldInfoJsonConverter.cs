@@ -11,19 +11,22 @@ public class FieldInfoJsonConverter : JsonConverter<IFieldInfo>
 {
     #region Methods
     
-    public override void WriteJson(JsonWriter writer, IFieldInfo value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, IFieldInfo? value, JsonSerializer serializer)
     {
-        var jToken = JToken.FromObject(value);
-        jToken.WriteTo(writer);
+        if (value != null)
+        {
+            var jToken = JToken.FromObject(value);
+            jToken.WriteTo(writer);
+        }
     }
     
-    public override IFieldInfo ReadJson(JsonReader reader, Type objectType, IFieldInfo existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override IFieldInfo? ReadJson(JsonReader reader, Type objectType, IFieldInfo? existingValue, bool hasExistingValue, JsonSerializer serializer)
     {
         var jObject = JObject.Load(reader);
         return Deserialize(jObject, null);
     }
     
-    public static IFieldInfo Deserialize(JObject jObject, string fieldName)
+    public static IFieldInfo? Deserialize(JObject jObject, string? fieldName)
     {
         try
         {
@@ -34,7 +37,7 @@ public class FieldInfoJsonConverter : JsonConverter<IFieldInfo>
                 if (Enum.TryParse(fieldTypeName, out FieldType fieldType))
                 {
                     var json = jObject.ToString(Formatting.None);
-                    IFieldInfo fieldInfo = fieldType switch
+                    IFieldInfo? fieldInfo = fieldType switch
                     {
                         // Primitive Types
                         FieldType.@object => JsonConvert.DeserializeObject<ObjectFieldInfo>(json, new FieldInfoCollectionJsonConverter()),
@@ -69,7 +72,7 @@ public class FieldInfoJsonConverter : JsonConverter<IFieldInfo>
                         _ => throw new SchemaValidationException($"Unknown field type : '{fieldTypeName}' ({fieldName})")
                     };
                     
-                    if (fieldInfo != null)
+                    if (fieldInfo != null && fieldName != null)
                     {
                         fieldInfo.Name = fieldName;
                     }
@@ -88,15 +91,12 @@ public class FieldInfoJsonConverter : JsonConverter<IFieldInfo>
         }
         catch (Exception ex)
         {
-            switch (ex.InnerException)
+            throw ex.InnerException switch
             {
-                case FieldValidationException:
-                    throw ex.InnerException;
-                case SchemaValidationException:
-                    throw ex.InnerException;
-                default:
-                    throw new SchemaValidationException(ex.Message);
-            }
+                FieldValidationException => ex.InnerException,
+                SchemaValidationException => ex.InnerException,
+                _ => new SchemaValidationException(ex.Message)
+            };
         }
     }
     

@@ -2,13 +2,6 @@ namespace Ertis.TemplateEngine;
 
 public class Parser
 {
-    #region Constants
-    
-    private const string DEFAULT_OPEN_BRACKETS = "{{";
-    private const string DEFAULT_CLOSE_BRACKETS = "}}";
-    
-    #endregion
-    
     #region Properties
     
     internal ParserOptions Options { get; }
@@ -21,15 +14,11 @@ public class Parser
     /// Constructor
     /// </summary>
     /// <param name="options"></param>
-    public Parser(ParserOptions options = null)
+    public Parser(ParserOptions? options = null)
     {
         if (options == null)
         {
-            this.Options = new ParserOptions
-            {
-                OpenBrackets = DEFAULT_OPEN_BRACKETS,
-                CloseBrackets = DEFAULT_CLOSE_BRACKETS
-            };
+            this.Options = new ParserOptions();
         }
         else
         {
@@ -79,13 +68,13 @@ public class Parser
         }
     }
     
-    private bool TryFindPlaceHolder(string template, out PlaceHolder placeHolder)
+    private bool TryFindPlaceHolder(string template, out PlaceHolder? placeHolder)
     {
         placeHolder = this.FindPlaceHolder(template);
         return placeHolder != null;
     }
     
-    private PlaceHolder FindPlaceHolder(string template)
+    private PlaceHolder? FindPlaceHolder(string template)
     {
         var startIndex = template.IndexOf(this.Options.OpenBrackets, StringComparison.Ordinal);
         var endIndex = template.IndexOf(this.Options.CloseBrackets, StringComparison.Ordinal);
@@ -103,7 +92,7 @@ public class Parser
             StartIndex = startIndex,
             Length = endIndex - startIndex + this.Options.CloseBrackets.Length,
             OpenBrackets = this.Options.OpenBrackets,
-            CloseBrackets = this.Options.CloseBrackets,
+            CloseBrackets = this.Options.CloseBrackets
         };
     }
     

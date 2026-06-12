@@ -1,21 +1,22 @@
 using Ertis.Core.Collections;
 using MongoDB.Bson;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.MongoDB.Models;
 
 public class IndexOptions
 {
 	#region Properties
 	
-	public IEnumerable<SingleIndexDefinition> Hint { get; set; }
+	public IEnumerable<SingleIndexDefinition>? Hint { get; set; }
 	
 	#endregion
 	
 	#region Methods
 	
-	internal BsonValue GetIndexHint()
+	internal BsonValue? GetIndexHint()
 	{
-		BsonValue hint = null;
+		BsonValue? hint = null;
 		if (this.Hint != null && this.Hint.Any())
 		{
 			var hintDocument = new BsonDocument();

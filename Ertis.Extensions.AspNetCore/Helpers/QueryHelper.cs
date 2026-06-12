@@ -7,7 +7,7 @@ public static class QueryHelper
 {
 	#region Methods
 	
-	public static string ExtractWhereQuery(dynamic body)
+	public static string? ExtractWhereQuery(dynamic body)
 	{
 		if (body == null)
 		{

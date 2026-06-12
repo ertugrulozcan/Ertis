@@ -9,51 +9,35 @@ namespace Ertis.Schema.Types;
 
 public abstract class FieldInfo : IFieldInfo, IHasDefault
 {
-    #region Fields
-    
-    private string name;
-    private IFieldInfo parent;
-    private string displayName;
-    private readonly string description;
-    private readonly string appearance;
-    private readonly bool isRequired;
-    private readonly bool isVirtual;
-    private readonly bool isHidden;
-    private readonly bool isReadonly;
-    private readonly bool isSearchable;
-    private readonly double? searchWeight;
-    
-    #endregion
-    
     #region Properties
     
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
-    public string Name
+    public string? Name
     {
-        get => this.name;
+        get;
         set
         {
-            this.name = value;
+            field = value;
             this.OnPropertyChanged(nameof(this.Name));
         }
     }
     
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
-    public IFieldInfo Parent
+    public IFieldInfo? Parent
     {
-        get => this.parent;
+        get;
         set
         {
-            this.parent = value;
+            field = value;
             this.OnPropertyChanged(nameof(this.Parent));
         }
     }
     
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
-    public string Path
+    public string? Path
     {
         get
         {
@@ -70,12 +54,12 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     [JsonProperty("displayName", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("displayName")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string DisplayName
+    public string? DisplayName
     {
-        get => this.displayName;
+        get;
         set
         {
-            this.displayName = value;
+            field = value;
             this.OnPropertyChanged(nameof(this.DisplayName));
         }
     }
@@ -83,12 +67,12 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     [JsonProperty("description", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("description")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public string Description
+    public string? Description
     {
-        get => this.description;
+        get;
         init
         {
-            this.description = value;
+            field = value;
             this.OnPropertyChanged(nameof(this.Description));
         }
     }
@@ -104,10 +88,10 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool IsRequired
     {
-        get => this.isRequired;
+        get;
         init
         {
-            this.isRequired = value;
+            field = value;
             this.OnPropertyChanged(nameof(this.IsRequired));
         }
     }
@@ -117,10 +101,10 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool IsVirtual
     {
-        get => this.isVirtual;
+        get;
         init
         {
-            this.isVirtual = value;
+            field = value;
             this.OnPropertyChanged(nameof(this.IsVirtual));
         }
     }
@@ -130,10 +114,10 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool IsHidden
     {
-        get => this.isHidden;
+        get;
         init
         {
-            this.isHidden = value;
+            field = value;
             this.OnPropertyChanged(nameof(this.IsHidden));
         }
     }
@@ -143,10 +127,10 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool IsReadonly
     {
-        get => this.isReadonly;
+        get;
         init
         {
-            this.isReadonly = value;
+            field = value;
             this.OnPropertyChanged(nameof(this.IsReadonly));
         }
     }
@@ -154,29 +138,29 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     [JsonProperty("appearance", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("appearance")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public string Appearance
+    public string? Appearance
     {
-        get => this.appearance;
+        get;
         init
         {
-            this.appearance = value;
+            field = value;
             this.OnPropertyChanged(nameof(this.Appearance));
         }
     }
     
     [Newtonsoft.Json.JsonIgnore]
     [System.Text.Json.Serialization.JsonIgnore]
-    protected internal object CurrentObject { get; private set; }
+    protected internal object? CurrentObject { get; private set; }
     
     [JsonProperty("isSearchable", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("isSearchable")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool IsSearchable
     {
-        get => this.isSearchable;
+        get;
         init
         {
-            this.isSearchable = value;
+            field = value;
             this.OnPropertyChanged(nameof(this.IsSearchable));
         }
     }
@@ -186,10 +170,10 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public double? SearchWeight
     {
-        get => this.searchWeight;
+        get;
         init
         {
-            this.searchWeight = value;
+            field = value;
             this.OnPropertyChanged(nameof(this.SearchWeight));
         }
     }
@@ -198,11 +182,11 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     
     #region Abstract Methods
     
-    protected abstract void ValidateSchemaCore(out Exception exception);
+    protected abstract void ValidateSchemaCore(out Exception? exception);
     
-    protected abstract bool ValidateCore(object obj, IValidationContext validationContext);
+    protected abstract bool ValidateCore(object? obj, IValidationContext validationContext);
     
-    public abstract object GetDefaultValue();
+    public abstract object? GetDefaultValue();
     
     public abstract object Clone();
     
@@ -213,7 +197,7 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     protected virtual void OnPropertyChanged(string propertyName)
     {}
     
-    public virtual bool ValidateSchema(out Exception exception)
+    public virtual bool ValidateSchema(out Exception? exception)
     {
         this.ValidateName(out exception);
         this.ValidateSchemaCore(out exception);
@@ -221,7 +205,7 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
         return exception == null;
     }
     
-    protected internal virtual bool Validate(object obj, IValidationContext validationContext)
+    protected internal virtual bool Validate(object? obj, IValidationContext validationContext)
     {
         this.CurrentObject = obj;
         
@@ -250,9 +234,9 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     }
     
     // ReSharper disable once UnusedMethodReturnValue.Local
-    private bool ValidateName(out Exception exception)
+    private bool ValidateName(out Exception? exception)
     {
-        if (this.Name == null || string.IsNullOrEmpty(this.Name.Trim()) || string.IsNullOrWhiteSpace(this.Name))
+        if (string.IsNullOrEmpty(this.Name?.Trim()) || string.IsNullOrWhiteSpace(this.Name))
         {
             exception = new FieldValidationException("The field name is required", this);
             return false;
@@ -280,7 +264,7 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
         return true;
     }
     
-    public bool IsAnArrayItem(out ArrayFieldInfo arrayFieldInfo)
+    public bool IsAnArrayItem(out ArrayFieldInfo? arrayFieldInfo)
     {
         switch (this.Parent)
         {
@@ -300,23 +284,17 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
 
 public abstract class FieldInfo<T> : FieldInfo, IHasDefault<T>
 {
-    #region Fields
-    
-    private readonly T defaultValue;
-    
-    #endregion
-    
     #region Properties
     
     [JsonProperty("defaultValue", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("defaultValue")]
     [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public T DefaultValue
+    public T? DefaultValue
     {
-        get => this.defaultValue;
+        get;
         init
         {
-            this.defaultValue = value;
+            field = value;
             this.OnPropertyChanged(nameof(this.DefaultValue));
         }
     }
@@ -325,7 +303,7 @@ public abstract class FieldInfo<T> : FieldInfo, IHasDefault<T>
     
     #region Methods
     
-    protected override bool ValidateCore(object obj, IValidationContext validationContext)
+    protected override bool ValidateCore(object? obj, IValidationContext validationContext)
     {
         var isValid = true;
         
@@ -352,7 +330,7 @@ public abstract class FieldInfo<T> : FieldInfo, IHasDefault<T>
         return isValid;
     }
     
-    protected override void ValidateSchemaCore(out Exception exception)
+    protected override void ValidateSchemaCore(out Exception? exception)
     {
         this.ValidateDefaultValue(out exception);
     }
@@ -365,13 +343,13 @@ public abstract class FieldInfo<T> : FieldInfo, IHasDefault<T>
         }
     }
     
-    public override object GetDefaultValue()
+    public override object? GetDefaultValue()
     {
         return this.DefaultValue;
     }
     
     // ReSharper disable once UnusedMethodReturnValue.Local
-    private bool ValidateDefaultValue(out Exception exception)
+    private bool ValidateDefaultValue(out Exception? exception)
     {
         if (this.DefaultValue != null)
         {
@@ -387,7 +365,7 @@ public abstract class FieldInfo<T> : FieldInfo, IHasDefault<T>
         return true;
     }
     
-    private bool IsCompatibleType(object obj)
+    private bool IsCompatibleType(object? obj)
     {
         if (obj == null)
         {

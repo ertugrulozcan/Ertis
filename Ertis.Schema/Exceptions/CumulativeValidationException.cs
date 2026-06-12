@@ -1,5 +1,7 @@
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.Schema.Exceptions;
 
+// ReSharper disable once UnusedType.Global
 public class CumulativeValidationException : ErtisSchemaValidationException
 {
 	#region Properties

@@ -1,13 +1,20 @@
 using System.Net;
+using System.Text.Json.Serialization;
+using JsonProperty = Newtonsoft.Json.JsonPropertyAttribute;
+using NullValueHandling = Newtonsoft.Json.NullValueHandling;
 using Ertis.Core.Models.Response;
 
 namespace Ertis.Core.Exceptions;
 
+// ReSharper disable once UnusedType.Global
 public class ErtisException<T> : ErtisException
 {
 	#region Properties
 	
-	public T Payload { get; set; }
+	[JsonProperty("errors", NullValueHandling = NullValueHandling.Ignore)]
+	[JsonPropertyName("errors")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public T? Payload { get; set; }
 	
 	#endregion
 	
@@ -47,10 +54,16 @@ public class ErtisException : HttpStatusCodeException, IHasErrorModel
 {
 	#region Properties
 	
-	public string ErrorCode { get; }
+	[JsonProperty("errorCode", NullValueHandling = NullValueHandling.Ignore)]
+	[JsonPropertyName("errorCode")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public string? ErrorCode { get; }
 	
+	[JsonProperty("error", NullValueHandling = NullValueHandling.Ignore)]
+	[JsonPropertyName("error")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public ErrorModel Error =>
-		new ErrorModel
+		new()
 		{
 			Message = this.Message,
 			ErrorCode = this.ErrorCode,
@@ -89,7 +102,7 @@ public class ErtisException : HttpStatusCodeException, IHasErrorModel
 	/// <param name="message"></param>
 	/// <param name="errorCode"></param>
 	/// <param name="innerException"></param>
-	protected ErtisException(HttpStatusCode statusCode, string message, string errorCode, Exception innerException) : base(statusCode, message, innerException)
+	protected ErtisException(HttpStatusCode statusCode, string message, string errorCode, Exception? innerException = null) : base(statusCode, message, innerException)
 	{
 		this.ErrorCode = errorCode;
 	}

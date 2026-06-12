@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
+// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.Core.Collections;
 
 public class Sorting : ICollection<SortField>
@@ -12,7 +13,7 @@ public class Sorting : ICollection<SortField>
 	
 	private List<SortField> Fields { get; } = new();
 	
-	public int Count => this.Fields?.Count ?? 0;
+	public int Count => this.Fields.Count;
 	
 	public bool IsReadOnly => false;
 	
@@ -46,13 +47,17 @@ public class Sorting : ICollection<SortField>
 	/// </summary>
 	/// <param name="orderBy"></param>
 	/// <param name="sortDirection"></param>
-	public Sorting(string orderBy = null, SortDirection? sortDirection = null)
+	public Sorting(string orderBy, SortDirection? sortDirection = null)
 	{
 		if (!string.IsNullOrEmpty(orderBy))
 		{
 			this.Fields = new List<SortField>
 			{
-				new (orderBy, sortDirection)
+				new()
+				{
+					OrderBy = orderBy,
+					SortDirection = sortDirection
+				}
 			};
 		}
 	}
@@ -61,7 +66,7 @@ public class Sorting : ICollection<SortField>
 	
 	#region Operators
 	
-	public SortField this[int index] => this.Fields?[index];
+	public SortField this[int index] => this.Fields[index];
 	
 	public static implicit operator Sorting(SortField sortField) => new (sortField);
 	
@@ -115,7 +120,7 @@ public class SortField
 	
 	[JsonProperty("orderBy")]
 	[JsonPropertyName("orderBy")]
-	public string OrderBy { get; set; }
+	public string? OrderBy { get; set; }
 	
 	[JsonProperty("sortDirection")]
 	[JsonPropertyName("sortDirection")]
@@ -139,7 +144,7 @@ public class SortField
 	/// </summary>
 	/// <param name="orderBy"></param>
 	/// <param name="sortDirection"></param>
-	public SortField(string orderBy = null, SortDirection? sortDirection = null)
+	public SortField(string orderBy, SortDirection? sortDirection = null)
 	{
 		this.OrderBy = orderBy;
 		this.SortDirection = sortDirection;

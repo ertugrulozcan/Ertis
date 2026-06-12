@@ -1,23 +1,20 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Ertis.MongoDB.Queries;
 
 internal class Query : IQuery, IHasChildren
 {
-    #region Fields
-    
-    private readonly IQuery _query;
-    
-    #endregion
-    
     #region Properties
     
     internal MongoOperator? Operator { get; init; }
     
-    internal IQuery Value 
+    [field: MaybeNull]
+    internal IQuery Value
     {
-        get => this._query;
+        get;
         init
         {
-            this._query = value;
+            field = value;
             this.Children.Insert(0, value);
         }
     }

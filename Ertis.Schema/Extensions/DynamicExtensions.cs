@@ -7,56 +7,59 @@ public static class DynamicExtensions
 {
     #region Methods
     
-    public static IDictionary<string, object> ToDictionary(this object model)
+    extension(object model)
     {
-        var jObject = JObject.FromObject(model);
-        return jObject.ToDictionary();
-    }
-    
-    internal static object ToDictionaryCore(this object model)
-    {
-        var jToken = JToken.FromObject(model);
-        switch (jToken)
+        public IDictionary<string, object?> ToDictionary()
         {
-            case JProperty jProperty:
+            var jObject = JObject.FromObject(model);
+            return jObject.ToDictionary();
+        }
+        
+        internal object? ToDictionaryCore()
+        {
+            var jToken = JToken.FromObject(model);
+            switch (jToken)
             {
-                if (jProperty.Value is JValue jValue)
+                case JProperty jProperty:
+                {
+                    if (jProperty.Value is JValue jValue)
+                    {
+                        return jValue.Value;
+                    }
+                    else
+                    {
+                        dynamic dynamicObject = jProperty.Value;
+                        return ToDictionaryCore(dynamicObject);
+                    }
+                }
+                case JValue jValue:
                 {
                     return jValue.Value;
                 }
-                else
+                case JObject jObject:
                 {
-                    dynamic dynamicObject = jProperty.Value;
-                    return ToDictionaryCore(dynamicObject);
+                    return jObject.Children().ToDictionary(childToken => childToken.GetFullPath(), ToDictionaryCore);
                 }
-            }
-            case JValue jValue:
-            {
-                return jValue.Value;
-            }
-            case JObject jObject:
-            {
-                return jObject.Children().ToDictionary(childToken => childToken.GetFullPath(), ToDictionaryCore);
-            }
-            case JArray jArray:
-            {
-                return jArray.Select(ToDictionaryCore).ToArray();
-            }
-            default:
-            {
-                throw new Exception("Unknown json node in ToDictionaryCore");
+                case JArray jArray:
+                {
+                    return jArray.Select(ToDictionaryCore).ToArray();
+                }
+                default:
+                {
+                    throw new Exception("Unknown json node in ToDictionaryCore");
+                }
             }
         }
     }
     
-    public static dynamic ToDynamic(this IDictionary<string, object> dictionary)
+    public static dynamic ToDynamic(this IDictionary<string, object?> dictionary)
     {
-        IDictionary<string, object> expando = new ExpandoObject();
+        IDictionary<string, object?> expando = new ExpandoObject();
         foreach (var pair in dictionary)
         {
-            if (pair.Value is IDictionary<string, object> childDictionary)
+            if (pair.Value is IDictionary<string, object?> childDictionary)
             {
-                expando.Add(new KeyValuePair<string, object>(pair.Key, childDictionary.ToDynamic()));
+                expando.Add(new KeyValuePair<string, object?>(pair.Key, childDictionary.ToDynamic()));
             }
             else
             {

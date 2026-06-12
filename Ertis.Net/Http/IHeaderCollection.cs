@@ -1,3 +1,4 @@
+// ReSharper disable UnusedMember.Global
 namespace Ertis.Net.Http;
 
 public interface IHeaderCollection : IEnumerable<object>

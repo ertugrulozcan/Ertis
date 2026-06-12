@@ -21,7 +21,7 @@ public class HostNameFieldInfo : StringFieldInfo
     
     #region Methods
     
-    protected internal override bool Validate(object obj, IValidationContext validationContext)
+    protected internal override bool Validate(object? obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
@@ -30,7 +30,7 @@ public class HostNameFieldInfo : StringFieldInfo
             if (!IsValidHostName(hostName))
             {
                 isValid = false;
-                validationContext.Errors.Add(new FieldValidationException($"Hostname is not valid", this));
+                validationContext.Errors.Add(new FieldValidationException("Hostname is not valid", this));
             }
         }
         

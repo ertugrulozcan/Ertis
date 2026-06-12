@@ -1,5 +1,7 @@
 using Ertis.Schema.Types;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.Schema.Exceptions;
 
 public class FieldValidationException : ErtisSchemaValidationException
@@ -8,9 +10,9 @@ public class FieldValidationException : ErtisSchemaValidationException
 	
 	private IFieldInfo FieldInfo { get; }
 	
-	public string FieldName => this.FieldInfo.Name;
+	public string? FieldName => this.FieldInfo.Name;
 	
-	public string FieldPath => this.FieldInfo.Path;
+	public string? FieldPath => this.FieldInfo.Path;
 	
 	public bool ThrowEvenOnCreate { get; init; }
 	

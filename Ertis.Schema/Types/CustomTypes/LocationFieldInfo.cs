@@ -64,7 +64,7 @@ public sealed class LocationFieldInfo : ObjectFieldInfoBase
             IsHidden = this.IsHidden,
             IsReadonly = this.IsReadonly,
             DefaultValue = this.DefaultValue,
-            Properties = this.Properties,
+            Properties = this.Properties
         };
     }
     

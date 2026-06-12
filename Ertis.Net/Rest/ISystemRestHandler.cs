@@ -1,6 +1,8 @@
 using Ertis.Core.Models.Response;
 using Ertis.Net.Http;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMemberInSuper.Global
 namespace Ertis.Net.Rest;
 
 public interface ISystemRestHandler

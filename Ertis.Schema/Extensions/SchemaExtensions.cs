@@ -5,6 +5,8 @@ using Ertis.Schema.Types.CustomTypes;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.Schema.Extensions;
 
 public static class SchemaExtensions
@@ -17,9 +19,14 @@ public static class SchemaExtensions
     /// <param name="fieldInfo"></param>
     /// <param name="schema"></param>
     /// <returns></returns>
-    public static string GetSelfPath(this IFieldInfo fieldInfo, ISchema schema)
+    public static string? GetSelfPath(this IFieldInfo fieldInfo, ISchema schema)
     {
         var path = fieldInfo.Path;
+        if (path == null)
+        {
+            return null;
+        }
+        
         var segments = path.Split('.');
         if (segments.Length > 1 && segments[0] == schema.Slug)
         {
@@ -33,19 +40,13 @@ public static class SchemaExtensions
     
     #region Validation Methods
     
-    public static void Validate(this ISchema schema, out Exception exception)
+    public static void Validate(this ISchema schema, out Exception? exception)
     {
         schema.ValidateProperties(out exception);
     }
     
-    internal static bool ValidateProperties(this ISchema schema, out Exception exception)
+    internal static bool ValidateProperties(this ISchema schema, out Exception? exception)
     {
-        if (schema.Properties == null)
-        {
-            exception = new SchemaValidationException($"Properties field is required for schema objects ({schema.Slug})");
-            return false;
-        }
-        
         foreach (var fieldInfo in schema.Properties)
         {
             if (!fieldInfo.ValidateSchema(out exception))
@@ -153,12 +154,12 @@ public static class SchemaExtensions
     
     #region Schema Tree Methods
     
-    public static IFieldInfo FindField(this ISchema schema, string path)
+    public static IFieldInfo? FindField(this ISchema schema, string path)
     {
         return FindFieldCore(schema.Properties, path);
     }
     
-    private static IFieldInfo FindFieldCore(IEnumerable<IFieldInfo> properties, string path)
+    private static IFieldInfo? FindFieldCore(IEnumerable<IFieldInfo> properties, string path)
     {
         foreach (var property in properties)
         {
@@ -172,7 +173,7 @@ public static class SchemaExtensions
         return null;
     }
     
-    private static IFieldInfo FindFieldCore(IFieldInfo property, string path)
+    private static IFieldInfo? FindFieldCore(IFieldInfo property, string path)
     {
         if (property.Type == FieldType.@object && property is ObjectFieldInfo objectFieldInfo)
         {
@@ -180,7 +181,7 @@ public static class SchemaExtensions
         }
         else if (property.Type == FieldType.array && property is ArrayFieldInfo arrayFieldInfo)
         {
-            return FindFieldCore(arrayFieldInfo.ItemSchema, path);
+            return arrayFieldInfo.ItemSchema == null ? null : FindFieldCore(arrayFieldInfo.ItemSchema, path);
         }
         else
         {
@@ -192,7 +193,7 @@ public static class SchemaExtensions
     
     #region Uniqueness Methods
     
-    private static bool CheckPropertiesUniqueness(this ISchema schema, out Exception exception)
+    private static bool CheckPropertiesUniqueness(this ISchema schema, out Exception? exception)
     {
         var fieldInfos = schema.Properties;
         var distinctCount = fieldInfos.Select(x => x.Name).Distinct().Count();
@@ -248,8 +249,10 @@ public static class SchemaExtensions
         switch (fieldInfo)
         {
             case IPrimitiveType { IsUnique: true }:
+            {
                 uniqueProperties.Add(fieldInfo);
                 break;
+            }
             case ObjectFieldInfo objectFieldInfo:
             {
                 foreach (var property in objectFieldInfo.Properties)
@@ -260,8 +263,14 @@ public static class SchemaExtensions
                 break;
             }
             case ArrayFieldInfo arrayFieldInfo:
-                uniqueProperties.AddRange(GetUniqueProperties(arrayFieldInfo.ItemSchema));
+            {
+                if (arrayFieldInfo.ItemSchema != null)
+                {
+                    uniqueProperties.AddRange(GetUniqueProperties(arrayFieldInfo.ItemSchema));
+                }
+                
                 break;
+            }
         }
         
         return uniqueProperties;
@@ -287,11 +296,14 @@ public static class SchemaExtensions
     {
         var referenceProperties = new List<ReferenceFieldInfo>();
         
+        // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
         switch (fieldInfo.Type)
         {
-            case FieldType.reference:
-                referenceProperties.Add(fieldInfo as ReferenceFieldInfo);
+            case FieldType.reference when fieldInfo is ReferenceFieldInfo referenceFieldInfo:
+            {
+                referenceProperties.Add(referenceFieldInfo);
                 break;
+            }
             case FieldType.@object when fieldInfo is ObjectFieldInfo objectFieldInfo:
             {
                 foreach (var property in objectFieldInfo.Properties)
@@ -302,8 +314,14 @@ public static class SchemaExtensions
                 break;
             }
             case FieldType.array when fieldInfo is ArrayFieldInfo arrayFieldInfo:
-                referenceProperties.AddRange(GetReferenceProperties(arrayFieldInfo.ItemSchema));
+            {
+                if (arrayFieldInfo.ItemSchema != null)
+                {
+                    referenceProperties.AddRange(GetReferenceProperties(arrayFieldInfo.ItemSchema));
+                }
+                
                 break;
+            }
         }
         
         return referenceProperties;
@@ -334,7 +352,7 @@ public static class SchemaExtensions
             if (defaultValue != null)
             {
                 var path = fieldInfo.GetSelfPath(schema);
-                if (!model.TryGetValue(path, out var currentValue, out _) || currentValue == null)
+                if (path != null && (!model.TryGetValue(path, out var currentValue, out _) || currentValue == null))
                 {
                     model.TrySetValue(path, defaultValue, out _, true);
                 }
@@ -364,7 +382,10 @@ public static class SchemaExtensions
         if (fieldInfo is ConstantFieldInfo constantFieldInfo)
         {
             var path = fieldInfo.GetSelfPath(schema);
-            model.TrySetValue(path, constantFieldInfo.Value, out _, true);
+            if (path != null)
+            {
+                model.TrySetValue(path, constantFieldInfo.Value, out _, true);
+            }
         }
     }
     
@@ -390,7 +411,7 @@ public static class SchemaExtensions
         if (fieldInfo is IDateTimeFieldInfo)
         {
             var path = fieldInfo.GetSelfPath(schema);
-            if (model.TryGetValue<string>(path, out var stringValue, out _) && DateTime.TryParse(stringValue, out var dateValue))
+            if (path != null && model.TryGetValue<string>(path, out var stringValue, out _) && DateTime.TryParse(stringValue, out var dateValue))
             {
                 model.TrySetValue(path, dateValue, out _, true);
             }
@@ -418,7 +439,7 @@ public static class SchemaExtensions
     {
         if (fieldInfo is StringFieldInfo stringFieldInfo)
         {
-            string value = null;
+            string? value = null;
             if (stringFieldInfo.CurrentObject != null && !string.IsNullOrEmpty(stringFieldInfo.CurrentObject.ToString()))
             {
                 value = stringFieldInfo.CurrentObject.ToString();
@@ -431,7 +452,10 @@ public static class SchemaExtensions
             if (!string.IsNullOrEmpty(value))
             {
                 var path = fieldInfo.GetSelfPath(schema);
-                model.TrySetValue(path, value, out _, true);
+                if (path != null)
+                {
+                    model.TrySetValue(path, value, out _, true);
+                }
             }
         }
     }

@@ -1,8 +1,10 @@
 using System.Net;
 using Ertis.Core.Exceptions;
 
+// ReSharper disable UnusedMember.Global
 namespace Ertis.MongoDB.Exceptions;
 
+// ReSharper disable once UnusedType.Global
 public class SelectQueryPathCollisionException : ErtisException
 {
 	#region Constructors

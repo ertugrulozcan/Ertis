@@ -3,6 +3,7 @@ using SixLabors.ImageSharp;
 using ImageProcessingException = Ertis.ImageProcessing.Exceptions.ImageProcessingException;
 
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.ImageProcessing;
 
 public class CropBounds

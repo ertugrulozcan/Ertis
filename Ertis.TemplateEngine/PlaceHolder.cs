@@ -1,3 +1,4 @@
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.TemplateEngine;
 
 public class PlaceHolder : ITemplateSegment
@@ -6,15 +7,15 @@ public class PlaceHolder : ITemplateSegment
 	
 	public SegmentType Type => SegmentType.PlaceHolder;
 	
-	public string Inner { get; init; }
+	public required string Inner { get; init; }
 	
-	public string Outer { get; init; }
+	public required string Outer { get; init; }
 	
-	public string OpenBrackets { get; init; }
+	public string? OpenBrackets { get; init; }
 	
-	public string CloseBrackets { get; init; }
+	public string? CloseBrackets { get; init; }
 	
-	public string Value { get; init; }
+	public required string Value { get; init; }
 	
 	public int StartIndex { get; init; }
 	

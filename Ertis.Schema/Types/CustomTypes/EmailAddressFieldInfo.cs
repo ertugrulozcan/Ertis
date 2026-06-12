@@ -23,7 +23,7 @@ public class EmailAddressFieldInfo : StringFieldInfo
     
     #region Methods
     
-    protected internal override bool Validate(object obj, IValidationContext validationContext)
+    protected internal override bool Validate(object? obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
@@ -32,7 +32,7 @@ public class EmailAddressFieldInfo : StringFieldInfo
             if (!IsValidEmail(emailAddress))
             {
                 isValid = false;
-                validationContext.Errors.Add(new FieldValidationException($"Email address is not valid", this));
+                validationContext.Errors.Add(new FieldValidationException("Email address is not valid", this));
             }
         }
         
@@ -49,7 +49,7 @@ public class EmailAddressFieldInfo : StringFieldInfo
         try
         {
             // Normalize the domain
-            email = Regex.Replace(email, @"(@)(.+)$", DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
+            email = Regex.Replace(email, "(@)(.+)$", DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
             
             // Examines the domain part of the email and normalizes it.
             string DomainMapper(Match match)

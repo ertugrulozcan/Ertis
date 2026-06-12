@@ -8,91 +8,91 @@ public static class NonAscii
     #region Fields & Properties
 	
     // International
-    private static ReadOnlyDictionary<char, string> _international;
+    private static ReadOnlyDictionary<char, string>? _international;
     public static ReadOnlyDictionary<char, string> International
     {
 	    get { return _international ??= new ReadOnlyDictionary<char, string>(InternationalChars); }
     }
     
     // Latin
-    private static ReadOnlyDictionary<char, string> _latin;
+    private static ReadOnlyDictionary<char, string>? _latin;
     public static ReadOnlyDictionary<char, string> Latin
     {
 	    get { return _latin ??= new ReadOnlyDictionary<char, string>(LatinChars); }
     }
     
     // Turkish
-    private static ReadOnlyDictionary<char, string> _turkish;
+    private static ReadOnlyDictionary<char, string>? _turkish;
     public static ReadOnlyDictionary<char, string> Turkish
     {
 	    get { return _turkish ??= new ReadOnlyDictionary<char, string>(TurkishChars); }
     }
     
     // Greek
-    private static ReadOnlyDictionary<char, string> _greek;
+    private static ReadOnlyDictionary<char, string>? _greek;
     public static ReadOnlyDictionary<char, string> Greek
     {
 	    get { return _greek ??= new ReadOnlyDictionary<char, string>(GreekChars); }
     }
     
     // Czech
-    private static ReadOnlyDictionary<char, string> _czech;
+    private static ReadOnlyDictionary<char, string>? _czech;
     public static ReadOnlyDictionary<char, string> Czech
     {
 	    get { return _czech ??= new ReadOnlyDictionary<char, string>(CzechChars); }
     }
     
     // Arabic
-    private static ReadOnlyDictionary<char, string> _arabic;
+    private static ReadOnlyDictionary<char, string>? _arabic;
     public static ReadOnlyDictionary<char, string> Arabic
     {
 	    get { return _arabic ??= new ReadOnlyDictionary<char, string>(ArabicChars); }
     }
     
     // Vietnamese
-    private static ReadOnlyDictionary<char, string> _vietnamese;
+    private static ReadOnlyDictionary<char, string>? _vietnamese;
     public static ReadOnlyDictionary<char, string> Vietnamese
     {
 	    get { return _vietnamese ??= new ReadOnlyDictionary<char, string>(VietnameseChars); }
     }
     
     // Polish
-    private static ReadOnlyDictionary<char, string> _polish;
+    private static ReadOnlyDictionary<char, string>? _polish;
     public static ReadOnlyDictionary<char, string> Polish
     {
 	    get { return _polish ??= new ReadOnlyDictionary<char, string>(PolishChars); }
     }
     
     // Latvian
-    private static ReadOnlyDictionary<char, string> _latvian;
+    private static ReadOnlyDictionary<char, string>? _latvian;
     public static ReadOnlyDictionary<char, string> Latvian
     {
 	    get { return _latvian ??= new ReadOnlyDictionary<char, string>(LatvianChars); }
     }
     
     // German
-    private static ReadOnlyDictionary<char, string> _german;
+    private static ReadOnlyDictionary<char, string>? _german;
     public static ReadOnlyDictionary<char, string> German
     {
 	    get { return _german ??= new ReadOnlyDictionary<char, string>(GermanChars); }
     }
     
     // Ukrainian
-    private static ReadOnlyDictionary<char, string> _ukrainian;
+    private static ReadOnlyDictionary<char, string>? _ukrainian;
     public static ReadOnlyDictionary<char, string> Ukrainian
     {
 	    get { return _ukrainian ??= new ReadOnlyDictionary<char, string>(UkrainianChars); }
     }
     
     // Serbian
-    private static ReadOnlyDictionary<char, string> _serbian;
+    private static ReadOnlyDictionary<char, string>? _serbian;
     public static ReadOnlyDictionary<char, string> Serbian
     {
 	    get { return _serbian ??= new ReadOnlyDictionary<char, string>(SerbianChars); }
     }
     
     // Russian
-    private static ReadOnlyDictionary<char, string> _russian;
+    private static ReadOnlyDictionary<char, string>? _russian;
     public static ReadOnlyDictionary<char, string> Russian
     {
 	    get { return _russian ??= new ReadOnlyDictionary<char, string>(RussianChars); }

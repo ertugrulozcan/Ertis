@@ -21,7 +21,7 @@ public class UriFieldInfo : StringFieldInfo
     
     #region Methods
     
-    protected internal override bool Validate(object obj, IValidationContext validationContext)
+    protected internal override bool Validate(object? obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
         
@@ -30,7 +30,7 @@ public class UriFieldInfo : StringFieldInfo
             if (!IsValidUri(uri))
             {
                 isValid = false;
-                validationContext.Errors.Add(new FieldValidationException($"Uri is not valid", this));
+                validationContext.Errors.Add(new FieldValidationException("Uri is not valid", this));
             }
         }
         

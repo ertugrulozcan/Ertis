@@ -1,12 +1,19 @@
 using System.Net;
+using System.Text.Json.Serialization;
+using JsonProperty = Newtonsoft.Json.JsonPropertyAttribute;
+using NullValueHandling = Newtonsoft.Json.NullValueHandling;
 
 namespace Ertis.Core.Exceptions;
 
+// ReSharper disable once UnusedType.Global
 public class ValidationException : ErtisException
 {
 	#region Properties
 	
-	public IEnumerable<string> Errors { get; set; }
+	[JsonProperty("errors", NullValueHandling = NullValueHandling.Ignore)]
+	[JsonPropertyName("errors")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public IEnumerable<string>? Errors { get; set; }
 	
 	#endregion
 	

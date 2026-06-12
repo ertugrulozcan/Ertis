@@ -27,8 +27,10 @@ public interface ISchema
     
     #region Methods
     
-    bool ValidateSchema(out Exception exception);
+    // ReSharper disable once UnusedMember.Global
+    bool ValidateSchema(out Exception? exception);
     
+    // ReSharper disable once UnusedMemberInSuper.Global
     bool ValidateContent(DynamicObject obj, IValidationContext validationContext);
     
     #endregion

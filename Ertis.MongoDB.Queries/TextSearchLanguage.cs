@@ -1,9 +1,11 @@
+// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.MongoDB.Queries;
 
 public readonly struct TextSearchLanguage
 {
     #region Properties
     
+    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public string Name { get; }
     
     public string ISO6391Code { get; }
@@ -25,67 +27,64 @@ public readonly struct TextSearchLanguage
     
     #region Statics
     
-    public static readonly TextSearchLanguage None = new TextSearchLanguage("None", "none");
+    public static readonly TextSearchLanguage None = new("None", "none");
     
-    public static readonly TextSearchLanguage Danish = new TextSearchLanguage("Danish", "da");
+    public static readonly TextSearchLanguage Danish = new("Danish", "da");
     
-    public static readonly TextSearchLanguage Dutch = new TextSearchLanguage("Dutch", "nl");
+    public static readonly TextSearchLanguage Dutch = new("Dutch", "nl");
     
-    public static readonly TextSearchLanguage English = new TextSearchLanguage("English", "en");
+    public static readonly TextSearchLanguage English = new("English", "en");
     
-    public static readonly TextSearchLanguage Finnish = new TextSearchLanguage("Finnish", "fi");
+    public static readonly TextSearchLanguage Finnish = new("Finnish", "fi");
     
-    public static readonly TextSearchLanguage French = new TextSearchLanguage("French", "fr");
+    public static readonly TextSearchLanguage French = new("French", "fr");
     
-    public static readonly TextSearchLanguage German = new TextSearchLanguage("German", "de");
+    public static readonly TextSearchLanguage German = new("German", "de");
     
-    public static readonly TextSearchLanguage Hungarian = new TextSearchLanguage("Hungarian", "hu");
+    public static readonly TextSearchLanguage Hungarian = new("Hungarian", "hu");
     
-    public static readonly TextSearchLanguage Italian = new TextSearchLanguage("Italian", "it");
+    public static readonly TextSearchLanguage Italian = new("Italian", "it");
     
-    public static readonly TextSearchLanguage Norwegian = new TextSearchLanguage("Norwegian", "nb");
+    public static readonly TextSearchLanguage Norwegian = new("Norwegian", "nb");
     
-    public static readonly TextSearchLanguage Portuguese = new TextSearchLanguage("Portuguese", "pt");
+    public static readonly TextSearchLanguage Portuguese = new("Portuguese", "pt");
     
-    public static readonly TextSearchLanguage Romanian = new TextSearchLanguage("Romanian", "ro");
+    public static readonly TextSearchLanguage Romanian = new("Romanian", "ro");
     
-    public static readonly TextSearchLanguage Russian = new TextSearchLanguage("Russian", "ru");
+    public static readonly TextSearchLanguage Russian = new("Russian", "ru");
     
-    public static readonly TextSearchLanguage Spanish = new TextSearchLanguage("Spanish", "es");
+    public static readonly TextSearchLanguage Spanish = new("Spanish", "es");
     
-    public static readonly TextSearchLanguage Swedish = new TextSearchLanguage("Swedish", "sv");
+    public static readonly TextSearchLanguage Swedish = new("Swedish", "sv");
     
-    public static readonly TextSearchLanguage Turkish = new TextSearchLanguage("Turkish", "tr");
+    public static readonly TextSearchLanguage Turkish = new("Turkish", "tr");
     
-    private static IReadOnlyCollection<TextSearchLanguage> _all;
+    // ReSharper disable once UnusedMember.Global
     public static IReadOnlyCollection<TextSearchLanguage> All
     {
         get
         {
-            if (_all == null)
+            field ??= new[]
             {
-                _all = new[]
-                {
-                    None,
-                    Danish,
-                    Dutch,
-                    English,
-                    Finnish,
-                    French,
-                    German,
-                    Hungarian,
-                    Italian,
-                    Norwegian,
-                    Portuguese,
-                    Romanian,
-                    Russian,
-                    Spanish,
-                    Swedish,
-                    Turkish
-                };
-            }
+                None,
+                Danish,
+                Dutch,
+                English,
+                Finnish,
+                French,
+                German,
+                Hungarian,
+                Italian,
+                Norwegian,
+                Portuguese,
+                Romanian,
+                Russian,
+                Spanish,
+                Swedish,
+                Turkish
+            };
             
-            return _all;
+            return field;
         }
     }
     

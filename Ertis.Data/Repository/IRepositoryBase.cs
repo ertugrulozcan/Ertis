@@ -2,43 +2,45 @@ using System.Linq.Expressions;
 using Ertis.Core.Collections;
 using Ertis.Data.Models;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMemberInSuper.Global
 namespace Ertis.Data.Repository;
 
 public interface IRepositoryBase<TEntity, in TIdentifier>
 {
     #region Find & Query Methods
 	
-	TEntity FindOne(TIdentifier id);
+	TEntity? FindOne(TIdentifier id);
 	
-	Task<TEntity> FindOneAsync(TIdentifier id, CancellationToken cancellationToken = default);
+	Task<TEntity?> FindOneAsync(TIdentifier id, CancellationToken cancellationToken = default);
 	
-	TEntity FindOne(Expression<Func<TEntity, bool>> expression);
+	TEntity? FindOne(Expression<Func<TEntity, bool>> expression);
 	
-	Task<TEntity> FindOneAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default);
+	Task<TEntity?> FindOneAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default);
 	
-	IPaginationCollection<TEntity> Find(int? skip = null, int? limit = null, bool? withCount = null, string orderBy = null, SortDirection? sortDirection = null);
+	IPaginationCollection<TEntity> Find(int? skip = null, int? limit = null, bool? withCount = null, string? orderBy = null, SortDirection? sortDirection = null);
 	
-	IPaginationCollection<TEntity> Find(int? skip = null, int? limit = null, bool? withCount = null, Sorting sorting = null);
+	IPaginationCollection<TEntity> Find(int? skip = null, int? limit = null, bool? withCount = null, Sorting? sorting = null);
 	
-	Task<IPaginationCollection<TEntity>> FindAsync(int? skip = null, int? limit = null, bool? withCount = null, string orderBy = null, SortDirection? sortDirection = null, CancellationToken cancellationToken = default);
+	Task<IPaginationCollection<TEntity>> FindAsync(int? skip = null, int? limit = null, bool? withCount = null, string? orderBy = null, SortDirection? sortDirection = null, CancellationToken cancellationToken = default);
 	
-	Task<IPaginationCollection<TEntity>> FindAsync(int? skip = null, int? limit = null, bool? withCount = null, Sorting sorting = null, CancellationToken cancellationToken = default);
+	Task<IPaginationCollection<TEntity>> FindAsync(int? skip = null, int? limit = null, bool? withCount = null, Sorting? sorting = null, CancellationToken cancellationToken = default);
 	
-	IPaginationCollection<TEntity> Find(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string orderBy = null, SortDirection? sortDirection = null);
+	IPaginationCollection<TEntity> Find(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string? orderBy = null, SortDirection? sortDirection = null);
 	
-	IPaginationCollection<TEntity> Find(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, Sorting sorting = null);
+	IPaginationCollection<TEntity> Find(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, Sorting? sorting = null);
 	
-	Task<IPaginationCollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string orderBy = null, SortDirection? sortDirection = null, CancellationToken cancellationToken = default);
+	Task<IPaginationCollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, string? orderBy = null, SortDirection? sortDirection = null, CancellationToken cancellationToken = default);
 	
-	Task<IPaginationCollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, Sorting sorting = null, CancellationToken cancellationToken = default);
+	Task<IPaginationCollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, int? skip = null, int? limit = null, bool? withCount = null, Sorting? sorting = null, CancellationToken cancellationToken = default);
 	
-	IPaginationCollection<TEntity> Find(string query, int? skip = null, int? limit = null, bool? withCount = null, string orderBy = null, SortDirection? sortDirection = null);
+	IPaginationCollection<TEntity> Find(string query, int? skip = null, int? limit = null, bool? withCount = null, string? orderBy = null, SortDirection? sortDirection = null);
 	
-	IPaginationCollection<TEntity> Find(string query, int? skip = null, int? limit = null, bool? withCount = null, Sorting sorting = null);
+	IPaginationCollection<TEntity> Find(string query, int? skip = null, int? limit = null, bool? withCount = null, Sorting? sorting = null);
 	
-	Task<IPaginationCollection<TEntity>> FindAsync(string query, int? skip = null, int? limit = null, bool? withCount = null, string orderBy = null, SortDirection? sortDirection = null, CancellationToken cancellationToken = default);
+	Task<IPaginationCollection<TEntity>> FindAsync(string query, int? skip = null, int? limit = null, bool? withCount = null, string? orderBy = null, SortDirection? sortDirection = null, CancellationToken cancellationToken = default);
 	
-	Task<IPaginationCollection<TEntity>> FindAsync(string query, int? skip = null, int? limit = null, bool? withCount = null, Sorting sorting = null, CancellationToken cancellationToken = default);
+	Task<IPaginationCollection<TEntity>> FindAsync(string query, int? skip = null, int? limit = null, bool? withCount = null, Sorting? sorting = null, CancellationToken cancellationToken = default);
 	
 	#endregion
 	
@@ -56,13 +58,13 @@ public interface IRepositoryBase<TEntity, in TIdentifier>
 	
 	#region Update Methods
 	
-	TEntity Update(TEntity entity, TIdentifier id = default, UpdateOptions? options = null);
+	TEntity Update(TEntity entity, TIdentifier? id = default, UpdateOptions? options = null);
 	
-	Task<TEntity> UpdateAsync(TEntity entity, TIdentifier id = default, UpdateOptions? options = null, CancellationToken cancellationToken = default);
+	Task<TEntity> UpdateAsync(TEntity entity, TIdentifier? id = default, UpdateOptions? options = null, CancellationToken cancellationToken = default);
 	
-	TEntity Upsert(TEntity entity, TIdentifier id = default);
+	TEntity Upsert(TEntity entity, TIdentifier? id = default);
 	
-	Task<TEntity> UpsertAsync(TEntity entity, TIdentifier id = default, CancellationToken cancellationToken = default);
+	Task<TEntity> UpsertAsync(TEntity entity, TIdentifier? id = default, CancellationToken cancellationToken = default);
 	
 	#endregion
 	

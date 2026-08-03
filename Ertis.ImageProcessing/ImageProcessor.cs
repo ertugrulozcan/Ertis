@@ -113,7 +113,12 @@ public static class ImageProcessor
 					image.SaveAsGifAsync(outputStream);
 					break;
 				case ImageFormat.Jpeg:
-					image.SaveAsJpegAsync(outputStream, new JpegEncoder { Quality = quality });
+					image.SaveAsJpegAsync(outputStream, new JpegEncoder
+					{
+						Quality = quality ?? Constants.DefaultQuality,
+						ColorType = JpegEncodingColor.YCbCrRatio420,
+						Interleaved = true,
+					});
 					break;
 				case ImageFormat.Pbm:
 					image.SaveAsPbmAsync(outputStream);
@@ -152,7 +157,12 @@ public static class ImageProcessor
 					await image.SaveAsGifAsync(outputStream, cancellationToken: cancellationToken);
 					break;
 				case ImageFormat.Jpeg:
-					await image.SaveAsJpegAsync(outputStream, new JpegEncoder { Quality = quality }, cancellationToken: cancellationToken);
+					await image.SaveAsJpegAsync(outputStream, new JpegEncoder
+					{
+						Quality = quality ?? Constants.DefaultQuality,
+						ColorType = JpegEncodingColor.YCbCrRatio420,
+						Interleaved = true,
+					}, cancellationToken: cancellationToken);
 					break;
 				case ImageFormat.Pbm:
 					await image.SaveAsPbmAsync(outputStream, cancellationToken: cancellationToken);

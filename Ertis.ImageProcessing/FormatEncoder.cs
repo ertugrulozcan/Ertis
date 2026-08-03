@@ -20,7 +20,12 @@ public static class FormatEncoder
 		{
 			ImageFormat.Bmp => new BmpEncoder(),
 			ImageFormat.Gif => new GifEncoder(),
-			ImageFormat.Jpeg => new JpegEncoder { Quality = quality ?? Constants.DefaultQuality },
+			ImageFormat.Jpeg => new JpegEncoder
+			{
+				Quality = quality ?? Constants.DefaultQuality,
+				ColorType = JpegEncodingColor.YCbCrRatio420,
+				Interleaved = true,
+			},
 			ImageFormat.Pbm => new PbmEncoder(),
 			ImageFormat.Png => new PngEncoder(),
 			ImageFormat.Tga => new TgaEncoder(),

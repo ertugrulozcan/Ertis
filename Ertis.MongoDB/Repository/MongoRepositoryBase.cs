@@ -39,7 +39,8 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 
 	public string CollectionName { get; }
 	
-	private IMongoCollection<TEntity> Collection { get; }
+	// ReSharper disable once MemberCanBePrivate.Global
+	protected IMongoCollection<TEntity> Collection { get; }
 
 	#endregion
 

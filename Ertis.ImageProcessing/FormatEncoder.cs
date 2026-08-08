@@ -20,12 +20,22 @@ public static class FormatEncoder
 		{
 			ImageFormat.Bmp => new BmpEncoder(),
 			ImageFormat.Gif => new GifEncoder(),
-			ImageFormat.Jpeg => new JpegEncoder { Quality = quality ?? Constants.DefaultQuality },
+			ImageFormat.Jpeg => new JpegEncoder
+			{
+				Quality = quality ?? Constants.DefaultQuality, 
+				Interleaved = true 
+			},
 			ImageFormat.Pbm => new PbmEncoder(),
 			ImageFormat.Png => new PngEncoder(),
 			ImageFormat.Tga => new TgaEncoder(),
 			ImageFormat.Tiff => new TiffEncoder(),
-			ImageFormat.Webp => new WebpEncoder { Quality = quality ?? Constants.DefaultQuality },
+			ImageFormat.Webp => new WebpEncoder
+			{
+				Quality = quality ?? Constants.DefaultQuality,
+				Method = WebpEncodingMethod.Level2,
+				FileFormat = WebpFileFormatType.Lossy, 
+				NearLossless = false
+			},
 			_ => throw new ArgumentOutOfRangeException(nameof(format), format, null)
 		};
 	}

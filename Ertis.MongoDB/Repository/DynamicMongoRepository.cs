@@ -38,9 +38,11 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	
 	public string CollectionName { get; }
 	
-	private IMongoCollection<dynamic> Collection { get; }
+	// ReSharper disable once MemberCanBePrivate.Global
+	protected IMongoCollection<dynamic> Collection { get; }
 	
-	private IMongoCollection<BsonDocument> DocumentCollection { get; }
+	// ReSharper disable once MemberCanBePrivate.Global
+	protected IMongoCollection<BsonDocument> DocumentCollection { get; }
 
 	#endregion
 

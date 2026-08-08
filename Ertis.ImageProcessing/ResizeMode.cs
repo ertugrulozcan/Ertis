@@ -1,11 +1,13 @@
 using ResizeModeEnum = SixLabors.ImageSharp.Processing.ResizeMode;
+
+// ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.ImageProcessing;
 
-// ReSharper disable MemberCanBePrivate.Global
 public class ResizeMode
 {
 	#region Statics
-
+	
 	public static readonly ResizeMode Crop = new(ResizeModeEnum.Crop);
 	public static readonly ResizeMode Manual = new(ResizeModeEnum.Manual);
 	public static readonly ResizeMode Max = new(ResizeModeEnum.Max);
@@ -13,17 +15,17 @@ public class ResizeMode
 	public static readonly ResizeMode Stretch = new(ResizeModeEnum.Stretch);
 	public static readonly ResizeMode Pad = new(ResizeModeEnum.Pad);
 	public static readonly ResizeMode BoxPad = new(ResizeModeEnum.BoxPad);
-
+	
 	#endregion
 	
 	#region Properties
-
+	
 	private ResizeModeEnum Value { get; }
-
+	
 	#endregion
 	
 	#region Constructors
-
+	
 	/// <summary>
 	/// Constructor
 	/// </summary>
@@ -32,17 +34,17 @@ public class ResizeMode
 	{
 		this.Value = value;
 	}
-
+	
 	#endregion
-
+	
 	#region Operators
-
+	
 	public static implicit operator ResizeModeEnum(ResizeMode d) => d.Value;
-
+	
 	#endregion
-
+	
 	#region Methods
-
+	
 	public static ResizeMode? Parse(string key)
 	{
 		if (Enum.TryParse<ResizeModeEnum>(key, true, out var enumValue))
@@ -59,9 +61,9 @@ public class ResizeMode
 				_ => null
 			};
 		}
-
+		
 		return null;
 	}
-
+	
 	#endregion
 }

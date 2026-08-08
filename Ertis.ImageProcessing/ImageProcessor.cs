@@ -1,16 +1,19 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Formats.Webp;
+using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Metadata;
 using SixLabors.ImageSharp.Processing;
 using ResizeModeEnum = SixLabors.ImageSharp.Processing.ResizeMode;
+using ImageProcessingException = Ertis.ImageProcessing.Exceptions.ImageProcessingException;
 
+// ReSharper disable once UnusedType.Global
 namespace Ertis.ImageProcessing;
 
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
-// ReSharper disable once UnusedType.Global
 public static class ImageProcessor
 {
 	#region Methods
@@ -24,9 +27,17 @@ public static class ImageProcessor
 			image.Mutate(x => x.Crop(bounds.ToRectangle(image.Width, image.Height))); 
 			image.Save(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality));
 		}
-		catch (Exception ex)
+		catch (ImageProcessingException)
 		{
-			throw new Ertis.ImageProcessing.Exceptions.ImageProcessingException(HttpStatusCode.BadRequest, ex.Message, "ImageProcessingError");
+			throw;
+		}
+		catch (OperationCanceledException)
+		{
+			throw;
+		}
+		catch (Exception ex) when (ex is not OutOfMemoryException)
+		{
+			throw new ImageProcessingException(HttpStatusCode.InternalServerError, ex.Message, "ImageProcessingError", ex);
 		}
 	}
 	
@@ -39,25 +50,58 @@ public static class ImageProcessor
 			image.Mutate(x => x.Crop(bounds.ToRectangle(image.Width, image.Height))); 
 			await image.SaveAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality), cancellationToken: cancellationToken);
 		}
-		catch (Exception ex)
+		catch (ImageProcessingException)
 		{
-			throw new Ertis.ImageProcessing.Exceptions.ImageProcessingException(HttpStatusCode.BadRequest, ex.Message, "ImageProcessingError");
+			throw;
+		}
+		catch (OperationCanceledException)
+		{
+			throw;
+		}
+		catch (Exception ex) when (ex is not OutOfMemoryException)
+		{
+			throw new ImageProcessingException(HttpStatusCode.InternalServerError, ex.Message, "ImageProcessingError", ex);
 		}
 	}
 	
-	public static void Resize(Stream imageStream, Stream outputStream, int? width, int? height, ImageFormat destinationFormat, ResizeMode? mode = null, Anchor? anchor = null, SamplerAlgorithm? sampler = null, int? quality = null)
+	public static void Resize(
+		Stream imageStream, 
+		Stream outputStream, 
+		int? width, 
+		int? height, 
+		ImageFormat destinationFormat, 
+		ResizeMode? mode = null, 
+		Anchor? anchor = null, 
+		SamplerAlgorithm? sampler = null, 
+		int? quality = null)
 	{
 		if (width == null && height == null)
 		{
 			return;
 		}
-
+		
+		if (width is <= 0 || height is <= 0)
+		{
+			throw new ImageProcessingException(HttpStatusCode.BadRequest, "Width and height must be greater than zero.", "InvalidDimensions");
+		}
+		
 		try
 		{
-			using var image = Image.Load(imageStream);
+			var sourceInfo = Image.Identify(imageStream);
+			imageStream.Position = 0;
+			
+			var targetWidth = width ?? Math.Max(1, (int)Math.Round(sourceInfo.Width * ((double)height!.Value / sourceInfo.Height)));
+			var targetHeight = height ?? Math.Max(1, (int)Math.Round(sourceInfo.Height * ((double)width!.Value / sourceInfo.Width)));
+			
+			var decoderOptions = new DecoderOptions
+			{
+				TargetSize = new Size(targetWidth, targetHeight)
+			};
+			
+			using var image = Image.Load(decoderOptions, imageStream);
 			var options = new ResizeOptions
 			{
-				Size = new Size(width ?? 0, height ?? 0),
+				Size = new Size(targetWidth, targetHeight),
 				Mode = mode ?? ResizeModeEnum.Crop,
 				Position = anchor ?? AnchorPositionMode.Center,
 				Sampler = (sampler ?? SamplerAlgorithm.Bicubic).ToResampler()!
@@ -66,25 +110,67 @@ public static class ImageProcessor
 			image.Mutate(x => x.Resize(options)); 
 			image.Save(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality));
 		}
-		catch (Exception ex)
+		catch (ImageProcessingException)
 		{
-			throw new Ertis.ImageProcessing.Exceptions.ImageProcessingException(HttpStatusCode.BadRequest, ex.Message, "ImageProcessingError");
+			throw;
+		}
+		catch (OperationCanceledException)
+		{
+			throw;
+		}
+		catch (InvalidImageContentException ex) when (ex.InnerException is InvalidMemoryOperationException)
+		{
+			throw new ImageProcessingException(HttpStatusCode.ServiceUnavailable, "Image is too large to process.", "ImageTooLarge", ex);
+		}
+		catch (Exception ex) when (ex is InvalidImageContentException or UnknownImageFormatException or NotSupportedException)
+		{
+			throw new ImageProcessingException(HttpStatusCode.BadRequest, "The image could not be decoded.", "InvalidImageContent", ex);
+		}
+		catch (Exception ex) when (ex is not OutOfMemoryException)
+		{
+			throw new ImageProcessingException(HttpStatusCode.InternalServerError, ex.Message, "ImageProcessingError", ex);
 		}
 	}
 	
-	public static async Task ResizeAsync(Stream imageStream, Stream outputStream, int? width, int? height, ImageFormat destinationFormat, ResizeMode? mode = null, Anchor? anchor = null, SamplerAlgorithm? sampler = null, int? quality = null, CancellationToken cancellationToken = default)
+	public static async Task ResizeAsync(
+		Stream imageStream, 
+		Stream outputStream, 
+		int? width, 
+		int? height, 
+		ImageFormat destinationFormat, 
+		ResizeMode? mode = null, 
+		Anchor? anchor = null, 
+		SamplerAlgorithm? sampler = null, 
+		int? quality = null, 
+		CancellationToken cancellationToken = default)
 	{
 		if (width == null && height == null)
 		{
 			return;
 		}
-
+		
+		if (width is <= 0 || height is <= 0)
+		{
+			throw new ImageProcessingException(HttpStatusCode.BadRequest, "Width and height must be greater than zero.", "InvalidDimensions");
+		}
+		
 		try
 		{
-			using var image = await Image.LoadAsync(imageStream, cancellationToken: cancellationToken);
+			var sourceInfo = await Image.IdentifyAsync(imageStream, cancellationToken);
+			imageStream.Position = 0;
+			
+			var targetWidth = width ?? Math.Max(1, (int)Math.Round(sourceInfo.Width * ((double)height!.Value / sourceInfo.Height)));
+			var targetHeight = height ?? Math.Max(1, (int)Math.Round(sourceInfo.Height * ((double)width!.Value / sourceInfo.Width)));
+			
+			var decoderOptions = new DecoderOptions
+			{
+				TargetSize = new Size(targetWidth, targetHeight)
+			};
+			
+			using var image = await Image.LoadAsync(decoderOptions, imageStream, cancellationToken: cancellationToken);
 			var options = new ResizeOptions
 			{
-				Size = new Size(width ?? 0, height ?? 0),
+				Size = new Size(targetWidth, targetHeight),
 				Mode = mode ?? ResizeModeEnum.Crop,
 				Position = anchor ?? AnchorPositionMode.Center,
 				Sampler = (sampler ?? SamplerAlgorithm.Bicubic).ToResampler()!
@@ -93,9 +179,25 @@ public static class ImageProcessor
 			image.Mutate(x => x.Resize(options)); 
 			await image.SaveAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality), cancellationToken: cancellationToken);
 		}
-		catch (Exception ex)
+		catch (ImageProcessingException)
 		{
-			throw new Ertis.ImageProcessing.Exceptions.ImageProcessingException(HttpStatusCode.BadRequest, ex.Message, "ImageProcessingError");
+			throw;
+		}
+		catch (OperationCanceledException)
+		{
+			throw;
+		}
+		catch (InvalidImageContentException ex) when (ex.InnerException is InvalidMemoryOperationException)
+		{
+			throw new ImageProcessingException(HttpStatusCode.ServiceUnavailable, "Image is too large to process.", "ImageTooLarge", ex);
+		}
+		catch (Exception ex) when (ex is InvalidImageContentException or UnknownImageFormatException or NotSupportedException)
+		{
+			throw new ImageProcessingException(HttpStatusCode.BadRequest, "The image could not be decoded.", "InvalidImageContent", ex);
+		}
+		catch (Exception ex) when (ex is not OutOfMemoryException)
+		{
+			throw new ImageProcessingException(HttpStatusCode.InternalServerError, ex.Message, "ImageProcessingError", ex);
 		}
 	}
 	
@@ -107,34 +209,44 @@ public static class ImageProcessor
 			switch (destinationFormat)
 			{
 				case ImageFormat.Bmp:
-					image.SaveAsBmpAsync(outputStream);
+					image.SaveAsBmp(outputStream);
 					break;
 				case ImageFormat.Gif:
-					image.SaveAsGifAsync(outputStream);
+					image.SaveAsGif(outputStream);
 					break;
 				case ImageFormat.Jpeg:
-					image.SaveAsJpegAsync(outputStream, new JpegEncoder { Quality = quality });
+					image.SaveAsJpeg(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality) as JpegEncoder);
 					break;
 				case ImageFormat.Pbm:
-					image.SaveAsPbmAsync(outputStream);
+					image.SaveAsPbm(outputStream);
 					break;
 				case ImageFormat.Png:
-					image.SaveAsPngAsync(outputStream);
+					image.SaveAsPng(outputStream);
 					break;
 				case ImageFormat.Tga:
-					image.SaveAsTgaAsync(outputStream);
+					image.SaveAsTga(outputStream);
 					break;
 				case ImageFormat.Tiff:
-					image.SaveAsTiffAsync(outputStream);
+					image.SaveAsTiff(outputStream);
 					break;
 				case ImageFormat.Webp:
-					image.SaveAsWebpAsync(outputStream, new WebpEncoder { FileFormat = WebpFileFormatType.Lossy, NearLossless = false, Quality = quality ?? Constants.DefaultQuality });
+					image.SaveAsWebp(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality) as WebpEncoder);
 					break;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(destinationFormat), destinationFormat, "Unsupported image format");
 			}
 		}
-		catch (Exception ex)
+		catch (ImageProcessingException)
 		{
-			throw new Ertis.ImageProcessing.Exceptions.ImageProcessingException(HttpStatusCode.BadRequest, ex.Message, "ImageProcessingError");
+			throw;
+		}
+		catch (OperationCanceledException)
+		{
+			throw;
+		}
+		catch (Exception ex) when (ex is not OutOfMemoryException)
+		{
+			throw new ImageProcessingException(HttpStatusCode.InternalServerError, ex.Message, "ImageProcessingError", ex);
 		}
 	}
 	
@@ -152,7 +264,7 @@ public static class ImageProcessor
 					await image.SaveAsGifAsync(outputStream, cancellationToken: cancellationToken);
 					break;
 				case ImageFormat.Jpeg:
-					await image.SaveAsJpegAsync(outputStream, new JpegEncoder { Quality = quality }, cancellationToken: cancellationToken);
+					await image.SaveAsJpegAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality) as JpegEncoder, cancellationToken: cancellationToken);
 					break;
 				case ImageFormat.Pbm:
 					await image.SaveAsPbmAsync(outputStream, cancellationToken: cancellationToken);
@@ -167,13 +279,23 @@ public static class ImageProcessor
 					await image.SaveAsTiffAsync(outputStream, cancellationToken: cancellationToken);
 					break;
 				case ImageFormat.Webp:
-					await image.SaveAsWebpAsync(outputStream, new WebpEncoder { FileFormat = WebpFileFormatType.Lossy, NearLossless = false, Quality = quality ?? Constants.DefaultQuality }, cancellationToken: cancellationToken);
+					await image.SaveAsWebpAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality) as WebpEncoder, cancellationToken: cancellationToken);
 					break;
+				default:
+					throw new ArgumentOutOfRangeException(nameof(destinationFormat), destinationFormat, "Unsupported image format");
 			}
 		}
-		catch (Exception ex)
+		catch (ImageProcessingException)
 		{
-			throw new Ertis.ImageProcessing.Exceptions.ImageProcessingException(HttpStatusCode.BadRequest, ex.Message, "ImageProcessingError");
+			throw;
+		}
+		catch (OperationCanceledException)
+		{
+			throw;
+		}
+		catch (Exception ex) when (ex is not OutOfMemoryException)
+		{
+			throw new ImageProcessingException(HttpStatusCode.InternalServerError, ex.Message, "ImageProcessingError", ex);
 		}
 	}
 	

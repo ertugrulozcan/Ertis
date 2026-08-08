@@ -1,6 +1,6 @@
 namespace Ertis.ImageProcessing;
 
-internal class Constants
+internal static class Constants
 {
     #region Constants
     

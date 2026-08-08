@@ -1,12 +1,14 @@
+using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
+// ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.ImageProcessing;
 
 public class SamplerAlgorithm
 {
 	#region Statics
-
+	
 	public static readonly SamplerAlgorithm Bicubic = new(SamplerAlgorithmEnum.Bicubic);
 	public static readonly SamplerAlgorithm Box = new(SamplerAlgorithmEnum.Box);
 	public static readonly SamplerAlgorithm Cubic = new(SamplerAlgorithmEnum.Cubic);
@@ -18,13 +20,13 @@ public class SamplerAlgorithm
 	#endregion
 	
 	#region Properties
-
+	
 	private SamplerAlgorithmEnum Value { get; }
-
+	
 	#endregion
 	
 	#region Constructors
-
+	
 	/// <summary>
 	/// Constructor
 	/// </summary>
@@ -33,23 +35,22 @@ public class SamplerAlgorithm
 	{
 		this.Value = value;
 	}
-
+	
 	#endregion
-
+	
 	#region Methods
-
-	// ReSharper disable once IdentifierTypo
+	
 	public IResampler? ToResampler()
 	{
 		return this.Value switch
 		{
-			SamplerAlgorithmEnum.Bicubic => new BicubicResampler(),
-			SamplerAlgorithmEnum.Box => new BoxResampler(),
-			SamplerAlgorithmEnum.Cubic => new CubicResampler(),
-			SamplerAlgorithmEnum.Lanczos => new LanczosResampler(),
-			SamplerAlgorithmEnum.Triangle => new TriangleResampler(),
-			SamplerAlgorithmEnum.Welch => new WelchResampler(),
-			SamplerAlgorithmEnum.NearestNeighbor => new NearestNeighborResampler(),
+			SamplerAlgorithmEnum.Bicubic => KnownResamplers.Bicubic,
+			SamplerAlgorithmEnum.Box => KnownResamplers.Box,
+			SamplerAlgorithmEnum.Cubic => KnownResamplers.CatmullRom,
+			SamplerAlgorithmEnum.Lanczos => KnownResamplers.Lanczos3,
+			SamplerAlgorithmEnum.Triangle => KnownResamplers.Triangle,
+			SamplerAlgorithmEnum.Welch => KnownResamplers.Welch,
+			SamplerAlgorithmEnum.NearestNeighbor => KnownResamplers.NearestNeighbor,
 			_ => null
 		};
 	}
@@ -70,14 +71,14 @@ public class SamplerAlgorithm
 				_ => null
 			};
 		}
-
+		
 		return null;
 	}
-
+	
 	#endregion
-
+	
 	#region Enum
-
+	
 	private enum SamplerAlgorithmEnum
 	{
 		Bicubic,
@@ -88,6 +89,6 @@ public class SamplerAlgorithm
 		Welch,
 		NearestNeighbor
 	}
-
+	
 	#endregion
 }

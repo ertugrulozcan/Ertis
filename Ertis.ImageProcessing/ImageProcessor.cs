@@ -19,13 +19,13 @@ public static class ImageProcessor
 	#region Methods
 	
 	[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
-	public static void Crop(Stream imageStream, Stream outputStream, CropBounds bounds, ImageFormat destinationFormat, int? quality = null)
+	public static void Crop(Stream imageStream, Stream outputStream, CropBounds bounds, ImageFormat destinationFormat, int? quality = null, int? level = null)
 	{
 		try
 		{
 			using var image = Image.Load(imageStream);
 			image.Mutate(x => x.Crop(bounds.ToRectangle(image.Width, image.Height))); 
-			image.Save(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality));
+			image.Save(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality, level));
 		}
 		catch (ImageProcessingException)
 		{
@@ -42,13 +42,13 @@ public static class ImageProcessor
 	}
 	
 	[SuppressMessage("ReSharper", "AccessToDisposedClosure")]
-	public static async Task CropAsync(Stream imageStream, Stream outputStream, CropBounds bounds, ImageFormat destinationFormat, int? quality = null, CancellationToken cancellationToken = default)
+	public static async Task CropAsync(Stream imageStream, Stream outputStream, CropBounds bounds, ImageFormat destinationFormat, int? quality = null, int? level = null, CancellationToken cancellationToken = default)
 	{
 		try
 		{
 			using var image = await Image.LoadAsync(imageStream, cancellationToken: cancellationToken);
 			image.Mutate(x => x.Crop(bounds.ToRectangle(image.Width, image.Height))); 
-			await image.SaveAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality), cancellationToken: cancellationToken);
+			await image.SaveAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality, level), cancellationToken: cancellationToken);
 		}
 		catch (ImageProcessingException)
 		{
@@ -73,7 +73,8 @@ public static class ImageProcessor
 		ResizeMode? mode = null, 
 		Anchor? anchor = null, 
 		SamplerAlgorithm? sampler = null, 
-		int? quality = null)
+		int? quality = null, 
+		int? level = null)
 	{
 		if (width == null && height == null)
 		{
@@ -108,7 +109,7 @@ public static class ImageProcessor
 			};
 			
 			image.Mutate(x => x.Resize(options)); 
-			image.Save(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality));
+			image.Save(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality, level));
 		}
 		catch (ImageProcessingException)
 		{
@@ -142,6 +143,7 @@ public static class ImageProcessor
 		Anchor? anchor = null, 
 		SamplerAlgorithm? sampler = null, 
 		int? quality = null, 
+		int? level = null, 
 		CancellationToken cancellationToken = default)
 	{
 		if (width == null && height == null)
@@ -177,7 +179,7 @@ public static class ImageProcessor
 			};
 			
 			image.Mutate(x => x.Resize(options)); 
-			await image.SaveAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality), cancellationToken: cancellationToken);
+			await image.SaveAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality, level), cancellationToken: cancellationToken);
 		}
 		catch (ImageProcessingException)
 		{
@@ -201,7 +203,7 @@ public static class ImageProcessor
 		}
 	}
 	
-	public static void Convert(Stream imageStream, Stream outputStream, ImageFormat destinationFormat, int? quality = null)
+	public static void Convert(Stream imageStream, Stream outputStream, ImageFormat destinationFormat, int? quality = null, int? level = null)
 	{
 		try
 		{
@@ -215,7 +217,7 @@ public static class ImageProcessor
 					image.SaveAsGif(outputStream);
 					break;
 				case ImageFormat.Jpeg:
-					image.SaveAsJpeg(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality) as JpegEncoder);
+					image.SaveAsJpeg(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality, level) as JpegEncoder);
 					break;
 				case ImageFormat.Pbm:
 					image.SaveAsPbm(outputStream);
@@ -230,7 +232,7 @@ public static class ImageProcessor
 					image.SaveAsTiff(outputStream);
 					break;
 				case ImageFormat.Webp:
-					image.SaveAsWebp(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality) as WebpEncoder);
+					image.SaveAsWebp(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality, level) as WebpEncoder);
 					break;
 				default:
 					throw new ArgumentOutOfRangeException(nameof(destinationFormat), destinationFormat, "Unsupported image format");
@@ -250,7 +252,7 @@ public static class ImageProcessor
 		}
 	}
 	
-	public static async Task ConvertAsync(Stream imageStream, Stream outputStream, ImageFormat destinationFormat, int? quality = null, CancellationToken cancellationToken = default)
+	public static async Task ConvertAsync(Stream imageStream, Stream outputStream, ImageFormat destinationFormat, int? quality = null, int? level = null, CancellationToken cancellationToken = default)
 	{
 		try
 		{
@@ -264,7 +266,7 @@ public static class ImageProcessor
 					await image.SaveAsGifAsync(outputStream, cancellationToken: cancellationToken);
 					break;
 				case ImageFormat.Jpeg:
-					await image.SaveAsJpegAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality) as JpegEncoder, cancellationToken: cancellationToken);
+					await image.SaveAsJpegAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality, level) as JpegEncoder, cancellationToken: cancellationToken);
 					break;
 				case ImageFormat.Pbm:
 					await image.SaveAsPbmAsync(outputStream, cancellationToken: cancellationToken);
@@ -279,7 +281,7 @@ public static class ImageProcessor
 					await image.SaveAsTiffAsync(outputStream, cancellationToken: cancellationToken);
 					break;
 				case ImageFormat.Webp:
-					await image.SaveAsWebpAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality) as WebpEncoder, cancellationToken: cancellationToken);
+					await image.SaveAsWebpAsync(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality, level) as WebpEncoder, cancellationToken: cancellationToken);
 					break;
 				default:
 					throw new ArgumentOutOfRangeException(nameof(destinationFormat), destinationFormat, "Unsupported image format");

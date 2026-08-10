@@ -14,7 +14,7 @@ public static class FormatEncoder
 {
 	#region Methods
 	
-	public static IImageEncoder GetDefaultFormatter(ImageFormat format, int? quality = null)
+	public static IImageEncoder GetDefaultFormatter(ImageFormat format, int? quality = null, int? level = null)
 	{
 		return format switch
 		{
@@ -22,8 +22,8 @@ public static class FormatEncoder
 			ImageFormat.Gif => new GifEncoder(),
 			ImageFormat.Jpeg => new JpegEncoder
 			{
-				Quality = quality ?? Constants.DefaultQuality, 
-				Interleaved = true 
+				Quality = quality ?? Constants.DefaultQuality,
+				Interleaved = true
 			},
 			ImageFormat.Pbm => new PbmEncoder(),
 			ImageFormat.Png => new PngEncoder(),
@@ -32,8 +32,8 @@ public static class FormatEncoder
 			ImageFormat.Webp => new WebpEncoder
 			{
 				Quality = quality ?? Constants.DefaultQuality,
-				Method = WebpEncodingMethod.Level2,
-				FileFormat = WebpFileFormatType.Lossy, 
+				Method = level != null && Enum.IsDefined(typeof(WebpEncodingMethod), level) ? (WebpEncodingMethod)(object)level : WebpEncodingMethod.Level2,
+				FileFormat = WebpFileFormatType.Lossy,
 				NearLossless = false
 			},
 			_ => throw new ArgumentOutOfRangeException(nameof(format), format, null)

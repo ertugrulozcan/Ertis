@@ -26,13 +26,20 @@ public class QueryValue<T> : IQuery
     
     public override string ToString()
     {
+        if (this.Value == null)
+        {
+            return "null";
+        }
+        
+        var stringValue = this.Value.ToString();
+        if (stringValue == null)
+        {
+            return "null";
+        }
+        
         if (this.Value is IQuery query)
         {
             return query.ToString();
-        }
-        else if (this.Value == null)
-        {
-            return "null";
         }
         else if (typeof(T) == typeof(string) || this.Value is string)
         {
@@ -40,7 +47,7 @@ public class QueryValue<T> : IQuery
         }
         else if (typeof(T) == typeof(bool) || this.Value is bool)
         {
-            return this.Value.ToString()?.ToLower() ?? string.Empty;
+            return stringValue.ToLower();
         }
         else if (typeof(T) == typeof(DateTime) || this.Value is DateTime)
         {
@@ -49,11 +56,11 @@ public class QueryValue<T> : IQuery
         }
         else if (IsNumericType(typeof(T)))
         {
-            return this.Value.ToString()?.Replace(',', '.') ?? string.Empty;
+            return stringValue.Replace(',', '.');
         }
         else
         {
-            return this.Value.ToString() ?? string.Empty;
+            return stringValue;
         }
     }
     

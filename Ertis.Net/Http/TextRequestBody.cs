@@ -1,21 +1,21 @@
 using System.Net.Http.Headers;
 
+// ReSharper disable UnusedType.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.Net.Http;
 
-// ReSharper disable once UnusedType.Global
 public class TextRequestBody : IRequestBody
 {
     #region Properties
     
     public BodyTypes Type => BodyTypes.Text;
     
-    // ReSharper disable once MemberCanBePrivate.Global
     public string? Body { get; }
     
     public object? Payload => this.Body;
     
-    // ReSharper disable once UnusedAutoPropertyAccessor.Global
-    public string? ContentType { get; set; }
+    public string? ContentType { get; init; }
     
     #endregion
     

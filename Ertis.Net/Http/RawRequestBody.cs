@@ -1,8 +1,8 @@
 using System.Net.Http.Headers;
 
+// ReSharper disable UnusedType.Global
 namespace Ertis.Net.Http;
 
-// ReSharper disable once UnusedType.Global
 public class RawRequestBody : IRequestBody
 {
     #region Properties

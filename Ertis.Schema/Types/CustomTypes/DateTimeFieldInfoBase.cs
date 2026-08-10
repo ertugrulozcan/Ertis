@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
-using Newtonsoft.Json;
 
 namespace Ertis.Schema.Types.CustomTypes;
 
@@ -11,40 +10,41 @@ public interface IDateTimeFieldInfo
 {
     #region Properties
     
-    [JsonProperty("minValue", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minValue")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("minValue", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public DateTime? MinValue { get; init; }
     
-    [JsonProperty("maxValue", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxValue")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("maxValue", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public DateTime? MaxValue { get; init; }
     
     #endregion
 }
 
-public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeFieldInfo where T : StringFieldInfo, IDateTimeFieldInfo, new()
+public abstract class DateTimeFieldInfoBase : StringFieldInfo, IDateTimeFieldInfo
 {
     #region Abstract Properties
     
+    [JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [System.Text.Json.Serialization.JsonIgnore]
     protected abstract string StringFormat { get; }
     
     #endregion
     
     #region Properties
     
-    [JsonProperty("minValue", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minValue")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("minValue", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public DateTime? MinValue
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMinValue(out var exception) && exception != null)
             {
                 throw exception;
@@ -52,15 +52,16 @@ public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeField
         }
     }
     
-    [JsonProperty("maxValue", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxValue")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("maxValue", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public DateTime? MaxValue
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMaxValue(out var exception) && exception != null)
             {
                 throw exception;
@@ -98,7 +99,7 @@ public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeField
                     isValid = false;
                     validationContext.Errors.Add(new FieldValidationException($"Datetime is not valid. Datetime values must be '{this.StringFormat}' format.", this));
                 }
-
+                
                 break;
             }
         }
@@ -153,7 +154,6 @@ public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeField
     
     private bool IsValidDateTime(string dateString, out DateTime? dateTime)
     {
-        // ReSharper disable once ConvertIfStatementToReturnStatement
         if (string.IsNullOrWhiteSpace(dateString))
         {
             dateTime = null;
@@ -164,31 +164,6 @@ public abstract class DateTimeFieldInfoBase<T> : StringFieldInfo, IDateTimeField
         dateTime = isValid ? _dateTime : null;
         
         return isValid;
-    }
-    
-    public override object Clone()
-    {
-        return new T
-        {
-            Name = this.Name,
-            Description = this.Description,
-            DisplayName = this.DisplayName,
-            Parent = this.Parent,
-            IsRequired = this.IsRequired,
-            IsUnique = this.IsUnique,
-            IsVirtual = this.IsVirtual,
-            IsHidden = this.IsHidden,
-            IsReadonly = this.IsReadonly,
-            DefaultValue = this.DefaultValue,
-            MinValue = this.MinValue,
-            MaxValue = this.MaxValue,
-            MinLength = this.MinLength,
-            MaxLength = this.MaxLength,
-            FormatPattern = this.FormatPattern,
-            RegexPattern = this.RegexPattern,
-            RestrictRegexPattern = this.RestrictRegexPattern,
-            CaseInsensitive = this.CaseInsensitive
-        };
     }
     
     #endregion

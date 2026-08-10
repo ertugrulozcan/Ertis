@@ -1,9 +1,9 @@
 using Ertis.Security.Cryptography;
 
+// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
 namespace Ertis.Security.Helpers;
 
-// ReSharper disable once UnusedType.Global
 public static class HashParser
 {
 	public static bool TryParseHashAlgorithm(string algorithmName, out HashAlgorithms algorithm, out int outputBitSize, out int stateSize)

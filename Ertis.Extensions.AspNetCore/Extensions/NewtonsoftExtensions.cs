@@ -8,9 +8,12 @@ public static class NewtonsoftExtensions
 	
 	public static bool TryGetValue<T>(this JToken jToken, out T? value)
 	{
-        ArgumentNullException.ThrowIfNull(jToken);
+		if (jToken == null)
+		{
+			throw new ArgumentNullException(nameof(jToken));
+		}
 		
-        try
+		try
 		{
 			value = jToken.Value<T>();
 			return true;

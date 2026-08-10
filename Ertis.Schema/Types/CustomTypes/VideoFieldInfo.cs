@@ -1,8 +1,6 @@
 using System.Text.Json.Serialization;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Exceptions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.CustomTypes;
 
@@ -10,25 +8,26 @@ public sealed class VideoFieldInfo : ObjectFieldInfoBase
 {
 	#region Properties
     
-    [JsonProperty("type")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Newtonsoft.Json.JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public override FieldType Type => FieldType.video;
     
+    [JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [System.Text.Json.Serialization.JsonIgnore]
     public override IReadOnlyCollection<IFieldInfo> Properties { get; init; }
     
-    [JsonProperty("maxSize", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxSize")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("maxSize", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MaxSize
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMaxSize(out var exception) && exception != null)
             {
                 throw exception;

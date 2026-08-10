@@ -1,9 +1,6 @@
 using System.Text.Json.Serialization;
 using Ertis.Schema.Dynamics.Legacy;
 using Ertis.Schema.Types.Primitives;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
 
 namespace Ertis.Schema.Types.CustomTypes;
 
@@ -11,14 +8,14 @@ public sealed class CodeFieldInfo : ObjectFieldInfoBase
 {
 	#region Properties
     
-    [JsonProperty("type")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Newtonsoft.Json.JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public override FieldType Type => FieldType.code;
     
+    [JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [System.Text.Json.Serialization.JsonIgnore]
     public override IReadOnlyCollection<IFieldInfo> Properties { get; init; }
     
     #endregion
@@ -56,7 +53,7 @@ public sealed class CodeFieldInfo : ObjectFieldInfoBase
     public override object? GetDefaultValue()
     {
         var defaultValue = base.GetDefaultValue();
-        if (defaultValue is JObject jObject)
+        if (defaultValue is Newtonsoft.Json.Linq.JObject jObject)
         {
             return DynamicObject.Load(jObject).ToDynamic();
         }

@@ -86,9 +86,7 @@ public class MongoDatabase : IMongoDatabase
 		}
 	}
 	
-	public async Task<IEnumerable<string>> ListCollectionsAsync( 
-		Expression<Func<BsonDocument, bool>>? filterExpression = null, 
-		CancellationToken cancellationToken = default)
+	public async Task<IEnumerable<string>> ListCollectionsAsync(Expression<Func<BsonDocument, bool>>? filterExpression = null, CancellationToken cancellationToken = default)
 	{
 		if (filterExpression != null)
 		{
@@ -134,14 +132,12 @@ public class MongoDatabase : IMongoDatabase
 	
 	public BsonDocument GetDatabaseStatisticsDocument()
 	{
-		// ReSharper disable once StringLiteralTypo
 		var command = new BsonDocument { { "dbstats", 1 } };
 		return this.Database.RunCommand<BsonDocument>(command);
 	}
 	
 	public async Task<BsonDocument> GetDatabaseStatisticsDocumentAsync(CancellationToken cancellationToken = default)
 	{
-		// ReSharper disable once StringLiteralTypo
 		var command = new BsonDocument { { "dbstats", 1 } };
 		return await this.Database.RunCommandAsync<BsonDocument>(command, cancellationToken: cancellationToken);
 	}

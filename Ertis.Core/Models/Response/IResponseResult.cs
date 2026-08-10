@@ -1,46 +1,44 @@
 using System.Net;
 using System.Text.Json.Serialization;
-using JsonProperty = Newtonsoft.Json.JsonPropertyAttribute;
-using NullValueHandling = Newtonsoft.Json.NullValueHandling;
 
+// ReSharper disable UnusedMemberInSuper.Global
 namespace Ertis.Core.Models.Response;
 
 public interface IResponseResult
 {
 	#region Properties
 	
-	[JsonProperty("isSuccess")]
 	[JsonPropertyName("isSuccess")]
+	[Newtonsoft.Json.JsonProperty("isSuccess")]
 	bool IsSuccess { get; }
 	
-	[JsonProperty("statusCode", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("statusCode")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[Newtonsoft.Json.JsonProperty("statusCode")]
 	HttpStatusCode? StatusCode { get; }
 	
-	[JsonProperty("headers", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("headers")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[Newtonsoft.Json.JsonProperty("headers", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	IDictionary<string, string>? Headers { get; }
 	
-	[JsonProperty("message", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("message")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[Newtonsoft.Json.JsonProperty("message", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	string? Message { get; set; }
 	
-	[JsonProperty("rawData", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("rawData")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[Newtonsoft.Json.JsonProperty("rawData", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	byte[]? RawData { get; set; }
 	
-	[JsonProperty("json", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("json")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[Newtonsoft.Json.JsonProperty("json", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	string? Json { get; set; }
 	
-	[JsonProperty("exception", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("exception")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[Newtonsoft.Json.JsonProperty("exception", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	Exception? Exception { get; set; }
 	
 	#endregion
@@ -50,9 +48,8 @@ public interface IResponseResult<out T> : IResponseResult
 {
 	#region Properties
 	
-	[JsonProperty("data", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("data")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[Newtonsoft.Json.JsonProperty("data")]
 	T? Data { get; }
 	
 	#endregion
@@ -69,8 +66,8 @@ public class ResponseResult<T> : IResponseResult<T>
 	
 	#region Properties
 	
-	[JsonProperty("isSuccess")]
 	[JsonPropertyName("isSuccess")]
+	[Newtonsoft.Json.JsonProperty("isSuccess")]
 	public bool IsSuccess
 	{
 		get
@@ -100,39 +97,38 @@ public class ResponseResult<T> : IResponseResult<T>
 		}
 	}
 	
-	[JsonProperty("statusCode", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("statusCode")]
-	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[Newtonsoft.Json.JsonProperty("statusCode")]
 	public HttpStatusCode? StatusCode { get; private set; }
 	
-	[JsonProperty("headers", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("headers")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[Newtonsoft.Json.JsonProperty("headers", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public IDictionary<string, string>? Headers { get; set; }
 	
-	[JsonProperty("message", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("message")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[Newtonsoft.Json.JsonProperty("message", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public string? Message { get; set; }
 	
-	[JsonProperty("data", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("data")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[Newtonsoft.Json.JsonProperty("data", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public T? Data { get; set; }
 	
-	[JsonProperty("rawData", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("rawData")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[Newtonsoft.Json.JsonProperty("rawData", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public byte[]? RawData { get; set; }
 	
-	[JsonProperty("json", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("json")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[Newtonsoft.Json.JsonProperty("json", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public string? Json { get; set; }
 	
-	[JsonProperty("exception", NullValueHandling = NullValueHandling.Ignore)]
 	[JsonPropertyName("exception")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[Newtonsoft.Json.JsonProperty("exception", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public Exception? Exception { get; set; }
 	
 	#endregion
@@ -183,9 +179,9 @@ public class ResponseResult<T> : IResponseResult<T>
 	
 	#region Methods
 	
-	public override string? ToString()
+	public override string ToString()
 	{
-		return this.Message;
+		return this.Message ?? this.Exception?.Message ?? this.Json ?? (this.IsSuccess ? "Success" : "Failure");
 	}
 	
 	#endregion
@@ -201,7 +197,7 @@ public class ResponseResult : ResponseResult<object>
 	/// </summary>
 	/// <param name="isSuccess"></param>
 	public ResponseResult(bool isSuccess) : base(isSuccess)
-	{}
+	{ }
 	
 	/// <summary>
 	/// Constructor 2
@@ -209,14 +205,14 @@ public class ResponseResult : ResponseResult<object>
 	/// <param name="isSuccess"></param>
 	/// <param name="message"></param>
 	public ResponseResult(bool isSuccess, string message) : base(isSuccess, message)
-	{}
+	{ }
 	
 	/// <summary>
 	/// Constructor 3
 	/// </summary>
 	/// <param name="httpCode"></param>
 	public ResponseResult(HttpStatusCode httpCode) : base(httpCode)
-	{}
+	{ }
 	
 	/// <summary>
 	/// Constructor 4
@@ -224,7 +220,7 @@ public class ResponseResult : ResponseResult<object>
 	/// <param name="httpCode"></param>
 	/// <param name="message"></param>
 	public ResponseResult(HttpStatusCode httpCode, string message) : base(httpCode, message)
-	{}
+	{ }
 	
 	#endregion
 }

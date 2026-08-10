@@ -1,8 +1,8 @@
 using MongoDB.Driver;
 
+// ReSharper disable UnusedType.Global
 namespace Ertis.MongoDB.Client;
 
-// ReSharper disable once UnusedType.Global
 public class MongoClientProvider : IMongoClientProvider
 {
 	#region Properties

@@ -4,8 +4,6 @@ using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
 using Ertis.Schema.Serialization;
 using Ertis.Schema.Validation;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.Primitives;
 
@@ -13,14 +11,14 @@ public class ArrayFieldInfo : FieldInfo<Array>
 {
     #region Properties
     
-    [JsonProperty("type")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Newtonsoft.Json.JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public override FieldType Type => FieldType.array;
     
-    [JsonProperty("itemSchema")]
     [JsonPropertyName("itemSchema")]
+    [Newtonsoft.Json.JsonProperty("itemSchema")]
     [Newtonsoft.Json.JsonConverter(typeof(FieldInfoJsonConverter))]
     public IFieldInfo? ItemSchema
     {
@@ -28,7 +26,10 @@ public class ArrayFieldInfo : FieldInfo<Array>
         init
         {
             field = value;
-            value?.Parent = this;
+            if (value != null)
+            {
+                value.Parent = this;
+            }
             
             if (!this.ValidateItemSchema(out var exception) && exception != null)
             {
@@ -42,15 +43,16 @@ public class ArrayFieldInfo : FieldInfo<Array>
         }
     }
     
-    [JsonProperty("minCount", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minCount")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("minCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MinCount
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMinCount(out var exception) && exception != null)
             {
                 throw exception;
@@ -58,15 +60,16 @@ public class ArrayFieldInfo : FieldInfo<Array>
         }
     }
     
-    [JsonProperty("maxCount", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxCount")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("maxCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MaxCount
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMaxCount(out var exception) && exception != null)
             {
                 throw exception;
@@ -74,21 +77,21 @@ public class ArrayFieldInfo : FieldInfo<Array>
         }
     }
     
-    [JsonProperty("uniqueItems", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("uniqueItems")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Newtonsoft.Json.JsonProperty("uniqueItems", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public bool UniqueItems { get; init; }
     
-    [JsonProperty("uniqueBy", NullValueHandling = NullValueHandling.Ignore,
-        DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("uniqueBy")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Newtonsoft.Json.JsonProperty("uniqueBy", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public IEnumerable<string>? UniqueBy
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateUniqueBy(out var exception) && exception != null)
             {
                 throw exception;
@@ -121,7 +124,7 @@ public class ArrayFieldInfo : FieldInfo<Array>
     protected internal override bool Validate(object? obj, IValidationContext validationContext)
     {
         var isValid = base.Validate(obj, validationContext);
-
+        
         if (obj is Array array)
         {
             if (this.MaxCount != null && array.Length > this.MaxCount.Value)
@@ -147,10 +150,13 @@ public class ArrayFieldInfo : FieldInfo<Array>
             }
             
             // Item validations
-            foreach (var item in array)
+            if (this.ItemSchema != null)
             {
-                var itemFieldInfo = (FieldInfo) this.ItemSchema?.Clone()!;
-                isValid &= itemFieldInfo.Validate(item, validationContext);
+                var itemFieldInfo = (FieldInfo) this.ItemSchema.Clone();
+                foreach (var item in array)
+                {
+                    isValid &= itemFieldInfo.Validate(item, validationContext);
+                }
             }
             
             // UniqueBy constraint validation
@@ -236,7 +242,7 @@ public class ArrayFieldInfo : FieldInfo<Array>
     
     private bool ValidateUniqueBy(out Exception? exception)
     {
-        if (this.ItemSchema != null && this.UniqueBy != null && this.Name != null)
+        if (this.ItemSchema != null && this.UniqueBy != null)
         {
             if (this.UniqueBy.Any() && this.ItemSchema.Type != FieldType.@object)
             {
@@ -295,7 +301,7 @@ public class ArrayFieldInfo : FieldInfo<Array>
             MinCount = this.MinCount,
             MaxCount = this.MaxCount,
             UniqueItems = this.UniqueItems,
-            ItemSchema = (IFieldInfo)this.ItemSchema?.Clone()!,
+            ItemSchema = (IFieldInfo?)this.ItemSchema?.Clone(),
             UniqueBy = this.UniqueBy,
             Appearance = this.Appearance
         };

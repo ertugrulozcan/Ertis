@@ -2,13 +2,11 @@ using Ertis.Schema.Dynamics.Legacy;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+// ReSharper disable UnusedType.Global
 namespace Ertis.Schema.Serialization;
 
-// ReSharper disable once UnusedType.Global
 public class DynamicObjectJsonConverter : JsonConverter<DynamicObject>
 {
-	#region Methods
-	
 	public override void WriteJson(JsonWriter writer, DynamicObject? value, JsonSerializer serializer)
 	{
 		if (value != null)
@@ -24,6 +22,4 @@ public class DynamicObjectJsonConverter : JsonConverter<DynamicObject>
 		var json = jObject.ToString(Formatting.None);
 		return DynamicObject.Parse(json);
 	}
-	
-	#endregion
 }

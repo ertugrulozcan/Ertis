@@ -7,13 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="MongoDB.Driver" Version="3.9.0" />
+      <ProjectReference Include="..\Ertis.Data\Ertis.Data.csproj" />
+      <ProjectReference Include="..\Ertis.MongoDB.Queries\Ertis.MongoDB.Queries.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Ertis.Core\Ertis.Core.csproj" />
-      <ProjectReference Include="..\Ertis.Data\Ertis.Data.csproj" />
-      <ProjectReference Include="..\Ertis.MongoDB.Queries\Ertis.MongoDB.Queries.csproj" />
+      <PackageReference Include="MongoDB.Driver" Version="3.10.0" />
     </ItemGroup>
 
 </Project>

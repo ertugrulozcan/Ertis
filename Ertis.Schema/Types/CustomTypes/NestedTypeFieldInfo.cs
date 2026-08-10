@@ -6,8 +6,6 @@ using Ertis.Schema.Extensions;
 using Ertis.Schema.Serialization;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using DynamicObject = Ertis.Schema.Dynamics.Legacy.DynamicObject;
 
 namespace Ertis.Schema.Types.CustomTypes;
@@ -16,14 +14,14 @@ public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
 {
     #region Properties
     
-    [JsonProperty("type")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Newtonsoft.Json.JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public override FieldType Type => FieldType.nestedType;
     
-    [JsonProperty("properties")]
     [JsonPropertyName("properties")]
+    [Newtonsoft.Json.JsonProperty("properties")]
     [Newtonsoft.Json.JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
     public override IReadOnlyCollection<IFieldInfo> Properties
     {
@@ -43,8 +41,8 @@ public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
         }
     }
     
-    [JsonProperty("nestedTypeId")]
     [JsonPropertyName("nestedTypeId")]
+    [Newtonsoft.Json.JsonProperty("nestedTypeId")]
     public string? NestedTypeId { get; set; }
     
     #endregion
@@ -107,7 +105,7 @@ public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
             
             foreach (var fieldInfo in this.Properties)
             {
-                if (fieldInfo.Name != null && !validatedProperties.Contains(fieldInfo.Name))
+                if (!validatedProperties.Contains(fieldInfo.Name))
                 {
                     isValid &= ((FieldInfo) fieldInfo).Validate(null, validationContext);
                 }
@@ -119,7 +117,7 @@ public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
     
     public override object Clone()
     {
-        return new NestedTypeFieldInfo(this.Properties.Select(x => (IFieldInfo) x.Clone()))
+        return new NestedTypeFieldInfo(this.Properties.Select(x => (IFieldInfo)x.Clone()))
         {
             Name = this.Name,
             Description = this.Description,

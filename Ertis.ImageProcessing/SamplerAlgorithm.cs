@@ -1,3 +1,4 @@
+using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
 
 // ReSharper disable UnusedMember.Global
@@ -39,18 +40,17 @@ public class SamplerAlgorithm
 	
 	#region Methods
 	
-	// ReSharper disable once IdentifierTypo
 	public IResampler? ToResampler()
 	{
 		return this.Value switch
 		{
-			SamplerAlgorithmEnum.Bicubic => new BicubicResampler(),
-			SamplerAlgorithmEnum.Box => new BoxResampler(),
-			SamplerAlgorithmEnum.Cubic => new CubicResampler(),
-			SamplerAlgorithmEnum.Lanczos => new LanczosResampler(),
-			SamplerAlgorithmEnum.Triangle => new TriangleResampler(),
-			SamplerAlgorithmEnum.Welch => new WelchResampler(),
-			SamplerAlgorithmEnum.NearestNeighbor => new NearestNeighborResampler(),
+			SamplerAlgorithmEnum.Bicubic => KnownResamplers.Bicubic,
+			SamplerAlgorithmEnum.Box => KnownResamplers.Box,
+			SamplerAlgorithmEnum.Cubic => KnownResamplers.CatmullRom,
+			SamplerAlgorithmEnum.Lanczos => KnownResamplers.Lanczos3,
+			SamplerAlgorithmEnum.Triangle => KnownResamplers.Triangle,
+			SamplerAlgorithmEnum.Welch => KnownResamplers.Welch,
+			SamplerAlgorithmEnum.NearestNeighbor => KnownResamplers.NearestNeighbor,
 			_ => null
 		};
 	}

@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Ertis.Schema.Models;
 
@@ -6,13 +6,16 @@ public struct ResolutionRules : ICloneable
 {
 	#region Properties
     
-    [JsonProperty("minWidth", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("minWidth")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("minWidth", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MinWidth
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMinWidth(out var exception) && exception != null)
             {
                 throw exception;
@@ -20,13 +23,16 @@ public struct ResolutionRules : ICloneable
         }
     }
     
-    [JsonProperty("minHeight", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("minHeight")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("minHeight", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MinHeight
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMinHeight(out var exception) && exception != null)
             {
                 throw exception;
@@ -34,13 +40,16 @@ public struct ResolutionRules : ICloneable
         }
     }
     
-    [JsonProperty("maxWidth", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("maxWidth")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("maxWidth", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MaxWidth
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMaxWidth(out var exception) && exception != null)
             {
                 throw exception;
@@ -48,13 +57,16 @@ public struct ResolutionRules : ICloneable
         }
     }
     
-    [JsonProperty("maxHeight", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("maxHeight")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("maxHeight", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MaxHeight
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMaxHeight(out var exception) && exception != null)
             {
                 throw exception;
@@ -62,19 +74,29 @@ public struct ResolutionRules : ICloneable
         }
     }
     
-    [JsonProperty("recommendedWidth", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("recommendedWidth")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("recommendedWidth", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? RecommendedWidth { get; set; }
     
-    [JsonProperty("recommendedHeight", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("recommendedHeight")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("recommendedHeight", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? RecommendedHeight { get; set; }
     
-    [JsonProperty("maxSizesRequired")]
+    [JsonPropertyName("maxSizesRequired")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Newtonsoft.Json.JsonProperty("maxSizesRequired", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public bool MaxSizesRequired { get; set; }
     
-    [JsonProperty("minSizesRequired")]
+    [JsonPropertyName("minSizesRequired")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Newtonsoft.Json.JsonProperty("minSizesRequired", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public bool MinSizesRequired { get; set; }
     
-    [JsonProperty("aspectRatioRequired")]
+    [JsonPropertyName("aspectRatioRequired")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Newtonsoft.Json.JsonProperty("aspectRatioRequired", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public bool AspectRatioRequired { get; set; }
     
     #endregion

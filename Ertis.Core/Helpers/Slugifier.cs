@@ -1,13 +1,13 @@
 using System.Text;
 
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
 namespace Ertis.Core.Helpers;
 
-// ReSharper disable once UnusedType.Global
 public static class Slugifier
 {
 	#region Helper Classes
 	
-	// ReSharper disable once ClassNeverInstantiated.Global
 	public sealed class SlugifierOptions
 	{
 		#region Properties
@@ -22,13 +22,12 @@ public static class Slugifier
 		/// Constructor
 		/// </summary>
 		internal SlugifierOptions()
-		{}
+		{ }
 		
 		#endregion
 		
 		#region Methods
 		
-		// ReSharper disable once UnusedMember.Global
 		public SlugifierOptions Ignore(params char[] chars)
 		{
 			this.IgnoreCharacters = chars;
@@ -121,7 +120,6 @@ public static class Slugifier
 		var str = slugBuilder.ToString();
 		if (previousDash)
 		{
-			// ReSharper disable once ReplaceSubstringWithRangeIndexer
 			str = str.Substring(0, slugBuilder.Length - 1);
 		}
 		

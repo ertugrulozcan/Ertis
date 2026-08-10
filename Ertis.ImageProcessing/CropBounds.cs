@@ -26,7 +26,6 @@ public class CropBounds
 	{
 		var width = this.Width ?? 0;
 		var height = this.Height ?? 0;
-		
 		var x = this.X ?? 0;
 		var y = this.Y ?? 0;
 		

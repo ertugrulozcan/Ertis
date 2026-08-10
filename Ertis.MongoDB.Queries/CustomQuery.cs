@@ -1,5 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
-
+// ReSharper disable UnusedMember.Global
 namespace Ertis.MongoDB.Queries;
 
 internal class CustomQuery : IQuery, IHasChildren
@@ -8,21 +7,34 @@ internal class CustomQuery : IQuery, IHasChildren
     
     internal string? Operator { get; init; }
     
-    [field: AllowNull, MaybeNull]
-    // ReSharper disable once UnusedMember.Global
-    internal IQuery Value
+    internal IQuery? Value
     {
         get;
         init
         {
             field = value;
-            this.Children.Insert(0, value);
+            if (value != null)
+            {
+                this.Children.Insert(0, value);
+            }
         }
     }
     
-    public List<IQuery> Children { get; init; } = new();
+    public List<IQuery> Children { get; init; }
     
     public bool ShowOperatorTag { get; init; } = true;
+    
+    #endregion
+    
+    #region Constructors
+    
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    public CustomQuery()
+    {
+        this.Children = new List<IQuery>();
+    }
     
     #endregion
     

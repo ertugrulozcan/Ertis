@@ -12,7 +12,7 @@ public static class JsonSchemaExtensions
 		foreach (var (_, jSchema) in schema.Properties)
 		{
 			IList<ValidationError>? validationErrorsForProperty = null;
-			var isValidProperty = jSchema.Default?.IsValid(jSchema, out validationErrorsForProperty);
+			var isValidProperty = jSchema?.Default?.IsValid(jSchema, out validationErrorsForProperty);
 			if (isValidProperty != null && !isValidProperty.Value && validationErrorsForProperty != null)
 			{
 				cumulativeValidationErrors.AddRange(validationErrorsForProperty);
@@ -50,7 +50,7 @@ public static class JsonSchemaExtensions
 				additionalPropertyErrors_.AddRange(additionalPropertyErrors__);
 				additionalPropertyErrors = additionalPropertyErrors_;
 				return true;
-			}
+			}	
 		}
 		
 		additionalPropertyErrors = additionalPropertyErrors_;

@@ -12,13 +12,13 @@ public abstract class QueryControllerBase : ControllerBase
 	#region Methods
 	
 	protected abstract Task<IPaginationCollection<dynamic>> GetDataAsync(
-		string query,
+		string query, 
 		int? skip,
 		int? limit,
-		bool? withCount,
-		string? sortField,
+		bool? withCount, 
+		string? sortField, 
 		SortDirection? sortDirection,
-		IDictionary<string, bool>? selectFields,
+		IDictionary<string, bool> selectFields,
 		CancellationToken cancellationToken = default);
 	
 	[HttpPost("_query")]

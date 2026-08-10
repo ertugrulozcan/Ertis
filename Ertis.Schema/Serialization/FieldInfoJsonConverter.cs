@@ -9,8 +9,6 @@ namespace Ertis.Schema.Serialization;
 
 public class FieldInfoJsonConverter : JsonConverter<IFieldInfo>
 {
-    #region Methods
-    
     public override void WriteJson(JsonWriter writer, IFieldInfo? value, JsonSerializer serializer)
     {
         if (value != null)
@@ -30,7 +28,6 @@ public class FieldInfoJsonConverter : JsonConverter<IFieldInfo>
     {
         try
         {
-            // ReSharper disable once CanSimplifyDictionaryLookupWithTryGetValue
             if (jObject.ContainsKey("type"))
             {
                 var fieldTypeName = jObject["type"]?.Value<string>();
@@ -91,14 +88,15 @@ public class FieldInfoJsonConverter : JsonConverter<IFieldInfo>
         }
         catch (Exception ex)
         {
-            throw ex.InnerException switch
+            switch (ex.InnerException)
             {
-                FieldValidationException => ex.InnerException,
-                SchemaValidationException => ex.InnerException,
-                _ => new SchemaValidationException(ex.Message)
-            };
+                case FieldValidationException:
+                    throw ex.InnerException;
+                case SchemaValidationException:
+                    throw ex.InnerException;
+                default:
+                    throw new SchemaValidationException(ex.Message);
+            }
         }
     }
-    
-    #endregion
 }

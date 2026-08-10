@@ -16,6 +16,7 @@ using MongoDB.Driver;
 using SortDirection = Ertis.Core.Collections.SortDirection;
 using UpdateOptions = Ertis.Data.Models.UpdateOptions;
 
+// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.MongoDB.Repository;
 
 // ReSharper disable once UnusedType.Global
@@ -32,9 +33,9 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	
 	public string CollectionName { get; }
 	
-	private IMongoCollection<dynamic> Collection { get; }
+	protected IMongoCollection<dynamic> Collection { get; }
 	
-	private IMongoCollection<BsonDocument> DocumentCollection { get; }
+	protected IMongoCollection<BsonDocument> DocumentCollection { get; }
 	
 	#endregion
 	
@@ -86,15 +87,15 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		return await this.Collection.Find(Builders<dynamic>.Filter.Eq("_id", objectId)).FirstOrDefaultAsync(cancellationToken: cancellationToken);
 	}
 	
-	public dynamic? FindOne(Expression<Func<dynamic, bool>>? expression)
+	public dynamic? FindOne(Expression<Func<dynamic, bool>> expression)
 	{
-		var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+		var filterDefinition = new ExpressionFilterDefinition<dynamic>(expression);
 		return this.Collection.Find(filterDefinition).FirstOrDefault();
 	}
 	
-	public async Task<dynamic?> FindOneAsync(Expression<Func<dynamic, bool>>? expression, CancellationToken cancellationToken = default)
+	public async Task<dynamic?> FindOneAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
 	{
-		var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+		var filterDefinition = new ExpressionFilterDefinition<dynamic>(expression);
 		return await (await this.Collection.FindAsync(filterDefinition, cancellationToken: cancellationToken)).FirstOrDefaultAsync(cancellationToken: cancellationToken);	
 	}
 	
@@ -139,7 +140,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	}
 	
 	public IPaginationCollection<dynamic> Find(
-		Expression<Func<dynamic, bool>>? expression,
+		Expression<Func<dynamic, bool>> expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
@@ -150,7 +151,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	}
 	
 	public IPaginationCollection<dynamic> Find(
-		Expression<Func<dynamic, bool>>? expression,
+		Expression<Func<dynamic, bool>> expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
@@ -160,7 +161,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	}
 	
 	public async Task<IPaginationCollection<dynamic>> FindAsync(
-		Expression<Func<dynamic, bool>>? expression,
+		Expression<Func<dynamic, bool>> expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
@@ -172,7 +173,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	}
 	
 	public async Task<IPaginationCollection<dynamic>> FindAsync(
-		Expression<Func<dynamic, bool>>? expression,
+		Expression<Func<dynamic, bool>> expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
@@ -226,13 +227,13 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		return await this.FindAsync(query, skip, limit, withCount, sorting, collationOptions: null, cancellationToken: cancellationToken);
 	}
 	
+	[SuppressMessage("ReSharper", "MethodOverloadWithOptionalParameter")]
 	public IPaginationCollection<dynamic> Find(
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null,
 		string? orderBy = null, 
-		SortDirection? sortDirection = null,
-		// ReSharper disable once MethodOverloadWithOptionalParameter
+		SortDirection? sortDirection = null, 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
@@ -247,12 +248,12 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			collationOptions);
 	}
 	
+	[SuppressMessage("ReSharper", "MethodOverloadWithOptionalParameter")]
 	public IPaginationCollection<dynamic> Find(
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null,
-		Sorting? sorting = null,
-		// ReSharper disable once MethodOverloadWithOptionalParameter
+		Sorting? sorting = null, 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
@@ -308,28 +309,29 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			cancellationToken: cancellationToken);
 	}
 	
+	[SuppressMessage("ReSharper", "MethodOverloadWithOptionalParameter")]
 	public IPaginationCollection<dynamic> Find(
 		Expression<Func<dynamic, bool>>? expression, 
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
 		string? orderBy = null, 
-		SortDirection? sortDirection = null,
-		// ReSharper disable once MethodOverloadWithOptionalParameter
+		SortDirection? sortDirection = null, 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
 		var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-		return this.Filter(filterExpression, skip, limit, withCount, orderBy != null ? new Sorting(orderBy, sortDirection) : null, indexOptions, collationOptions);
+		var sorting = string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection);
+		return this.Filter(filterExpression, skip, limit, withCount, sorting, indexOptions, collationOptions);
 	}
 	
+	[SuppressMessage("ReSharper", "MethodOverloadWithOptionalParameter")]
 	public IPaginationCollection<dynamic> Find(
 		Expression<Func<dynamic, bool>>? expression, 
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		Sorting? sorting = null,
-		// ReSharper disable once MethodOverloadWithOptionalParameter
+		Sorting? sorting = null, 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
@@ -349,7 +351,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		CancellationToken cancellationToken = default)
 	{
 		var filterExpression = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
-		return await this.FilterAsync(filterExpression, skip, limit, withCount, orderBy != null ? new Sorting(orderBy, sortDirection) : null, indexOptions, collationOptions, cancellationToken: cancellationToken);
+		var sorting = string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection);
+		return await this.FilterAsync(filterExpression, skip, limit, withCount, sorting, indexOptions, collationOptions, cancellationToken: cancellationToken);
 	}
 	
 	public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -366,29 +369,30 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		return await this.FilterAsync(filterExpression, skip, limit, withCount, sorting, indexOptions, collationOptions, cancellationToken: cancellationToken);
 	}
 	
+	[SuppressMessage("ReSharper", "MethodOverloadWithOptionalParameter")]
 	public IPaginationCollection<dynamic> Find(
 		string query, 
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
 		string? orderBy = null, 
-		SortDirection? sortDirection = null,
-		// ReSharper disable once MethodOverloadWithOptionalParameter
+		SortDirection? sortDirection = null, 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
 		query = QueryHelper.EnsureObjectIdsAndISODates(query);
 		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-		return this.Filter(filterDefinition, skip, limit, withCount, orderBy != null ? new Sorting(orderBy, sortDirection) : null, indexOptions, collationOptions);
+		var sorting = string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection);
+		return this.Filter(filterDefinition, skip, limit, withCount, sorting, indexOptions, collationOptions);
 	}
 	
+	[SuppressMessage("ReSharper", "MethodOverloadWithOptionalParameter")]
 	public IPaginationCollection<dynamic> Find(
 		string query, 
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		Sorting? sorting = null,
-		// ReSharper disable once MethodOverloadWithOptionalParameter
+		Sorting? sorting = null, 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
@@ -410,7 +414,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	{
 		query = QueryHelper.EnsureObjectIdsAndISODates(query);
 		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
-		return await this.FilterAsync(filterDefinition, skip, limit, withCount, orderBy != null ? new Sorting(orderBy, sortDirection) : null, indexOptions, collationOptions, cancellationToken: cancellationToken);
+		var sorting = string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection);
+		return await this.FilterAsync(filterDefinition, skip, limit, withCount, sorting, indexOptions, collationOptions, cancellationToken: cancellationToken);
 	}
 	
 	public async Task<IPaginationCollection<dynamic>> FindAsync(
@@ -478,15 +483,13 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	}
 	
 	private IFindFluent<dynamic, dynamic> ExecuteFilter(
-		FilterDefinition<dynamic>? predicate,
+		FilterDefinition<dynamic> predicate,
 		int? skip = null,
 		int? limit = null,
 		Sorting? sorting = null, 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
-		predicate ??= new ExpressionFilterDefinition<dynamic>(item => true);
-		
 		SortDefinition<dynamic>? sortDefinition = null;
 		if (sorting is { Count: > 0 })
 		{
@@ -494,7 +497,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			var sortDefinitions = new List<SortDefinition<dynamic>>();
 			foreach (var sortField in sorting)
 			{
-				if (sortField.OrderBy != null && !string.IsNullOrEmpty(sortField.OrderBy.Trim()))
+				if (!string.IsNullOrEmpty(sortField.OrderBy.Trim()))
 				{
 					var fieldDefinition = new StringFieldDefinition<dynamic>(sortField.OrderBy);
 					sortDefinitions.Add(sortField.SortDirection is null or SortDirection.Ascending 
@@ -606,14 +609,14 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			skip,
 			limit,
 			withCount,
-			orderBy != null ? new Sorting(orderBy, sortDirection) : null, 
+			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection), 
 			selectFields,
 			indexOptions,
 			collationOptions);
 	}
 	
 	public IPaginationCollection<dynamic> Query(
-		Expression<Func<dynamic, bool>>? expression,
+		Expression<Func<dynamic, bool>> expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
@@ -624,7 +627,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	{
 		try
 		{
-			var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+			var filterDefinition = new ExpressionFilterDefinition<dynamic>(expression);
 			return this.ExecuteQuery(
 				filterDefinition,
 				skip,
@@ -650,7 +653,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	}
 	
 	public IPaginationCollection<dynamic> Query(
-		Expression<Func<dynamic, bool>>? expression,
+		Expression<Func<dynamic, bool>> expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
@@ -665,7 +668,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			skip,
 			limit,
 			withCount,
-			orderBy != null ? new Sorting(orderBy, sortDirection) : null, 
+			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection), 
 			selectFields,
 			indexOptions,
 			collationOptions);
@@ -728,7 +731,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			skip,
 			limit,
 			withCount,
-			orderBy != null ? new Sorting(orderBy, sortDirection) : null, 
+			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection), 
 			selectFields,
 			indexOptions,
 			collationOptions,
@@ -736,7 +739,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	}
 	
 	public async Task<IPaginationCollection<dynamic>> QueryAsync(
-		Expression<Func<dynamic, bool>>? expression,
+		Expression<Func<dynamic, bool>> expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
@@ -752,7 +755,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			skip,
 			limit,
 			withCount,
-			orderBy != null ? new Sorting(orderBy, sortDirection) : null,
+			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection),
 			selectFields,
 			indexOptions,
 			collationOptions,
@@ -760,7 +763,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	}
 	
 	public async Task<IPaginationCollection<dynamic>> QueryAsync(
-		Expression<Func<dynamic, bool>>? expression,
+		Expression<Func<dynamic, bool>> expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
@@ -772,7 +775,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	{
 		try
 		{
-			var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+			var filterDefinition = new ExpressionFilterDefinition<dynamic>(expression);
 			return await this.ExecuteQueryAsync(
 				filterDefinition,
 				skip,
@@ -1219,16 +1222,16 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		return isDeletedAll;
 	}
 	
-	public bool DeleteMany(Expression<Func<dynamic, bool>>? expression)
+	public bool DeleteMany(Expression<Func<dynamic, bool>> expression)
 	{
-		var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+		var filterDefinition = new ExpressionFilterDefinition<dynamic>(expression);
 		var result = this.Collection.DeleteMany(filterDefinition);
 		return result.IsAcknowledged && result.DeletedCount == 1;
 	}
 	
-	public async Task<bool> DeleteManyAsync(Expression<Func<dynamic, bool>>? expression, CancellationToken cancellationToken = default)
+	public async Task<bool> DeleteManyAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
 	{
-		var filterDefinition = expression != null ? new ExpressionFilterDefinition<dynamic>(expression) : FilterDefinition<dynamic>.Empty;
+		var filterDefinition = new ExpressionFilterDefinition<dynamic>(expression);
 		var result = await this.Collection.DeleteManyAsync(filterDefinition, cancellationToken: cancellationToken);
 		return result.IsAcknowledged && result.DeletedCount == 1;
 	}
@@ -1270,7 +1273,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		return this.Count(item => true);
 	}
 	
-	public long Count(IndexOptions indexOptions)
+	public long Count(IndexOptions? indexOptions)
 	{
 		return this.Count(item => true, indexOptions);
 	}
@@ -1285,25 +1288,25 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		return await this.CountAsync(item => true, indexOptions, cancellationToken: cancellationToken);
 	}
 	
-	public long Count(Expression<Func<dynamic, bool>>? expression)
+	public long Count(Expression<Func<dynamic, bool>> expression)
 	{
 		FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
 		return this.Count(filterExpression);
 	}
 	
-	public long Count(Expression<Func<dynamic, bool>>? expression, IndexOptions indexOptions)
+	public long Count(Expression<Func<dynamic, bool>> expression, IndexOptions? indexOptions)
 	{
 		FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
 		return this.Count(filterExpression, indexOptions);
 	}
 	
-	public async Task<long> CountAsync(Expression<Func<dynamic, bool>>? expression, CancellationToken cancellationToken = default)
+	public async Task<long> CountAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
 	{
 		FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
 		return await this.CountAsync(filterExpression, cancellationToken: cancellationToken);
 	}
 	
-	public async Task<long> CountAsync(Expression<Func<dynamic, bool>>? expression, IndexOptions? indexOptions = null, CancellationToken cancellationToken = default)
+	public async Task<long> CountAsync(Expression<Func<dynamic, bool>> expression, IndexOptions? indexOptions = null, CancellationToken cancellationToken = default)
 	{
 		FilterDefinition<dynamic> filterExpression = new ExpressionFilterDefinition<dynamic>(expression);
 		return await this.CountAsync(filterExpression, indexOptions, cancellationToken: cancellationToken);
@@ -1316,7 +1319,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		return this.Count(filterDefinition);
 	}
 	
-	public long Count(string query, IndexOptions indexOptions)
+	public long Count(string query, IndexOptions? indexOptions)
 	{
 		query = QueryHelper.EnsureObjectIdsAndISODates(query);
 		var filterDefinition = new JsonFilterDefinition<dynamic>(query);
@@ -1339,7 +1342,6 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	
 	private long Count(FilterDefinition<dynamic> filterDefinition, IndexOptions? indexOptions = null)
 	{
-		// estimatedDocumentCount
 		var countOptions = new CountOptions { Hint = indexOptions?.GetIndexHint() };
 		return this.Collection.CountDocuments(filterDefinition, countOptions);
 	}
@@ -1526,20 +1528,18 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	
 	public async Task<string> CreateIndexAsync(IIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
 	{
-		// ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-		// ReSharper disable once ConvertSwitchStatementToSwitchExpression
 		switch (indexDefinition.Type)
 		{
 			case IndexType.Single:
-				return await this.CreateSingleIndexAsync((SingleIndexDefinition) indexDefinition, cancellationToken: cancellationToken);
+				return await this.CreateSingleIndexAsync((SingleIndexDefinition)indexDefinition, cancellationToken: cancellationToken);
 			case IndexType.Compound:
-				return await this.CreateCompoundIndexAsync((CompoundIndexDefinition) indexDefinition, cancellationToken: cancellationToken);
+				return await this.CreateCompoundIndexAsync((CompoundIndexDefinition)indexDefinition, cancellationToken: cancellationToken);
 			case IndexType.Text:
-				return await this.CreateTextIndexAsync((TextIndexDefinition) indexDefinition, cancellationToken: cancellationToken);
+				return await this.CreateTextIndexAsync((TextIndexDefinition)indexDefinition, cancellationToken: cancellationToken);
 			case IndexType.TTL:
-				return await this.CreateTTLIndexAsync((TTLIndexDefinition) indexDefinition, cancellationToken: cancellationToken);
+				return await this.CreateTTLIndexAsync((TTLIndexDefinition)indexDefinition, cancellationToken: cancellationToken);
 			default:
-				throw new NotImplementedException("Not implemented yet for this index type");
+				throw new ArgumentOutOfRangeException();
 		}
 	}
 	

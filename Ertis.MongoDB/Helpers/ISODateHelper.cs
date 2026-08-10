@@ -9,7 +9,7 @@ public static class ISODateHelper
 {
 	#region Methods
 	
-	public static string EnsureDatetimeFieldsToISODate(string json)
+	public static string? EnsureDatetimeFieldsToISODate(string json)
 	{
 		if (string.IsNullOrEmpty(json))
 		{
@@ -21,7 +21,7 @@ public static class ISODateHelper
 			var root = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
 			if (root is JToken jToken)
 			{
-				return EnsureDatetimeFieldsToISODate(jToken).ToString();
+				return EnsureDatetimeFieldsToISODate(jToken)?.ToString();	
 			}
 			
 			return json;
@@ -32,8 +32,13 @@ public static class ISODateHelper
 		}
 	}
 	
-	public static JToken EnsureDatetimeFieldsToISODate(JToken node)
+	public static JToken? EnsureDatetimeFieldsToISODate(JToken? node)
 	{
+		if (node == null)
+		{
+			return null;
+		}
+		
 		try
 		{
 			if (node is JValue jValue)
@@ -45,7 +50,7 @@ public static class ISODateHelper
 					{
 						jValue.Replace(new JRaw($"ISODate(\"{dateTime:yyyy-MM-ddTHH:mm:ssZ}\")"));
 					}
-				}
+				}	
 			}
 			
 			foreach (var child in node)

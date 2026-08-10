@@ -773,7 +773,7 @@ public static class QueryBuilder
     /// </summary>
     /// <param name="keyword">Search Keyword</param>
     /// <param name="language">The language that determines the list of stop words for the search and the rules for the stemmer and tokenizer.</param>
-    /// <param name="isCaseSensitive">A boolean flag to enable or disable case-sensitive search.</param>
+    /// <param name="isCaseSensitive">A boolean flag to enable or disable case sensitive search.</param>
     /// <param name="isDiacriticSensitive">A boolean flag to enable or disable diacritic sensitive search against version 3 text indexes.</param>
     public static IQuery FullTextSearch(string keyword, string language = "none", bool isCaseSensitive = false, bool isDiacriticSensitive = false)
     {

@@ -1,22 +1,20 @@
 using Ertis.Core.Models.Response;
 using Ertis.Net.Http;
-using Newtonsoft.Json;
 
 // ReSharper disable UnusedMemberInSuper.Global
 namespace Ertis.Net.Rest;
 
-// [Obsolete("This class uses Newtonsoft library for JSON serialization and is no longer supported. Please use SystemRestHandler.")]
 public interface IRestHandler
 {
 	#region Methods
 	
-	IResponseResult<TResult> ExecuteRequest<TResult>(HttpMethod method, string url, IHeaderCollection? headers = null, IRequestBody? body = null, JsonConverter[]? converters = null);
+	IResponseResult<TResult> ExecuteRequest<TResult>(HttpMethod method, string url, IHeaderCollection? headers = null, IRequestBody? body = null, Newtonsoft.Json.JsonConverter[]? converters = null);
 	
-	Task<IResponseResult<TResult>> ExecuteRequestAsync<TResult>(HttpMethod method, string url, IHeaderCollection? headers = null, IRequestBody? body = null, JsonConverter[]? converters = null, CancellationToken cancellationToken = default);
+	Task<IResponseResult<TResult>> ExecuteRequestAsync<TResult>(HttpMethod method, string url, IHeaderCollection? headers = null, IRequestBody? body = null, Newtonsoft.Json.JsonConverter[]? converters = null, CancellationToken cancellationToken = default);
 	
-	IResponseResult<TResult> ExecuteRequest<TResult>(HttpMethod method, string url, IQueryString? queryString = null, IHeaderCollection? headers = null, IRequestBody? body = null, JsonConverter[]? converters = null);
+	IResponseResult<TResult> ExecuteRequest<TResult>(HttpMethod method, string url, IQueryString? queryString = null, IHeaderCollection? headers = null, IRequestBody? body = null, Newtonsoft.Json.JsonConverter[]? converters = null);
 	
-	Task<IResponseResult<TResult>> ExecuteRequestAsync<TResult>(HttpMethod method, string url, IQueryString? queryString = null, IHeaderCollection? headers = null, IRequestBody? body = null, JsonConverter[]? converters = null, CancellationToken cancellationToken = default);
+	Task<IResponseResult<TResult>> ExecuteRequestAsync<TResult>(HttpMethod method, string url, IQueryString? queryString = null, IHeaderCollection? headers = null, IRequestBody? body = null, Newtonsoft.Json.JsonConverter[]? converters = null, CancellationToken cancellationToken = default);
 	
 	IResponseResult ExecuteRequest(HttpMethod method, string url, IHeaderCollection? headers = null, IRequestBody? body = null);
 	

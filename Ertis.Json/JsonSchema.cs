@@ -1,10 +1,10 @@
 using Ertis.Json.Extensions;
 using Newtonsoft.Json.Schema;
 
+// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
 namespace Ertis.Json;
 
-// ReSharper disable once UnusedType.Global
 public static class JsonSchema
 {
 	#region Methods
@@ -14,7 +14,6 @@ public static class JsonSchema
 		try
 		{
 			var schema = JSchema.Parse(json);
-			
 			var isValidDefaults = schema.IsValidDefaults(out var validationErrors_);
 			if (isValidDefaults != null && !isValidDefaults.Value)
 			{

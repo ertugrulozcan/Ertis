@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Ertis.MongoDB.Queries;
 
 internal class Query : IQuery, IHasChildren
@@ -8,8 +6,7 @@ internal class Query : IQuery, IHasChildren
     
     internal MongoOperator? Operator { get; init; }
     
-    [field: MaybeNull]
-    internal IQuery Value
+    internal required IQuery Value
     {
         get;
         init

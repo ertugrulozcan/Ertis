@@ -5,8 +5,6 @@ using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
 using Ertis.Schema.Serialization;
 using Ertis.Schema.Validation;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using DynamicObject = Ertis.Schema.Dynamics.Legacy.DynamicObject;
 
 namespace Ertis.Schema.Types.Primitives;
@@ -15,13 +13,13 @@ public abstract class ObjectFieldInfoBase : FieldInfo<object>, ISchema
 {
     #region Properties
     
+    [JsonIgnore]
     [Newtonsoft.Json.JsonIgnore]
-    [System.Text.Json.Serialization.JsonIgnore]
-    public string Slug => this.Name ?? string.Empty;
+    public string Slug => this.Name;
     
-    [JsonProperty("allowAdditionalProperties", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("allowAdditionalProperties")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Newtonsoft.Json.JsonProperty("allowAdditionalProperties", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public bool AllowAdditionalProperties { get; init; }
     
     #endregion
@@ -46,14 +44,14 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
 {
     #region Properties
     
-    [JsonProperty("type")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Newtonsoft.Json.JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public override FieldType Type => FieldType.@object;
     
-    [JsonProperty("properties")]
     [JsonPropertyName("properties")]
+    [Newtonsoft.Json.JsonProperty("properties")]
     [Newtonsoft.Json.JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
     public override IReadOnlyCollection<IFieldInfo> Properties
     {
@@ -133,7 +131,7 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
             
             foreach (var fieldInfo in this.Properties)
             {
-                if (fieldInfo.Name != null && !validatedProperties.Contains(fieldInfo.Name))
+                if (!validatedProperties.Contains(fieldInfo.Name))
                 {
                     isValid &= ((FieldInfo) fieldInfo).Validate(null, validationContext);
                 }
@@ -145,7 +143,7 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
     
     public override object Clone()
     {
-        return new ObjectFieldInfo(this.Properties.Select(x => (IFieldInfo) x.Clone()))
+        return new ObjectFieldInfo(this.Properties.Select(x => (IFieldInfo)x.Clone()))
         {
             Name = this.Name,
             Description = this.Description,

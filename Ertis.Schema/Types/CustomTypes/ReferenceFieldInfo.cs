@@ -2,8 +2,6 @@ using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Models;
 using Ertis.Schema.Validation;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 // ReSharper disable UnusedMember.Global
 namespace Ertis.Schema.Types.CustomTypes;
@@ -23,36 +21,36 @@ public class ReferenceFieldInfo : FieldInfo
     
     #region Properties
     
-    [JsonProperty("type")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Newtonsoft.Json.JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public override FieldType Type => FieldType.reference;
     
-    [JsonProperty("referenceType")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("referenceType")]
-    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Newtonsoft.Json.JsonProperty("referenceType")]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public ReferenceTypes ReferenceType { get; set; }
     
-    [JsonProperty("contentType", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("contentType")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Newtonsoft.Json.JsonProperty("contentType", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public string? ContentType { get; set; }
     
-    [JsonProperty("singleReferenceOptions", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("singleReferenceOptions")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Newtonsoft.Json.JsonProperty("singleReferenceOptions", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public SingleReferenceOptions? SingleReferenceOptions { get; set; }
     
-    [JsonProperty("multipleReferenceOptions", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("multipleReferenceOptions")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Newtonsoft.Json.JsonProperty("multipleReferenceOptions", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public MultipleReferenceOptions? MultipleReferenceOptions { get; set; }
     
-    [JsonProperty("collectionReferenceOptions", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("collectionReferenceOptions")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Newtonsoft.Json.JsonProperty("collectionReferenceOptions", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public CollectionReferenceOptions? CollectionReferenceOptions { get; set; }
     
     #endregion
@@ -68,7 +66,6 @@ public class ReferenceFieldInfo : FieldInfo
     {
         var isValid = true;
         
-        // ReSharper disable once ConvertIfStatementToSwitchStatement
         if (this.ReferenceType == ReferenceTypes.single)
         {
             var hasReferenceId = EnsureReferenceId(obj) != null;
@@ -98,7 +95,7 @@ public class ReferenceFieldInfo : FieldInfo
         }
         else if (this.ReferenceType == ReferenceTypes.collection)
         {
-            
+            // NOP
         }
         else
         {
@@ -150,15 +147,16 @@ public class MultipleReferenceOptions
 {
     #region Properties
     
-    [JsonProperty("minCount", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minCount")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("minCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MinCount
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMinCount(out var exception) && exception != null)
             {
                 throw exception;
@@ -166,15 +164,16 @@ public class MultipleReferenceOptions
         }
     }
     
-    [JsonProperty("maxCount", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxCount")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("maxCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MaxCount
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMaxCount(out var exception) && exception != null)
             {
                 throw exception;
@@ -235,20 +234,21 @@ public class CollectionReferenceOptions
 {
     #region Properties
     
-    [JsonProperty("collection", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("collection")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("collection", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public string? CollectionSlug { get; set; }
     
-    [JsonProperty("skip", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("skip")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("skip", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? Skip
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateSkipValue(out var exception) && exception != null)
             {
                 throw exception;
@@ -256,15 +256,16 @@ public class CollectionReferenceOptions
         }
     }
     
-    [JsonProperty("limit", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("limit")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("limit", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? Limit
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateLimitValue(out var exception) && exception != null)
             {
                 throw exception;
@@ -272,18 +273,18 @@ public class CollectionReferenceOptions
         }
     }
     
-    [JsonProperty("asObject", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("asObject")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("asObject", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public bool? AsObject { get; set; }
     
-    [JsonProperty("queryParams", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("queryParams")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("queryParams", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public CollectionReferenceParameter[]? QueryParams { get; set; }
     
-    [JsonProperty("excludedFields")]
     [JsonPropertyName("excludedFields")]
+    [Newtonsoft.Json.JsonProperty("excludedFields")]
     public string[]? ExcludedFields { get; set; }
     
     #endregion
@@ -335,18 +336,18 @@ public class CollectionReferenceParameter : DynamicQueryParameter
 {
     #region Properties
     
-    [JsonProperty("value")]
     [JsonPropertyName("value")]
+    [Newtonsoft.Json.JsonProperty("value")]
     public object? Value { get; set; }
-	
-    [JsonProperty("bindingType")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+    
     [JsonPropertyName("bindingType")]
-    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Newtonsoft.Json.JsonProperty("bindingType")]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public BindingTypes BindingType { get; set; }
-	
-    [JsonProperty("dynamicParameter")]
+    
     [JsonPropertyName("dynamicParameter")]
+    [Newtonsoft.Json.JsonProperty("dynamicParameter")]
     public string? DynamicParameter { get; set; }
 	
     #endregion

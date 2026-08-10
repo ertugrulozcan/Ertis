@@ -3,8 +3,6 @@ using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Models;
 using Ertis.Schema.Validation;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.CustomTypes;
 
@@ -12,21 +10,22 @@ public class RichTextFieldInfo : StringFieldInfo
 {
     #region Properties
     
-    [JsonProperty("type")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Newtonsoft.Json.JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public override FieldType Type => FieldType.richtext;
     
-    [JsonProperty("minWordCount", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minWordCount")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("minWordCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MinWordCount
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMinWordCount(out var exception) && exception != null)
             {
                 throw exception;
@@ -34,15 +33,16 @@ public class RichTextFieldInfo : StringFieldInfo
         }
     }
     
-    [JsonProperty("maxWordCount", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxWordCount")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("maxWordCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MaxWordCount
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMaxWordCount(out var exception) && exception != null)
             {
                 throw exception;
@@ -50,14 +50,14 @@ public class RichTextFieldInfo : StringFieldInfo
         }
     }
     
-    [JsonProperty("embeddedImageRules", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("embeddedImageRules")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("embeddedImageRules", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public ResolutionRules? EmbeddedImageRules { get; set; }
     
-    [JsonProperty("embeddedImageMaxSize", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("embeddedImageMaxSize")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("embeddedImageMaxSize", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? EmbeddedImageMaxSize { get; set; }
     
     #endregion
@@ -80,7 +80,6 @@ public class RichTextFieldInfo : StringFieldInfo
         /*
         if (obj is string richText)
         {
-            // TODO: CalculateTotalWordCount Method Implementation
             var wordCount = HtmlAgilityPack.CalculateTotalWordCount(richText);
             
             if (this.MaxWordCount != null && wordCount > this.MaxWordCount.Value)

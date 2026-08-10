@@ -1,8 +1,9 @@
 using System.Net.Http.Headers;
 
+// ReSharper disable UnusedType.Global
+// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.Net.Http;
 
-// ReSharper disable once UnusedType.Global
 public class SystemJsonRequestBody : IRequestBody
 {
     #region Properties
@@ -11,7 +12,6 @@ public class SystemJsonRequestBody : IRequestBody
 		
     public BodyTypes Type => BodyTypes.Json;
     
-    // ReSharper disable once MemberCanBePrivate.Global
     public string? Json => this.Payload == null ? null : System.Text.Json.JsonSerializer.Serialize(this.Payload);
     
     #endregion

@@ -1,9 +1,9 @@
 using Ertis.Core.Models.Response;
 using Ertis.Net.Http;
 
+// ReSharper disable UnusedType.Global
 namespace Ertis.Net.Rest;
 
-// ReSharper disable once UnusedType.Global
 public class SystemRestHandler : ISystemRestHandler
 {
     #region Constants

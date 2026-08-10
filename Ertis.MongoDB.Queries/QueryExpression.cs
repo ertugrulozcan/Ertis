@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Ertis.MongoDB.Queries;
 
 internal class QueryExpression : IQueryExpression, IHasChildren
@@ -8,8 +6,7 @@ internal class QueryExpression : IQueryExpression, IHasChildren
     
     public required string Field { get; init; }
     
-    [field: AllowNull, MaybeNull]
-    internal IQuery Value
+    internal required IQuery Value
     {
         get;
         init

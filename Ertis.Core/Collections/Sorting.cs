@@ -1,9 +1,7 @@
 using System.Collections;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
+// ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.Core.Collections;
 
@@ -22,7 +20,7 @@ public class Sorting : ICollection<SortField>
 	#region Constructors
 	
 	/// <summary>
-	/// Constructor
+	/// Constructor 1
 	/// </summary>
 	/// <param name="fields"></param>
 	public Sorting(IEnumerable<SortField> fields)
@@ -31,7 +29,7 @@ public class Sorting : ICollection<SortField>
 	}
 	
 	/// <summary>
-	/// Constructor
+	/// Constructor 2
 	/// </summary>
 	/// <param name="sortField"></param>
 	public Sorting(SortField sortField)
@@ -43,7 +41,7 @@ public class Sorting : ICollection<SortField>
 	}
 	
 	/// <summary>
-	/// Constructor
+	/// Constructor 3
 	/// </summary>
 	/// <param name="orderBy"></param>
 	/// <param name="sortDirection"></param>
@@ -53,11 +51,7 @@ public class Sorting : ICollection<SortField>
 		{
 			this.Fields = new List<SortField>
 			{
-				new()
-				{
-					OrderBy = orderBy,
-					SortDirection = sortDirection
-				}
+				new (orderBy, sortDirection)
 			};
 		}
 	}
@@ -112,32 +106,23 @@ public class Sorting : ICollection<SortField>
 	#endregion
 }
 
-// ReSharper disable once ClassNeverInstantiated.Global
-[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public class SortField
 {
 	#region Properties
 	
-	[JsonProperty("orderBy")]
 	[JsonPropertyName("orderBy")]
-	public string? OrderBy { get; set; }
+	[Newtonsoft.Json.JsonProperty("orderBy")]
+	public string OrderBy { get; set; }
 	
-	[JsonProperty("sortDirection")]
 	[JsonPropertyName("sortDirection")]
-	[Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+	[JsonConverter(typeof(JsonStringEnumConverter))]
+	[Newtonsoft.Json.JsonProperty("sortDirection")]
+	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	public SortDirection? SortDirection { get; set; }
 	
 	#endregion
 	
 	#region Constructors
-	
-	/// <summary>
-	/// Parameterless Constructor
-	/// </summary>
-	public SortField()
-	{
-		// NOP (For serialization)
-	}
 	
 	/// <summary>
 	/// Constructor

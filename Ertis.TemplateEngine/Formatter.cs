@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Text;
 
+// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
 namespace Ertis.TemplateEngine;
 
-// ReSharper disable once UnusedType.Global
 public class Formatter
 {
     #region Properties
@@ -55,17 +55,19 @@ public class Formatter
                     {
                         case UndefinedStrategy.Ignore:
                             stringBuilder.Append(segment);
-                        break;
+                            break;
                         case UndefinedStrategy.Remove:
-                        break;
+                            break;
                         case UndefinedStrategy.Throw:
                             throw new ArgumentException($"{placeHolder.Value} is undefined");
                         case UndefinedStrategy.Swap:
+                        {
                             if (!string.IsNullOrEmpty(this.Parser.Options.Fallback))
                             {
                                 stringBuilder.Append(this.Parser.Options.Fallback);
                             }
-                        break;
+                            break;
+                        }
                     }
                 }
             }
@@ -83,7 +85,7 @@ public class Formatter
         return this.Parser.Parse(template).ToArray();
     }
     
-    private static object? ExtractData(string path, IDictionary<string, object> dictionary)
+    private static object? ExtractData(string? path, IDictionary<string, object> dictionary)
     {
         if (string.IsNullOrEmpty(path))
         {

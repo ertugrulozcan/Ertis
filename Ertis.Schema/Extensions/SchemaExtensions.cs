@@ -19,14 +19,9 @@ public static class SchemaExtensions
     /// <param name="fieldInfo"></param>
     /// <param name="schema"></param>
     /// <returns></returns>
-    public static string? GetSelfPath(this IFieldInfo fieldInfo, ISchema schema)
+    public static string GetSelfPath(this IFieldInfo fieldInfo, ISchema schema)
     {
         var path = fieldInfo.Path;
-        if (path == null)
-        {
-            return null;
-        }
-        
         var segments = path.Split('.');
         if (segments.Length > 1 && segments[0] == schema.Slug)
         {
@@ -249,28 +244,19 @@ public static class SchemaExtensions
         switch (fieldInfo)
         {
             case IPrimitiveType { IsUnique: true }:
-            {
                 uniqueProperties.Add(fieldInfo);
                 break;
-            }
             case ObjectFieldInfo objectFieldInfo:
             {
                 foreach (var property in objectFieldInfo.Properties)
                 {
                     uniqueProperties.AddRange(GetUniqueProperties(property));
                 }
-                
                 break;
             }
-            case ArrayFieldInfo arrayFieldInfo:
-            {
-                if (arrayFieldInfo.ItemSchema != null)
-                {
-                    uniqueProperties.AddRange(GetUniqueProperties(arrayFieldInfo.ItemSchema));
-                }
-                
+            case ArrayFieldInfo { ItemSchema: not null } arrayFieldInfo:
+                uniqueProperties.AddRange(GetUniqueProperties(arrayFieldInfo.ItemSchema));
                 break;
-            }
         }
         
         return uniqueProperties;
@@ -295,33 +281,22 @@ public static class SchemaExtensions
     private static IEnumerable<ReferenceFieldInfo> GetReferenceProperties(IFieldInfo fieldInfo)
     {
         var referenceProperties = new List<ReferenceFieldInfo>();
-        
-        // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
         switch (fieldInfo.Type)
         {
             case FieldType.reference when fieldInfo is ReferenceFieldInfo referenceFieldInfo:
-            {
                 referenceProperties.Add(referenceFieldInfo);
                 break;
-            }
             case FieldType.@object when fieldInfo is ObjectFieldInfo objectFieldInfo:
             {
                 foreach (var property in objectFieldInfo.Properties)
                 {
                     referenceProperties.AddRange(GetReferenceProperties(property));
                 }
-                
                 break;
             }
-            case FieldType.array when fieldInfo is ArrayFieldInfo arrayFieldInfo:
-            {
-                if (arrayFieldInfo.ItemSchema != null)
-                {
-                    referenceProperties.AddRange(GetReferenceProperties(arrayFieldInfo.ItemSchema));
-                }
-                
+            case FieldType.array when fieldInfo is ArrayFieldInfo { ItemSchema: not null } arrayFieldInfo:
+                referenceProperties.AddRange(GetReferenceProperties(arrayFieldInfo.ItemSchema));
                 break;
-            }
         }
         
         return referenceProperties;
@@ -352,7 +327,7 @@ public static class SchemaExtensions
             if (defaultValue != null)
             {
                 var path = fieldInfo.GetSelfPath(schema);
-                if (path != null && (!model.TryGetValue(path, out var currentValue, out _) || currentValue == null))
+                if (!model.TryGetValue(path, out var currentValue, out _) || currentValue == null)
                 {
                     model.TrySetValue(path, defaultValue, out _, true);
                 }
@@ -382,10 +357,7 @@ public static class SchemaExtensions
         if (fieldInfo is ConstantFieldInfo constantFieldInfo)
         {
             var path = fieldInfo.GetSelfPath(schema);
-            if (path != null)
-            {
-                model.TrySetValue(path, constantFieldInfo.Value, out _, true);
-            }
+            model.TrySetValue(path, constantFieldInfo.Value, out _, true);
         }
     }
     
@@ -411,7 +383,7 @@ public static class SchemaExtensions
         if (fieldInfo is IDateTimeFieldInfo)
         {
             var path = fieldInfo.GetSelfPath(schema);
-            if (path != null && model.TryGetValue<string>(path, out var stringValue, out _) && DateTime.TryParse(stringValue, out var dateValue))
+            if (model.TryGetValue<string>(path, out var stringValue, out _) && DateTime.TryParse(stringValue, out var dateValue))
             {
                 model.TrySetValue(path, dateValue, out _, true);
             }
@@ -452,10 +424,7 @@ public static class SchemaExtensions
             if (!string.IsNullOrEmpty(value))
             {
                 var path = fieldInfo.GetSelfPath(schema);
-                if (path != null)
-                {
-                    model.TrySetValue(path, value, out _, true);
-                }
+                model.TrySetValue(path, value, out _, true);
             }
         }
     }

@@ -6,7 +6,7 @@ using Ertis.Schema.Extensions;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMethodReturnValue.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Local
+// ReSharper disable OutParameterValueIsAlwaysDiscarded.Global
 namespace Ertis.Schema.Dynamics;
 
 // ReSharper disable once UnusedType.Global
@@ -14,7 +14,7 @@ public class DynamicObject : ICloneable, IDisposable
 {
     #region Properties
     
-    private IDictionary<string, object?> PropertyDictionary { get; set; }
+    private IDictionary<string, object?> PropertyDictionary { get; init; }
     
     #endregion
     
@@ -199,11 +199,11 @@ public class DynamicObject : ICloneable, IDisposable
         {
             try
             {
-                return (T?) Convert.ChangeType(value, typeof(T));
+                return (T) Convert.ChangeType(value, typeof(T));
             }
             catch
             {
-                return (T?) value;
+                return (T) value;
             }
         }
     }
@@ -234,7 +234,6 @@ public class DynamicObject : ICloneable, IDisposable
         }
     }
     
-    // ReSharper disable once OutParameterValueIsAlwaysDiscarded.Global
     public bool TryGetValue(string path, out object? value, out Exception? exception)
     {
         try
@@ -341,7 +340,7 @@ public class DynamicObject : ICloneable, IDisposable
             var indexerStartIndex = key.IndexOf('[');
             var indexerCloseIndex = key.IndexOf(']');
             
-            var originalKey = key.Substring(0, indexerStartIndex);
+            var originalKey = key[..indexerStartIndex];
             if (dictionary.TryGetValue(originalKey, out var value))
             {
                 if (value is Array array)
@@ -457,7 +456,7 @@ public class DynamicObject : ICloneable, IDisposable
         
         if (indexerStartIndex > 0 && indexerCloseIndex > 0 && indexerStartIndex < indexerCloseIndex)
         {
-            var originalKey = key.Substring(0, indexerStartIndex);
+            var originalKey = key[..indexerStartIndex];
             if (dictionary.TryGetValue(originalKey, out var value))
             {
                 if (value is Array array)
@@ -472,13 +471,13 @@ public class DynamicObject : ICloneable, IDisposable
                             if (key.Length > indexerPath.Length && arrayItem is IDictionary<string, object?> subDictionary)
                             {
                                 SetValueCore(key[indexerPath.Length..].TrimStart('.'), setValue, subDictionary, false);
-                                return true;
                             }
                             else
                             {
                                 array.SetValue(setValue, index);
-                                return true;   
                             }
+                            
+                            return true;
                         }
                         else
                         {
@@ -538,16 +537,19 @@ public class DynamicObject : ICloneable, IDisposable
     
     public bool ContainsProperty(string path)
     {
-        if (!this.TryGetValue(path, out _, out var exception) && exception != null)
+        if (!this.TryGetValue(path, out _, out var exception))
         {
             if (exception is UndefinedFieldException)
             {
+                // ReSharper disable once DuplicatedStatements
                 return false;
             }
-            else
+            else if (exception != null)
             {
                 throw exception;
             }
+            
+            return false;
         }
         
         return true;

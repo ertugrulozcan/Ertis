@@ -88,7 +88,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default);
-
+	
 	IPaginationCollection<TEntity> Find(
 		string query, 
 		int? skip = null, 
@@ -107,7 +107,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		Sorting? sorting = null, 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null);
-
+	
 	Task<IPaginationCollection<TEntity>> FindAsync(
 		string query, 
 		int? skip = null, 
@@ -170,7 +170,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		IDictionary<string, bool>? selectFields = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null);
-
+	
 	IPaginationCollection<dynamic> Query(
 		Expression<Func<TEntity, bool>> expression, 
 		int? skip = null, 
@@ -305,15 +305,15 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default);
 	
-	long Count(IndexOptions indexOptions);
+	long Count(IndexOptions? indexOptions = null);
 	
 	Task<long> CountAsync(IndexOptions? indexOptions = null, CancellationToken cancellationToken = default);
 	
-	long Count(string query, IndexOptions indexOptions);
+	long Count(string query, IndexOptions? indexOptions = null);
 	
 	Task<long> CountAsync(string query, IndexOptions? indexOptions = null, CancellationToken cancellationToken = default);
-
-	long Count(Expression<Func<TEntity, bool>> expression, IndexOptions indexOptions);
+	
+	long Count(Expression<Func<TEntity, bool>> expression, IndexOptions? indexOptions = null);
 	
 	Task<long> CountAsync(Expression<Func<TEntity, bool>> expression, IndexOptions? indexOptions = null, CancellationToken cancellationToken = default);
 	
@@ -364,23 +364,23 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 	IPaginationCollection<TEntity> Search(string keyword, TextSearchOptions? options = null, int? skip = null, int? limit = null, bool? withCount = null, string? orderBy = null, SortDirection? sortDirection = null);
 	
 	Task<IPaginationCollection<TEntity>> SearchAsync(string keyword, TextSearchOptions? options = null, int? skip = null, int? limit = null, bool? withCount = null, string? orderBy = null, SortDirection? sortDirection = null, CancellationToken cancellationToken = default);
-
+	
 	dynamic Aggregate(string aggregationStagesJson);
 	
 	Task<dynamic> AggregateAsync(string aggregationStagesJson, CancellationToken cancellationToken = default);
 	
 	Task<IEnumerable<IIndexDefinition>> GetIndexesAsync(CancellationToken cancellationToken = default);
-
+	
 	Task<string> CreateIndexAsync(IIndexDefinition indexDefinition, CancellationToken cancellationToken = default);
 	
 	Task<string[]> CreateManyIndexAsync(IEnumerable<IIndexDefinition> indexDefinitions, CancellationToken cancellationToken = default);
-
+	
 	Task<string> CreateSingleIndexAsync(string fieldName, SortDirection? direction = null, CancellationToken cancellationToken = default);
 	
 	Task<string> CreateSingleIndexAsync(Expression<Func<TEntity, object>> expression, SortDirection? direction = null, CancellationToken cancellationToken = default);
-
+	
 	Task<string> CreateSingleIndexAsync(SingleIndexDefinition indexDefinition, CancellationToken cancellationToken = default);
-
+	
 	Task<string> CreateCompoundIndexAsync(IDictionary<string, SortDirection> indexFieldDefinitions, CancellationToken cancellationToken = default);
 	
 	Task<string> CreateCompoundIndexAsync(IDictionary<Expression<Func<TEntity, object>>, SortDirection> indexFieldDefinitions, CancellationToken cancellationToken = default);

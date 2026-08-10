@@ -1,10 +1,9 @@
 using System.Collections;
-using System.Diagnostics.CodeAnalysis;
 
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
 namespace Ertis.Net.Http;
 
-// ReSharper disable once UnusedType.Global
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public static class HeaderCollection
 {
 	#region Statics
@@ -33,8 +32,6 @@ public static class HeaderCollection
 	#endregion
 }
 
-[SuppressMessage("ReSharper", "UnusedMember.Global")]
-[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public class RequestHeaders : IHeaderCollection
 {
 	#region Properties

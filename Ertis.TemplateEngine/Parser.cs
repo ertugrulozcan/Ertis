@@ -2,6 +2,13 @@ namespace Ertis.TemplateEngine;
 
 public class Parser
 {
+    #region Constants
+    
+    private const string DEFAULT_OPEN_BRACKETS = "{{";
+    private const string DEFAULT_CLOSE_BRACKETS = "}}";
+    
+    #endregion
+    
     #region Properties
     
     internal ParserOptions Options { get; }
@@ -18,7 +25,11 @@ public class Parser
     {
         if (options == null)
         {
-            this.Options = new ParserOptions();
+            this.Options = new ParserOptions
+            {
+                OpenBrackets = DEFAULT_OPEN_BRACKETS,
+                CloseBrackets = DEFAULT_CLOSE_BRACKETS
+            };
         }
         else
         {
@@ -53,7 +64,7 @@ public class Parser
             
             if (placeHolder.StartIndex > 0)
             {
-                var rawText = template.Substring(0, placeHolder.StartIndex);
+                var rawText = template[..placeHolder.StartIndex];
                 yield return new RawPart { RawValue = rawText };
             }
             

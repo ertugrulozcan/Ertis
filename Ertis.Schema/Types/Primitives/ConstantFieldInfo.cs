@@ -1,8 +1,6 @@
 using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.Primitives;
 
@@ -10,20 +8,20 @@ public class ConstantFieldInfo : FieldInfo<object>
 {
     #region Properties
     
-    [JsonProperty("type")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+    [Newtonsoft.Json.JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     [JsonPropertyName("type")]
-    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public override FieldType Type => FieldType.@const;
     
-    [JsonProperty("value")]
+    [Newtonsoft.Json.JsonProperty("value")]
     [JsonPropertyName("value")]
     public object? Value { get; set; }
     
-    [JsonProperty("valueType")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
+    [Newtonsoft.Json.JsonProperty("valueType")]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     [JsonPropertyName("valueType")]
-    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public ConstantType ValueType { get; set; }
     
     #endregion

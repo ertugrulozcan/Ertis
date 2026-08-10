@@ -1,8 +1,6 @@
 using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.Primitives;
 
@@ -10,24 +8,25 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
 {
     #region Properties
     
-    [JsonProperty("type")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Newtonsoft.Json.JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public override FieldType Type => FieldType.integer;
     
     /// <summary>
     /// Greater than or equal
     /// </summary>
-    [JsonProperty("minimum", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minimum")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("minimum", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? Minimum
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMinimum(out var exception) && exception != null)
             {
                 throw exception;
@@ -38,15 +37,16 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
     /// <summary>
     /// Less than or equal
     /// </summary>
-    [JsonProperty("maximum", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maximum")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("maximum", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? Maximum
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMaximum(out var exception) && exception != null)
             {
                 throw exception;
@@ -57,15 +57,16 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
     /// <summary>
     /// Greater than
     /// </summary>
-    [JsonProperty("exclusiveMinimum", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("exclusiveMinimum")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("exclusiveMinimum", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? ExclusiveMinimum
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateExclusiveMinimum(out var exception) && exception != null)
             {
                 throw exception;
@@ -76,15 +77,16 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
     /// <summary>
     /// Less than or equal
     /// </summary>
-    [JsonProperty("exclusiveMaximum", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("exclusiveMaximum")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("exclusiveMaximum", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? ExclusiveMaximum
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateExclusiveMaximum(out var exception) && exception != null)
             {
                 throw exception;
@@ -95,15 +97,16 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
     /// <summary>
     /// A numeric instance is valid only if division by this keyword's value results in an integer.
     /// </summary>
-    [JsonProperty("multipleOf", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("multipleOf")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("multipleOf", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MultipleOf
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMultipleOf(out var exception) && exception != null)
             {
                 throw exception;
@@ -111,9 +114,9 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
         }
     }
     
-    [JsonProperty("isUnique", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("isUnique")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Newtonsoft.Json.JsonProperty("isUnique", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public bool IsUnique { get; set; }
     
     #endregion

@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
@@ -6,15 +5,14 @@ using Ertis.Schema.Extensions;
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMethodReturnValue.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Local
+// ReSharper disable OutParameterValueIsAlwaysDiscarded.Global
 namespace Ertis.Schema.Dynamics.Legacy;
 
-// [Obsolete("This class uses Newtonsoft library for JSON serialization and is no longer supported. Please use Ertis.Schema.Dynamics.DynamicObject")]
 public class DynamicObject : ICloneable, IDisposable
 {
     #region Properties
     
-    private IDictionary<string, object?> PropertyDictionary { get; set; }
+    private IDictionary<string, object?> PropertyDictionary { get; init; }
     
     #endregion
     
@@ -147,7 +145,7 @@ public class DynamicObject : ICloneable, IDisposable
         
         dynamic dynamicObject = (ExpandoObject) expandoDictionary;
         return dynamicObject;
-    }
+    } 
     
     public object? GetValue(string path)
     {
@@ -166,62 +164,56 @@ public class DynamicObject : ICloneable, IDisposable
         }
     }
     
-    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public T? GetValue<T>(string path)
-    {
-        var value = GetValueCore(path, this.PropertyDictionary);
-        if (value == null)
-        {
-            return default;
-        }
-        
-        if (value is IDictionary<string, object?> dictionary)
-        {
-            return Create(dictionary).Deserialize<T>();
-        }
-        else if (typeof(T).IsArray && value.GetType().IsArray && value is object[] array)
-        {
-            var itemType = typeof(T).GetElementType();
-            if (itemType != null)
-            {
-                if (itemType.IsPrimitive)
-                {
-                    return (T) (array.ToArray() as object);
-                }
-                else if (itemType == typeof(string))
-                {
-                    return (T) (array.Select(x => x.ToString()).ToArray() as object);
-                }
-                
-                return (T) (array.Select(x => Cast(x, itemType)).ToArray() as object);
-            }
-            else
-            {
-                return default;
-            }
-        }
-        else if (typeof(T).IsEnum && Enum.TryParse(typeof(T), value.ToString(), false, out var enumValue))
-        {
-            return (T) enumValue;
-        }
-        else
-        {
-            try
-            {
-                return (T?) Convert.ChangeType(value, typeof(T));
-            }
-            catch
-            {
-                return (T?) value;
-            }
-        }
-    }
-    
-    public T? GetValue<T>(string path, T? defaultValue)
+    public T? GetValue<T>(string path, T? defaultValue = default)
     {
         try
         {
-            return this.GetValue<T>(path);
+            var value = GetValueCore(path, this.PropertyDictionary);
+            if (value == null)
+            {
+                return default;
+            }
+            
+            if (value is IDictionary<string, object?> dictionary)
+            {
+                return Create(dictionary).Deserialize<T>();
+            }
+            else if (typeof(T).IsArray && value.GetType().IsArray && value is object[] array)
+            {
+                var itemType = typeof(T).GetElementType();
+                if (itemType != null)
+                {
+                    if (itemType.IsPrimitive)
+                    {
+                        return (T) (array.ToArray() as object);
+                    }
+                    else if (itemType == typeof(string))
+                    {
+                        return (T) (array.Select(x => x.ToString()).ToArray() as object);
+                    }
+                    
+                    return (T) (array.Select(x => Cast(x, itemType)).ToArray() as object);
+                }
+                else
+                {
+                    return default;
+                }
+            }
+            else if (typeof(T).IsEnum && Enum.TryParse(typeof(T), value.ToString(), false, out var enumValue))
+            {
+                return (T) enumValue;
+            }
+            else
+            {
+                try
+                {
+                    return (T) Convert.ChangeType(value, typeof(T));
+                }
+                catch
+                {
+                    return (T) value;
+                }
+            }
         }
         catch (UndefinedFieldException)
         {
@@ -273,7 +265,6 @@ public class DynamicObject : ICloneable, IDisposable
         }
     }
     
-    // ReSharper disable once OutParameterValueIsAlwaysDiscarded.Global
     public bool TryGetValue<T>(string path, out T? value, out Exception? exception)
     {
         try
@@ -350,7 +341,7 @@ public class DynamicObject : ICloneable, IDisposable
             var indexerStartIndex = key.IndexOf('[');
             var indexerCloseIndex = key.IndexOf(']');
             
-            var originalKey = key.Substring(0, indexerStartIndex);
+            var originalKey = key[..indexerStartIndex];
             if (dictionary.TryGetValue(originalKey, out var value))
             {
                 if (value is Array array)
@@ -393,7 +384,6 @@ public class DynamicObject : ICloneable, IDisposable
         SetValueCore(path, value, this.PropertyDictionary, createIfNotExist);
     }
     
-    // ReSharper disable once OutParameterValueIsAlwaysDiscarded.Global
     public bool TrySetValue(string path, object? value, out Exception? exception, bool createIfNotExist = false)
     {
         try
@@ -467,7 +457,7 @@ public class DynamicObject : ICloneable, IDisposable
         
         if (indexerStartIndex > 0 && indexerCloseIndex > 0 && indexerStartIndex < indexerCloseIndex)
         {
-            var originalKey = key.Substring(0, indexerStartIndex);
+            var originalKey = key[..indexerStartIndex];
             if (dictionary.TryGetValue(originalKey, out var value))
             {
                 if (value is Array array)
@@ -482,13 +472,13 @@ public class DynamicObject : ICloneable, IDisposable
                             if (key.Length > indexerPath.Length && arrayItem is IDictionary<string, object?> subDictionary)
                             {
                                 SetValueCore(key[indexerPath.Length..].TrimStart('.'), setValue, subDictionary, false);
-                                return true;
                             }
                             else
                             {
                                 array.SetValue(setValue, index);
-                                return true;   
                             }
+                            
+                            return true;
                         }
                         else
                         {
@@ -548,16 +538,19 @@ public class DynamicObject : ICloneable, IDisposable
     
     public bool ContainsProperty(string path)
     {
-        if (!this.TryGetValue(path, out _, out var exception) && exception != null)
+        if (!this.TryGetValue(path, out _, out var exception))
         {
             if (exception is UndefinedFieldException)
             {
+                // ReSharper disable once DuplicatedStatements
                 return false;
             }
-            else
+            else if (exception != null)
             {
                 throw exception;
             }
+            
+            return false;
         }
         
         return true;

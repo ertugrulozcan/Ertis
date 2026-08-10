@@ -21,7 +21,7 @@ internal static class NumericTypeHelper
             }
         }
         
-        if (!type1.IsNumericType() || !type2.IsNumericType())
+        if (!IsNumericType(type1) || !IsNumericType(type2))
         {
             return null;
         }
@@ -68,7 +68,9 @@ internal static class NumericTypeHelper
     
     private static bool IsNumericType(this Type type)
     {
-        return IsIntegralNumericType(type) || IsFloatingPointNumericType(type);
+        return
+            IsIntegralNumericType(type) ||
+            IsFloatingPointNumericType(type);
     }
     
     private static bool IsIntegralNumericType(this Type type)

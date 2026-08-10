@@ -9,17 +9,17 @@ public class NegativeSkipException : ErtisException
 	#region Constructors
 	
 	public NegativeSkipException() : base(
-		HttpStatusCode.BadRequest,
+		HttpStatusCode.BadRequest, 
 		"The skip value can not be negative",
 		"NegativeSkipError")
-	{}
+	{ }
 	
 	public NegativeSkipException(Exception innerException) : base(
-		HttpStatusCode.BadRequest,
+		HttpStatusCode.BadRequest, 
 		"The skip value can not be negative",
 		"NegativeSkipError",
 		innerException)
-	{}
+	{ }
 	
 	#endregion
 }

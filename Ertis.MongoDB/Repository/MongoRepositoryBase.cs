@@ -17,6 +17,8 @@ using MongoDB.Driver;
 using SortDirection = Ertis.Core.Collections.SortDirection;
 using UpdateOptions = Ertis.Data.Models.UpdateOptions;
 
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MethodOverloadWithOptionalParameter
 namespace Ertis.MongoDB.Repository;
 
 // ReSharper disable once UnusedType.Global
@@ -34,7 +36,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	
 	public string CollectionName { get; }
 	
-	private IMongoCollection<TEntity> Collection { get; }
+	protected IMongoCollection<TEntity> Collection { get; }
 	
 	#endregion
 	
@@ -162,20 +164,18 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	
 	public async Task<string> CreateIndexAsync(IIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
 	{
-		// ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-		// ReSharper disable once ConvertSwitchStatementToSwitchExpression
 		switch (indexDefinition.Type)
 		{
 			case IndexType.Single:
-				return await this.CreateSingleIndexAsync((SingleIndexDefinition) indexDefinition, cancellationToken: cancellationToken);
+				return await this.CreateSingleIndexAsync((SingleIndexDefinition)indexDefinition, cancellationToken: cancellationToken);
 			case IndexType.Compound:
-				return await this.CreateCompoundIndexAsync((CompoundIndexDefinition) indexDefinition, cancellationToken: cancellationToken);
+				return await this.CreateCompoundIndexAsync((CompoundIndexDefinition)indexDefinition, cancellationToken: cancellationToken);
 			case IndexType.Text:
-				return await this.CreateTextIndexAsync((TextIndexDefinition) indexDefinition, cancellationToken: cancellationToken);
+				return await this.CreateTextIndexAsync((TextIndexDefinition)indexDefinition, cancellationToken: cancellationToken);
 			case IndexType.TTL:
-				return await this.CreateTTLIndexAsync((TTLIndexDefinition) indexDefinition, cancellationToken: cancellationToken);
+				return await this.CreateTTLIndexAsync((TTLIndexDefinition)indexDefinition, cancellationToken: cancellationToken);
 			default:
-				throw new NotImplementedException("Not implemented yet for this index type");
+				throw new ArgumentOutOfRangeException();
 		}
 	}
 	
@@ -337,9 +337,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 			
 			if (nonIndexedPropertyNames.Any())
 			{
-				var combinedTextIndexDefinition = Builders<TEntity>.IndexKeys.Combine(
-					nonIndexedPropertyNames.Select(x => Builders<TEntity>.IndexKeys.Text(x)));
-			
+				var combinedTextIndexDefinition = Builders<TEntity>.IndexKeys.Combine(nonIndexedPropertyNames.Select(x => Builders<TEntity>.IndexKeys.Text(x)));
 				await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<TEntity>(combinedTextIndexDefinition), cancellationToken: cancellationToken);	
 			}
 		}
@@ -417,7 +415,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	}
 	
 	public IPaginationCollection<TEntity> Find(
-		Expression<Func<TEntity, bool>>? expression,
+		Expression<Func<TEntity, bool>> expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
@@ -428,7 +426,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	}
 	
 	public IPaginationCollection<TEntity> Find(
-		Expression<Func<TEntity, bool>>? expression,
+		Expression<Func<TEntity, bool>> expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
@@ -438,7 +436,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	}
 	
 	public async Task<IPaginationCollection<TEntity>> FindAsync(
-		Expression<Func<TEntity, bool>>? expression,
+		Expression<Func<TEntity, bool>> expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
@@ -450,7 +448,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	}
 	
 	public async Task<IPaginationCollection<TEntity>> FindAsync(
-		Expression<Func<TEntity, bool>>? expression,
+		Expression<Func<TEntity, bool>> expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
@@ -510,7 +508,6 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		bool? withCount = null,
 		string? orderBy = null, 
 		SortDirection? sortDirection = null,
-		// ReSharper disable once MethodOverloadWithOptionalParameter
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
@@ -530,7 +527,6 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		int? limit = null, 
 		bool? withCount = null,
 		Sorting? sorting = null,
-		// ReSharper disable once MethodOverloadWithOptionalParameter
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
@@ -593,12 +589,12 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		bool? withCount = null, 
 		string? orderBy = null, 
 		SortDirection? sortDirection = null,
-		// ReSharper disable once MethodOverloadWithOptionalParameter
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
 		var filterExpression = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
-		return this.Filter(filterExpression, skip, limit, withCount, orderBy != null ? new Sorting(orderBy, sortDirection) : null, indexOptions, collationOptions);
+		var sorting = string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection);
+		return this.Filter(filterExpression, skip, limit, withCount, sorting, indexOptions, collationOptions);
 	}
 	
 	public IPaginationCollection<TEntity> Find(
@@ -606,8 +602,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		Sorting? sorting = null,
-		// ReSharper disable once MethodOverloadWithOptionalParameter
+		Sorting? sorting = null, 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
@@ -627,7 +622,8 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		CancellationToken cancellationToken = default)
 	{
 		var filterExpression = expression != null ? new ExpressionFilterDefinition<TEntity>(expression) : FilterDefinition<TEntity>.Empty;
-		return await this.FilterAsync(filterExpression, skip, limit, withCount, orderBy != null ? new Sorting(orderBy, sortDirection) : null, indexOptions, collationOptions, cancellationToken: cancellationToken);
+		var sorting = string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection);
+		return await this.FilterAsync(filterExpression, skip, limit, withCount, sorting, indexOptions, collationOptions, cancellationToken: cancellationToken);
 	}
 	
 	public async Task<IPaginationCollection<TEntity>> FindAsync(
@@ -651,13 +647,13 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		bool? withCount = null, 
 		string? orderBy = null, 
 		SortDirection? sortDirection = null,
-		// ReSharper disable once MethodOverloadWithOptionalParameter
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
 		query = QueryHelper.EnsureObjectIdsAndISODates(query);
 		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<TEntity>.Empty : new JsonFilterDefinition<TEntity>(query);
-		return this.Filter(filterDefinition, skip, limit, withCount, orderBy != null ? new Sorting(orderBy, sortDirection) : null, indexOptions, collationOptions);
+		var sorting = string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection);
+		return this.Filter(filterDefinition, skip, limit, withCount, sorting, indexOptions, collationOptions);
 	}
 	
 	public IPaginationCollection<TEntity> Find(
@@ -665,8 +661,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		int? skip = null, 
 		int? limit = null, 
 		bool? withCount = null, 
-		Sorting? sorting = null,
-		// ReSharper disable once MethodOverloadWithOptionalParameter
+		Sorting? sorting = null, 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
@@ -688,7 +683,8 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	{
 		query = QueryHelper.EnsureObjectIdsAndISODates(query);
 		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<TEntity>.Empty : new JsonFilterDefinition<TEntity>(query);
-		return await this.FilterAsync(filterDefinition, skip, limit, withCount, orderBy != null ? new Sorting(orderBy, sortDirection) : null, indexOptions, collationOptions, cancellationToken: cancellationToken);
+		var sorting = string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection);
+		return await this.FilterAsync(filterDefinition, skip, limit, withCount, sorting, indexOptions, collationOptions, cancellationToken: cancellationToken);
 	}
 	
 	public async Task<IPaginationCollection<TEntity>> FindAsync(
@@ -756,15 +752,13 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	}
 	
 	private IFindFluent<TEntity, TEntity> ExecuteFilter(
-		FilterDefinition<TEntity>? predicate,
+		FilterDefinition<TEntity> predicate,
 		int? skip = null,
 		int? limit = null,
 		Sorting? sorting = null, 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
-		predicate ??= new ExpressionFilterDefinition<TEntity>(item => true);
-		
 		SortDefinition<TEntity>? sortDefinition = null;
 		if (sorting is { Count: > 0 })
 		{
@@ -772,7 +766,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 			var sortDefinitions = new List<SortDefinition<TEntity>>();
 			foreach (var sortField in sorting)
 			{
-				if (sortField.OrderBy != null && !string.IsNullOrEmpty(sortField.OrderBy.Trim()))
+				if (!string.IsNullOrEmpty(sortField.OrderBy.Trim()))
 				{
 					var fieldDefinition = new StringFieldDefinition<TEntity>(sortField.OrderBy);
 					sortDefinitions.Add(sortField.SortDirection is null or SortDirection.Ascending 
@@ -833,7 +827,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	public TField[] Distinct<TField>(string distinctBy, string? query = null)
 	{
 		FieldDefinition<TEntity, TField> fieldDefinition = new StringFieldDefinition<TEntity, TField>(distinctBy);
-		query = query != null ? QueryHelper.EnsureObjectIdsAndISODates(query) : query;
+		query = string.IsNullOrEmpty(query) ? query : QueryHelper.EnsureObjectIdsAndISODates(query);
 		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<TEntity>.Empty : new JsonFilterDefinition<TEntity>(query);
 		var cursor = this.Collection.Distinct(fieldDefinition, filterDefinition);
 		return cursor.Current.ToArray();
@@ -842,7 +836,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	public async Task<TField[]> DistinctAsync<TField>(string distinctBy, string? query = null, CancellationToken cancellationToken = default)
 	{
 		FieldDefinition<TEntity, TField> fieldDefinition = new StringFieldDefinition<TEntity, TField>(distinctBy);
-		query = query != null ? QueryHelper.EnsureObjectIdsAndISODates(query) : query;
+		query = string.IsNullOrEmpty(query) ? query : QueryHelper.EnsureObjectIdsAndISODates(query);
 		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<TEntity>.Empty : new JsonFilterDefinition<TEntity>(query);
 		var cursor = await this.Collection.DistinctAsync(fieldDefinition, filterDefinition, cancellationToken: cancellationToken);
 		var result = await cursor.ToListAsync(cancellationToken: cancellationToken);
@@ -861,17 +855,15 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		return await this.DistinctCoreAsync<TField>(distinctBy, filterExpression, cancellationToken: cancellationToken);
 	}
 	
-	private TField[] DistinctCore<TField>(string distinctBy, FilterDefinition<TEntity>? predicate)
+	private TField[] DistinctCore<TField>(string distinctBy, FilterDefinition<TEntity> predicate)
 	{
-		predicate ??= new ExpressionFilterDefinition<TEntity>(item => true);
 		FieldDefinition<TEntity, TField> fieldDefinition = new StringFieldDefinition<TEntity, TField>(distinctBy);
 		var cursor = this.Collection.Distinct(fieldDefinition, predicate);
 		return cursor.Current.ToArray();
 	}
 	
-	private async Task<TField[]> DistinctCoreAsync<TField>(string distinctBy, FilterDefinition<TEntity>? predicate, CancellationToken cancellationToken = default)
+	private async Task<TField[]> DistinctCoreAsync<TField>(string distinctBy, FilterDefinition<TEntity> predicate, CancellationToken cancellationToken = default)
 	{
-		predicate ??= new ExpressionFilterDefinition<TEntity>(item => true);
 		FieldDefinition<TEntity, TField> fieldDefinition = new StringFieldDefinition<TEntity, TField>(distinctBy);
 		var cursor = await this.Collection.DistinctAsync(fieldDefinition, predicate, cancellationToken: cancellationToken);
 		var result = await cursor.ToListAsync(cancellationToken: cancellationToken);
@@ -974,7 +966,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 			skip,
 			limit,
 			withCount,
-			orderBy != null ? new Sorting(orderBy, sortDirection) : null,
+			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection), 
 			selectFields,
 			indexOptions,
 			collationOptions);
@@ -996,7 +988,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 			skip,
 			limit,
 			withCount,
-			orderBy != null ? new Sorting(orderBy, sortDirection) : null,
+			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection), 
 			selectFields,
 			indexOptions,
 			collationOptions);
@@ -1077,7 +1069,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	}
 	
 	public IPaginationCollection<dynamic> Query(
-		Expression<Func<TEntity, bool>>? expression,
+		Expression<Func<TEntity, bool>> expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
@@ -1092,14 +1084,14 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 			skip,
 			limit,
 			withCount,
-			orderBy != null ? new Sorting(orderBy, sortDirection) : null, 
+			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection), 
 			selectFields,
 			indexOptions,
 			collationOptions);
 	}
 	
 	public IPaginationCollection<T> Query<T>(
-		Expression<Func<TEntity, bool>>? expression,
+		Expression<Func<TEntity, bool>> expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
@@ -1114,7 +1106,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 			skip,
 			limit,
 			withCount,
-			orderBy != null ? new Sorting(orderBy, sortDirection) : null, 
+			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection), 
 			selectFields,
 			indexOptions,
 			collationOptions);
@@ -1217,7 +1209,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 			skip,
 			limit,
 			withCount,
-			orderBy != null ? new Sorting(orderBy, sortDirection) : null, 
+			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection), 
 			selectFields,
 			indexOptions,
 			collationOptions,
@@ -1241,7 +1233,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 			skip,
 			limit,
 			withCount,
-			orderBy != null ? new Sorting(orderBy, sortDirection) : null, 
+			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection),  
 			selectFields,
 			indexOptions,
 			collationOptions,
@@ -1327,7 +1319,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	}
 	
 	public async Task<IPaginationCollection<dynamic>> QueryAsync(
-		Expression<Func<TEntity, bool>>? expression,
+		Expression<Func<TEntity, bool>> expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
@@ -1343,7 +1335,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 			skip,
 			limit,
 			withCount,
-			orderBy != null ? new Sorting(orderBy, sortDirection) : null, 
+			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection), 
 			selectFields,
 			indexOptions,
 			collationOptions,
@@ -1351,7 +1343,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	}
 	
 	public async Task<IPaginationCollection<T>> QueryAsync<T>(
-		Expression<Func<TEntity, bool>>? expression,
+		Expression<Func<TEntity, bool>> expression,
 		int? skip = null,
 		int? limit = null,
 		bool? withCount = null,
@@ -1367,7 +1359,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 			skip,
 			limit,
 			withCount,
-			orderBy != null ? new Sorting(orderBy, sortDirection) : null, 
+			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection),  
 			selectFields,
 			indexOptions,
 			collationOptions,
@@ -1387,7 +1379,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		try
 		{
 			var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, indexOptions, collationOptions);
-			var projectionDefinition = selectFields != null ? ExecuteSelectQuery<TEntity>(selectFields) : null;
+			var projectionDefinition = ExecuteSelectQuery<TEntity>(selectFields);
 			var collection = filterResult.Project(projectionDefinition);
 			
 			long totalCount = 0;
@@ -1432,7 +1424,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		try
 		{
 			var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, indexOptions, collationOptions);
-			var projectionDefinition = selectFields != null ? ExecuteSelectQuery<TEntity>(selectFields) : null;
+			var projectionDefinition = ExecuteSelectQuery<TEntity>(selectFields);
 			var collection = filterResult.Project(projectionDefinition);
 			
 			long totalCount = 0;
@@ -1478,7 +1470,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		try
 		{
 			var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, indexOptions, collationOptions);
-			var projectionDefinition = selectFields != null ? ExecuteSelectQuery<TEntity>(selectFields) : null;
+			var projectionDefinition = ExecuteSelectQuery<TEntity>(selectFields);
 			var collection = filterResult.Project(projectionDefinition);
 			
 			long totalCount = 0;
@@ -1524,7 +1516,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		try
 		{
 			var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, indexOptions, collationOptions);
-			var projectionDefinition = selectFields != null ? ExecuteSelectQuery<TEntity>(selectFields) : null;
+			var projectionDefinition = ExecuteSelectQuery<TEntity>(selectFields);
 			var collection = filterResult.Project(projectionDefinition);
 			
 			long totalCount = 0;
@@ -1630,7 +1622,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		return new PaginationCollection<TEntity>
 		{
 			Count = queryResults.Count,
-			Items = queryResults.Items?
+			Items = queryResults.Items
 				.Cast<Dictionary<string, object>>()
 				.Select(x => new BsonDocument(x))
 				.Select(x => BsonSerializer.Deserialize<TEntity>(x))
@@ -1652,7 +1644,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		return new PaginationCollection<TEntity>
 		{
 			Count = queryResults.Count,
-			Items = queryResults.Items?
+			Items = queryResults.Items
 				.Cast<Dictionary<string, object>>()
 				.Select(x => new BsonDocument(x))
 				.Select(x => BsonSerializer.Deserialize<TEntity>(x))
@@ -1661,11 +1653,11 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	
 	#endregion
 	
-	#region Select Methods
+	#region Projection Methods
 	
-	private static ProjectionDefinition<T> ExecuteSelectQuery<T>(IDictionary<string, bool> selectFields)
+	private static ProjectionDefinition<T> ExecuteSelectQuery<T>(IDictionary<string, bool>? selectFields)
 	{
-		if (selectFields.Any())
+		if (selectFields != null && selectFields.Any())
 		{
 			var selectDefinition = Builders<T>.Projection.Include("_id");
 			var includedFields = selectFields.Where(x => x.Value);
@@ -1874,7 +1866,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		return this.Count(item => true);
 	}
 	
-	public long Count(IndexOptions indexOptions)
+	public long Count(IndexOptions? indexOptions = null)
 	{
 		return this.Count(item => true, indexOptions);
 	}
@@ -1889,25 +1881,25 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		return await this.CountAsync(item => true, indexOptions, cancellationToken: cancellationToken);
 	}
 	
-	public long Count(Expression<Func<TEntity, bool>>? expression)
+	public long Count(Expression<Func<TEntity, bool>> expression)
 	{
 		FilterDefinition<TEntity> filterExpression = new ExpressionFilterDefinition<TEntity>(expression);
 		return this.Count(filterExpression);
 	}
 	
-	public long Count(Expression<Func<TEntity, bool>>? expression, IndexOptions indexOptions)
+	public long Count(Expression<Func<TEntity, bool>> expression, IndexOptions? indexOptions = null)
 	{
 		FilterDefinition<TEntity> filterExpression = new ExpressionFilterDefinition<TEntity>(expression);
 		return this.Count(filterExpression, indexOptions);
 	}
 	
-	public async Task<long> CountAsync(Expression<Func<TEntity, bool>>? expression, CancellationToken cancellationToken = default)
+	public async Task<long> CountAsync(Expression<Func<TEntity, bool>> expression, CancellationToken cancellationToken = default)
 	{
 		FilterDefinition<TEntity> filterExpression = new ExpressionFilterDefinition<TEntity>(expression);
 		return await this.CountAsync(filterExpression, cancellationToken: cancellationToken);
 	}
 	
-	public async Task<long> CountAsync(Expression<Func<TEntity, bool>>? expression, IndexOptions? indexOptions = null, CancellationToken cancellationToken = default)
+	public async Task<long> CountAsync(Expression<Func<TEntity, bool>> expression, IndexOptions? indexOptions = null, CancellationToken cancellationToken = default)
 	{
 		FilterDefinition<TEntity> filterExpression = new ExpressionFilterDefinition<TEntity>(expression);
 		return await this.CountAsync(filterExpression, indexOptions, cancellationToken: cancellationToken);
@@ -1920,7 +1912,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		return this.Count(filterDefinition);
 	}
 	
-	public long Count(string query, IndexOptions indexOptions)
+	public long Count(string query, IndexOptions? indexOptions = null)
 	{
 		query = QueryHelper.EnsureObjectIdsAndISODates(query);
 		var filterDefinition = new JsonFilterDefinition<TEntity>(query);

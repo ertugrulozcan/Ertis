@@ -214,16 +214,16 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default);
-	
-	long Count(IndexOptions indexOptions);
+    
+	long Count(IndexOptions? indexOptions = null);
 	
 	Task<long> CountAsync(IndexOptions? indexOptions = null, CancellationToken cancellationToken = default);
 	
-	long Count(string query, IndexOptions indexOptions);
+	long Count(string query, IndexOptions? indexOptions = null);
 	
 	Task<long> CountAsync(string query, IndexOptions? indexOptions = null, CancellationToken cancellationToken = default);
 	
-	long Count(Expression<Func<dynamic, bool>> expression, IndexOptions indexOptions);
+	long Count(Expression<Func<dynamic, bool>> expression, IndexOptions? indexOptions = null);
 	
 	Task<long> CountAsync(Expression<Func<dynamic, bool>> expression, IndexOptions? indexOptions = null, CancellationToken cancellationToken = default);
 	

@@ -2,8 +2,6 @@ using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Helpers;
 using Ertis.Schema.Validation;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.Primitives;
 
@@ -11,24 +9,25 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
 {
     #region Properties
     
-    [JsonProperty("type")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Newtonsoft.Json.JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public override FieldType Type => FieldType.@float;
     
     /// <summary>
     /// Greater than or equal
     /// </summary>
-    [JsonProperty("minimum", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minimum")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("minimum", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public double? Minimum
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMinimum(out var exception) && exception != null)
             {
                 throw exception;
@@ -39,15 +38,16 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
     /// <summary>
     /// Less than or equal
     /// </summary>
-    [JsonProperty("maximum", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maximum")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("maximum", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public double? Maximum
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMaximum(out var exception) && exception != null)
             {
                 throw exception;
@@ -58,15 +58,16 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
     /// <summary>
     /// Greater than
     /// </summary>
-    [JsonProperty("exclusiveMinimum", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("exclusiveMinimum")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("exclusiveMinimum", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public double? ExclusiveMinimum
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateExclusiveMinimum(out var exception) && exception != null)
             {
                 throw exception;
@@ -77,15 +78,16 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
     /// <summary>
     /// Less than or equal
     /// </summary>
-    [JsonProperty("exclusiveMaximum", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("exclusiveMaximum")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("exclusiveMaximum", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public double? ExclusiveMaximum
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateExclusiveMaximum(out var exception) && exception != null)
             {
                 throw exception;
@@ -93,9 +95,9 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
         }
     }
     
-    [JsonProperty("isUnique", NullValueHandling = NullValueHandling.Ignore, DefaultValueHandling = DefaultValueHandling.Ignore)]
     [JsonPropertyName("isUnique")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Newtonsoft.Json.JsonProperty("isUnique", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public bool IsUnique { get; set; }
     
     #endregion
@@ -127,19 +129,19 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
                     isValid = false;
                     validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be greater than {this.Maximum}", this));
                 }
-                
+            
                 if (this.Minimum != null && doubleValue < this.Minimum.Value)
                 {
                     isValid = false;
                     validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be less than {this.Minimum}", this));
                 }
-                
+            
                 if (this.ExclusiveMaximum != null && doubleValue >= this.ExclusiveMaximum.Value)
                 {
                     isValid = false;
                     validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be greater than or equal {this.ExclusiveMaximum}", this));
                 }
-                
+            
                 if (this.ExclusiveMinimum != null && doubleValue < this.ExclusiveMinimum.Value)
                 {
                     isValid = false;

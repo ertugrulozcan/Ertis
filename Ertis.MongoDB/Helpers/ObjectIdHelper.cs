@@ -10,7 +10,7 @@ public static class ObjectIdHelper
 {
 	#region Methods
 	
-	public static string EnsureObjectIds(string json)
+	public static string? EnsureObjectIds(string json)
 	{
 		if (string.IsNullOrEmpty(json))
 		{
@@ -22,7 +22,7 @@ public static class ObjectIdHelper
 			var root = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
 			if (root is JToken jToken)
 			{
-				return EnsureObjectIds(jToken).ToString();
+				return EnsureObjectIds(jToken)?.ToString();	
 			}
 			
 			return json;
@@ -33,8 +33,13 @@ public static class ObjectIdHelper
 		}
 	}
 	
-	public static JToken EnsureObjectIds(JToken node)
+	public static JToken? EnsureObjectIds(JToken? node)
 	{
+		if (node == null)
+		{
+			return null;
+		}
+		
 		try
 		{
 			if (node is JValue jValue && (node.Path == "_id" || node.Path.StartsWith("_id.") || node.Path.EndsWith("._id")))
@@ -43,7 +48,7 @@ public static class ObjectIdHelper
 				if (node.Type == JTokenType.String && ObjectId.TryParse(nodeValue, out _))
 				{
 					jValue.Replace(new JRaw($"ObjectId(\"{nodeValue}\")"));
-				}
+				}	
 			}
 			
 			foreach (var child in node)

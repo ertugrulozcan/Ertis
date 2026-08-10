@@ -1,11 +1,10 @@
 using Ertis.Core.Models.Response;
 using Ertis.Net.Http;
-using Newtonsoft.Json;
 
+// ReSharper disable UnusedType.Global
 namespace Ertis.Net.Rest;
 
 [Obsolete("This class uses Newtonsoft library for json serialization and is no longer supported. Please use SystemRestHandler.")]
-// ReSharper disable once UnusedType.Global
 public class RestHandler : IRestHandler
 {
 	#region Constants
@@ -82,8 +81,8 @@ public class RestHandler : IRestHandler
 		HttpMethod method, 
 		string url, 
 		IHeaderCollection? headers = null,
-		IRequestBody? body = null, 
-		JsonConverter[]? converters = null)
+		IRequestBody? body = null,
+		Newtonsoft.Json.JsonConverter[]? converters = null)
 	{
 		return this.ExecuteRequestAsync<TResult>(method, url, headers, body, converters).ConfigureAwait(false).GetAwaiter().GetResult();
 	}
@@ -93,7 +92,7 @@ public class RestHandler : IRestHandler
 		string url, 
 		IHeaderCollection? headers = null,
 		IRequestBody? body = null,
-		JsonConverter[]? converters = null, 
+		Newtonsoft.Json.JsonConverter[]? converters = null, 
 		CancellationToken cancellationToken = default)
 	{
 		using var httpClient = this._httpClientFactory.CreateClient();
@@ -133,7 +132,7 @@ public class RestHandler : IRestHandler
 			{
 				Json = json,
 				RawData = rawData,
-				Data = JsonConvert.DeserializeObject<TResult>(json, converters ?? Array.Empty<JsonConverter>())
+				Data = Newtonsoft.Json.JsonConvert.DeserializeObject<TResult>(json, converters ?? Array.Empty<Newtonsoft.Json.JsonConverter>())
 			};
 		}
 		else
@@ -151,8 +150,8 @@ public class RestHandler : IRestHandler
 		string baseUrl, 
 		IQueryString? queryString = null,
 		IHeaderCollection? headers = null, 
-		IRequestBody? body = null, 
-		JsonConverter[]? converters = null)
+		IRequestBody? body = null,
+		Newtonsoft.Json.JsonConverter[]? converters = null)
 	{
 		if (queryString != null && queryString.Any())
 		{
@@ -170,8 +169,8 @@ public class RestHandler : IRestHandler
 		string baseUrl, 
 		IQueryString? queryString = null,
 		IHeaderCollection? headers = null, 
-		IRequestBody? body = null, 
-		JsonConverter[]? converters = null,
+		IRequestBody? body = null,
+		Newtonsoft.Json.JsonConverter[]? converters = null,
 		CancellationToken cancellationToken = default)
 	{
 		if (queryString != null && queryString.Any())

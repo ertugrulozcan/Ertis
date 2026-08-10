@@ -1,11 +1,12 @@
+// ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.MongoDB.Queries;
 
 public readonly struct TextSearchLanguage
 {
     #region Properties
     
-    // ReSharper disable once UnusedAutoPropertyAccessor.Global
     public string Name { get; }
     
     public string ISO6391Code { get; }
@@ -59,7 +60,6 @@ public readonly struct TextSearchLanguage
     
     public static readonly TextSearchLanguage Turkish = new("Turkish", "tr");
     
-    // ReSharper disable once UnusedMember.Global
     public static IReadOnlyCollection<TextSearchLanguage> All
     {
         get

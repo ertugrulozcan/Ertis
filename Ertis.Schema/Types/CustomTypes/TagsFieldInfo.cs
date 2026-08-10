@@ -1,8 +1,6 @@
 using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace Ertis.Schema.Types.CustomTypes;
 
@@ -10,21 +8,22 @@ public class TagsFieldInfo : FieldInfo<string[]>
 {
 	#region Properties
     
-    [JsonProperty("type")]
-    [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
     [JsonPropertyName("type")]
-    [System.Text.Json.Serialization.JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [Newtonsoft.Json.JsonProperty("type")]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public override FieldType Type => FieldType.tags;
     
-    [JsonProperty("minCount", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minCount")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("minCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MinCount
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMinCount(out var exception) && exception != null)
             {
                 throw exception;
@@ -32,15 +31,16 @@ public class TagsFieldInfo : FieldInfo<string[]>
         }
     }
     
-    [JsonProperty("maxCount", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxCount")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("maxCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MaxCount
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMaxCount(out var exception) && exception != null)
             {
                 throw exception;
@@ -48,15 +48,16 @@ public class TagsFieldInfo : FieldInfo<string[]>
         }
     }
     
-    [JsonProperty("minLength", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("minLength")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("minLength", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MinLength
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMinLength(out var exception) && exception != null)
             {
                 throw exception;
@@ -64,15 +65,16 @@ public class TagsFieldInfo : FieldInfo<string[]>
         }
     }
     
-    [JsonProperty("maxLength", NullValueHandling = NullValueHandling.Ignore)]
     [JsonPropertyName("maxLength")]
-    [System.Text.Json.Serialization.JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [Newtonsoft.Json.JsonProperty("maxLength", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MaxLength
     {
         get;
         init
         {
             field = value;
+            
             if (!this.ValidateMaxLength(out var exception) && exception != null)
             {
                 throw exception;

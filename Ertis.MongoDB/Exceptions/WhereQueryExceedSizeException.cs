@@ -9,17 +9,17 @@ public class WhereQueryExceedSizeException : ErtisException
 	#region Constructors
 	
 	public WhereQueryExceedSizeException(string message) : base(
-		HttpStatusCode.BadRequest,
+		HttpStatusCode.BadRequest, 
 		message,
 		"WhereQueryExceedSizeError")
-	{}
+	{ }
 	
 	public WhereQueryExceedSizeException(string message, Exception innerException) : base(
-		HttpStatusCode.BadRequest,
+		HttpStatusCode.BadRequest, 
 		message,
 		"WhereQueryExceedSizeError",
 		innerException)
-	{}
+	{ }
 	
 	#endregion
 }

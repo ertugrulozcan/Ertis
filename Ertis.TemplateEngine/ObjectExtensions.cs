@@ -6,59 +6,56 @@ internal static class ObjectExtensions
 {
 	#region Methods
 	
-	extension(object model)
+	public static IDictionary<string, object> ToDictionary(this object model)
 	{
-		public IDictionary<string, object> ToDictionary()
+		var dictionary = new Dictionary<string, object>();
+		
+		var jObject = JObject.FromObject(model);
+		foreach (var childToken in jObject.Children())
 		{
-			var dictionary = new Dictionary<string, object>();
-			
-			var jObject = JObject.FromObject(model);
-			foreach (var childToken in jObject.Children())
+			if (childToken is JProperty jProperty)
 			{
-				if (childToken is JProperty jProperty)
-				{
-					var propertyName = jProperty.Name;
-					dynamic dynamicObject = jProperty.Value;
-					dictionary.Add(propertyName, ToDictionaryCore(dynamicObject));
-				}
+				var propertyName = jProperty.Name;
+				dynamic dynamicObject = jProperty.Value;
+				dictionary.Add(propertyName, ToDictionaryCore(dynamicObject));
 			}
-			
-			return dictionary;
 		}
 		
-		private object? ToDictionaryCore()
+		return dictionary;
+	}
+	
+	private static object? ToDictionaryCore(this object model)
+	{
+		var jToken = JToken.FromObject(model);
+		switch (jToken)
 		{
-			var jToken = JToken.FromObject(model);
-			switch (jToken)
+			case JProperty jProperty:
 			{
-				case JProperty jProperty:
-				{
-					if (jProperty.Value is JValue jValue)
-					{
-						return jValue.Value;
-					}
-					else
-					{
-						dynamic dynamicObject = jProperty.Value;
-						return ToDictionaryCore(dynamicObject);
-					}
-				}
-				case JValue jValue:
+				if (jProperty.Value is JValue jValue)
 				{
 					return jValue.Value;
 				}
-				case JObject jObject:
+				else
 				{
-					return jObject.Children().ToDictionary(childToken => childToken.Path, ToDictionaryCore);
+					dynamic dynamicObject = jProperty.Value;
+					return ToDictionaryCore(dynamicObject);
 				}
-				case JArray jArray:
-				{
-					return jArray.Select(ToDictionaryCore).ToArray();
-				}
-				default:
-				{
-					throw new Exception("Unknown json node in ToDictionaryCore");
-				}
+			}
+			case JValue jValue:
+			{
+				return jValue.Value;
+			}
+			case JObject jObject:
+			{
+				return jObject.Children().ToDictionary(childToken => childToken.Path, ToDictionaryCore);
+			}
+			case JArray jArray:
+			{
+				return jArray.Select(ToDictionaryCore).ToArray();
+			}
+			default:
+			{
+				throw new Exception("Unknown json node in ToDictionaryCore");
 			}
 		}
 	}

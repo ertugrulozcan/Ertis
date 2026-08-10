@@ -1,8 +1,9 @@
 using ResizeModeEnum = SixLabors.ImageSharp.Processing.ResizeMode;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.ImageProcessing;
 
-// ReSharper disable MemberCanBePrivate.Global
 public class ResizeMode
 {
 	#region Statics

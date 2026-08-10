@@ -2,8 +2,8 @@ using System.Dynamic;
 using System.Reflection;
 using Ertis.Core.Collections;
 using Ertis.MongoDB.Exceptions;
-using Newtonsoft.Json;
 
+// ReSharper disable UnusedMember.Global
 namespace Ertis.MongoDB.Extensions;
 
 // ReSharper disable once UnusedType.Global
@@ -11,10 +11,9 @@ public static class NewtonsoftExtensions
 {
 	#region Methods
 	
-	// ReSharper disable once UnusedMember.Global
-	public static dynamic ExecuteSelectQuery<T>(this IPaginationCollection<T> paginationCollection, IDictionary<string, bool>? selectFields)
+	public static dynamic? ExecuteSelectQuery<T>(this IPaginationCollection<T>? paginationCollection, IDictionary<string, bool>? selectFields)
 	{
-		if (paginationCollection.Items == null || selectFields == null || !selectFields.Any())
+		if (paginationCollection?.Items == null || selectFields == null || !selectFields.Any())
 		{
 			return paginationCollection;
 		}
@@ -33,21 +32,20 @@ public static class NewtonsoftExtensions
 		foreach (var propertyInfo in properties)
 		{
 			bool? isSelected = null;
-			var jsonPropertyAttribute = propertyInfo.CustomAttributes.FirstOrDefault(x => x.AttributeType == typeof(JsonPropertyAttribute));
+			var jsonPropertyAttribute = propertyInfo.CustomAttributes.FirstOrDefault(x => x.AttributeType == typeof(Newtonsoft.Json.JsonPropertyAttribute));
 			var constructorArguments = jsonPropertyAttribute?.ConstructorArguments.ToList();
 			var attributeValue = constructorArguments?.Select(x => x.Value?.ToString()).FirstOrDefault(x => !string.IsNullOrEmpty(x));
-			if (attributeValue != null && selectFields.TryGetValue(attributeValue, out var value))
+			if (attributeValue != null && selectFields.TryGetValue(attributeValue, out var field))
 			{
-				isSelected = value;
+				isSelected = field;
 			}
 			
 			if (attributeValue != null && !string.IsNullOrEmpty(attributeValue))
 			{
 				/*
-					In projections that explicitly include fields, the _id field is the only field that you can explicitly exclude.
-					In projections that explicitly excludes fields, the _id field is the only field that you can explicitly include; however, the _id field is included by default.
+				 In projections that explicitly include fields, the _id field is the only field that you can explicitly exclude.
+				 In projections that explicitly excludes fields, the _id field is the only field that you can explicitly include; however, the _id field is included by default.
 				*/
-				
 				if (attributeValue == "_id")
 				{
 					selectedProperties.Add(propertyInfo);

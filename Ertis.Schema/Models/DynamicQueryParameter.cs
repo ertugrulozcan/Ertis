@@ -1,5 +1,4 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json.Serialization;
 
 // ReSharper disable UnusedMember.Global
 namespace Ertis.Schema.Models;
@@ -8,26 +7,36 @@ public class DynamicQueryParameter
 {
 	#region Properties
 	
-	[JsonProperty("name")]
-	public required string Name { get; set; }
+	[JsonPropertyName("name")]
+	[Newtonsoft.Json.JsonProperty("name")]
+	public string? Name { get; set; }
 	
-	[JsonProperty("slug")]
-	public required string Slug { get; set; }
+	[JsonPropertyName("slug")]
+	[Newtonsoft.Json.JsonProperty("slug")]
+	public string? Slug { get; set; }
 	
-	[JsonProperty("description")]
+	[JsonPropertyName("description")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[Newtonsoft.Json.JsonProperty("description", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public string? Description { get; set; }
 	
-	[JsonProperty("type")]
-	[JsonConverter(typeof(StringEnumConverter))]
+	[JsonPropertyName("type")]
+	[JsonConverter(typeof(JsonStringEnumConverter))]
+	[Newtonsoft.Json.JsonProperty("type")]
+	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	public DynamicQueryParameterType Type { get; set; }
 	
-	[JsonProperty("defaultValue")]
+	[JsonPropertyName("defaultValue")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	[Newtonsoft.Json.JsonProperty("defaultValue", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public object? DefaultValue { get; set; }
 	
-	[JsonProperty("isRequired")]
+	[JsonPropertyName("isRequired")]
+	[Newtonsoft.Json.JsonProperty("isRequired")]
 	public bool IsRequired { get; set; }
 	
-	[JsonProperty("isNullable")]
+	[JsonPropertyName("isNullable")]
+	[Newtonsoft.Json.JsonProperty("isNullable")]
 	public bool IsNullable { get; set; }
 	
 	#endregion

@@ -19,7 +19,8 @@ public static class QueryHelper
 			var root = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
 			if (root is JToken jToken)
 			{
-				return EnsureObjectIdsAndISODates(jToken).ToString();	
+				var query = EnsureObjectIdsAndISODates(jToken)?.ToString();
+				return query ?? json;
 			}
 			
 			return json;
@@ -30,8 +31,13 @@ public static class QueryHelper
 		}
 	}
 	
-	private static JToken EnsureObjectIdsAndISODates(JToken node)
+	private static JToken? EnsureObjectIdsAndISODates(JToken? node)
 	{
+		if (node == null)
+		{
+			return null;
+		}
+		
 		try
 		{
 			switch (node)

@@ -1,9 +1,8 @@
 using AnchorEnum = SixLabors.ImageSharp.Processing.AnchorPositionMode;
 
-// ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.ImageProcessing;
 
-// ReSharper disable MemberCanBePrivate.Global
 public class Anchor
 {
 	#region Statics
@@ -47,6 +46,7 @@ public class Anchor
 	
 	#region Methods
 	
+	// ReSharper disable once UnusedMember.Global
 	public static Anchor? Parse(string key)
 	{
 		if (Enum.TryParse<AnchorEnum>(key, true, out var enumValue))

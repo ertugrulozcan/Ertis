@@ -8,9 +8,7 @@ public class SchemaValidationException : ErtisSchemaValidationException
 	/// Constructor
 	/// </summary>
 	public SchemaValidationException(string message) : base(message)
-	{
-		
-	}
+	{ }
 	
 	#endregion
 }

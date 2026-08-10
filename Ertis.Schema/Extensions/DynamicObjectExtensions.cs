@@ -1,9 +1,9 @@
 using Ertis.Schema.Dynamics.Legacy;
 
+// ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
 namespace Ertis.Schema.Extensions;
 
-// ReSharper disable once UnusedType.Global
 public static class DynamicObjectExtensions
 {
 	#region Methods

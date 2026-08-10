@@ -128,8 +128,7 @@ public class CompoundIndexDefinition : IndexDefinitionBase
 	
 	public override IndexType Type => IndexType.Compound;
 	
-	public override string Key => string.Join('_',
-		this.Indexes.Select(index => $"{index.Field}_{(index.Direction is SortDirection.Descending ? "-1" : "1")}"));
+	public override string Key => string.Join('_', this.Indexes.Select(index => $"{index.Field}_{(index.Direction is SortDirection.Descending ? "-1" : "1")}"));
 	
 	#endregion
 	
@@ -198,7 +197,6 @@ public class TextIndexDefinition : IndexDefinitionBase
 			
 			return this.fields ?? Array.Empty<string>();
 		}
-		
 		private init => this.fields = value;
 	}
 	
@@ -214,7 +212,6 @@ public class TextIndexDefinition : IndexDefinitionBase
 			
 			return this.weightedFields;
 		}
-		
 		private init => this.weightedFields = value;
 	}
 	

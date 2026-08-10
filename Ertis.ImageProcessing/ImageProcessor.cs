@@ -76,61 +76,7 @@ public static class ImageProcessor
 		int? quality = null, 
 		int? level = null)
 	{
-		if (width == null && height == null)
-		{
-			return;
-		}
-		
-		if (width is <= 0 || height is <= 0)
-		{
-			throw new ImageProcessingException(HttpStatusCode.BadRequest, "Width and height must be greater than zero.", "InvalidDimensions");
-		}
-		
-		try
-		{
-			var sourceInfo = Image.Identify(imageStream);
-			imageStream.Position = 0;
-			
-			var targetWidth = width ?? Math.Max(1, (int)Math.Round(sourceInfo.Width * ((double)height!.Value / sourceInfo.Height)));
-			var targetHeight = height ?? Math.Max(1, (int)Math.Round(sourceInfo.Height * ((double)width!.Value / sourceInfo.Width)));
-			
-			var decoderOptions = new DecoderOptions
-			{
-				TargetSize = new Size(targetWidth, targetHeight)
-			};
-			
-			using var image = Image.Load(decoderOptions, imageStream);
-			var options = new ResizeOptions
-			{
-				Size = new Size(targetWidth, targetHeight),
-				Mode = mode ?? ResizeModeEnum.Crop,
-				Position = anchor ?? AnchorPositionMode.Center,
-				Sampler = (sampler ?? SamplerAlgorithm.Bicubic).ToResampler()!
-			};
-			
-			image.Mutate(x => x.Resize(options)); 
-			image.Save(outputStream, FormatEncoder.GetDefaultFormatter(destinationFormat, quality, level));
-		}
-		catch (ImageProcessingException)
-		{
-			throw;
-		}
-		catch (OperationCanceledException)
-		{
-			throw;
-		}
-		catch (InvalidImageContentException ex) when (ex.InnerException is InvalidMemoryOperationException)
-		{
-			throw new ImageProcessingException(HttpStatusCode.ServiceUnavailable, "Image is too large to process.", "ImageTooLarge", ex);
-		}
-		catch (Exception ex) when (ex is InvalidImageContentException or UnknownImageFormatException or NotSupportedException)
-		{
-			throw new ImageProcessingException(HttpStatusCode.BadRequest, "The image could not be decoded.", "InvalidImageContent", ex);
-		}
-		catch (Exception ex) when (ex is not OutOfMemoryException)
-		{
-			throw new ImageProcessingException(HttpStatusCode.InternalServerError, ex.Message, "ImageProcessingError", ex);
-		}
+		ResizeAsync(imageStream, outputStream, width, height, destinationFormat, mode, anchor, sampler, quality, level).ConfigureAwait(false).GetAwaiter().GetResult();
 	}
 	
 	public static async Task ResizeAsync(
@@ -161,19 +107,13 @@ public static class ImageProcessor
 			var sourceInfo = await Image.IdentifyAsync(imageStream, cancellationToken);
 			imageStream.Position = 0;
 			
-			var targetWidth = width ?? Math.Max(1, (int)Math.Round(sourceInfo.Width * ((double)height!.Value / sourceInfo.Height)));
-			var targetHeight = height ?? Math.Max(1, (int)Math.Round(sourceInfo.Height * ((double)width!.Value / sourceInfo.Width)));
-			
-			var decoderOptions = new DecoderOptions
-			{
-				TargetSize = new Size(targetWidth, targetHeight)
-			};
-			
+			var resizeMode = mode ?? ResizeModeEnum.Crop;
+			var decoderOptions = GetDecoderOptions(sourceInfo, resizeMode, width, height, out var targetWidth, out var targetHeight);
 			using var image = await Image.LoadAsync(decoderOptions, imageStream, cancellationToken: cancellationToken);
 			var options = new ResizeOptions
 			{
 				Size = new Size(targetWidth, targetHeight),
-				Mode = mode ?? ResizeModeEnum.Crop,
+				Mode = resizeMode,
 				Position = anchor ?? AnchorPositionMode.Center,
 				Sampler = (sampler ?? SamplerAlgorithm.Bicubic).ToResampler()!
 			};
@@ -305,6 +245,40 @@ public static class ImageProcessor
 	{
 		using var image = await Image.LoadAsync(imageStream, cancellationToken: cancellationToken);
 		return image.Metadata;
+	}
+	
+	private static DecoderOptions GetDecoderOptions(ImageInfo sourceInfo, ResizeModeEnum resizeMode, int? width, int? height, out int targetWidth, out int targetHeight)
+	{
+		targetWidth = width ?? Math.Max(1, (int)Math.Round(sourceInfo.Width * ((double)height!.Value / sourceInfo.Height)));
+		targetHeight = height ?? Math.Max(1, (int)Math.Round(sourceInfo.Height * ((double)width!.Value / sourceInfo.Width)));
+		
+		return new DecoderOptions
+		{
+			TargetSize = GetDecoderTargetSize(new Size(sourceInfo.Width, sourceInfo.Height), new Size(targetWidth, targetHeight), resizeMode)
+		};
+	}
+	
+	private static Size? GetDecoderTargetSize(Size sourceSize, Size targetSize, ResizeModeEnum mode)
+	{
+		var scaleX = (double)targetSize.Width / sourceSize.Width;
+		var scaleY = (double)targetSize.Height / sourceSize.Height;
+		
+		var scale = mode switch
+		{
+			ResizeModeEnum.Max or ResizeModeEnum.Pad or ResizeModeEnum.BoxPad => Math.Min(scaleX, scaleY),
+			_ => Math.Max(scaleX, scaleY)
+		};
+		
+		const double DecodeScaleThreshold = 0.5;
+		if (scale >= DecodeScaleThreshold)
+		{
+			return null;
+		}
+		
+		var width = Math.Max(1, (int)Math.Ceiling(sourceSize.Width * scale));
+		var height = Math.Max(1, (int)Math.Ceiling(sourceSize.Height * scale));
+		
+		return new Size(width, height);
 	}
 	
 	#endregion

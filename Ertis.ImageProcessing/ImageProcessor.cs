@@ -11,6 +11,7 @@ using ResizeModeEnum = SixLabors.ImageSharp.Processing.ResizeMode;
 using ImageProcessingException = Ertis.ImageProcessing.Exceptions.ImageProcessingException;
 
 // ReSharper disable once UnusedType.Global
+// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.ImageProcessing;
 
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
@@ -108,7 +109,7 @@ public static class ImageProcessor
 			imageStream.Position = 0;
 			
 			var resizeMode = mode ?? ResizeModeEnum.Crop;
-			var decoderOptions = GetDecoderOptions(sourceInfo, resizeMode, width, height, out var targetWidth, out var targetHeight);
+			var decoderOptions = GetDecoderOptions(sourceInfo, resizeMode, width, height, quality, out var targetWidth, out var targetHeight);
 			using var image = await Image.LoadAsync(decoderOptions, imageStream, cancellationToken: cancellationToken);
 			var options = new ResizeOptions
 			{
@@ -247,14 +248,14 @@ public static class ImageProcessor
 		return image.Metadata;
 	}
 	
-	private static DecoderOptions GetDecoderOptions(ImageInfo sourceInfo, ResizeModeEnum resizeMode, int? width, int? height, out int targetWidth, out int targetHeight)
+	private static DecoderOptions GetDecoderOptions(ImageInfo sourceInfo, ResizeModeEnum resizeMode, int? width, int? height, int? quality, out int targetWidth, out int targetHeight)
 	{
 		targetWidth = width ?? Math.Max(1, (int)Math.Round(sourceInfo.Width * ((double)height!.Value / sourceInfo.Height)));
 		targetHeight = height ?? Math.Max(1, (int)Math.Round(sourceInfo.Height * ((double)width!.Value / sourceInfo.Width)));
 		
 		return new DecoderOptions
 		{
-			TargetSize = GetDecoderTargetSize(new Size(sourceInfo.Width, sourceInfo.Height), new Size(targetWidth, targetHeight), resizeMode)
+			TargetSize = quality == 100 ? null : GetDecoderTargetSize(new Size(sourceInfo.Width, sourceInfo.Height), new Size(targetWidth, targetHeight), resizeMode)
 		};
 	}
 	

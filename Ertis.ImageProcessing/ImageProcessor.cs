@@ -75,9 +75,10 @@ public static class ImageProcessor
 		Anchor? anchor = null, 
 		SamplerAlgorithm? sampler = null, 
 		int? quality = null, 
-		int? level = null)
+		int? level = null,
+		TargetSizeMode targetSizeMode = TargetSizeMode.Auto)
 	{
-		ResizeAsync(imageStream, outputStream, width, height, destinationFormat, mode, anchor, sampler, quality, level).ConfigureAwait(false).GetAwaiter().GetResult();
+		ResizeAsync(imageStream, outputStream, width, height, destinationFormat, mode, anchor, sampler, quality, level, targetSizeMode).ConfigureAwait(false).GetAwaiter().GetResult();
 	}
 	
 	public static async Task ResizeAsync(
@@ -90,7 +91,8 @@ public static class ImageProcessor
 		Anchor? anchor = null, 
 		SamplerAlgorithm? sampler = null, 
 		int? quality = null, 
-		int? level = null, 
+		int? level = null,
+		TargetSizeMode targetSizeMode = TargetSizeMode.Auto, 
 		CancellationToken cancellationToken = default)
 	{
 		if (width == null && height == null)
@@ -109,7 +111,7 @@ public static class ImageProcessor
 			imageStream.Position = 0;
 			
 			var resizeMode = mode ?? ResizeModeEnum.Crop;
-			var decoderOptions = GetDecoderOptions(sourceInfo, resizeMode, width, height, quality, out var targetWidth, out var targetHeight);
+			var decoderOptions = GetDecoderOptions(sourceInfo, targetSizeMode, resizeMode, width, height, out var targetWidth, out var targetHeight);
 			using var image = await Image.LoadAsync(decoderOptions, imageStream, cancellationToken: cancellationToken);
 			var options = new ResizeOptions
 			{
@@ -248,14 +250,25 @@ public static class ImageProcessor
 		return image.Metadata;
 	}
 	
-	private static DecoderOptions GetDecoderOptions(ImageInfo sourceInfo, ResizeModeEnum resizeMode, int? width, int? height, int? quality, out int targetWidth, out int targetHeight)
+	private static DecoderOptions GetDecoderOptions(ImageInfo sourceInfo, TargetSizeMode targetSizeMode, ResizeModeEnum resizeMode, int? width, int? height, out int targetWidth, out int targetHeight)
 	{
-		targetWidth = width ?? Math.Max(1, (int)Math.Round(sourceInfo.Width * ((double)height!.Value / sourceInfo.Height)));
-		targetHeight = height ?? Math.Max(1, (int)Math.Round(sourceInfo.Height * ((double)width!.Value / sourceInfo.Width)));
+		Size? targetSize = null;
+		if (targetSizeMode == TargetSizeMode.Auto)
+		{
+			targetWidth = width ?? Math.Max(1, (int)Math.Round(sourceInfo.Width * ((double)height!.Value / sourceInfo.Height)));
+			targetHeight = height ?? Math.Max(1, (int)Math.Round(sourceInfo.Height * ((double)width!.Value / sourceInfo.Width)));
+			
+			targetSize = GetDecoderTargetSize(new Size(sourceInfo.Width, sourceInfo.Height), new Size(targetWidth, targetHeight), resizeMode);
+		}
+		else
+		{
+			targetWidth = width ?? 0;
+			targetHeight = height ?? 0;
+		}
 		
 		return new DecoderOptions
 		{
-			TargetSize = quality == 100 ? null : GetDecoderTargetSize(new Size(sourceInfo.Width, sourceInfo.Height), new Size(targetWidth, targetHeight), resizeMode)
+			TargetSize = targetSize
 		};
 	}
 	

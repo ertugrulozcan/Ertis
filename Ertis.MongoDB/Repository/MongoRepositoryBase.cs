@@ -36,7 +36,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	
 	public string CollectionName { get; }
 	
-	protected IMongoCollection<TEntity> Collection { get; }
+	public IMongoCollection<TEntity> Collection { get; }
 	
 	#endregion
 	

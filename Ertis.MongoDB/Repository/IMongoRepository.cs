@@ -3,7 +3,9 @@ using Ertis.Core.Collections;
 using Ertis.Data.Models;
 using Ertis.Data.Repository;
 using Ertis.MongoDB.Models;
-using Ertis.MongoDB.Queries;
+using MongoDB.Driver;
+using SortDirection = Ertis.Core.Collections.SortDirection;
+using TextSearchOptions = Ertis.MongoDB.Queries.TextSearchOptions;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMemberInSuper.Global
@@ -12,6 +14,8 @@ namespace Ertis.MongoDB.Repository;
 public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where TEntity : IEntity<string>
 {
 	string CollectionName { get; }
+	
+	IMongoCollection<TEntity> Collection { get; }
 	
 	IPaginationCollection<TEntity> Find(
 		int? skip = null, 

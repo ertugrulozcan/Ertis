@@ -28,22 +28,21 @@ namespace Ertis.MongoDB.Repository;
 public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> where TEntity : IEntity<string>
 {
 	#region Services
-
+	
 	private readonly IRepositoryActionBinder _actionBinder;
 	
 	private readonly IDatabaseSettings _settings;
-
+	
 	#endregion
 	
 	#region Properties
-
+	
 	public string CollectionName { get; }
 	
-	// ReSharper disable once MemberCanBePrivate.Global
-	protected IMongoCollection<TEntity> Collection { get; }
-
+	public IMongoCollection<TEntity> Collection { get; }
+	
 	#endregion
-
+	
 	#region Constructors
 
 	/// <summary>
@@ -58,11 +57,11 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		this._settings = settings;
 		
 		var database = clientProvider.Client.GetDatabase(settings.DefaultAuthDatabase);
-
+		
 		this.CollectionName = collectionName;
 		this.Collection = database.GetCollection<TEntity>(collectionName);
 		this.CreateSearchIndexesAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-
+		
 		this._actionBinder = actionBinder;
 	}
 

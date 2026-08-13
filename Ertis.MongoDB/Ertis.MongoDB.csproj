@@ -1,18 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Ertis.Data\Ertis.Data.csproj" />
-      <ProjectReference Include="..\Ertis.MongoDB.Queries\Ertis.MongoDB.Queries.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="MongoDB.Driver" Version="3.10.0" />
-    </ItemGroup>
-
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\Ertis.Data\Ertis.Data.csproj" />
+		<ProjectReference Include="..\Ertis.MongoDB.Queries\Ertis.MongoDB.Queries.csproj" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="MongoDB.Driver" Version="3.10.0" />
+	</ItemGroup>
 </Project>

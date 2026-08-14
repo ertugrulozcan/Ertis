@@ -3,5 +3,9 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<PackageId>Ertis.MongoDB.Queries</PackageId>
+		<PackageVersion>10.0.0</PackageVersion>
+		<Version>10.0.0-preview.1</Version>
+		<Authors>Ertuğrul Özcan</Authors>
 	</PropertyGroup>
 </Project>

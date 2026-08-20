@@ -14,7 +14,7 @@ namespace Ertis.MongoDB.Queries
         Or,
         Nor,
         Not,
-        Exist,
+        Exists,
         TypeOf,
         Regex,
         Text,

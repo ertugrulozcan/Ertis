@@ -670,32 +670,32 @@ public static class QueryBuilder
     #region Element Queries
     
     /// <summary>
-    /// Exist ($exist)
+    /// Exists ($exists)
     /// </summary>
     /// <param name="key">Field Name</param>
     /// <param name="value">Operand Value</param>
-    public static IQueryExpression Exist(string key, bool value)
+    public static IQueryExpression Exists(string key, bool value)
     {
         return new QueryExpression
         {
             Field = key,
             Value = new Query
             {
-                Operator = MongoOperator.Exist,
+                Operator = MongoOperator.Exists,
                 Value = new QueryValue<bool>(value)
             }
         };
     }
     
     /// <summary>
-    /// Exist ($exist)
+    /// Exists ($exists)
     /// </summary>
     /// <param name="value">Operand Value</param>
-    public static IQuery Exist(bool value)
+    public static IQuery Exists(bool value)
     {
         return new Query
         {
-            Operator = MongoOperator.Exist,
+            Operator = MongoOperator.Exists,
             Value = new QueryValue<bool>(value)
         };
     }

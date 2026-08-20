@@ -504,9 +504,9 @@ namespace Ertis.Tests.Ertis.MongoDB.Queries.Tests
         #region Element Queries Tests
         
         [Test]
-        public void ExistTest()
+        public void ExistsTest()
         {
-            var query = QueryBuilder.Exist("qty", true);
+            var query = QueryBuilder.Exists("qty", true);
             var queryJson = query.ToString();
             Assert.That(queryJson != null);
             Assert.That("{ \"qty\": { $exists: true } }".Trim() == queryJson?.Trim());

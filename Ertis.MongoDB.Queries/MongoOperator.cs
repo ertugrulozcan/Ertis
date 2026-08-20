@@ -14,7 +14,7 @@ internal enum MongoOperator
 	Or,
 	Nor,
 	Not,
-	Exist,
+	Exists,
 	TypeOf,
 	Regex,
 	Text,

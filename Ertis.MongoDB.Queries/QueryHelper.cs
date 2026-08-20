@@ -20,7 +20,7 @@ internal static class QueryHelper
             MongoOperator.Or => "or",
             MongoOperator.Nor => "nor",
             MongoOperator.Not => "not",
-            MongoOperator.Exist => "exists",
+            MongoOperator.Exists => "exists",
             MongoOperator.TypeOf => "type",
             MongoOperator.Regex => "regex",
             MongoOperator.Text => "text",

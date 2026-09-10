@@ -1366,7 +1366,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 
 	#region Aggregation Methods
 
-	public dynamic Aggregate(string query)
+	public dynamic Aggregate(string query, IndexOptions indexOptions = null, CollationOptions collationOptions = null)
 	{
 		try
 		{
@@ -1377,7 +1377,23 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			var bsonArray = serializer.Deserialize(BsonDeserializationContext.CreateRoot(jsonReader));
 			var bsonDocuments = bsonArray.Select(x => BsonDocument.Parse(x.ToString()));
 			var pipelineDefinition = PipelineDefinition<dynamic, BsonDocument>.Create(bsonDocuments);
-			var aggregationResultCursor = this.Collection.Aggregate(pipelineDefinition);
+			
+			Collation collation = null;
+			if (collationOptions is { Locale: not null })
+			{
+				collation = new Collation(
+					LocaleHelper.GetLanguageCode(collationOptions.Locale.Value),
+					strength: collationOptions.CaseInsensitive ? CollationStrength.Primary : null
+				);
+			}
+			
+			var aggregationOptions = new AggregateOptions
+			{
+				Collation = collation,
+				Hint = indexOptions?.GetIndexHint()
+			};
+			
+			var aggregationResultCursor = this.Collection.Aggregate(pipelineDefinition, aggregationOptions);
 			var documents = aggregationResultCursor.ToList();
 			var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
 			return objects;
@@ -1396,7 +1412,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		}
 	}
 	
-	public async Task<dynamic> AggregateAsync(string query, CancellationToken cancellationToken = default)
+	public async Task<dynamic> AggregateAsync(string query, IndexOptions indexOptions = null, CollationOptions collationOptions = null, CancellationToken cancellationToken = default)
 	{
 		try
 		{
@@ -1407,7 +1423,23 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			var bsonArray = serializer.Deserialize(BsonDeserializationContext.CreateRoot(jsonReader));
 			var bsonDocuments = bsonArray.Select(x => BsonDocument.Parse(x.ToString()));
 			var pipelineDefinition = PipelineDefinition<dynamic, BsonDocument>.Create(bsonDocuments);
-			var aggregationResultCursor = await this.Collection.AggregateAsync(pipelineDefinition, cancellationToken: cancellationToken);
+			
+			Collation collation = null;
+			if (collationOptions is { Locale: not null })
+			{
+				collation = new Collation(
+					LocaleHelper.GetLanguageCode(collationOptions.Locale.Value),
+					strength: collationOptions.CaseInsensitive ? CollationStrength.Primary : null
+				);
+			}
+			
+			var aggregationOptions = new AggregateOptions
+			{
+				Collation = collation,
+				Hint = indexOptions?.GetIndexHint()
+			};
+			
+			var aggregationResultCursor = await this.Collection.AggregateAsync(pipelineDefinition, aggregationOptions, cancellationToken: cancellationToken);
 			var documents = await aggregationResultCursor.ToListAsync(cancellationToken: cancellationToken);
 			var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
 			return objects;

@@ -373,9 +373,9 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 	
 	Task<IPaginationCollection<TEntity>> SearchAsync(string keyword, TextSearchOptions options = null, int? skip = null, int? limit = null, bool? withCount = null, string orderBy = null, SortDirection? sortDirection = null, CancellationToken cancellationToken = default);
 
-	dynamic Aggregate(string aggregationStagesJson);
+	dynamic Aggregate(string aggregationStagesJson, IndexOptions indexOptions = null, CollationOptions collationOptions = null);
 	
-	Task<dynamic> AggregateAsync(string aggregationStagesJson, CancellationToken cancellationToken = default);
+	Task<dynamic> AggregateAsync(string aggregationStagesJson, IndexOptions indexOptions = null, CollationOptions collationOptions = null, CancellationToken cancellationToken = default);
 	
 	Task<IEnumerable<IIndexDefinition>> GetIndexesAsync(CancellationToken cancellationToken = default);
 

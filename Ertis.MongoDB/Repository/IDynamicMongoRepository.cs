@@ -239,9 +239,9 @@ public interface IDynamicMongoRepository : IDynamicRepository<string>
 	
     Task<TField[]> DistinctAsync<TField>(string distinctBy, Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default);
     
-    dynamic Aggregate(string query);
+    dynamic Aggregate(string query, IndexOptions? indexOptions = null, CollationOptions? collationOptions = null);
 	
-    Task<dynamic> AggregateAsync(string query, CancellationToken cancellationToken = default);
+    Task<dynamic> AggregateAsync(string query, IndexOptions? indexOptions = null, CollationOptions? collationOptions = null, CancellationToken cancellationToken = default);
 	
     Task<IEnumerable<IIndexDefinition>> GetIndexesAsync(CancellationToken cancellationToken = default);
     

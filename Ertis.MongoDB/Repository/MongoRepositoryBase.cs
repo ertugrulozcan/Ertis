@@ -1552,14 +1552,30 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 	
 	#region Aggregation Methods
 	
-	public dynamic Aggregate(string aggregationStagesJson)
+	public dynamic Aggregate(string aggregationStagesJson, IndexOptions? indexOptions = null, CollationOptions? collationOptions = null)
 	{
 		try
 		{
 			var jArray = Newtonsoft.Json.Linq.JArray.Parse(aggregationStagesJson);
 			var bsonDocuments = jArray.Select(x => BsonDocument.Parse(QueryHelper.EnsureObjectIdsAndISODates(x.ToString())));
 			var pipelineDefinition = PipelineDefinition<TEntity, BsonDocument>.Create(bsonDocuments);
-			var aggregationResultCursor = this.Collection.Aggregate(pipelineDefinition);
+			
+			Collation? collation = null;
+			if (collationOptions is { Locale: not null })
+			{
+				collation = new Collation(
+					LocaleHelper.GetLanguageCode(collationOptions.Locale.Value),
+					strength: collationOptions.CaseInsensitive ? CollationStrength.Primary : null
+				);
+			}
+			
+			var aggregationOptions = new AggregateOptions
+			{
+				Collation = collation,
+				Hint = indexOptions?.GetIndexHint()
+			};
+			
+			var aggregationResultCursor = this.Collection.Aggregate(pipelineDefinition, aggregationOptions);
 			var documents = aggregationResultCursor.ToList();
 			var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
 			return objects;
@@ -1578,14 +1594,30 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		}
 	}
 	
-	public async Task<dynamic> AggregateAsync(string aggregationStagesJson, CancellationToken cancellationToken = default)
+	public async Task<dynamic> AggregateAsync(string aggregationStagesJson, IndexOptions? indexOptions = null, CollationOptions? collationOptions = null, CancellationToken cancellationToken = default)
 	{
 		try
 		{
 			var jArray = Newtonsoft.Json.Linq.JArray.Parse(aggregationStagesJson);
 			var bsonDocuments = jArray.Select(x => BsonDocument.Parse(QueryHelper.EnsureObjectIdsAndISODates(x.ToString())));
 			var pipelineDefinition = PipelineDefinition<TEntity, BsonDocument>.Create(bsonDocuments);
-			var aggregationResultCursor = await this.Collection.AggregateAsync(pipelineDefinition, cancellationToken: cancellationToken);
+			
+			Collation? collation = null;
+			if (collationOptions is { Locale: not null })
+			{
+				collation = new Collation(
+					LocaleHelper.GetLanguageCode(collationOptions.Locale.Value),
+					strength: collationOptions.CaseInsensitive ? CollationStrength.Primary : null
+				);
+			}
+			
+			var aggregationOptions = new AggregateOptions
+			{
+				Collation = collation,
+				Hint = indexOptions?.GetIndexHint()
+			};
+			
+			var aggregationResultCursor = await this.Collection.AggregateAsync(pipelineDefinition, aggregationOptions, cancellationToken: cancellationToken);
 			var documents = await aggregationResultCursor.ToListAsync(cancellationToken: cancellationToken);
 			var objects = documents.Select(BsonTypeMapper.MapToDotNetValue);
 			return objects;

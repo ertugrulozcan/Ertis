@@ -1,102 +1,114 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types;
 using Ertis.Schema.Types.CustomTypes;
 using Ertis.Schema.Types.Primitives;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Ertis.Schema.Serialization;
 
 public class FieldInfoJsonConverter : JsonConverter<IFieldInfo>
 {
-    public override void WriteJson(JsonWriter writer, IFieldInfo? value, JsonSerializer serializer)
-    {
-        if (value != null)
-        {
-            var jToken = JToken.FromObject(value);
-            jToken.WriteTo(writer);
-        }
-    }
+    #region Methods
     
-    public override IFieldInfo? ReadJson(JsonReader reader, Type objectType, IFieldInfo? existingValue, bool hasExistingValue, JsonSerializer serializer)
-    {
-        var jObject = JObject.Load(reader);
-        return Deserialize(jObject, null);
-    }
+    public override bool CanConvert(Type typeToConvert) => typeof(IFieldInfo).IsAssignableFrom(typeToConvert);
     
-    public static IFieldInfo? Deserialize(JObject jObject, string? fieldName)
+    public override IFieldInfo Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         try
         {
-            if (jObject.ContainsKey("type"))
+            var tempReader = reader;
+            if (tempReader.TokenType != JsonTokenType.StartObject)
             {
-                var fieldTypeName = jObject["type"]?.Value<string>();
-                if (Enum.TryParse(fieldTypeName, out FieldType fieldType))
+                throw new JsonException();
+            }
+            
+            var depth = 1;
+            while (tempReader.Read())
+            {
+                // ReSharper disable once ConvertIfStatementToSwitchStatement
+                if (tempReader.TokenType == JsonTokenType.PropertyName)
                 {
-                    var json = jObject.ToString(Formatting.None);
-                    IFieldInfo? fieldInfo = fieldType switch
+                    var propertyName = tempReader.GetString();
+                    if (propertyName == "type" && depth == 1)
                     {
-                        // Primitive Types
-                        FieldType.@object => JsonConvert.DeserializeObject<ObjectFieldInfo>(json, new FieldInfoCollectionJsonConverter()),
-                        FieldType.@string => JsonConvert.DeserializeObject<StringFieldInfo>(json),
-                        FieldType.integer => JsonConvert.DeserializeObject<IntegerFieldInfo>(json),
-                        FieldType.@float => JsonConvert.DeserializeObject<FloatFieldInfo>(json),
-                        FieldType.boolean => JsonConvert.DeserializeObject<BooleanFieldInfo>(json),
-                        FieldType.array => JsonConvert.DeserializeObject<ArrayFieldInfo>(json),
-                        FieldType.@enum => JsonConvert.DeserializeObject<EnumFieldInfo>(json),
-                        FieldType.@const => JsonConvert.DeserializeObject<ConstantFieldInfo>(json),
-                        
-                        // Custom Types
-                        FieldType.tags => JsonConvert.DeserializeObject<TagsFieldInfo>(json),
-                        FieldType.json => JsonConvert.DeserializeObject<JsonFieldInfo>(json),
-                        FieldType.date => JsonConvert.DeserializeObject<DateFieldInfo>(json),
-                        FieldType.datetime => JsonConvert.DeserializeObject<DateTimeFieldInfo>(json),
-                        FieldType.longtext => JsonConvert.DeserializeObject<LongTextFieldInfo>(json),
-                        FieldType.richtext => JsonConvert.DeserializeObject<RichTextFieldInfo>(json),
-                        FieldType.email => JsonConvert.DeserializeObject<EmailAddressFieldInfo>(json),
-                        FieldType.uri => JsonConvert.DeserializeObject<UriFieldInfo>(json),
-                        FieldType.hostname => JsonConvert.DeserializeObject<HostNameFieldInfo>(json),
-                        FieldType.color => JsonConvert.DeserializeObject<ColorFieldInfo>(json),
-                        FieldType.location => JsonConvert.DeserializeObject<LocationFieldInfo>(json),
-                        FieldType.reference => JsonConvert.DeserializeObject<ReferenceFieldInfo>(json),
-                        FieldType.code => JsonConvert.DeserializeObject<CodeFieldInfo>(json),
-                        FieldType.image => JsonConvert.DeserializeObject<ImageFieldInfo>(json),
-                        FieldType.video => JsonConvert.DeserializeObject<VideoFieldInfo>(json),
-                        FieldType.nestedType => JsonConvert.DeserializeObject<NestedTypeFieldInfo>(json, new FieldInfoCollectionJsonConverter()),
-                        FieldType.photoGallery => JsonConvert.DeserializeObject<PhotoGalleryFieldInfo>(json),
-                        
-                        // Unknown Type
-                        _ => throw new SchemaValidationException($"Unknown field type : '{fieldTypeName}' ({fieldName})")
-                    };
-                    
-                    if (fieldInfo != null && fieldName != null)
-                    {
-                        fieldInfo.Name = fieldName;
+                        tempReader.Read();
+                        var fieldTypeName = tempReader.GetString();
+                        if (!string.IsNullOrEmpty(fieldTypeName))
+                        {
+                            if (Enum.TryParse(fieldTypeName, out FieldType fieldType))
+                            {
+                                var type = fieldType switch
+                                {
+                                    FieldType.@object => typeof(ObjectFieldInfo),
+                                    FieldType.@string => typeof(StringFieldInfo),
+                                    FieldType.integer => typeof(IntegerFieldInfo),
+                                    FieldType.@float => typeof(FloatFieldInfo),
+                                    FieldType.boolean => typeof(BooleanFieldInfo),
+                                    FieldType.array => typeof(ArrayFieldInfo),
+                                    FieldType.@enum => typeof(EnumFieldInfo),
+                                    FieldType.@const => typeof(ConstantFieldInfo),
+                                    FieldType.tags => typeof(TagsFieldInfo),
+                                    FieldType.json => typeof(JsonFieldInfo),
+                                    FieldType.date => typeof(DateFieldInfo),
+                                    FieldType.datetime => typeof(DateTimeFieldInfo),
+                                    FieldType.longtext => typeof(LongTextFieldInfo),
+                                    FieldType.richtext => typeof(RichTextFieldInfo),
+                                    FieldType.email => typeof(EmailAddressFieldInfo),
+                                    FieldType.uri => typeof(UriFieldInfo),
+                                    FieldType.hostname => typeof(HostNameFieldInfo),
+                                    FieldType.color => typeof(ColorFieldInfo),
+                                    FieldType.location => typeof(LocationFieldInfo),
+                                    FieldType.reference => typeof(ReferenceFieldInfo),
+                                    FieldType.code => typeof(CodeFieldInfo),
+                                    FieldType.image => typeof(ImageFieldInfo),
+                                    FieldType.video => typeof(VideoFieldInfo),
+                                    FieldType.nestedType => typeof(NestedTypeFieldInfo),
+                                    FieldType.photoGallery => typeof(PhotoGalleryFieldInfo),
+                                    
+                                    _ => throw new SchemaValidationException($"Unknown field type : '{fieldTypeName}'")
+                                };
+                                
+                                return (JsonSerializer.Deserialize(ref reader, type) as IFieldInfo)!;
+                            }
+                            else
+                            {
+                                throw new SchemaValidationException($"Unknown field type : '{fieldTypeName}'");
+                            }
+                        }
+                        else
+                        {
+                            throw new SchemaValidationException("Field info type missing");
+                        }
                     }
-                    
-                    return fieldInfo;
                 }
-                else
+                else if (tempReader.TokenType is JsonTokenType.StartObject or JsonTokenType.StartArray)
                 {
-                    throw new SchemaValidationException($"Unknown field type : '{fieldTypeName}' ({fieldName})");
+                    depth++;
+                }
+                else if (tempReader.TokenType is JsonTokenType.EndObject or JsonTokenType.EndArray)
+                {
+                    depth--;
                 }
             }
-            else
-            {
-                throw new SchemaValidationException($"Field type is required ({fieldName})");
-            }
+            
+            throw new SchemaValidationException("Field info type missing");
         }
         catch (Exception ex)
         {
-            switch (ex.InnerException)
+            throw ex.InnerException switch
             {
-                case FieldValidationException:
-                    throw ex.InnerException;
-                case SchemaValidationException:
-                    throw ex.InnerException;
-                default:
-                    throw new SchemaValidationException(ex.Message);
-            }
+                FieldValidationException => ex.InnerException,
+                SchemaValidationException => ex.InnerException,
+                _ => new SchemaValidationException(ex.Message)
+            };
         }
     }
+    
+    public override void Write(Utf8JsonWriter writer, IFieldInfo fieldInfo, JsonSerializerOptions options)
+    {
+        JsonSerializer.Serialize(writer, fieldInfo, fieldInfo.GetType(), options);
+    }
+    
+    #endregion
 }

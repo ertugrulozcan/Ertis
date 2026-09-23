@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
 using Ertis.Schema.Serialization;
+using Ertis.Schema.Serialization.Legacy;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
 using DynamicObject = Ertis.Schema.Dynamics.Legacy.DynamicObject;
@@ -21,6 +22,7 @@ public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
     public override FieldType Type => FieldType.nestedType;
     
     [JsonPropertyName("properties")]
+    [JsonConverter(typeof(FieldInfoCollectionJsonConverterFactory))]
     [Newtonsoft.Json.JsonProperty("properties")]
     [Newtonsoft.Json.JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
     public override IReadOnlyCollection<IFieldInfo> Properties

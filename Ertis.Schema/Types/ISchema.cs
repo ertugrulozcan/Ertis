@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Ertis.Schema.Dynamics.Legacy;
 using Ertis.Schema.Serialization;
+using Ertis.Schema.Serialization.Legacy;
 using Ertis.Schema.Validation;
 
 // ReSharper disable UnusedMember.Global
@@ -16,6 +17,7 @@ public interface ISchema
 	string Slug { get; }
 	
 	[JsonPropertyName("properties")]
+	[JsonConverter(typeof(FieldInfoCollectionJsonConverterFactory))]
 	[Newtonsoft.Json.JsonProperty("properties")]
 	[Newtonsoft.Json.JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
 	IReadOnlyCollection<IFieldInfo> Properties { get; }

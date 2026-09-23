@@ -1,25 +1,24 @@
-using Ertis.Schema.Dynamics.Legacy;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Ertis.Schema.Dynamics;
 
 // ReSharper disable UnusedType.Global
 namespace Ertis.Schema.Serialization;
 
 public class DynamicObjectJsonConverter : JsonConverter<DynamicObject>
 {
-	public override void WriteJson(JsonWriter writer, DynamicObject? value, JsonSerializer serializer)
+	#region Methods
+	
+	public override DynamicObject? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 	{
-		if (value != null)
-		{
-			var jToken = JToken.Parse(value.ToJson());
-			jToken.WriteTo(writer);
-		}
+		var json = reader.GetString();
+		return string.IsNullOrEmpty(json) ? null : DynamicObject.Parse(json);
 	}
 	
-	public override DynamicObject ReadJson(JsonReader reader, Type objectType, DynamicObject? existingValue, bool hasExistingValue, JsonSerializer serializer)
+	public override void Write(Utf8JsonWriter writer, DynamicObject dynamicObject, JsonSerializerOptions options)
 	{
-		var jObject = JObject.Load(reader);
-		var json = jObject.ToString(Formatting.None);
-		return DynamicObject.Parse(json);
+		writer.WriteStringValue(dynamicObject.ToJson());
 	}
+	
+	#endregion
 }

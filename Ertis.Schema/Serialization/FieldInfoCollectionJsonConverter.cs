@@ -1,67 +1,120 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Types;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
-// ReSharper disable UnusedMember.Global
 namespace Ertis.Schema.Serialization;
 
-public class FieldInfoCollectionJsonConverter : JsonConverter<IEnumerable<IFieldInfo>>
+public sealed class FieldInfoCollectionJsonConverterFactory : JsonConverterFactory
 {
-	public override void WriteJson(JsonWriter writer, IEnumerable<IFieldInfo>? value, JsonSerializer serializer)
-	{
-		if (value != null)
-		{
-			ToJsonObject(value).WriteTo(writer);
-		}
-	}
-	
-	public override IEnumerable<IFieldInfo> ReadJson(JsonReader reader, Type objectType, IEnumerable<IFieldInfo>? existingValue, bool hasExistingValue, JsonSerializer serializer)
-	{
-		var jObject = JObject.Load(reader);
-		return Deserialize(jObject);
-	}
-	
-	private static IEnumerable<IFieldInfo> Deserialize(JObject rootNode)
-	{
-		var fieldInfoList = new List<IFieldInfo>();
-		foreach (var (name, jToken) in rootNode)
-		{
-			if (jToken is JObject jObject)
-			{
-				var fieldInfo = FieldInfoJsonConverter.Deserialize(jObject, name);
-				if (fieldInfo != null)
-				{
-					fieldInfoList.Add(fieldInfo);
-				}
-			}
-		}
-		
-		return fieldInfoList;
-	}
-	
-	private static JObject ToJsonObject(IEnumerable<IFieldInfo> properties)
-	{
-		var rootNode = new JObject();
-		foreach (var fieldInfo in properties)
-		{
-			if (!string.IsNullOrEmpty(fieldInfo.Name))
-			{
-				var jObject = JObject.FromObject(fieldInfo);
-				jObject.Remove("name");
-				rootNode.Add(fieldInfo.Name, jObject);
-			}
-		}
-		
-		return rootNode;
-	}
-	
-	public static string Serialize(IEnumerable<IFieldInfo> properties)
-	{
-		return ToJsonObject(properties).ToString();
-	}
-	
-	public static IEnumerable<IFieldInfo>? Deserialize(string json)
-	{
-		return string.IsNullOrEmpty(json) ? null : Deserialize(JObject.Parse(json));
-	}
+    #region Methods
+    
+    public override bool CanConvert(Type typeToConvert)
+    {
+        if (!typeof(IEnumerable<IFieldInfo>).IsAssignableFrom(typeToConvert))
+        {
+            return false;
+        }
+        
+        if (typeToConvert.IsArray)
+        {
+            return true;
+        }
+        
+        // IEnumerable, IReadOnlyCollection, IReadOnlyList, ICollection, IList, List<IFieldInfo>
+        return typeToConvert.IsAssignableFrom(typeof(List<IFieldInfo>));
+    }
+    
+    public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
+    {
+        var converterType = typeof(FieldInfoCollectionJsonConverter<>).MakeGenericType(typeToConvert);
+        return (JsonConverter)Activator.CreateInstance(converterType)!;
+    }
+    
+    #endregion
+}
+
+public sealed class FieldInfoCollectionJsonConverter<TCollection> : JsonConverter<TCollection> where TCollection : IEnumerable<IFieldInfo>
+{
+    #region Methods
+    
+    private static string GetNameKey(JsonSerializerOptions options)
+    {
+        return options.PropertyNamingPolicy?.ConvertName(nameof(IFieldInfo.Name)) ?? nameof(IFieldInfo.Name);
+    }
+    
+    public override void Write(Utf8JsonWriter writer, TCollection value, JsonSerializerOptions options)
+    {
+        var writtenNames = new HashSet<string>(StringComparer.Ordinal);
+        var nameKey = GetNameKey(options);
+        
+        writer.WriteStartObject();
+        
+        foreach (var field in value)
+        {
+            if (!writtenNames.Add(field.Name))
+            {
+                throw new JsonException($"Duplicate field name: '{field.Name}'.");
+            }
+            
+            writer.WritePropertyName(field.Name);
+            
+            var node = JsonSerializer.SerializeToNode(field, options)!.AsObject();
+            node.Remove(nameKey);
+            node.WriteTo(writer, options);
+        }
+        
+        writer.WriteEndObject();
+    }
+
+    public override TCollection Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType != JsonTokenType.StartObject)
+        {
+            throw new JsonException($"Expected StartObject but got {reader.TokenType}.");
+        }
+        
+        var fields = new List<IFieldInfo>();
+        while (reader.Read())
+        {
+            if (reader.TokenType == JsonTokenType.EndObject)
+            {
+                return CreateCollection(fields);
+            }
+            
+            if (reader.TokenType != JsonTokenType.PropertyName)
+            {
+                throw new JsonException($"Expected PropertyName but got {reader.TokenType}.");
+            }
+            
+            var nameKey = GetNameKey(options);
+            
+            reader.Read();
+            
+            var node = JsonNode.Parse(ref reader)!.AsObject();
+            node[GetNameKey(options)] = nameKey;
+            
+            var field = node.Deserialize<IFieldInfo>(options);
+            if (field is null)
+            {
+                throw new JsonException("Field value cannot be null.");
+            }
+            
+            fields.Add(field);
+        }
+        
+        throw new JsonException("Unexpected end of JSON.");
+    }
+    
+    private static TCollection CreateCollection(List<IFieldInfo> fields)
+    {
+        if (typeof(TCollection).IsArray)
+        {
+            return (TCollection)(object)fields.ToArray();
+        }
+        
+        return (TCollection)(object)fields;
+    }
+    
+    #endregion
 }

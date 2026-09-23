@@ -1,9 +1,7 @@
 using System.Linq.Expressions;
-using System.Reflection;
 using Ertis.Core.Collections;
 using Ertis.Data.Models;
 using Ertis.Data.Repository;
-using Ertis.MongoDB.Attributes;
 using Ertis.MongoDB.Client;
 using Ertis.MongoDB.Configuration;
 using Ertis.MongoDB.Exceptions;
@@ -12,7 +10,6 @@ using Ertis.MongoDB.Models;
 using Ertis.MongoDB.Queries;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using SortDirection = Ertis.Core.Collections.SortDirection;
 using UpdateOptions = Ertis.Data.Models.UpdateOptions;
@@ -57,7 +54,6 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		
 		this.CollectionName = collectionName;
 		this.Collection = database.GetCollection<TEntity>(collectionName);
-		this.CreateSearchIndexesAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 		
 		this._actionBinder = actionBinder;
 	}
@@ -299,52 +295,6 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		else
 		{
 			throw new IndexException("No fields defined");
-		}
-	}
-	
-	private async Task CreateSearchIndexesAsync(CancellationToken cancellationToken = default)
-	{
-		try
-		{
-			var currentIndexesCursor = await this.Collection.Indexes.ListAsync(cancellationToken: cancellationToken);
-			var currentIndexes = await currentIndexesCursor.ToListAsync(cancellationToken: cancellationToken);
-			var currentTextIndexes = currentIndexes.Where(x =>
-				x.Contains("key") &&
-				x["key"].IsBsonDocument &&
-				x["key"].AsBsonDocument.Contains("_fts") &&
-				x["key"].AsBsonDocument["_fts"].IsString &&
-				x["key"].AsBsonDocument["_fts"].AsString == "text");
-			
-			var indexedPropertyNames = currentTextIndexes.SelectMany(x => x["weights"].AsBsonDocument.Names).ToArray();
-			var nonIndexedPropertyNames = new List<string>();
-			
-			var propertyInfos = typeof(TEntity).GetProperties();
-			foreach (var propertyInfo in propertyInfos)
-			{
-				var searchableAttribute = propertyInfo.GetCustomAttribute(typeof(SearchableAttribute), true);
-				if (searchableAttribute is SearchableAttribute)
-				{
-					var attribute = propertyInfo.GetCustomAttribute(typeof(BsonElementAttribute), true);
-					if (attribute is BsonElementAttribute bsonElementAttribute)
-					{
-						if (!indexedPropertyNames.Contains(bsonElementAttribute.ElementName))
-						{
-							nonIndexedPropertyNames.Add(bsonElementAttribute.ElementName);
-						}
-					}
-				}
-			}
-			
-			if (nonIndexedPropertyNames.Any())
-			{
-				var combinedTextIndexDefinition = Builders<TEntity>.IndexKeys.Combine(nonIndexedPropertyNames.Select(x => Builders<TEntity>.IndexKeys.Text(x)));
-				await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<TEntity>(combinedTextIndexDefinition), cancellationToken: cancellationToken);	
-			}
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine($"An error occured while creating search indexes for '{typeof(TEntity).Name}' entity type;");
-			Console.WriteLine(ex);
 		}
 	}
 	

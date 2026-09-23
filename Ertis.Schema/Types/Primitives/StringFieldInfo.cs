@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using Ertis.Schema.Dynamics.Legacy;
+using Ertis.Schema.Dynamics;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
 

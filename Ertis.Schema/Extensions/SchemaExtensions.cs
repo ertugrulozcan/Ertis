@@ -1,4 +1,4 @@
-using Ertis.Schema.Dynamics.Legacy;
+using Ertis.Schema.Dynamics;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types;
 using Ertis.Schema.Types.CustomTypes;
@@ -357,7 +357,7 @@ public static class SchemaExtensions
         if (fieldInfo is ConstantFieldInfo constantFieldInfo)
         {
             var path = fieldInfo.GetSelfPath(schema);
-            model.TrySetValue(path, constantFieldInfo.Value, out _, true);
+            model.TrySetValue(path, constantFieldInfo, out _, true);
         }
     }
     

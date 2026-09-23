@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Ertis.Schema.Dynamics.Legacy;
+using Ertis.Schema.Dynamics;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
 using Ertis.Schema.Serialization;

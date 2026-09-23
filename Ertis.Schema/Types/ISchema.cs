@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Ertis.Schema.Dynamics.Legacy;
+using Ertis.Schema.Dynamics;
 using Ertis.Schema.Serialization;
 using Ertis.Schema.Serialization.Legacy;
 using Ertis.Schema.Validation;

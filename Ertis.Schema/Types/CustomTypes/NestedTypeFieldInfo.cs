@@ -7,7 +7,7 @@ using Ertis.Schema.Serialization;
 using Ertis.Schema.Serialization.Legacy;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
-using DynamicObject = Ertis.Schema.Dynamics.Legacy.DynamicObject;
+using DynamicObject = Ertis.Schema.Dynamics.DynamicObject;
 
 namespace Ertis.Schema.Types.CustomTypes;
 

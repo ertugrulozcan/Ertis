@@ -1,4 +1,4 @@
-using Ertis.Schema.Dynamics.Legacy;
+using Ertis.Schema.Dynamics;
 
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global

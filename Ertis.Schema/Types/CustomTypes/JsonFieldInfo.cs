@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Ertis.Schema.Dynamics.Legacy;
 
 namespace Ertis.Schema.Types.CustomTypes;
 
@@ -16,19 +15,6 @@ public class JsonFieldInfo : FieldInfo<object>
     #endregion
     
     #region Methods
-    
-    public override object? GetDefaultValue()
-    {
-        var defaultValue = base.GetDefaultValue();
-        if (defaultValue is Newtonsoft.Json.Linq.JObject jObject)
-        {
-            return DynamicObject.Load(jObject).ToDynamic();
-        }
-        else
-        {
-            return defaultValue;
-        }
-    }
     
     public override object Clone()
     {

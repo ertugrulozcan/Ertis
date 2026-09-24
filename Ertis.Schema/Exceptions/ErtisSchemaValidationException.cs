@@ -8,10 +8,9 @@ public abstract class ErtisSchemaValidationException : Exception
 	/// Constructor
 	/// </summary>
 	/// <param name="message"></param>
-	protected ErtisSchemaValidationException(string message) : base(message)
-	{
-		
-	}
+	/// <param name="innerException"></param>
+	protected ErtisSchemaValidationException(string message, Exception? innerException = null) : base(message, innerException)
+	{ }
 	
 	#endregion
 }

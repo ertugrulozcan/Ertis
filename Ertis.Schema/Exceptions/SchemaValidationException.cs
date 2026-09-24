@@ -7,7 +7,7 @@ public class SchemaValidationException : ErtisSchemaValidationException
 	/// <summary>
 	/// Constructor
 	/// </summary>
-	public SchemaValidationException(string message) : base(message)
+	public SchemaValidationException(string message, Exception? innerException = null) : base(message, innerException)
 	{ }
 	
 	#endregion

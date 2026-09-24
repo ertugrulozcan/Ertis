@@ -4,10 +4,13 @@ using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
 using Ertis.Schema.Serialization;
-using Ertis.Schema.Serialization.Legacy;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
+
 using DynamicObject = Ertis.Schema.Dynamics.DynamicObject;
+using NewtonsoftJsonProperty = Newtonsoft.Json.JsonPropertyAttribute;
+using NewtonsoftJsonConverter = Newtonsoft.Json.JsonConverterAttribute;
+using NewtonsoftFieldInfoCollectionJsonConverter = Ertis.Schema.Serialization.Legacy.FieldInfoCollectionJsonConverter;
 
 namespace Ertis.Schema.Types.CustomTypes;
 
@@ -17,14 +20,14 @@ public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
     
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    [Newtonsoft.Json.JsonProperty("type")]
-    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+    [NewtonsoftJsonProperty("type")]
+    [NewtonsoftJsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public override FieldType Type => FieldType.nestedType;
     
     [JsonPropertyName("properties")]
     [JsonConverter(typeof(FieldInfoCollectionJsonConverterFactory))]
-    [Newtonsoft.Json.JsonProperty("properties")]
-    [Newtonsoft.Json.JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
+    [NewtonsoftJsonProperty("properties")]
+    [NewtonsoftJsonConverter(typeof(NewtonsoftFieldInfoCollectionJsonConverter))]
     public override IReadOnlyCollection<IFieldInfo> Properties
     {
         get;
@@ -44,12 +47,21 @@ public sealed class NestedTypeFieldInfo : ObjectFieldInfoBase
     }
     
     [JsonPropertyName("nestedTypeId")]
-    [Newtonsoft.Json.JsonProperty("nestedTypeId")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [NewtonsoftJsonProperty("nestedTypeId", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public string? NestedTypeId { get; set; }
     
     #endregion
     
     #region Constructors
+    
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    public NestedTypeFieldInfo()
+    {
+        this.Properties = new ReadOnlyCollection<IFieldInfo>(new List<IFieldInfo>());
+    }
     
     /// <summary>
     /// Constructor

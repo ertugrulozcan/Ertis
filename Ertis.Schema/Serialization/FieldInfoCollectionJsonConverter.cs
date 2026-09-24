@@ -28,7 +28,7 @@ public sealed class FieldInfoCollectionJsonConverterFactory : JsonConverterFacto
     public override JsonConverter CreateConverter(Type typeToConvert, JsonSerializerOptions options)
     {
         var converterType = typeof(FieldInfoCollectionJsonConverter<>).MakeGenericType(typeToConvert);
-        return (JsonConverter)Activator.CreateInstance(converterType)!;
+        return (JsonConverter) Activator.CreateInstance(converterType)!;
     }
     
     #endregion
@@ -37,11 +37,6 @@ public sealed class FieldInfoCollectionJsonConverterFactory : JsonConverterFacto
 public sealed class FieldInfoCollectionJsonConverter<TCollection> : JsonConverter<TCollection> where TCollection : IEnumerable<IFieldInfo>
 {
     #region Methods
-    
-    private static string GetNameKey(JsonSerializerOptions options)
-    {
-        return options.PropertyNamingPolicy?.ConvertName(nameof(IFieldInfo.Name)) ?? nameof(IFieldInfo.Name);
-    }
     
     public override void Write(Utf8JsonWriter writer, TCollection value, JsonSerializerOptions options)
     {
@@ -79,7 +74,12 @@ public sealed class FieldInfoCollectionJsonConverter<TCollection> : JsonConverte
         {
             if (reader.TokenType == JsonTokenType.EndObject)
             {
-                return CreateCollection(fields);
+                if (typeof(TCollection).IsArray)
+                {
+                    return (TCollection)(object) fields.ToArray();
+                }
+                
+                return (TCollection)(object) fields;
             }
             
             if (reader.TokenType != JsonTokenType.PropertyName)
@@ -88,11 +88,17 @@ public sealed class FieldInfoCollectionJsonConverter<TCollection> : JsonConverte
             }
             
             var nameKey = GetNameKey(options);
+            var name = reader.GetString();
             
             reader.Read();
             
             var node = JsonNode.Parse(ref reader)!.AsObject();
-            node[GetNameKey(options)] = nameKey;
+            node[nameKey] = name;
+            
+            if (node["type"]?.GetValue<string>() == FieldType.array.ToString())
+            {
+                node["itemSchema"]?[nameKey] = "$schema";
+            }
             
             var field = node.Deserialize<IFieldInfo>(options);
             if (field is null)
@@ -106,14 +112,9 @@ public sealed class FieldInfoCollectionJsonConverter<TCollection> : JsonConverte
         throw new JsonException("Unexpected end of JSON.");
     }
     
-    private static TCollection CreateCollection(List<IFieldInfo> fields)
+    private static string GetNameKey(JsonSerializerOptions options)
     {
-        if (typeof(TCollection).IsArray)
-        {
-            return (TCollection)(object)fields.ToArray();
-        }
-        
-        return (TCollection)(object)fields;
+        return options.PropertyNamingPolicy?.ConvertName(nameof(IFieldInfo.Name)) ?? nameof(IFieldInfo.Name);
     }
     
     #endregion

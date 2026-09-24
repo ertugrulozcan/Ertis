@@ -196,11 +196,11 @@ public static class SchemaExtensions
         {
             if (schema is IFieldInfo fieldInfo)
             {
-                exception = new FieldValidationException("Duplicate property declaration. Property names are must be unique.", fieldInfo);    
+                exception = new FieldValidationException("Duplicate property declaration in a field info. Property names are must be unique.", fieldInfo);    
             }
             else
             {
-                exception = new SchemaValidationException("Duplicate property declaration. Property names are must be unique.");
+                exception = new SchemaValidationException("Duplicate property declaration in schema. Property names are must be unique.");
             }
             
             return false;

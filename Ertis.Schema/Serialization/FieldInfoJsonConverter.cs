@@ -1,3 +1,4 @@
+using System.Runtime.ExceptionServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
@@ -10,8 +11,6 @@ namespace Ertis.Schema.Serialization;
 public class FieldInfoJsonConverter : JsonConverter<IFieldInfo>
 {
     #region Methods
-    
-    public override bool CanConvert(Type typeToConvert) => typeof(IFieldInfo).IsAssignableFrom(typeToConvert);
     
     public override IFieldInfo Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
@@ -69,7 +68,7 @@ public class FieldInfoJsonConverter : JsonConverter<IFieldInfo>
                                     _ => throw new SchemaValidationException($"Unknown field type : '{fieldTypeName}'")
                                 };
                                 
-                                return (JsonSerializer.Deserialize(ref reader, type) as IFieldInfo)!;
+                                return (IFieldInfo) JsonSerializer.Deserialize(ref reader, type, options)!;
                             }
                             else
                             {
@@ -94,14 +93,14 @@ public class FieldInfoJsonConverter : JsonConverter<IFieldInfo>
             
             throw new SchemaValidationException("Field info type missing");
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not FieldValidationException and not SchemaValidationException)
         {
-            throw ex.InnerException switch
+            if (ex.InnerException is FieldValidationException or SchemaValidationException)
             {
-                FieldValidationException => ex.InnerException,
-                SchemaValidationException => ex.InnerException,
-                _ => new SchemaValidationException(ex.Message)
-            };
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            }
+            
+            throw new SchemaValidationException($"FieldInfo cannot be deserialized: {ex.Message}", ex);
         }
     }
     

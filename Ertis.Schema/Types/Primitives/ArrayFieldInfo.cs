@@ -5,6 +5,11 @@ using Ertis.Schema.Extensions;
 using Ertis.Schema.Serialization;
 using Ertis.Schema.Validation;
 
+using NewtonsoftJsonProperty = Newtonsoft.Json.JsonPropertyAttribute;
+using NewtonsoftJsonConverter = Newtonsoft.Json.JsonConverterAttribute;
+using NewtonsoftFieldInfoJsonConverter = Ertis.Schema.Serialization.Legacy.FieldInfoJsonConverter;
+using NewtonsoftStringEnumConverter = Newtonsoft.Json.Converters.StringEnumConverter;
+
 namespace Ertis.Schema.Types.Primitives;
 
 public class ArrayFieldInfo : FieldInfo<Array>
@@ -13,13 +18,14 @@ public class ArrayFieldInfo : FieldInfo<Array>
     
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    [Newtonsoft.Json.JsonProperty("type")]
-    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+    [NewtonsoftJsonProperty("type")]
+    [NewtonsoftJsonConverter(typeof(NewtonsoftStringEnumConverter))]
     public override FieldType Type => FieldType.array;
     
     [JsonPropertyName("itemSchema")]
-    [Newtonsoft.Json.JsonProperty("itemSchema")]
-    [Newtonsoft.Json.JsonConverter(typeof(FieldInfoJsonConverter))]
+    [NewtonsoftJsonProperty("itemSchema")]
+    [JsonConverter(typeof(FieldInfoJsonConverter))]
+    [NewtonsoftJsonConverter(typeof(NewtonsoftFieldInfoJsonConverter))]
     public IFieldInfo? ItemSchema
     {
         get;
@@ -45,7 +51,7 @@ public class ArrayFieldInfo : FieldInfo<Array>
     
     [JsonPropertyName("minCount")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [Newtonsoft.Json.JsonProperty("minCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    [NewtonsoftJsonProperty("minCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MinCount
     {
         get;
@@ -62,7 +68,7 @@ public class ArrayFieldInfo : FieldInfo<Array>
     
     [JsonPropertyName("maxCount")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [Newtonsoft.Json.JsonProperty("maxCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    [NewtonsoftJsonProperty("maxCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public int? MaxCount
     {
         get;
@@ -79,12 +85,12 @@ public class ArrayFieldInfo : FieldInfo<Array>
     
     [JsonPropertyName("uniqueItems")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    [Newtonsoft.Json.JsonProperty("uniqueItems", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
+    [NewtonsoftJsonProperty("uniqueItems", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public bool UniqueItems { get; init; }
     
     [JsonPropertyName("uniqueBy")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    [Newtonsoft.Json.JsonProperty("uniqueBy", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
+    [NewtonsoftJsonProperty("uniqueBy", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public IEnumerable<string>? UniqueBy
     {
         get;

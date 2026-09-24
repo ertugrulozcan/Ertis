@@ -3,6 +3,11 @@ using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
 
+using NewtonsoftJsonIgnore = Newtonsoft.Json.JsonIgnoreAttribute;
+using NewtonsoftJsonProperty = Newtonsoft.Json.JsonPropertyAttribute;
+using NewtonsoftJsonConverter = Newtonsoft.Json.JsonConverterAttribute;
+using NewtonsoftStringEnumConverter = Newtonsoft.Json.Converters.StringEnumConverter;
+
 // ReSharper disable UnusedMethodReturnValue.Local
 namespace Ertis.Schema.Types;
 
@@ -10,8 +15,6 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
 {
     #region Properties
     
-    [JsonIgnore]
-    [Newtonsoft.Json.JsonIgnore]
     public required string Name
     {
         get;
@@ -23,7 +26,7 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     }
     
     [JsonIgnore]
-    [Newtonsoft.Json.JsonIgnore]
+    [NewtonsoftJsonIgnore]
     public IFieldInfo? Parent
     {
         get;
@@ -35,7 +38,7 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     }
     
     [JsonIgnore]
-    [Newtonsoft.Json.JsonIgnore]
+    [NewtonsoftJsonIgnore]
     public string Path
     {
         get
@@ -52,7 +55,7 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     
     [JsonPropertyName("displayName")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [Newtonsoft.Json.JsonProperty("displayName", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    [NewtonsoftJsonProperty("displayName", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public string DisplayName
     {
         get => field ?? this.Name;
@@ -65,7 +68,7 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     
     [JsonPropertyName("description")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    [Newtonsoft.Json.JsonProperty("description", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
+    [NewtonsoftJsonProperty("description", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public string? Description
     {
         get;
@@ -78,13 +81,13 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    [Newtonsoft.Json.JsonProperty("type")]
-    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+    [NewtonsoftJsonProperty("type")]
+    [NewtonsoftJsonConverter(typeof(NewtonsoftStringEnumConverter))]
     public abstract FieldType Type { get; }
     
     [JsonPropertyName("isRequired")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    [Newtonsoft.Json.JsonProperty("isRequired", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
+    [NewtonsoftJsonProperty("isRequired", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public bool IsRequired
     {
         get;
@@ -97,7 +100,7 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     
     [JsonPropertyName("isVirtual")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    [Newtonsoft.Json.JsonProperty("isVirtual", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
+    [NewtonsoftJsonProperty("isVirtual", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public bool IsVirtual
     {
         get;
@@ -110,7 +113,7 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     
     [JsonPropertyName("isHidden")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    [Newtonsoft.Json.JsonProperty("isHidden", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
+    [NewtonsoftJsonProperty("isHidden", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public bool IsHidden
     {
         get;
@@ -123,7 +126,7 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     
     [JsonPropertyName("isReadonly")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    [Newtonsoft.Json.JsonProperty("isReadonly", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
+    [NewtonsoftJsonProperty("isReadonly", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public bool IsReadonly
     {
         get;
@@ -136,7 +139,7 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     
     [JsonPropertyName("appearance")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    [Newtonsoft.Json.JsonProperty("appearance", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
+    [NewtonsoftJsonProperty("appearance", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public string? Appearance
     {
         get;
@@ -148,12 +151,12 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     }
     
     [JsonIgnore]
-    [Newtonsoft.Json.JsonIgnore]
+    [NewtonsoftJsonIgnore]
     protected internal object? CurrentObject { get; private set; }
     
     [JsonPropertyName("isSearchable")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    [Newtonsoft.Json.JsonProperty("isSearchable", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
+    [NewtonsoftJsonProperty("isSearchable", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public bool IsSearchable
     {
         get;
@@ -166,7 +169,7 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     
     [JsonPropertyName("searchWeight")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    [Newtonsoft.Json.JsonProperty("searchWeight", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
+    [NewtonsoftJsonProperty("searchWeight", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public double? SearchWeight
     {
         get;
@@ -288,7 +291,7 @@ public abstract class FieldInfo<T> : FieldInfo, IHasDefault<T>
     
     [JsonPropertyName("defaultValue")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    [Newtonsoft.Json.JsonProperty("defaultValue", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
+    [NewtonsoftJsonProperty("defaultValue", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public T? DefaultValue
     {
         get;

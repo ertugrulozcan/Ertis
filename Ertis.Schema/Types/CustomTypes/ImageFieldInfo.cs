@@ -20,7 +20,7 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
     public override IReadOnlyCollection<IFieldInfo> Properties { get; init; }
     
     [JsonPropertyName("multiple")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     [Newtonsoft.Json.JsonProperty("multiple", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
     public bool Multiple { get; set; }
     
@@ -154,14 +154,17 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
     public int? RecommendedHeight { get; set; }
     
     [JsonPropertyName("maxSizesRequired")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     [Newtonsoft.Json.JsonProperty("maxSizesRequired")]
     public bool MaxSizesRequired { get; set; }
     
     [JsonPropertyName("minSizesRequired")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     [Newtonsoft.Json.JsonProperty("minSizesRequired")]
     public bool MinSizesRequired { get; set; }
     
     [JsonPropertyName("aspectRatioRequired")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     [Newtonsoft.Json.JsonProperty("aspectRatioRequired")]
     public bool AspectRatioRequired { get; set; }
     

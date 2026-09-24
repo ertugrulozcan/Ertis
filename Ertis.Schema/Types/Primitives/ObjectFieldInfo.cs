@@ -6,7 +6,11 @@ using Ertis.Schema.Extensions;
 using Ertis.Schema.Serialization;
 using Ertis.Schema.Serialization.Legacy;
 using Ertis.Schema.Validation;
+
 using DynamicObject = Ertis.Schema.Dynamics.DynamicObject;
+using NewtonsoftJsonIgnore = Newtonsoft.Json.JsonIgnoreAttribute;
+using NewtonsoftJsonProperty = Newtonsoft.Json.JsonPropertyAttribute;
+using NewtonsoftJsonConverter = Newtonsoft.Json.JsonConverterAttribute;
 
 namespace Ertis.Schema.Types.Primitives;
 
@@ -15,18 +19,22 @@ public abstract class ObjectFieldInfoBase : FieldInfo<object>, ISchema
     #region Properties
     
     [JsonIgnore]
-    [Newtonsoft.Json.JsonIgnore]
+    [NewtonsoftJsonIgnore]
     public string Slug => this.Name;
     
     [JsonPropertyName("allowAdditionalProperties")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    [Newtonsoft.Json.JsonProperty("allowAdditionalProperties", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
+    [NewtonsoftJsonProperty("allowAdditionalProperties", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
     public bool AllowAdditionalProperties { get; init; }
     
     #endregion
     
     #region Abstract Properties
     
+    [JsonPropertyName("properties")]
+    [JsonConverter(typeof(FieldInfoCollectionJsonConverterFactory))]
+    [NewtonsoftJsonProperty("properties")]
+    [NewtonsoftJsonConverter(typeof(FieldInfoCollectionJsonConverter))]
     public abstract IReadOnlyCollection<IFieldInfo> Properties { get; init; }
     
     #endregion
@@ -47,14 +55,14 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
     
     [JsonPropertyName("type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    [Newtonsoft.Json.JsonProperty("type")]
-    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+    [NewtonsoftJsonProperty("type")]
+    [NewtonsoftJsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public override FieldType Type => FieldType.@object;
     
     [JsonPropertyName("properties")]
     [JsonConverter(typeof(FieldInfoCollectionJsonConverterFactory))]
-    [Newtonsoft.Json.JsonProperty("properties")]
-    [Newtonsoft.Json.JsonConverter(typeof(FieldInfoCollectionJsonConverter))]
+    [NewtonsoftJsonProperty("properties")]
+    [NewtonsoftJsonConverter(typeof(FieldInfoCollectionJsonConverter))]
     public override IReadOnlyCollection<IFieldInfo> Properties
     {
         get;
@@ -76,6 +84,14 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
     #endregion
     
     #region Constructors
+    
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    public ObjectFieldInfo()
+    {
+        this.Properties = new ReadOnlyCollection<IFieldInfo>(new List<IFieldInfo>());
+    }
     
     /// <summary>
     /// Constructor

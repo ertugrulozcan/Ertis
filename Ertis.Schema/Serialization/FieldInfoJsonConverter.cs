@@ -63,7 +63,6 @@ public class FieldInfoJsonConverter : JsonConverter<IFieldInfo>
                                     FieldType.image => typeof(ImageFieldInfo),
                                     FieldType.video => typeof(VideoFieldInfo),
                                     FieldType.nestedType => typeof(NestedTypeFieldInfo),
-                                    FieldType.photoGallery => typeof(PhotoGalleryFieldInfo),
                                     
                                     _ => throw new SchemaValidationException($"Unknown field type : '{fieldTypeName}'")
                                 };

@@ -25,8 +25,9 @@ public interface IFieldInfo : ICloneable
     IFieldInfo? Parent { get; set; }
     
     [JsonPropertyName("displayName")]
-    [NewtonsoftJsonProperty("displayName")]
-    string DisplayName { get; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [NewtonsoftJsonProperty("displayName", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+    string? DisplayName { get; }
     
     [JsonPropertyName("description")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

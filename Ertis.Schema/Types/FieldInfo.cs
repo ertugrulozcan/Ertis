@@ -56,9 +56,9 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
     [JsonPropertyName("displayName")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [NewtonsoftJsonProperty("displayName", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-    public string DisplayName
+    public string? DisplayName
     {
-        get => field ?? this.Name;
+        get;
         set
         {
             field = value;

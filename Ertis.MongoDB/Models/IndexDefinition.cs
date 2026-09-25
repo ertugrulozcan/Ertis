@@ -23,6 +23,8 @@ public interface IIndexDefinition
 	IndexType Type { get; }
 	
 	string Key { get; }
+	
+	bool IsUnique { get; }
 }
 
 public enum IndexLocale
@@ -52,7 +54,10 @@ public abstract class IndexDefinitionBase : IIndexDefinition
 	public abstract IndexType Type { get; }
 	
 	public abstract string Key { get; }
-
+	
+	// ReSharper disable once UnusedAutoPropertyAccessor.Global
+	public bool IsUnique { get; set; }
+	
 	#endregion
 
 	#region Methods

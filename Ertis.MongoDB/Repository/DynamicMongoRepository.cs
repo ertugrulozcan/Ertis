@@ -1597,7 +1597,11 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	
 	public async Task<string> CreateSingleIndexAsync(SingleIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
 	{
-		return await this.CreateSingleIndexAsync(indexDefinition.Field, indexDefinition.Direction, cancellationToken: cancellationToken);
+		var indexKeysDefinition = indexDefinition.Direction is SortDirection.Descending ?
+			Builders<dynamic>.IndexKeys.Descending(indexDefinition.Field) :
+			Builders<dynamic>.IndexKeys.Ascending(indexDefinition.Field);
+		
+		return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(indexKeysDefinition, new CreateIndexOptions { Unique = indexDefinition.IsUnique }), cancellationToken: cancellationToken);
 	}
 	
 	public async Task<string> CreateTTLIndexAsync(TTLIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
@@ -1606,7 +1610,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			Builders<dynamic>.IndexKeys.Descending(indexDefinition.Field) :
 			Builders<dynamic>.IndexKeys.Ascending(indexDefinition.Field);
 		
-		return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(indexKeysDefinition, new CreateIndexOptions { ExpireAfter = indexDefinition.ExpireAfter }), cancellationToken: cancellationToken);
+		return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(indexKeysDefinition, new CreateIndexOptions { ExpireAfter = indexDefinition.ExpireAfter, Unique = indexDefinition.IsUnique }), cancellationToken: cancellationToken);
 	}
 	
 	public async Task<string> CreateCompoundIndexAsync(IDictionary<string, SortDirection> indexFieldDefinitions, CancellationToken cancellationToken = default)
@@ -1634,7 +1638,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		}
 		
 		var combinedIndexDefinition = Builders<dynamic>.IndexKeys.Combine(indexKeyDefinitions);
-		return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(combinedIndexDefinition), cancellationToken: cancellationToken);
+		return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(combinedIndexDefinition, new CreateIndexOptions { Unique = indexDefinition.IsUnique }), cancellationToken: cancellationToken);
 	}
 	
 	public async Task<string> CreateTextIndexAsync(TextIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
@@ -1643,7 +1647,9 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		{
 			var indexOptions = new CreateIndexOptions
 			{
-				DefaultLanguage = indexDefinition.Locale.ToString()
+				Name = indexDefinition.Key,
+				DefaultLanguage = indexDefinition.Locale.ToString(),
+				Unique = indexDefinition.IsUnique
 			};
 			
 			var isWeighted = indexDefinition.WeightedFields.Any(x => x.Value > 1) && indexDefinition.WeightedFields.Count > 1;

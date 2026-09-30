@@ -43,7 +43,10 @@ public abstract class ObjectFieldInfoBase : FieldInfo<object>, ISchema
 	
 	public bool ValidateContent(DynamicObject obj, IValidationContext validationContext)
 	{
-		return this.Validate(obj.ToDynamic(), validationContext);
+		using (ValidationPath.Begin(this.Path))
+		{
+			return this.Validate(obj.ToDynamic(), validationContext);
+		}
 	}
 	
 	#endregion
@@ -51,6 +54,15 @@ public abstract class ObjectFieldInfoBase : FieldInfo<object>, ISchema
 
 public sealed class ObjectFieldInfo : ObjectFieldInfoBase
 {
+	#region Fields
+	
+	/// <summary>
+	/// A root object created to validate the data of a schema; it doesn't own (re-parent) the shared properties of the schema
+	/// </summary>
+	private readonly bool _isDetachedRoot;
+	
+	#endregion
+	
 	#region Properties
 	
 	[JsonPropertyName("type")]
@@ -69,6 +81,11 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
 		init
 		{
 			field = value;
+			if (this._isDetachedRoot)
+			{
+				return;
+			}
+			
 			foreach (var fieldInfo in value)
 			{
 				fieldInfo.Parent = this;
@@ -80,6 +97,7 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
 			}
 		}
 	}
+
 	
 	#endregion
 	
@@ -102,9 +120,33 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
 		this.Properties = new ReadOnlyCollection<IFieldInfo>(properties.ToList());
 	}
 	
+	/// <summary>
+	/// Constructor
+	/// </summary>
+	/// <param name="schema"></param>
+	private ObjectFieldInfo(ISchema schema)
+	{
+		this._isDetachedRoot = true;
+		this.Properties = schema.Properties;
+	}
+	
 	#endregion
 	
 	#region Methods
+	
+	/// <summary>
+	/// Creates a root object to validate the data of the schema, without changing the parents of the schema properties
+	/// </summary>
+	/// <param name="schema"></param>
+	/// <returns></returns>
+	internal static ObjectFieldInfo CreateDetachedRoot(ISchema schema)
+	{
+		return new ObjectFieldInfo(schema)
+		{
+			Name = schema.Slug,
+			AllowAdditionalProperties = schema.AllowAdditionalProperties
+		};
+	}
 	
 	public override bool ValidateSchema(out Exception? exception)
 	{
@@ -136,7 +178,10 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
 				var fieldInfo = this.Properties.FirstOrDefault(x => x.Name == propertyName);
 				if (fieldInfo != null)
 				{
-					isValid &= ((FieldInfo) fieldInfo).Validate(propertyValue, validationContext);
+					using (ValidationPath.Push(propertyName))
+					{
+						isValid &= ((FieldInfo) fieldInfo).Validate(propertyValue, validationContext);
+					}
 				}
 				else if (!this.AllowAdditionalProperties)
 				{
@@ -151,7 +196,10 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
 			{
 				if (!validatedProperties.Contains(fieldInfo.Name))
 				{
-					isValid &= ((FieldInfo) fieldInfo).Validate(null, validationContext);
+					using (ValidationPath.Push(fieldInfo.Name))
+					{
+						isValid &= ((FieldInfo) fieldInfo).Validate(null, validationContext);
+					}
 				}
 			}   
 		}

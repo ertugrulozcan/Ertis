@@ -44,9 +44,10 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
 		get
 		{
 			var path = this.Parent != null ? $"{this.Parent.Path}.{this.Name}" : this.Name;
-			if (this.Parent is ArrayFieldInfo arrayFieldInfo)
+			if (this.Parent is ArrayFieldInfo)
 			{
-				path = $"{this.Parent.Path}[{arrayFieldInfo.IndexOf(this)}]";   
+				// The item schema of an array; the item indexes are known only during the validation (see ValidationPath)
+				path = $"{this.Parent.Path}[]";
 			}
 			
 			return path;
@@ -150,10 +151,6 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
 		}
 	}
 	
-	[JsonIgnore]
-	[NewtonsoftJsonIgnore]
-	protected internal object? CurrentObject { get; private set; }
-	
 	[JsonPropertyName("isSearchable")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 	[NewtonsoftJsonProperty("isSearchable", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
@@ -211,8 +208,6 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
 	
 	protected internal virtual bool Validate(object? obj, IValidationContext validationContext)
 	{
-		this.CurrentObject = obj;
-		
 		var isValid = true;
 		if (validationContext == null)
 		{

@@ -156,12 +156,14 @@ public class ArrayFieldInfo : FieldInfo<Array>
 			}
 			
 			// Item validations
-			if (this.ItemSchema != null)
+			if (this.ItemSchema is FieldInfo itemFieldInfo)
 			{
-				var itemFieldInfo = (FieldInfo) this.ItemSchema.Clone();
-				foreach (var item in array)
+				for (var i = 0; i < array.Length; i++)
 				{
-					isValid &= itemFieldInfo.Validate(item, validationContext);
+					using (ValidationPath.PushIndex(i))
+					{
+						isValid &= itemFieldInfo.Validate(array.GetValue(i), validationContext);
+					}
 				}
 			}
 			
@@ -277,16 +279,6 @@ public class ArrayFieldInfo : FieldInfo<Array>
 		
 		exception = null;
 		return true;
-	}
-	
-	internal int? IndexOf(FieldInfo itemFieldInfo)
-	{
-		if (itemFieldInfo is { CurrentObject: not null } && this.CurrentObject is Array array)
-		{
-			return Array.IndexOf(array, itemFieldInfo.CurrentObject);
-		}
-		
-		return null;
 	}
 	
 	public override object Clone()

@@ -22,10 +22,17 @@ public static class SchemaExtensions
 	public static string GetSelfPath(this IFieldInfo fieldInfo, ISchema schema)
 	{
 		var path = fieldInfo.Path;
-		var segments = path.Split('.');
-		if (segments.Length > 1 && segments[0] == schema.Slug)
+		
+		// The path starts with the schema segment only when the schema itself is the root of the field (e.g. an ObjectFieldInfo schema)
+		var root = fieldInfo;
+		while (root.Parent != null)
 		{
-			path = string.Join(".", segments.Skip(1));
+			root = root.Parent;
+		}
+		
+		if (ReferenceEquals(root, schema) && path.StartsWith($"{schema.Slug}.", StringComparison.Ordinal))
+		{
+			path = path[(schema.Slug.Length + 1)..];
 		}
 		
 		return path;
@@ -69,19 +76,7 @@ public static class SchemaExtensions
 	{
 		try
 		{
-			ObjectFieldInfo rootObjectFieldInfo;
-			if (schema is ObjectFieldInfo objectFieldInfo)
-			{
-				rootObjectFieldInfo = objectFieldInfo;
-			}
-			else
-			{
-				rootObjectFieldInfo = new ObjectFieldInfo(schema.Properties)
-				{
-					Name = schema.Slug,
-					AllowAdditionalProperties = schema.AllowAdditionalProperties
-				};
-			}
+			var rootObjectFieldInfo = schema as ObjectFieldInfo ?? ObjectFieldInfo.CreateDetachedRoot(schema);
 			
 			var isValidContent = rootObjectFieldInfo.ValidateContent(model, validationContext);
 			
@@ -409,22 +404,12 @@ public static class SchemaExtensions
 	
 	private static void SetFormatPatterns(ISchema schema, IFieldInfo fieldInfo, DynamicObject model)
 	{
-		if (fieldInfo is StringFieldInfo stringFieldInfo)
+		if (fieldInfo is StringFieldInfo stringFieldInfo && !string.IsNullOrEmpty(stringFieldInfo.FormatPattern))
 		{
-			string? value = null;
-			if (stringFieldInfo.CurrentObject != null && !string.IsNullOrEmpty(stringFieldInfo.CurrentObject.ToString()))
-			{
-				value = stringFieldInfo.CurrentObject.ToString();
-			}
-			else if (!string.IsNullOrEmpty(stringFieldInfo.FormatPattern) && stringFieldInfo.TryFormat(model, out var formattedString))
-			{
-				value = formattedString;
-			}
-			
-			if (!string.IsNullOrEmpty(value))
+			if (stringFieldInfo.TryFormat(model, out var formattedString) && !string.IsNullOrEmpty(formattedString))
 			{
 				var path = fieldInfo.GetSelfPath(schema);
-				model.TrySetValue(path, value, out _, true);
+				model.TrySetValue(path, formattedString, out _, true);
 			}
 		}
 	}

@@ -35,8 +35,18 @@ public abstract class QueryControllerBase : ControllerBase
 			this.ValidatePaginationParams(skip, limit);
 			
 			var body = await this.ExtractRequestBodyAsync(cancellationToken: cancellationToken);
-			var whereQuery = this.ExtractWhereQuery(body, body);
-			var selectFields = Helpers.QueryHelper.ExtractSelectFields(body);
+			string? whereQuery;
+			Dictionary<string, bool> selectFields;
+			try
+			{
+				whereQuery = this.ExtractWhereQuery(body, body);
+				selectFields = Helpers.QueryHelper.ExtractSelectFields(body);
+			}
+			catch (System.Text.Json.JsonException ex)
+			{
+				throw new InvalidQueryException(ex);
+			}
+			
 			this.ExtractSortingParameters(out var sortField, out var sortDirection);
 			var result = await this.GetDataAsync(whereQuery ?? string.Empty, skip, limit, withCount, sortField, sortDirection, selectFields, cancellationToken: cancellationToken);
 			
@@ -52,10 +62,6 @@ public abstract class QueryControllerBase : ControllerBase
 			{
 				return this.StatusCode((int)ex.StatusCode, ex.Message);
 			}
-		}
-		catch (Exception ex)
-		{
-			return this.StatusCode(500, ex.Message);
 		}
 	}
 	

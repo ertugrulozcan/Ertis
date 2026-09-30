@@ -1,5 +1,5 @@
-using Ertis.Extensions.AspNetCore.Extensions;
-using Newtonsoft.Json.Linq;
+using System.Globalization;
+using System.Text.Json;
 
 namespace Ertis.Extensions.AspNetCore.Helpers;
 
@@ -7,54 +7,94 @@ public static class QueryHelper
 {
 	#region Methods
 	
+	/// <summary>
+	/// Returns the raw json of the 'where' node of the query body, or null when the body has no 'where' node
+	/// </summary>
+	/// <exception cref="JsonException">The body is not a valid json</exception>
 	public static string? ExtractWhereQuery(dynamic body)
 	{
-		if (body == null)
+		using JsonDocument? document = ParseBody((object?) body);
+		if (document?.RootElement is { ValueKind: JsonValueKind.Object } root && root.TryGetProperty("where", out JsonElement whereNode))
 		{
-			return null;
-		}
-		
-		var root = Newtonsoft.Json.JsonConvert.DeserializeObject(body);
-		if (root is JObject rootNode && rootNode.TryGetValue("where", out var whereNode))
-		{
-			return whereNode.ToString();
+			return whereNode.GetRawText();
 		}
 		
 		return null;
 	}
 	
+	/// <summary>
+	/// Returns the fields of the 'select' node of the query body (1, true, "true" or a non-zero number includes a field, 0 or false excludes it)
+	/// </summary>
+	/// <exception cref="JsonException">The body is not a valid json</exception>
 	public static Dictionary<string, bool> ExtractSelectFields(dynamic body)
 	{
 		var fieldDictionary = new Dictionary<string, bool>();
 		
-		if (body == null)
+		using JsonDocument? document = ParseBody((object?) body);
+		if (document?.RootElement is { ValueKind: JsonValueKind.Object } root && root.TryGetProperty("select", out JsonElement selectNode) && selectNode.ValueKind == JsonValueKind.Object)
 		{
-			return fieldDictionary;
-		}
-		
-		var root = Newtonsoft.Json.JsonConvert.DeserializeObject(body);
-		if (root is JObject rootNode)
-		{
-			if (rootNode.TryGetValue("select", out var jToken))
+			foreach (var property in selectNode.EnumerateObject())
 			{
-				if (jToken is JObject selectNode)
+				if (TryGetSelection(property.Value, out var isSelected))
 				{
-					foreach (var (key, value) in selectNode)
-					{
-						if (value != null)
-						{
-							var intValue = 0;
-							if (value.TryGetValue(out bool boolValue) || value.TryGetValue(out intValue))
-							{
-								fieldDictionary.Add(key, boolValue || intValue == 1);
-							}
-						}
-					}
+					// A repeated field overrides the previous one
+					fieldDictionary[property.Name] = isSelected;
 				}
 			}
 		}
 		
 		return fieldDictionary;
+	}
+	
+	private static JsonDocument? ParseBody(object? body)
+	{
+		var json = body as string ?? body?.ToString();
+		if (string.IsNullOrWhiteSpace(json))
+		{
+			return null;
+		}
+		
+		return JsonDocument.Parse(json, new JsonDocumentOptions
+		{
+			AllowTrailingCommas = true,
+			CommentHandling = JsonCommentHandling.Skip
+		});
+	}
+	
+	private static bool TryGetSelection(JsonElement value, out bool isSelected)
+	{
+		switch (value.ValueKind)
+		{
+			case JsonValueKind.True:
+				isSelected = true;
+				return true;
+			case JsonValueKind.False:
+				isSelected = false;
+				return true;
+			case JsonValueKind.Number:
+				isSelected = value.GetDouble() != 0;
+				return true;
+			case JsonValueKind.String:
+			{
+				var text = value.GetString();
+				if (bool.TryParse(text, out isSelected))
+				{
+					return true;
+				}
+				
+				if (int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var number))
+				{
+					isSelected = number == 1;
+					return true;
+				}
+				
+				isSelected = false;
+				return false;
+			}
+			default:
+				isSelected = false;
+				return false;
+		}
 	}
 	
 	#endregion

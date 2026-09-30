@@ -1,7 +1,5 @@
 using System.Text.Json.Serialization;
-using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
-using Ertis.Schema.Validation;
 
 namespace Ertis.Schema.Types.CustomTypes;
 
@@ -31,21 +29,9 @@ public class ColorFieldInfo : StringFieldInfo
 	
 	#region Methods
 	
-	protected internal override bool Validate(object? obj, IValidationContext validationContext)
+	protected override string GetRegexPatternErrorMessage()
 	{
-		try
-		{
-			return base.Validate(obj, validationContext);
-		}
-		catch (FieldValidationException ex)
-		{
-			validationContext.Errors.Add(
-				ex.Message == $"String value is not valid by the regular expression rule. ('{this.RegexPattern}')"
-					? new FieldValidationException("Color code is not valid", this)
-					: ex);
-			
-			return false;
-		}
+		return "Color code is not valid";
 	}
 	
 	#endregion

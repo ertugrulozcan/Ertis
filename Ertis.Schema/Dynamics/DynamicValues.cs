@@ -181,6 +181,20 @@ internal static class DynamicValues
 		return TryGetLargeInteger(Encoding.UTF8.GetBytes(element.GetRawText()), out var decimalValue) ? decimalValue : element.GetDouble();
 	}
 	
+	/// <summary>
+	/// Converts the json values created by a deserialization of an object-typed property (JsonElement, JsonNode) into the value model;
+	/// the other values are returned as they are
+	/// </summary>
+	internal static object? FromDeserializedValue(object? value)
+	{
+		return value switch
+		{
+			JsonElement jsonElement => FromJsonElement(jsonElement),
+			JsonNode jsonNode => FromValue(jsonNode),
+			_ => value
+		};
+	}
+	
 	#endregion
 	
 	#region CLR Object Methods

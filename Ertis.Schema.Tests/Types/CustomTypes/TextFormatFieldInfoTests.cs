@@ -112,6 +112,7 @@ public class TextFormatFieldInfoTests
 		var result = SchemaValidation.ValidateField(new ColorFieldInfo { Name = "color" }, $$"""{ "color": "{{value}}" }""");
 		
 		Assert.False(result.IsValid);
+		Assert.Equal(["Color code is not valid"], result.Messages);
 	}
 	
 	#endregion

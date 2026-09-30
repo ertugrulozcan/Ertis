@@ -18,7 +18,11 @@ public class ConstantFieldInfo : FieldInfo<object>
 	
 	[Newtonsoft.Json.JsonProperty("value")]
 	[JsonPropertyName("value")]
-	public object? Value { get; set; }
+	public object? Value
+	{
+		get;
+		set => field = DynamicValues.FromDeserializedValue(value);
+	}
 	
 	[Newtonsoft.Json.JsonProperty("valueType")]
 	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]

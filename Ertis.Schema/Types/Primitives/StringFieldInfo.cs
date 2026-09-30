@@ -169,7 +169,7 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 				if (!this._regex.IsMatch(text))
 				{
 					isValid = false;
-					validationContext.Errors.Add(new FieldValidationException($"String value is not valid by the regular expression rule. ('{this.RegexPattern}')", this));
+					validationContext.Errors.Add(new FieldValidationException(this.GetRegexPatternErrorMessage(), this));
 				}
 			}
 			
@@ -184,6 +184,14 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 		}
 		
 		return isValid;
+	}
+	
+	/// <summary>
+	/// The error message of a value which doesn't match the regexPattern
+	/// </summary>
+	protected virtual string GetRegexPatternErrorMessage()
+	{
+		return $"String value is not valid by the regular expression rule. ('{this.RegexPattern}')";
 	}
 	
 	/// <summary>

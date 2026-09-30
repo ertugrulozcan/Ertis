@@ -1,5 +1,6 @@
 using System.Runtime.ExceptionServices;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types;
@@ -35,7 +36,8 @@ public class FieldInfoJsonConverter : JsonConverter<IFieldInfo>
 						var fieldTypeName = tempReader.GetString();
 						if (!string.IsNullOrEmpty(fieldTypeName))
 						{
-							if (Enum.TryParse(fieldTypeName, out FieldType fieldType))
+							// Only the exact type names (Enum.TryParse accepts the numeric values too)
+							if (Enum.TryParse(fieldTypeName, out FieldType fieldType) && fieldType.ToString() == fieldTypeName)
 							{
 								var type = fieldType switch
 								{
@@ -65,6 +67,11 @@ public class FieldInfoJsonConverter : JsonConverter<IFieldInfo>
 									
 									_ => throw new SchemaValidationException($"Unknown field type : '{fieldTypeName}'")
 								};
+								
+								if (type == typeof(ArrayFieldInfo))
+								{
+									return ReadArrayFieldInfo(ref reader, options);
+								}
 								
 								return (IFieldInfo) JsonSerializer.Deserialize(ref reader, type, options)!;
 							}
@@ -100,6 +107,21 @@ public class FieldInfoJsonConverter : JsonConverter<IFieldInfo>
 			
 			throw new SchemaValidationException($"FieldInfo cannot be deserialized: {ex.Message}", ex);
 		}
+	}
+	
+	/// <summary>
+	/// The item schema of an array is named by the library ('$schema') when the json has no name for it
+	/// (the item schema is read by this converter too, so the arrays of arrays are named on every level)
+	/// </summary>
+	private static IFieldInfo ReadArrayFieldInfo(ref Utf8JsonReader reader, JsonSerializerOptions options)
+	{
+		var node = JsonNode.Parse(ref reader)!.AsObject();
+		if (node["itemSchema"] is JsonObject itemSchema && !itemSchema.ContainsKey("name"))
+		{
+			itemSchema["name"] = "$schema";
+		}
+		
+		return node.Deserialize<ArrayFieldInfo>(options)!;
 	}
 	
 	public override void Write(Utf8JsonWriter writer, IFieldInfo fieldInfo, JsonSerializerOptions options)

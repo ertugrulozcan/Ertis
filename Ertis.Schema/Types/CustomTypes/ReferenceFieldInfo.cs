@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Ertis.Schema.Dynamics;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Models;
 using Ertis.Schema.Validation;
@@ -77,7 +78,17 @@ public class ReferenceFieldInfo : FieldInfo
 		}
 		else if (this.ReferenceType == ReferenceTypes.multiple && obj is object[] objectArray)
 		{
-			isValid = objectArray.All(x => EnsureReferenceId(x) != null);
+			for (var i = 0; i < objectArray.Length; i++)
+			{
+				if (EnsureReferenceId(objectArray[i]) == null)
+				{
+					using (ValidationPath.PushIndex(i))
+					{
+						isValid = false;
+						validationContext.Errors.Add(new FieldValidationException($"The reference field [{this.Name}] item has no _id field", this));
+					}
+				}
+			}
 			if (this.MultipleReferenceOptions != null)
 			{
 				if (this.MultipleReferenceOptions.MaxCount != null && objectArray.Length > this.MultipleReferenceOptions.MaxCount.Value)
@@ -321,7 +332,11 @@ public class CollectionReferenceParameter : DynamicQueryParameter
 	
 	[JsonPropertyName("value")]
 	[Newtonsoft.Json.JsonProperty("value")]
-	public object? Value { get; set; }
+	public object? Value
+	{
+		get;
+		set => field = DynamicValues.FromDeserializedValue(value);
+	}
 	
 	[JsonPropertyName("bindingType")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]

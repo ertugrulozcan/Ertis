@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Ertis.Schema.Dynamics;
 
 // ReSharper disable UnusedMember.Global
 namespace Ertis.Schema.Models;
@@ -29,7 +30,11 @@ public class DynamicQueryParameter
 	[JsonPropertyName("defaultValue")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[Newtonsoft.Json.JsonProperty("defaultValue", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-	public object? DefaultValue { get; set; }
+	public object? DefaultValue
+	{
+		get;
+		set => field = DynamicValues.FromDeserializedValue(value);
+	}
 	
 	[JsonPropertyName("isRequired")]
 	[Newtonsoft.Json.JsonProperty("isRequired")]

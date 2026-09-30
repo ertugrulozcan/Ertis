@@ -104,12 +104,58 @@ public class FieldInfoJsonConverterTests
 		Assert.Equal("tags", Assert.Single(roundTripped.Properties).Name);
 	}
 	
+	[Fact]
+	public void Deserialize_ArrayFieldWithoutItemSchemaName_UsesTheSchemaName()
+	{
+		var fieldInfo = JsonSerializer.Deserialize<IFieldInfo>("""{ "name": "tags", "type": "array", "itemSchema": { "type": "string" } }""", Options);
+		
+		var array = Assert.IsType<ArrayFieldInfo>(fieldInfo);
+		Assert.Equal("$schema", array.ItemSchema?.Name);
+	}
+	
+	[Fact]
+	public void Deserialize_ArrayFieldWithItemSchemaName_KeepsTheName()
+	{
+		var fieldInfo = JsonSerializer.Deserialize<IFieldInfo>("""{ "name": "tags", "type": "array", "itemSchema": { "name": "custom", "type": "string" } }""", Options);
+		
+		Assert.Equal("custom", Assert.IsType<ArrayFieldInfo>(fieldInfo).ItemSchema?.Name);
+	}
+	
+	[Fact]
+	public void Deserialize_ArrayOfArrays_ReadsEveryLevel()
+	{
+		const string json = """{ "properties": { "matrix": { "type": "array", "itemSchema": { "type": "array", "itemSchema": { "type": "array", "itemSchema": { "type": "integer" } } } } } }""";
+		
+		var properties = JsonSerializer.Deserialize<PropertiesModel>(json, Options)!;
+		var roundTripped = JsonSerializer.Deserialize<PropertiesModel>(JsonSerializer.Serialize(properties, Options), Options)!;
+		
+		var level1 = Assert.IsType<ArrayFieldInfo>(Assert.Single(roundTripped.Properties));
+		var level2 = Assert.IsType<ArrayFieldInfo>(level1.ItemSchema);
+		var level3 = Assert.IsType<ArrayFieldInfo>(level2.ItemSchema);
+		Assert.IsType<IntegerFieldInfo>(level3.ItemSchema);
+		Assert.Equal("$schema", level3.ItemSchema?.Name);
+	}
+	
+	[Fact]
+	public void Validate_WithArrayOfArrays_ReportsTheNestedItemPath()
+	{
+		const string json = """{ "properties": { "matrix": { "type": "array", "itemSchema": { "type": "array", "itemSchema": { "type": "integer" } } } } }""";
+		var properties = JsonSerializer.Deserialize<PropertiesModel>(json, Options)!;
+		
+		var result = SchemaValidation.Validate(TestSchema.Of(properties.Properties.ToArray()), """{ "matrix": [[1, 2], ["x"]] }""");
+		
+		Assert.False(result.IsValid);
+		Assert.Equal("test-schema.matrix[1][0]", Assert.Single(result.Errors).FieldPath);
+	}
+	
 	#endregion
 	
 	#region Error Methods
 	
 	[Theory]
 	[InlineData("""{ "type": "unknown" }""", "Unknown field type : 'unknown'")]
+	[InlineData("""{ "type": "1" }""", "Unknown field type : '1'")]
+	[InlineData("""{ "type": "String" }""", "Unknown field type : 'String'")]
 	[InlineData("""{ "maxLength": 5 }""", "Field info type missing")]
 	public void Deserialize_WithInvalidType_ThrowsSchemaValidationException(string fieldJson, string expectedMessage)
 	{

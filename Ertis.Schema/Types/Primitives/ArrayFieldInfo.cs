@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Ertis.Schema.Dynamics;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
+using Ertis.Schema.Helpers;
 using Ertis.Schema.Serialization;
 using Ertis.Schema.Validation;
 
@@ -145,7 +146,7 @@ public class ArrayFieldInfo : FieldInfo<Array>
 			
 			if (this.UniqueItems)
 			{
-				var uniqueCount = array.Cast<object>().Distinct().Count();
+				var uniqueCount = array.Cast<object?>().Distinct(StructuralEqualityComparer.Instance).Count();
 				if (array.Length != uniqueCount)
 				{
 					isValid = false;

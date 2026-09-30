@@ -47,13 +47,15 @@ public class ReferenceFieldInfoTests
 	}
 	
 	[Fact]
-	public void Validate_MultipleWithAnItemWithoutId_Fails()
+	public void Validate_MultipleWithItemsWithoutId_ReportsEachItem()
 	{
 		var fieldInfo = new ReferenceFieldInfo { Name = "tags", ReferenceType = ReferenceFieldInfo.ReferenceTypes.multiple };
 		
-		var result = SchemaValidation.ValidateField(fieldInfo, """{ "tags": ["a", { "title": "b" }] }""");
+		var result = SchemaValidation.ValidateField(fieldInfo, """{ "tags": ["a", { "title": "b" }, { "_id": "c" }, 5] }""");
 		
 		Assert.False(result.IsValid);
+		Assert.Equal(["The reference field [tags] item has no _id field", "The reference field [tags] item has no _id field"], result.Messages);
+		Assert.Equal(["test-schema.tags[1]", "test-schema.tags[3]"], result.Errors.Select(x => x.FieldPath));
 	}
 	
 	[Theory]

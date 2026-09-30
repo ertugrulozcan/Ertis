@@ -1,4 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
+using Ertis.Schema.Dynamics;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
@@ -316,7 +319,8 @@ public abstract class FieldInfo<T> : FieldInfo, IHasDefault<T>
 		get;
 		init
 		{
-			field = value;
+			// A default value of an object-typed field is deserialized as a JsonElement
+			field = value is JsonElement or JsonNode ? (T?) DynamicValues.FromDeserializedValue(value) : value;
 			this.OnPropertyChanged(nameof(this.DefaultValue));
 		}
 	}

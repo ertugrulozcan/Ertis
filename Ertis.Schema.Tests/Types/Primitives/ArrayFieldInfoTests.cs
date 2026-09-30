@@ -108,6 +108,45 @@ public class ArrayFieldInfoTests
 		Assert.Equal(["Array items must be unique"], result.Messages);
 	}
 	
+	[Theory]
+	[InlineData("""[{ "number": "1", "label": "a" }, { "label": "a", "number": "1" }]""", false)]
+	[InlineData("""[{ "number": "1", "label": "a" }, { "number": "1", "label": "b" }]""", true)]
+	[InlineData("""[{ "number": "1" }, { "number": "1", "label": null }]""", true)]
+	public void Validate_WithObjectItemsWhenUniqueItems_ComparesTheContent(string items, bool expected)
+	{
+		var fieldInfo = new ArrayFieldInfo { Name = "phones", ItemSchema = PhoneItem(), UniqueItems = true };
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, $$"""{ "phones": {{items}} }""");
+		
+		Assert.Equal(expected, result.IsValid);
+	}
+	
+	[Theory]
+	[InlineData("[1, 1.0]", false)]
+	[InlineData("[0.1, 0.10]", false)]
+	[InlineData("[1, 2.5]", true)]
+	[InlineData("[9007199254740993, 9007199254740992]", true)]
+	public void Validate_WithNumberItemsWhenUniqueItems_ComparesTheValues(string items, bool expected)
+	{
+		var fieldInfo = new ArrayFieldInfo { Name = "ratios", ItemSchema = new FloatFieldInfo { Name = "$schema" }, UniqueItems = true };
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, $$"""{ "ratios": {{items}} }""");
+		
+		Assert.Equal(expected, result.IsValid);
+	}
+	
+	[Theory]
+	[InlineData("[[1, 2], [1, 2.0]]", false)]
+	[InlineData("[[1, 2], [2, 1]]", true)]
+	public void Validate_WithArrayItemsWhenUniqueItems_ComparesTheItemsInOrder(string items, bool expected)
+	{
+		var fieldInfo = new ArrayFieldInfo { Name = "matrix", ItemSchema = new ArrayFieldInfo { Name = "$schema", ItemSchema = new FloatFieldInfo { Name = "$schema" } }, UniqueItems = true };
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, $$"""{ "matrix": {{items}} }""");
+		
+		Assert.Equal(expected, result.IsValid);
+	}
+	
 	[Fact]
 	public void Validate_WithObjectItems_ValidatesEachItem()
 	{

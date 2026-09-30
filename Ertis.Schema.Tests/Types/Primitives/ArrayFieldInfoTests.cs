@@ -141,6 +141,62 @@ public class ArrayFieldInfoTests
 		Assert.True(result.IsValid);
 	}
 	
+	[Fact]
+	public void Validate_WithDuplicateItemsByANestedUniqueByPath_Fails()
+	{
+		var fieldInfo = new ArrayFieldInfo
+		{
+			Name = "people",
+			UniqueBy = ["contact.email"],
+			ItemSchema = new ObjectFieldInfo([new ObjectFieldInfo([new StringFieldInfo { Name = "email" }]) { Name = "contact" }]) { Name = "$schema" }
+		};
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, """{ "people": [{ "contact": { "email": "a@x.com" } }, { "contact": { "email": "a@x.com" } }] }""");
+		
+		Assert.Equal(["Array items must be unique by the 'contact.email' field"], result.Messages);
+	}
+	
+	[Fact]
+	public void Validate_UniqueBy_IgnoresTheItemsWithoutTheField()
+	{
+		var fieldInfo = new ArrayFieldInfo { Name = "phones", ItemSchema = PhoneItem(), UniqueBy = ["label"] };
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, """{ "phones": [{ "number": "1" }, { "number": "2" }, { "number": "3", "label": null }] }""");
+		
+		Assert.True(result.IsValid);
+	}
+	
+	[Fact]
+	public void Validate_UniqueBy_IsCaseSensitive()
+	{
+		var fieldInfo = new ArrayFieldInfo { Name = "phones", ItemSchema = PhoneItem(), UniqueBy = ["label"] };
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, """{ "phones": [{ "number": "1", "label": "Home" }, { "number": "2", "label": "home" }] }""");
+		
+		Assert.True(result.IsValid);
+	}
+	
+	[Fact]
+	public void Validate_WithSeveralUniqueByPaths_ReportsEachViolatedPath()
+	{
+		var fieldInfo = new ArrayFieldInfo { Name = "phones", ItemSchema = PhoneItem(), UniqueBy = ["number", "label"] };
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, """{ "phones": [{ "number": "1", "label": "home" }, { "number": "2", "label": "home" }] }""");
+		
+		Assert.Equal(["Array items must be unique by the 'label' field"], result.Messages);
+	}
+	
+	[Fact]
+	public void Validate_UniqueByWithAPrimitiveItem_FailsWithTypeMismatch()
+	{
+		var fieldInfo = new ArrayFieldInfo { Name = "phones", ItemSchema = PhoneItem(), UniqueBy = ["number"] };
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, """{ "phones": [{ "number": "1" }, "2"] }""");
+		
+		Assert.False(result.IsValid);
+		Assert.Equal(["Type mismatch error. '$schema' is must be 'object'"], result.Messages);
+	}
+	
 	private static StringFieldInfo StringItem()
 	{
 		return new StringFieldInfo { Name = "$schema" };

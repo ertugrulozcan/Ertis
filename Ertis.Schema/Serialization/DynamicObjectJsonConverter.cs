@@ -21,13 +21,13 @@ public class DynamicObjectJsonConverter : JsonConverter<DynamicObject>
 			return null;
 		}
 		
-		using var document = JsonDocument.ParseValue(ref reader);
-		return DynamicObject.FromJsonElement(document.RootElement);
+		return DynamicObject.Read(ref reader);
 	}
 	
 	public override void Write(Utf8JsonWriter writer, DynamicObject dynamicObject, JsonSerializerOptions options)
 	{
-		writer.WriteRawValue(dynamicObject.ToJson(), skipInputValidation: false);
+		// ToJson is written by the serializer, so it is a valid json and doesn't need a validation
+		writer.WriteRawValue(dynamicObject.ToJson(), skipInputValidation: true);
 	}
 	
 	#endregion

@@ -91,12 +91,15 @@ public abstract class DateTimeFieldInfoBase : StringFieldInfo, IDateTimeFieldInf
 	{
 		var isValid = base.Validate(obj, validationContext);
 		
-		if (obj is string && !this.TryGetUtcDateTime(obj, out _))
+		if (!this.TryGetUtcDateTime(obj, out var dateTime))
 		{
-			isValid = false;
-			validationContext.Errors.Add(new FieldValidationException($"Datetime is not valid. Datetime values must be '{this.StringFormat}' format.", this));
+			if (obj is string)
+			{
+				isValid = false;
+				validationContext.Errors.Add(new FieldValidationException($"Datetime is not valid. Datetime values must be '{this.StringFormat}' format.", this));
+			}
 		}
-		else if (this.TryGetUtcDateTime(obj, out var dateTime))
+		else
 		{
 			if (this.MaxValue != null && dateTime > ToUtc(this.MaxValue.Value))
 			{

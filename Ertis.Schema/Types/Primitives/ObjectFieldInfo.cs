@@ -28,6 +28,11 @@ public abstract class ObjectFieldInfoBase : FieldInfo<object>, ISchema
 	public bool AllowAdditionalProperties { get; init; }
 	
 	/// <summary>
+	/// The properties by name (built on the first validation; the properties can not change after the initialization)
+	/// </summary>
+	private Dictionary<string, FieldInfo>? _propertyLookup;
+	
+	/// <summary>
 	/// Whether the object accepts the properties which are not declared in its schema
 	/// </summary>
 	protected virtual bool AcceptsAdditionalProperties => this.AllowAdditionalProperties;
@@ -99,18 +104,29 @@ public abstract class ObjectFieldInfoBase : FieldInfo<object>, ISchema
 		return isValid;
 	}
 	
+	private Dictionary<string, FieldInfo> CreatePropertyLookup()
+	{
+		var propertyLookup = new Dictionary<string, FieldInfo>(this.Properties.Count);
+		foreach (var fieldInfo in this.Properties)
+		{
+			// The first one wins like a lookup in the list would do (the duplicate names are rejected by the schema validation)
+			propertyLookup.TryAdd(fieldInfo.Name, (FieldInfo) fieldInfo);
+		}
+		
+		return propertyLookup;
+	}
+	
 	private bool ValidateObject(IDictionary<string, object?> dictionary, IValidationContext validationContext)
 	{
 		var isValid = true;
-		var validatedProperties = new List<string>();
+		var propertyLookup = this._propertyLookup ??= this.CreatePropertyLookup();
 		foreach (var (propertyName, propertyValue) in dictionary)
 		{
-			var fieldInfo = this.Properties.FirstOrDefault(x => x.Name == propertyName);
-			if (fieldInfo != null)
+			if (propertyLookup.TryGetValue(propertyName, out var fieldInfo))
 			{
 				using (ValidationPath.Push(propertyName))
 				{
-					isValid &= ((FieldInfo) fieldInfo).Validate(propertyValue, validationContext);
+					isValid &= fieldInfo.Validate(propertyValue, validationContext);
 				}
 			}
 			else if (!this.AcceptsAdditionalProperties)
@@ -118,13 +134,11 @@ public abstract class ObjectFieldInfoBase : FieldInfo<object>, ISchema
 				isValid = false;
 				validationContext.Errors.Add(new FieldValidationException($"Additional properties not allowed in this object schema. ({propertyName})", this));
 			}
-			
-			validatedProperties.Add(propertyName);
 		}
 		
 		foreach (var fieldInfo in this.Properties)
 		{
-			if (!validatedProperties.Contains(fieldInfo.Name))
+			if (!dictionary.ContainsKey(fieldInfo.Name))
 			{
 				using (ValidationPath.Push(fieldInfo.Name))
 				{

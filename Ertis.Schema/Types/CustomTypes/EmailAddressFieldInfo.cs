@@ -7,7 +7,7 @@ using Ertis.Schema.Validation;
 
 namespace Ertis.Schema.Types.CustomTypes;
 
-public class EmailAddressFieldInfo : StringFieldInfo
+public partial class EmailAddressFieldInfo : StringFieldInfo
 {
 	#region Properties
 	
@@ -47,7 +47,7 @@ public class EmailAddressFieldInfo : StringFieldInfo
 		try
 		{
 			// Normalize the domain
-			email = Regex.Replace(email, "(@)(.+)$", DomainMapper, RegexOptions.None, TimeSpan.FromMilliseconds(200));
+			email = DomainRegex().Replace(email, DomainMapper);
 			
 			// Examines the domain part of the email and normalizes it.
 			string DomainMapper(Match match)
@@ -72,13 +72,19 @@ public class EmailAddressFieldInfo : StringFieldInfo
 		
 		try
 		{
-			return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+			return EmailRegex().IsMatch(email);
 		}
 		catch (RegexMatchTimeoutException)
 		{
 			return false;
 		}
 	}
+	
+	[GeneratedRegex("(@)(.+)$", RegexOptions.None, matchTimeoutMilliseconds: 200)]
+	private static partial Regex DomainRegex();
+	
+	[GeneratedRegex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.IgnoreCase, matchTimeoutMilliseconds: 250)]
+	private static partial Regex EmailRegex();
 	
 	#endregion
 }

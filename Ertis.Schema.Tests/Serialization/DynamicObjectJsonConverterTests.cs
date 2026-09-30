@@ -69,6 +69,54 @@ public class DynamicObjectJsonConverterTests
 		Assert.Equal(json, JsonSerializer.Serialize(model, Options));
 	}
 	
+	[Fact]
+	public void Deserialize_DynamicObjectInTheMiddleOfAModel_ReadsTheFollowingProperties()
+	{
+		const string json = """{ "id": "1", "document": { "a": { "b": [1, { "c": 2 }] } }, "after": "x", "items": [{ "n": 1 }, null, { "n": 2 }] }""";
+		
+		var model = JsonSerializer.Deserialize<WideModel>(json, Options)!;
+		
+		Assert.Equal(2L, model.Document?.GetValue("a.b[1].c"));
+		Assert.Equal("x", model.After);
+		Assert.NotNull(model.Items);
+		Assert.Equal(3, model.Items.Count);
+		Assert.Equal(1L, model.Items[0]?.GetValue("n"));
+		Assert.Null(model.Items[1]);
+		Assert.Equal(2L, model.Items[2]?.GetValue("n"));
+	}
+	
+	[Theory]
+	[InlineData("5")]
+	[InlineData("\"text\"")]
+	[InlineData("[1, 2]")]
+	[InlineData("true")]
+	public void Deserialize_NonObjectValue_ReadsAnEmptyObject(string jsonValue)
+	{
+		var model = JsonSerializer.Deserialize<WideModel>($$"""{ "document": {{jsonValue}}, "after": "x" }""", Options)!;
+		
+		Assert.NotNull(model.Document);
+		Assert.Empty(model.Document.ToDictionary());
+		Assert.Equal("x", model.After);
+	}
+	
+	[Fact]
+	public void Deserialize_EscapedStrings_AreUnescaped()
+	{
+		var model = JsonSerializer.Deserialize<EventModel>("""{ "id": "1", "document": { "text": "line\nbreak \u015Eule \"q\"" } }""", Options)!;
+		
+		Assert.Equal("line\nbreak Şule \"q\"", model.Document?.GetValue("text"));
+	}
+	
+	[Fact]
+	public void Serialize_ListOfDynamicObjects_WritesEachObject()
+	{
+		var model = new WideModel { Items = [DynamicObject.Parse("""{ "n": 1 }"""), null] };
+		
+		var json = JsonSerializer.Serialize(model, Options);
+		
+		Assert.Equal("""{"id":null,"document":null,"after":null,"items":[{"n":1},null]}""", json);
+	}
+	
 	#endregion
 	
 	#region Test Types
@@ -80,6 +128,21 @@ public class DynamicObjectJsonConverterTests
 		
 		[JsonPropertyName("document")]
 		public DynamicObject? Document { get; init; }
+	}
+	
+	public sealed class WideModel
+	{
+		[JsonPropertyName("id")]
+		public string? Id { get; init; }
+		
+		[JsonPropertyName("document")]
+		public DynamicObject? Document { get; init; }
+		
+		[JsonPropertyName("after")]
+		public string? After { get; init; }
+		
+		[JsonPropertyName("items")]
+		public List<DynamicObject?>? Items { get; init; }
 	}
 	
 	#endregion

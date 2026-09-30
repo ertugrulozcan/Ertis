@@ -1,8 +1,10 @@
+using System.Buffers;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Globalization;
 using System.Numerics;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -18,7 +20,7 @@ internal static class DynamicValues
 {
 	#region Fields
 	
-	private static readonly JsonDocumentOptions DocumentOptions = new()
+	private static readonly JsonReaderOptions ReaderOptions = new()
 	{
 		AllowTrailingCommas = true,
 		CommentHandling = JsonCommentHandling.Skip
@@ -40,13 +42,94 @@ internal static class DynamicValues
 	/// </summary>
 	internal static Dictionary<string, object?> FromJson(string json)
 	{
-		using var document = JsonDocument.Parse(json, DocumentOptions);
-		return FromJsonObject(document.RootElement);
+		var buffer = ArrayPool<byte>.Shared.Rent(Encoding.UTF8.GetMaxByteCount(json.Length));
+		try
+		{
+			var length = Encoding.UTF8.GetBytes(json, buffer);
+			var reader = new Utf8JsonReader(buffer.AsSpan(0, length), ReaderOptions);
+			if (!reader.Read())
+			{
+				throw new JsonException("The json is empty");
+			}
+			
+			var value = ReadValue(ref reader);
+			
+			// Nothing is allowed after the json value (throws JsonException on an extra token)
+			reader.Read();
+			
+			return value as Dictionary<string, object?> ?? new Dictionary<string, object?>();
+		}
+		finally
+		{
+			ArrayPool<byte>.Shared.Return(buffer);
+		}
 	}
 	
-	internal static Dictionary<string, object?> FromJsonObject(JsonElement element)
+	/// <summary>
+	/// Reads the json value at the current token of the reader, the reader is left on the last token of the value
+	/// </summary>
+	internal static object? ReadValue(ref Utf8JsonReader reader)
 	{
-		return FromJsonElement(element) as Dictionary<string, object?> ?? new Dictionary<string, object?>();
+		switch (reader.TokenType)
+		{
+			case JsonTokenType.StartObject:
+			{
+				var dictionary = new Dictionary<string, object?>();
+				while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+				{
+					var propertyName = reader.GetString()!;
+					reader.Read();
+					dictionary[propertyName] = ReadValue(ref reader);
+				}
+				
+				return dictionary;
+			}
+			case JsonTokenType.StartArray:
+			{
+				var items = new List<object?>();
+				while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+				{
+					items.Add(ReadValue(ref reader));
+				}
+				
+				return items.ToArray();
+			}
+			case JsonTokenType.String:
+				// The strings stay strings (no date detection); the schema converts its date fields
+				return reader.GetString();
+			case JsonTokenType.Number:
+				return ReadNumber(ref reader);
+			case JsonTokenType.True:
+				return true;
+			case JsonTokenType.False:
+				return false;
+			default:
+				return null;
+		}
+	}
+	
+	private static object ReadNumber(ref Utf8JsonReader reader)
+	{
+		if (reader.TryGetInt64(out var longValue))
+		{
+			return longValue;
+		}
+		
+		return TryGetLargeInteger(reader.ValueSpan, out var decimalValue) ? decimalValue : reader.GetDouble();
+	}
+	
+	/// <summary>
+	/// Gets an integer out of the Int64 range as decimal (the numbers with a fraction or an exponent are not integers)
+	/// </summary>
+	private static bool TryGetLargeInteger(ReadOnlySpan<byte> rawNumber, out decimal value)
+	{
+		if (rawNumber.IndexOfAny((byte) '.', (byte) 'e', (byte) 'E') >= 0)
+		{
+			value = 0;
+			return false;
+		}
+		
+		return decimal.TryParse(Encoding.UTF8.GetString(rawNumber), NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
 	}
 	
 	internal static object? FromJsonElement(JsonElement element)
@@ -95,15 +178,7 @@ internal static class DynamicValues
 			return longValue;
 		}
 		
-		var rawText = element.GetRawText();
-		var isIntegral = rawText.IndexOfAny(['.', 'e', 'E']) < 0;
-		if (isIntegral && decimal.TryParse(rawText, NumberStyles.Integer, CultureInfo.InvariantCulture, out var decimalValue))
-		{
-			// An integer out of the Int64 range
-			return decimalValue;
-		}
-		
-		return element.GetDouble();
+		return TryGetLargeInteger(Encoding.UTF8.GetBytes(element.GetRawText()), out var decimalValue) ? decimalValue : element.GetDouble();
 	}
 	
 	#endregion

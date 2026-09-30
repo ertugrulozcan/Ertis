@@ -173,8 +173,7 @@ public class ArrayFieldInfo : FieldInfo<Array>
 					var values = new List<object>();
 					foreach (var item in array)
 					{
-						var dynamicObject = new DynamicObject(item);
-						if (dynamicObject.TryGetValue(uniqueByPath, out var val, out _) && val != null)
+						if (item is IDictionary<string, object?> itemDictionary && DynamicObject.TryGetValue(itemDictionary, uniqueByPath, out var val) && val != null)
 						{
 							values.Add(val);
 						}

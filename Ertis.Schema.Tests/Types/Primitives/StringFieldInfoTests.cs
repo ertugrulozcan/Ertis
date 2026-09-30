@@ -109,6 +109,44 @@ public class StringFieldInfoTests
 		Assert.Equal(expected, result.IsValid);
 	}
 	
+	[Fact]
+	public void Validate_ManyFieldsWithDifferentRegexPatterns_ValidatesEachWithItsOwnPattern()
+	{
+		var fields = Enumerable.Range(0, 30).Select(i => new StringFieldInfo { Name = $"code{i}", RegexPattern = $"^{i}-[a-z]+$" }).ToArray<Ertis.Schema.Types.IFieldInfo>();
+		var schema = TestSchema.Of(fields);
+		var validJson = "{" + string.Join(",", Enumerable.Range(0, 30).Select(i => $"\"code{i}\": \"{i}-abc\"")) + "}";
+		var invalidJson = "{" + string.Join(",", Enumerable.Range(0, 30).Select(i => $"\"code{i}\": \"{(i + 1) % 30}-abc\"")) + "}";
+		
+		Assert.True(SchemaValidation.Validate(schema, validJson).IsValid);
+		Assert.Equal(30, SchemaValidation.Validate(schema, invalidJson).Errors.Count);
+	}
+	
+	[Theory]
+	[InlineData("[", null, "regexPattern")]
+	[InlineData(null, "(", "restrictRegexPattern")]
+	public void Create_WithInvalidRegexPattern_Throws(string? regexPattern, string? restrictRegexPattern, string propertyName)
+	{
+		var exception = Assert.Throws<FieldValidationException>(() => new StringFieldInfo { Name = "code", RegexPattern = regexPattern, RestrictRegexPattern = restrictRegexPattern });
+		
+		Assert.StartsWith($"The '{propertyName}' is not a valid regular expression.", exception.Message);
+	}
+	
+	[Fact]
+	public void Deserialize_WithInvalidRegexPattern_ThrowsTheFieldValidationException()
+	{
+		var options = new System.Text.Json.JsonSerializerOptions { Converters = { new Ertis.Schema.Serialization.FieldInfoJsonConverter() } };
+		
+		Assert.Throws<FieldValidationException>(() => System.Text.Json.JsonSerializer.Deserialize<Ertis.Schema.Types.IFieldInfo>("""{ "name": "code", "type": "string", "regexPattern": "[" }""", options));
+	}
+	
+	[Fact]
+	public void Validate_WithRegexPatternAndEmptyValue_SkipsThePattern()
+	{
+		var result = SchemaValidation.ValidateField(new StringFieldInfo { Name = "code", RegexPattern = "^[A-Z]+$" }, """{ "code": "" }""");
+		
+		Assert.True(result.IsValid);
+	}
+	
 	[Theory]
 	[InlineData("hello", true)]
 	[InlineData("<script>", false)]

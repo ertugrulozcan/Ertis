@@ -172,6 +172,30 @@ public class FieldInfoTests
 	}
 	
 	[Fact]
+	public void Validate_PropertyNames_AreCaseSensitive()
+	{
+		var schema = TestSchema.Of(new StringFieldInfo { Name = "firstname", IsRequired = true });
+		
+		var result = SchemaValidation.Validate(schema, """{ "Firstname": "Jane" }""");
+		
+		Assert.False(result.IsValid);
+		Assert.Equal(["Additional properties not allowed in this object schema. (Firstname)", "firstname is required"], result.Messages);
+	}
+	
+	[Fact]
+	public void Validate_ReportsTheErrorsInThePropertyOrderOfTheContent()
+	{
+		var schema = TestSchema.Of(
+			new IntegerFieldInfo { Name = "a" },
+			new IntegerFieldInfo { Name = "b" },
+			new IntegerFieldInfo { Name = "c", IsRequired = true });
+		
+		var result = SchemaValidation.Validate(schema, """{ "b": "x", "extra": 1, "a": "y" }""");
+		
+		Assert.Equal(["b", "test-schema", "a", "c"], result.Errors.Select(x => x.FieldName));
+	}
+	
+	[Fact]
 	public void Validate_SeveralInvalidFields_ReportsAllErrors()
 	{
 		var schema = TestSchema.Of(

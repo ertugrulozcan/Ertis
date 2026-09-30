@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Dynamic;
 using System.Text.Json;
 using Ertis.Schema.Exceptions;
@@ -73,11 +74,14 @@ public class DynamicObject : ICloneable, IDisposable
 		};
 	}
 	
-	internal static DynamicObject FromJsonElement(JsonElement element)
+	/// <summary>
+	/// Reads the json value at the current token of the reader (a json which is not an object results in an empty object)
+	/// </summary>
+	internal static DynamicObject Read(ref Utf8JsonReader reader)
 	{
 		return new DynamicObject
 		{
-			PropertyDictionary = DynamicValues.FromJsonObject(element)
+			PropertyDictionary = DynamicValues.ReadValue(ref reader) as Dictionary<string, object?> ?? new Dictionary<string, object?>()
 		};
 	}
 	
@@ -110,8 +114,7 @@ public class DynamicObject : ICloneable, IDisposable
 	
 	public string ToJson()
 	{
-		var dynamicObject = ToDynamic();
-		return JsonSerializer.Serialize(dynamicObject);
+		return JsonSerializer.Serialize(this.PropertyDictionary);
 	}
 	
 	public string Serialize()
@@ -121,12 +124,12 @@ public class DynamicObject : ICloneable, IDisposable
 	
 	public T? Deserialize<T>()
 	{
-		return JsonSerializer.Deserialize<T>(this.ToJson());
+		return JsonSerializer.Deserialize<T>(JsonSerializer.SerializeToUtf8Bytes(this.PropertyDictionary));
 	}
 	
 	public object? Deserialize(Type type)
 	{
-		return JsonSerializer.Deserialize(this.ToJson(), type);
+		return JsonSerializer.Deserialize(JsonSerializer.SerializeToUtf8Bytes(this.PropertyDictionary), type);
 	}
 	
 	public dynamic ToDynamic()
@@ -155,19 +158,77 @@ public class DynamicObject : ICloneable, IDisposable
 	
 	public object? GetValue(string path, object defaultValue)
 	{
-		try
+		var exception = TryResolve(path, this.PropertyDictionary, out var value);
+		return exception switch
 		{
-			return GetValueCore(path, this.PropertyDictionary);
-		}
-		catch (UndefinedFieldException)
-		{
-			return defaultValue;
-		}
+			null => value,
+			UndefinedFieldException => defaultValue,
+			_ => throw exception
+		};
 	}
 	
 	public T? GetValue<T>(string path)
 	{
-		var value = GetValueCore(path, this.PropertyDictionary);
+		return ConvertValue<T>(GetValueCore(path, this.PropertyDictionary));
+	}
+	
+	public T? GetValue<T>(string path, T defaultValue)
+	{
+		var exception = TryResolve(path, this.PropertyDictionary, out var value);
+		return exception switch
+		{
+			null => ConvertValue<T>(value),
+			UndefinedFieldException => defaultValue,
+			_ => throw exception
+		};
+	}
+	
+	public bool TryGetValue(string path, out object? value)
+	{
+		return TryResolve(path, this.PropertyDictionary, out value) == null;
+	}
+	
+	public bool TryGetValue(string path, out object? value, out Exception? exception)
+	{
+		exception = TryResolve(path, this.PropertyDictionary, out value);
+		return exception == null;
+	}
+	
+	public bool TryGetValue<T>(string path, out T? value)
+	{
+		return this.TryGetValue(path, out value, out _);
+	}
+	
+	public bool TryGetValue<T>(string path, out T? value, out Exception? exception)
+	{
+		exception = TryResolve(path, this.PropertyDictionary, out var rawValue);
+		if (exception == null)
+		{
+			try
+			{
+				value = ConvertValue<T>(rawValue);
+				return true;
+			}
+			catch (Exception ex)
+			{
+				exception = ex;
+			}
+		}
+		
+		value = default;
+		return false;
+	}
+	
+	/// <summary>
+	/// Gets the value of the path in a dictionary of the object model, without throwing
+	/// </summary>
+	internal static bool TryGetValue(IDictionary<string, object?> dictionary, string path, out object? value)
+	{
+		return TryResolve(path, dictionary, out value) == null;
+	}
+	
+	private static T? ConvertValue<T>(object? value)
+	{
 		return value == null ? default : (T?) ConvertValue(value, typeof(T));
 	}
 	
@@ -201,174 +262,147 @@ public class DynamicObject : ICloneable, IDisposable
 		}
 	}
 	
-	public T? GetValue<T>(string path, T defaultValue)
-	{
-		try
-		{
-			return this.GetValue<T>(path);
-		}
-		catch (UndefinedFieldException)
-		{
-			return defaultValue;
-		}
-	}
-	
-	public bool TryGetValue(string path, out object? value)
-	{
-		try
-		{
-			value = this.GetValue(path);
-			return true;
-		}
-		catch
-		{
-			value = null;
-			return false;
-		}
-	}
-	
-	public bool TryGetValue(string path, out object? value, out Exception? exception)
-	{
-		try
-		{
-			value = this.GetValue(path);
-			exception = null;
-			return true;
-		}
-		catch (Exception ex)
-		{
-			value = null;
-			exception = ex;
-			return false;
-		}
-	}
-	
-	public bool TryGetValue<T>(string path, out T? value)
-	{
-		try
-		{
-			value = this.GetValue<T>(path);
-			return true;
-		}
-		catch
-		{
-			value = default;
-			return false;
-		}
-	}
-	
-	public bool TryGetValue<T>(string path, out T? value, out Exception? exception)
-	{
-		try
-		{
-			value = this.GetValue<T>(path);
-			exception = null;
-			return true;
-		}
-		catch (Exception ex)
-		{
-			value = default;
-			exception = ex;
-			return false;
-		}
-	}
-	
 	private static object? GetValueCore(string path, IDictionary<string, object?> dictionary)
 	{
+		var exception = TryResolve(path, dictionary, out var value);
+		return exception == null ? value : throw exception;
+	}
+	
+	/// <summary>
+	/// Resolves the path; returns the exception (without throwing it) when the path can not be resolved.
+	/// The exceptions are created instead of thrown, because the Try methods are used on the hot paths (e.g. the default values of the missing fields).
+	/// </summary>
+	private static Exception? TryResolve(string path, IDictionary<string, object?> dictionary, out object? value)
+	{
+		value = null;
 		if (string.IsNullOrEmpty(path))
 		{
-			throw new ArgumentException("Path can not be null or empty!");
+			return new ArgumentException("Path can not be null or empty!");
 		}
 		
-		var segments = path.Split('.');
-		var key = segments[0];
-		if (dictionary.TryGetValue(key, out var value))
+		var remaining = path.AsSpan();
+		var current = dictionary;
+		while (true)
 		{
-			if (segments.Length > 1)
+			var dotIndex = remaining.IndexOf('.');
+			var key = dotIndex < 0 ? remaining : remaining[..dotIndex];
+			
+			if (!TryGetProperty(current, key, out value))
 			{
-				if (value is IDictionary<string, object?> subDictionary)
+				var indexerException = TryGetIndexedValue(current, key, out var isIndexed, out value);
+				if (indexerException != null)
 				{
-					var subPath = string.Join(".", segments.Skip(1));
-					return GetValueCore(subPath, subDictionary);
+					value = null;
+					return indexerException;
 				}
-				else
+				
+				if (!isIndexed)
 				{
-					throw new UndefinedFieldException(path);
+					return new UndefinedFieldException(remaining.ToString());
 				}
 			}
-			else
+			
+			if (dotIndex < 0)
 			{
-				return value;
-			}   
-		}
-		else if (TryGetValueFromArray(key, dictionary, out var foundValue))
-		{
-			if (segments.Length > 1)
-			{
-				if (foundValue is IDictionary<string, object?> subDictionary)
-				{
-					var subPath = string.Join(".", segments.Skip(1));
-					return GetValueCore(subPath, subDictionary);
-				}
-				else
-				{
-					throw new UndefinedFieldException(path);
-				}
+				return null;
 			}
-			else
+			
+			if (value is not IDictionary<string, object?> subDictionary)
 			{
-				return foundValue;
+				value = null;
+				return new UndefinedFieldException(remaining.ToString());
 			}
-		}
-		else
-		{
-			throw new UndefinedFieldException(path);
+			
+			remaining = remaining[(dotIndex + 1)..];
+			if (remaining.IsEmpty)
+			{
+				value = null;
+				return new ArgumentException("Path can not be null or empty!");
+			}
+			
+			current = subDictionary;
 		}
 	}
 	
-	private static bool TryGetValueFromArray(string key, IDictionary<string, object?> dictionary, out object? foundValue)
+	/// <summary>
+	/// Looks up a property without allocating the key (the dictionaries of the object model are Dictionary&lt;string, object?&gt;)
+	/// </summary>
+	private static bool TryGetProperty(IDictionary<string, object?> dictionary, ReadOnlySpan<char> key, out object? value)
 	{
-		if (key.Contains('[') && key.EndsWith(']'))
+		if (dictionary is Dictionary<string, object?> concreteDictionary && concreteDictionary.Comparer.Equals(EqualityComparer<string>.Default))
 		{
-			var indexerStartIndex = key.IndexOf('[');
-			var indexerCloseIndex = key.IndexOf(']');
-			
-			var originalKey = key[..indexerStartIndex];
-			if (dictionary.TryGetValue(originalKey, out var value))
-			{
-				if (value is Array array)
-				{
-					var indexStr = key.Substring(indexerStartIndex + 1, indexerCloseIndex - indexerStartIndex - 1);
-					if (int.TryParse(indexStr, out var index))
-					{
-						if (index < array.Length)
-						{
-							foundValue = array.GetValue(index);
-							return true;
-						}
-						else
-						{
-							throw new InvalidOperationException($"Out of range (length: {array.Length}, index: {index})");
-						}
-					}
-					else
-					{
-						throw new InvalidOperationException($"Array index is not valid integer ('{indexStr}')");
-					}
-				}
-				else
-				{
-					throw new InvalidOperationException("Indexed node is not an array");
-				}
-			}
-			else
-			{
-				throw new UndefinedFieldException(key);
-			}
+			return concreteDictionary.GetAlternateLookup<ReadOnlySpan<char>>().TryGetValue(key, out value);
 		}
 		
-		foundValue = null;
-		return false;
+		return dictionary.TryGetValue(key.ToString(), out value);
+	}
+	
+	/// <summary>
+	/// Resolves an indexed key like 'tags[1]' or 'matrix[1][0]' (isIndexed is false when the key has no indexer)
+	/// </summary>
+	private static Exception? TryGetIndexedValue(IDictionary<string, object?> dictionary, ReadOnlySpan<char> key, out bool isIndexed, out object? value)
+	{
+		var indexerStart = key.IndexOf('[');
+		isIndexed = indexerStart >= 0 && key[^1] == ']';
+		if (!isIndexed)
+		{
+			value = null;
+			return null;
+		}
+		
+		if (!TryGetProperty(dictionary, key[..indexerStart], out value))
+		{
+			return new UndefinedFieldException(key.ToString());
+		}
+		
+		var indexers = key[indexerStart..];
+		while (!indexers.IsEmpty)
+		{
+			var exception = TryGetIndexedArray(value, indexers, out var array, out var index, out var indexerLength);
+			if (exception != null)
+			{
+				return exception;
+			}
+			
+			value = array!.GetValue(index);
+			indexers = indexers[indexerLength..];
+		}
+		
+		return null;
+	}
+	
+	/// <summary>
+	/// Validates the first indexer of the indexers ('[1]...') against the node
+	/// </summary>
+	private static Exception? TryGetIndexedArray(object? node, ReadOnlySpan<char> indexers, out Array? array, out int index, out int indexerLength)
+	{
+		array = node as Array;
+		index = 0;
+		indexerLength = 0;
+		if (array == null)
+		{
+			return new InvalidOperationException("Indexed node is not an array");
+		}
+		
+		var closeIndex = indexers.IndexOf(']');
+		if (indexers[0] != '[' || closeIndex < 0)
+		{
+			return new InvalidOperationException($"Array index is not valid integer ('{indexers}')");
+		}
+		
+		var indexText = indexers[1..closeIndex];
+		if (!int.TryParse(indexText, NumberStyles.Integer, CultureInfo.InvariantCulture, out index))
+		{
+			return new InvalidOperationException($"Array index is not valid integer ('{indexText}')");
+		}
+		
+		if (index < 0 || index >= array.Length)
+		{
+			return new InvalidOperationException($"Out of range (length: {array.Length}, index: {index})");
+		}
+		
+		indexerLength = closeIndex + 1;
+		return null;
 	}
 	
 	public void SetValue(string path, object? value, bool createIfNotExist = false)
@@ -398,105 +432,109 @@ public class DynamicObject : ICloneable, IDisposable
 			throw new ArgumentException("Path can not be null or empty!");
 		}
 		
-		var segments = path.Split('.');
-		var key = segments[0];
-		if (dictionary.ContainsKey(key))
+		var remaining = path.AsSpan();
+		var current = dictionary;
+		while (true)
 		{
-			var value = dictionary[key];
-			if (segments.Length > 1)
+			var dotIndex = remaining.IndexOf('.');
+			var key = dotIndex < 0 ? remaining : remaining[..dotIndex];
+			
+			if (TryGetProperty(current, key, out var value))
 			{
-				if (value is IDictionary<string, object?> subDictionary)
+				if (dotIndex < 0)
 				{
-					var subPath = string.Join(".", segments.Skip(1));
-					SetValueCore(subPath, obj, subDictionary, createIfNotExist);
+					current[key.ToString()] = obj;
+					return;
 				}
-				else
-				{
-					throw new UndefinedFieldException(path);
-				}
-			}
-			else
-			{
-				dictionary[key] = obj;
-			}
-		}
-		else if (TrySetValueOnArray(path, dictionary, obj))
-		{
-			// NOP
-		}
-		else if (createIfNotExist)
-		{
-			if (segments.Length > 1)
-			{
-				var subDictionary = new Dictionary<string, object?>();
-				dictionary.Add(key, subDictionary);
 				
-				var subPath = string.Join(".", segments.Skip(1));
-				SetValueCore(subPath, obj, subDictionary, true);
+				if (value is not IDictionary<string, object?> subDictionary)
+				{
+					throw new UndefinedFieldException(remaining.ToString());
+				}
+				
+				current = subDictionary;
+			}
+			else if (TrySetIndexedValue(current, key, dotIndex >= 0, obj, out var item))
+			{
+				if (item == null)
+				{
+					return;
+				}
+				
+				// The properties of an array item are never created
+				current = item;
+				createIfNotExist = false;
+			}
+			else if (createIfNotExist && remaining.IndexOf('[') < 0)
+			{
+				if (dotIndex < 0)
+				{
+					current.Add(key.ToString(), obj);
+					return;
+				}
+				
+				var subDictionary = new Dictionary<string, object?>();
+				current.Add(key.ToString(), subDictionary);
+				current = subDictionary;
 			}
 			else
 			{
-				dictionary.Add(key, obj);
+				throw new UndefinedFieldException(remaining.ToString());
 			}
-		}
-		else
-		{
-			throw new UndefinedFieldException(path);
+			
+			remaining = remaining[(dotIndex + 1)..];
+			if (remaining.IsEmpty)
+			{
+				throw new ArgumentException("Path can not be null or empty!");
+			}
 		}
 	}
 	
-	private static bool TrySetValueOnArray(string key, IDictionary<string, object?> dictionary, object? setValue)
+	/// <summary>
+	/// Sets the item of an indexed key like 'tags[1]' or 'matrix[1][0]'; returns false when the key has no indexer.
+	/// When the path continues after the key and the item is an object, the item is returned instead to set the value in it.
+	/// </summary>
+	private static bool TrySetIndexedValue(IDictionary<string, object?> dictionary, ReadOnlySpan<char> key, bool hasMoreSegments, object? obj, out IDictionary<string, object?>? item)
 	{
-		var indexerStartIndex = key.IndexOf('[');
-		var indexerCloseIndex = key.IndexOf(']');
-		
-		if (indexerStartIndex > 0 && indexerCloseIndex > 0 && indexerStartIndex < indexerCloseIndex)
+		item = null;
+		var indexerStart = key.IndexOf('[');
+		if (indexerStart <= 0 || key[^1] != ']')
 		{
-			var originalKey = key[..indexerStartIndex];
-			if (dictionary.TryGetValue(originalKey, out var value))
+			return false;
+		}
+		
+		if (!TryGetProperty(dictionary, key[..indexerStart], out var node))
+		{
+			throw new UndefinedFieldException(key.ToString());
+		}
+		
+		var indexers = key[indexerStart..];
+		while (true)
+		{
+			var exception = TryGetIndexedArray(node, indexers, out var array, out var index, out var indexerLength);
+			if (exception != null)
 			{
-				if (value is Array array)
-				{
-					var indexStr = key.Substring(indexerStartIndex + 1, indexerCloseIndex - indexerStartIndex - 1);
-					if (int.TryParse(indexStr, out var index))
-					{
-						if (index < array.Length)
-						{
-							var indexerPath = $"{originalKey}[{index}]";
-							var arrayItem = array.GetValue(index);
-							if (key.Length > indexerPath.Length && arrayItem is IDictionary<string, object?> subDictionary)
-							{
-								SetValueCore(key[indexerPath.Length..].TrimStart('.'), setValue, subDictionary, false);
-							}
-							else
-							{
-								array.SetValue(setValue, index);
-							}
-							
-							return true;
-						}
-						else
-						{
-							throw new InvalidOperationException($"Out of range (length: {array.Length}, index: {index})");
-						}
-					}
-					else
-					{
-						throw new InvalidOperationException($"Array index is not valid integer ('{indexStr}')");
-					}
-				}
-				else
-				{
-					throw new InvalidOperationException("Indexed node is not an array");
-				}
+				throw exception;
+			}
+			
+			indexers = indexers[indexerLength..];
+			if (!indexers.IsEmpty)
+			{
+				node = array!.GetValue(index);
+				continue;
+			}
+			
+			if (hasMoreSegments && array!.GetValue(index) is IDictionary<string, object?> subDictionary)
+			{
+				item = subDictionary;
 			}
 			else
 			{
-				throw new UndefinedFieldException(key);
+				array!.SetValue(obj, index);
 			}
+			
+			return true;
 		}
-		
-		return false;
 	}
 	
 	public void RemoveProperty(string path)
@@ -567,28 +605,13 @@ public class DynamicObject : ICloneable, IDisposable
 	
 	#region Disposing
 	
-	private bool _disposedValue;
-	
-	~DynamicObject() => this.Dispose(false);
-	
+	/// <summary>
+	/// Clears the properties. The object holds no unmanaged resources, so it has no finalizer
+	/// (a finalizer would keep every instance alive for an extra garbage collection).
+	/// </summary>
 	public void Dispose()
 	{
-		this.Dispose(true);
-		GC.SuppressFinalize(this);
-	}
-	
-	private void Dispose(bool disposing)
-	{
-		if (!_disposedValue)
-		{
-			if (disposing)
-			{
-				this.PropertyDictionary.Clear();
-			}
-			
-			// Free unmanaged resources (unmanaged objects) and override finalizer, set large fields to null
-			_disposedValue = true;
-		}
+		this.PropertyDictionary.Clear();
 	}
 	
 	#endregion

@@ -16,6 +16,13 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 	
 	#endregion
 	
+	#region Fields
+	
+	private Regex? _regex;
+	private Regex? _restrictRegex;
+	
+	#endregion
+	
 	#region Properties
 	
 	[JsonPropertyName("type")]
@@ -80,12 +87,28 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 	[JsonPropertyName("regexPattern")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 	[Newtonsoft.Json.JsonProperty("regexPattern", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
-	public string? RegexPattern { get; init; }
+	public string? RegexPattern
+	{
+		get;
+		init
+		{
+			field = value;
+			this._regex = this.CreateRegex(value, "regexPattern");
+		}
+	}
 	
 	[JsonPropertyName("restrictRegexPattern")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
 	[Newtonsoft.Json.JsonProperty("restrictRegexPattern", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
-	public string? RestrictRegexPattern { get; init; }
+	public string? RestrictRegexPattern
+	{
+		get;
+		init
+		{
+			field = value;
+			this._restrictRegex = this.CreateRegex(value, "restrictRegexPattern");
+		}
+	}
 	
 	[JsonPropertyName("caseInsensitive")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -141,20 +164,18 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 				validationContext.Errors.Add(new FieldValidationException($"String length can not be less than {this.MinLength}", this));
 			}
 			
-			if (!string.IsNullOrEmpty(text) && !string.IsNullOrEmpty(this.RegexPattern))
+			if (!string.IsNullOrEmpty(text) && this._regex != null)
 			{
-				var match = Regex.Match(text, this.RegexPattern);
-				if (!match.Success)
+				if (!this._regex.IsMatch(text))
 				{
 					isValid = false;
 					validationContext.Errors.Add(new FieldValidationException($"String value is not valid by the regular expression rule. ('{this.RegexPattern}')", this));
 				}
 			}
 			
-			if (!string.IsNullOrEmpty(text) && !string.IsNullOrEmpty(this.RestrictRegexPattern))
+			if (!string.IsNullOrEmpty(text) && this._restrictRegex != null)
 			{
-				var match = Regex.Match(text, this.RestrictRegexPattern);
-				if (match.Success)
+				if (this._restrictRegex.IsMatch(text))
 				{
 					isValid = false;
 					validationContext.Errors.Add(new FieldValidationException($"String value is not valid by the restrict regular expression rule. ('{this.RestrictRegexPattern}')", this));
@@ -163,6 +184,26 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 		}
 		
 		return isValid;
+	}
+	
+	/// <summary>
+	/// Creates the regex once (instead of the static regex cache of each validation), an invalid pattern is rejected when the field is created
+	/// </summary>
+	private Regex? CreateRegex(string? pattern, string propertyName)
+	{
+		if (string.IsNullOrEmpty(pattern))
+		{
+			return null;
+		}
+		
+		try
+		{
+			return new Regex(pattern);
+		}
+		catch (ArgumentException ex)
+		{
+			throw new FieldValidationException($"The '{propertyName}' is not a valid regular expression. ({ex.Message})", this);
+		}
 	}
 	
 	private bool ValidateMinLength(out Exception? exception)

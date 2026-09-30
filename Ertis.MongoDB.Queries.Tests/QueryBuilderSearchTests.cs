@@ -94,5 +94,39 @@ public class QueryBuilderSearchTests
 		QueryAssert.Filter("""{ "$text": { "$search": "jane" } }""", QueryBuilder.FullTextSearch("jane", language));
 	}
 	
+	[Fact]
+	public void TextSearchLanguage_All_ContainsEveryLanguageOnce()
+	{
+		var languages = TextSearchLanguage.All;
+		
+		Assert.Equal(16, languages.Count);
+		Assert.Equal(languages.Count, languages.Select(x => x.ISO6391Code).Distinct().Count());
+		Assert.Contains(languages, x => x is { Name: "Turkish", ISO6391Code: "tr" });
+		Assert.Contains(languages, x => x is { Name: "None", ISO6391Code: "none" });
+	}
+	
+	/// <summary>
+	/// The repositories build the search from the TextSearchOptions (e.g. MongoRepositoryBase.Search)
+	/// </summary>
+	[Fact]
+	public void FullTextSearch_WithTheCodeOfTextSearchOptions_WritesTheLanguage()
+	{
+		var options = new TextSearchOptions { Language = TextSearchLanguage.Turkish, IsCaseSensitive = true };
+		
+		var query = QueryBuilder.FullTextSearch("kitap", options.Language.ISO6391Code, options.IsCaseSensitive, options.IsDiacriticSensitive);
+		
+		QueryAssert.Filter("""{ "$text": { "$search": "kitap", "$language": "tr", "$caseSensitive": true } }""", query);
+	}
+	
+	[Fact]
+	public void FullTextSearch_WithTextSearchOptionsWithoutALanguage_OmitsTheLanguage()
+	{
+		var options = new TextSearchOptions();
+		
+		var query = QueryBuilder.FullTextSearch("kitap", options.Language.ISO6391Code, options.IsCaseSensitive, options.IsDiacriticSensitive);
+		
+		QueryAssert.Filter("""{ "$text": { "$search": "kitap" } }""", query);
+	}
+	
 	#endregion
 }

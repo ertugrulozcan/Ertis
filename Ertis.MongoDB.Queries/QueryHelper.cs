@@ -32,6 +32,7 @@ internal static class QueryHelper
 			MongoOperator.TextSearchLanguage => "language",
 			MongoOperator.TextSearchCaseSensitive => "caseSensitive",
 			MongoOperator.TextSearchDiacriticSensitive => "diacriticSensitive",
+			MongoOperator.ElemMatch => "elemMatch",
 			_ => throw new ArgumentOutOfRangeException(nameof(mongoOperator), mongoOperator, null)
 		};
 	}

@@ -817,6 +817,56 @@ public static class QueryBuilder
 	
 	#endregion
 	
+	#region Array Queries
+	
+	/// <summary>
+	/// Matches the documents whose array field has at least one element that satisfies all the queries,
+	/// e.g. ElemMatch("accounts", Equals("provider", "google"), Equals("user_id", "123")) or ElemMatch("scores", GreaterThanOrEqual(80), LessThan(85))
+	/// </summary>
+	public static IQueryExpression ElemMatch(string key, params IQuery[] queries)
+	{
+		return ElemMatch(key, (IEnumerable<IQuery>) queries);
+	}
+	
+	/// <summary>
+	/// Matches the documents whose array field has at least one element that satisfies all the queries
+	/// </summary>
+	public static IQueryExpression ElemMatch(string key, IEnumerable<IQuery> queries)
+	{
+		return new QueryExpression
+		{
+			Field = key,
+			Value = ElemMatchCore(queries)
+		};
+	}
+	
+	/// <summary>
+	/// The $elemMatch operator without a field (e.g. to combine it with other operators of a field)
+	/// </summary>
+	public static IQuery ElemMatch(params IQuery[] queries)
+	{
+		return ElemMatchCore(queries);
+	}
+	
+	/// <summary>
+	/// The $elemMatch operator without a field (e.g. to combine it with other operators of a field)
+	/// </summary>
+	public static IQuery ElemMatch(IEnumerable<IQuery> queries)
+	{
+		return ElemMatchCore(queries);
+	}
+	
+	private static IQuery ElemMatchCore(IEnumerable<IQuery> queries)
+	{
+		return new Query
+		{
+			Operator = MongoOperator.ElemMatch,
+			Value = CombineCore(queries)
+		};
+	}
+	
+	#endregion
+	
 	#region Helper Methods
 	
 	/// <summary>

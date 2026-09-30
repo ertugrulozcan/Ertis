@@ -36,12 +36,20 @@ public sealed class FieldInfoCollectionJsonConverterFactory : JsonConverterFacto
 
 public sealed class FieldInfoCollectionJsonConverter<TCollection> : JsonConverter<TCollection> where TCollection : IEnumerable<IFieldInfo>
 {
+	#region Constants
+	
+	/// <summary>
+	/// The json name of the field names (FieldInfo.Name is declared with [JsonPropertyName("name")])
+	/// </summary>
+	private const string NAME_KEY = "name";
+	
+	#endregion
+	
 	#region Methods
 	
 	public override void Write(Utf8JsonWriter writer, TCollection value, JsonSerializerOptions options)
 	{
 		var writtenNames = new HashSet<string>(StringComparer.Ordinal);
-		var nameKey = GetNameKey(options);
 		
 		writer.WriteStartObject();
 		
@@ -55,7 +63,7 @@ public sealed class FieldInfoCollectionJsonConverter<TCollection> : JsonConverte
 			writer.WritePropertyName(field.Name);
 			
 			var node = JsonSerializer.SerializeToNode(field, options)!.AsObject();
-			node.Remove(nameKey);
+			node.Remove(NAME_KEY);
 			node.WriteTo(writer, options);
 		}
 		
@@ -86,18 +94,17 @@ public sealed class FieldInfoCollectionJsonConverter<TCollection> : JsonConverte
 			{
 				throw new JsonException($"Expected PropertyName but got {reader.TokenType}.");
 			}
-			
-			var nameKey = GetNameKey(options);
-			var name = reader.GetString();
+				
+				var name = reader.GetString();
 			
 			reader.Read();
 			
 			var node = JsonNode.Parse(ref reader)!.AsObject();
-			node[nameKey] = name;
+			node[NAME_KEY] = name;
 			
 			if (node["type"]?.GetValue<string>() == FieldType.array.ToString())
 			{
-				node["itemSchema"]?[nameKey] = "$schema";
+				node["itemSchema"]?[NAME_KEY] = "$schema";
 			}
 			
 			var field = node.Deserialize<IFieldInfo>(options);
@@ -112,10 +119,6 @@ public sealed class FieldInfoCollectionJsonConverter<TCollection> : JsonConverte
 		throw new JsonException("Unexpected end of JSON.");
 	}
 	
-	private static string GetNameKey(JsonSerializerOptions options)
-	{
-		return options.PropertyNamingPolicy?.ConvertName(nameof(IFieldInfo.Name)) ?? nameof(IFieldInfo.Name);
-	}
 	
 	#endregion
 }

@@ -57,7 +57,7 @@ public class ConstantFieldInfo : FieldInfo<object>
 					incompatibleType = obj is not DateTime && !DateTime.TryParse(DynamicValues.ToInvariantString(obj), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out _);
 					break;
 				default:
-					throw new ArgumentOutOfRangeException();
+					throw new InvalidOperationException($"Unknown constant type '{this.ValueType}' ({this.Name})");
 			}
 			
 			if (incompatibleType)

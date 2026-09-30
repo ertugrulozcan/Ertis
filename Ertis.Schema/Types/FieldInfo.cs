@@ -15,6 +15,8 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
 {
 	#region Properties
 	
+	[JsonPropertyName("name")]
+	[NewtonsoftJsonProperty("name")]
 	public required string Name
 	{
 		get;
@@ -408,30 +410,39 @@ public abstract class FieldInfo<T> : FieldInfo, IHasDefault<T>
 	
 	private static string GetPrimitiveName(Type type)
 	{
-		var primitiveTypeName = type.Name;
+		type = Nullable.GetUnderlyingType(type) ?? type;
 		
-		if (type == typeof(int))
+		if (type == typeof(long) || type == typeof(int))
 		{
-			primitiveTypeName = "integer";
-		}
-		else if (type == typeof(double))
-		{
-			primitiveTypeName = "float";
-		}
-		else if (type == typeof(bool))
-		{
-			primitiveTypeName = "boolean";
-		}
-		else if (type == typeof(Array))
-		{
-			primitiveTypeName = "array";
-		}
-		else if (type == typeof(string))
-		{
-			primitiveTypeName = "string";
+			return "integer";
 		}
 		
-		return primitiveTypeName;
+		if (type == typeof(double) || type == typeof(float))
+		{
+			return "float";
+		}
+		
+		if (type == typeof(bool))
+		{
+			return "boolean";
+		}
+		
+		if (type == typeof(string))
+		{
+			return "string";
+		}
+		
+		if (type == typeof(string[]))
+		{
+			return "string array";
+		}
+		
+		if (type == typeof(Array))
+		{
+			return "array";
+		}
+		
+		return type.Name;
 	}
 	
 	protected virtual void ValidateHiddenRules()

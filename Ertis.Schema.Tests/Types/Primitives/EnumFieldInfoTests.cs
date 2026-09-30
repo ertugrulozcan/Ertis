@@ -28,6 +28,17 @@ public class EnumFieldInfoTests
 		Assert.Equal("Enum items must be unique", exception.Message);
 	}
 	
+	[Fact]
+	public void ValidateSchema_WithoutItems_ReturnsFalse()
+	{
+		var fieldInfo = new EnumFieldInfo { Name = "country" };
+		
+		var isValid = fieldInfo.ValidateSchema(out var exception);
+		
+		Assert.False(isValid);
+		Assert.Equal("Enum items can not be empty", exception?.Message);
+	}
+	
 	#endregion
 	
 	#region Data Validation Methods

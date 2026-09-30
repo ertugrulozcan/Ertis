@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Ertis.Schema.Exceptions;
 
 namespace Ertis.Schema.Models;
 
@@ -109,13 +110,13 @@ public struct ResolutionRules : ICloneable
 		{
 			if (this.MinWidth < 0)
 			{
-				exception = new Exception("The 'minWidth' value can not be less than zero')");
+				exception = new SchemaValidationException("The 'minWidth' value can not be less than zero");
 				return false;
 			}
 			
 			if (this.MaxWidth != null && this.MinWidth != null && this.MaxWidth < this.MinWidth)
 			{
-				exception = new Exception("The 'minWidth' value can not be greater than the 'maxWidth' value')");
+				exception = new SchemaValidationException("The 'minWidth' value can not be greater than the 'maxWidth' value");
 				return false;
 			}
 		}
@@ -130,13 +131,13 @@ public struct ResolutionRules : ICloneable
 		{
 			if (this.MinHeight < 0)
 			{
-				exception = new Exception("The 'minHeight' value can not be less than zero')");
+				exception = new SchemaValidationException("The 'minHeight' value can not be less than zero");
 				return false;
 			}
 			
 			if (this.MaxHeight != null && this.MinHeight != null && this.MaxHeight < this.MinHeight)
 			{
-				exception = new Exception("The 'minHeight' value can not be greater than the 'maxHeight' value')");
+				exception = new SchemaValidationException("The 'minHeight' value can not be greater than the 'maxHeight' value");
 				return false;
 			}
 		}
@@ -151,13 +152,13 @@ public struct ResolutionRules : ICloneable
 		{
 			if (this.MaxWidth < 0)
 			{
-				exception = new Exception("The 'maxWidth' value can not be less than zero')");
+				exception = new SchemaValidationException("The 'maxWidth' value can not be less than zero");
 				return false;
 			}
 			
 			if (this.MinWidth != null && this.MaxWidth != null && this.MinWidth > this.MaxWidth)
 			{
-				exception = new Exception("The 'minWidth' value can not be greater than the 'maxWidth' value')");
+				exception = new SchemaValidationException("The 'minWidth' value can not be greater than the 'maxWidth' value");
 				return false;
 			}
 		}
@@ -172,13 +173,13 @@ public struct ResolutionRules : ICloneable
 		{
 			if (this.MaxHeight < 0)
 			{
-				exception = new Exception("The 'maxHeight' value can not be less than zero')");
+				exception = new SchemaValidationException("The 'maxHeight' value can not be less than zero");
 				return false;
 			}
 			
 			if (this.MinHeight != null && this.MaxHeight != null && this.MinHeight > this.MaxHeight)
 			{
-				exception = new Exception("The 'minHeight' value can not be greater than the 'maxHeight' value')");
+				exception = new SchemaValidationException("The 'minHeight' value can not be greater than the 'maxHeight' value");
 				return false;
 			}
 		}

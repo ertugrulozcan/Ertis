@@ -551,9 +551,8 @@ public class DynamicObject : ICloneable, IDisposable
 		
 		var segments = path.Split('.');
 		var key = segments[0];
-		if (dictionary.ContainsKey(key))
+		if (dictionary.TryGetValue(key, out var value))
 		{
-			var value = dictionary[key];
 			if (segments.Length > 1)
 			{
 				if (value is IDictionary<string, object?> subDictionary)

@@ -1,3 +1,4 @@
+using Ertis.Schema.Exceptions;
 using Ertis.Schema.Models;
 
 namespace Ertis.Schema.Tests.Models;
@@ -18,25 +19,25 @@ public class ResolutionRulesTests
 	[Fact]
 	public void Create_WithNegativeMinWidth_Throws()
 	{
-		var exception = Assert.Throws<Exception>(() => new ResolutionRules { MinWidth = -1 });
+		var exception = Assert.Throws<SchemaValidationException>(() => new ResolutionRules { MinWidth = -1 });
 		
-		Assert.StartsWith("The 'minWidth' value can not be less than zero", exception.Message);
+		Assert.Equal("The 'minWidth' value can not be less than zero", exception.Message);
 	}
 	
 	[Fact]
 	public void Create_WithMinWidthGreaterThanMaxWidth_Throws()
 	{
-		var exception = Assert.Throws<Exception>(() => new ResolutionRules { MaxWidth = 100, MinWidth = 200 });
+		var exception = Assert.Throws<SchemaValidationException>(() => new ResolutionRules { MaxWidth = 100, MinWidth = 200 });
 		
-		Assert.StartsWith("The 'minWidth' value can not be greater than the 'maxWidth' value", exception.Message);
+		Assert.Equal("The 'minWidth' value can not be greater than the 'maxWidth' value", exception.Message);
 	}
 	
 	[Fact]
 	public void Create_WithMinHeightGreaterThanMaxHeight_Throws()
 	{
-		var exception = Assert.Throws<Exception>(() => new ResolutionRules { MaxHeight = 100, MinHeight = 200 });
+		var exception = Assert.Throws<SchemaValidationException>(() => new ResolutionRules { MaxHeight = 100, MinHeight = 200 });
 		
-		Assert.StartsWith("The 'minHeight' value can not be greater than the 'maxHeight' value", exception.Message);
+		Assert.Equal("The 'minHeight' value can not be greater than the 'maxHeight' value", exception.Message);
 	}
 	
 	[Fact]

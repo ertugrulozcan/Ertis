@@ -48,10 +48,9 @@ public static class ExpandoObjectExtensions
 		else
 		{
 			IDictionary<string, object?> expandoDictionary = expandoObject;
-			if (expandoDictionary.ContainsKey(segments[0]))
+			if (expandoDictionary.TryGetValue(segments[0], out var segmentValue))
 			{
 				var subPath = path[(segments[0].Length + 1)..];
-				var segmentValue = expandoDictionary[segments[0]];
 				if (segmentValue == null)
 				{
 					return (T?) segmentValue;
@@ -92,10 +91,9 @@ public static class ExpandoObjectExtensions
 		else
 		{
 			IDictionary<string, object?> expandoDictionary = expandoObject;
-			if (expandoDictionary.ContainsKey(segments[0]))
+			if (expandoDictionary.TryGetValue(segments[0], out var segmentValue))
 			{
 				var subPath = path[(segments[0].Length + 1)..];
-				var segmentValue = expandoDictionary[segments[0]];
 				if (segmentValue == null)
 				{
 					return expandoObject;

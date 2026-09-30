@@ -91,6 +91,19 @@ public class FieldInfoJsonConverterTests
 		Assert.Equal("address.city", city.Path);
 	}
 	
+	[Fact]
+	public void Serialize_WithDefaultOptions_WritesTheNameInLowerCase()
+	{
+		var options = new JsonSerializerOptions { Converters = { new FieldInfoJsonConverter() } };
+		var properties = new PropertiesModel { Properties = [new ArrayFieldInfo { Name = "tags", ItemSchema = new StringFieldInfo { Name = "$schema" } }] };
+		
+		var json = JsonSerializer.Serialize(properties, options);
+		var roundTripped = JsonSerializer.Deserialize<PropertiesModel>(json, options)!;
+		
+		Assert.Equal("""{"properties":{"tags":{"type":"array","itemSchema":{"type":"string","name":"$schema"}}}}""", json);
+		Assert.Equal("tags", Assert.Single(roundTripped.Properties).Name);
+	}
+	
 	#endregion
 	
 	#region Error Methods

@@ -98,18 +98,15 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
 	{
 		if (this.Items.Length == 0)
 		{
-			throw new FieldValidationException("Enum items can not be empty", this);
-		}
-		
-		if (this.Items.Any(x => !x.Value.GetType().IsPrimitive && x.Value.GetType() != typeof(string)))
-		{
-			throw new FieldValidationException("Enum item values must be primitive type", this);
+			exception = new FieldValidationException("Enum items can not be empty", this);
+			return false;
 		}
 		
 		var uniqueCount = this.Items.Select(x => x.Value).Distinct().Count();
 		if (this.Items.Length != uniqueCount)
 		{
-			throw new FieldValidationException("Enum items must be unique", this);
+			exception = new FieldValidationException("Enum items must be unique", this);
+			return false;
 		}
 		
 		exception = null;

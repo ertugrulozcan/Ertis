@@ -26,7 +26,7 @@ public class BooleanFieldInfoTests
 		var result = SchemaValidation.ValidateField(new BooleanFieldInfo { Name = "active" }, $$"""{ "active": {{jsonValue}} }""");
 		
 		Assert.False(result.IsValid);
-		Assert.Equal(["Type mismatch error. 'active' is must be 'Nullable`1'"], result.Messages);
+		Assert.Equal(["Type mismatch error. 'active' is must be 'boolean'"], result.Messages);
 	}
 	
 	[Fact]

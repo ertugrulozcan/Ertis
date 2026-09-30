@@ -208,13 +208,13 @@ public class TagsFieldInfo : FieldInfo<string[]>
 	{
 		if (this.MinLength < 0)
 		{
-			exception = new FieldValidationException("MinLength can not be less than zero", this);
+			exception = new FieldValidationException($"The 'minLength' value can not be less than zero ('{this.Name}')", this);
 			return false;
 		}
 		
 		if (this.MaxLength != null && this.MinLength != null && this.MaxLength < this.MinLength)
 		{
-			exception = new FieldValidationException("MinLength can not be greater than MaxLength", this);
+			exception = new FieldValidationException($"The 'minLength' value can not be greater than the 'maxLength' value ('{this.Name}')", this);
 			return false;
 		}
 		
@@ -226,13 +226,13 @@ public class TagsFieldInfo : FieldInfo<string[]>
 	{
 		if (this.MaxLength < 0)
 		{
-			exception = new FieldValidationException("MaxLength can not be less than zero", this);
+			exception = new FieldValidationException($"The 'maxLength' value can not be less than zero ('{this.Name}')", this);
 			return false;
 		}
 		
 		if (this.MinLength != null && this.MaxLength != null && this.MinLength > this.MaxLength)
 		{
-			exception = new FieldValidationException("MinLength can not be greater than MaxLength", this);
+			exception = new FieldValidationException($"The 'minLength' value can not be greater than the 'maxLength' value ('{this.Name}')", this);
 			return false;
 		}
 		

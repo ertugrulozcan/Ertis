@@ -40,7 +40,7 @@ public class FloatFieldInfoTests
 		var result = SchemaValidation.ValidateField(new FloatFieldInfo { Name = "ratio" }, $$"""{ "ratio": {{jsonValue}} }""");
 		
 		Assert.False(result.IsValid);
-		Assert.Equal(["Type mismatch error. 'ratio' is must be 'Nullable`1'"], result.Messages);
+		Assert.Equal(["Type mismatch error. 'ratio' is must be 'float'"], result.Messages);
 	}
 	
 	[Fact]
@@ -99,7 +99,7 @@ public class FloatFieldInfoTests
 		var result = SchemaValidation.Validate(TestSchema.Of(new FloatFieldInfo { Name = "ratio", Maximum = 1 }), content);
 		
 		Assert.False(result.IsValid);
-		Assert.Equal(["Type mismatch error. 'ratio' is must be 'Nullable`1'"], result.Messages);
+		Assert.Equal(["Type mismatch error. 'ratio' is must be 'float'"], result.Messages);
 	}
 	
 	[Fact]

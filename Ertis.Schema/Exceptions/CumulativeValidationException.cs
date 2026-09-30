@@ -15,7 +15,10 @@ public class CumulativeValidationException : ErtisSchemaValidationException
 	/// <summary>
 	/// Constructor
 	/// </summary>
-	public CumulativeValidationException(IEnumerable<FieldValidationException> errors) : base("ValidationException")
+	public CumulativeValidationException(IEnumerable<FieldValidationException> errors) : this(errors.ToArray())
+	{ }
+	
+	private CumulativeValidationException(FieldValidationException[] errors) : base($"Validation failed ({errors.Length} {(errors.Length == 1 ? "error" : "errors")})")
 	{
 		this.Errors = errors;
 	}

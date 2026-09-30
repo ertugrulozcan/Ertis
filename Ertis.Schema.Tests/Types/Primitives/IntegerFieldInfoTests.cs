@@ -59,7 +59,7 @@ public class IntegerFieldInfoTests
 		var result = SchemaValidation.ValidateField(new IntegerFieldInfo { Name = "count" }, $$"""{ "count": {{jsonValue}} }""");
 		
 		Assert.False(result.IsValid);
-		Assert.Equal(["Type mismatch error. 'count' is must be 'Nullable`1'"], result.Messages);
+		Assert.Equal(["Type mismatch error. 'count' is must be 'integer'"], result.Messages);
 	}
 	
 	[Fact]
@@ -156,7 +156,7 @@ public class IntegerFieldInfoTests
 		var result = SchemaValidation.Validate(TestSchema.Of(new IntegerFieldInfo { Name = "count", Maximum = 100 }), content);
 		
 		Assert.False(result.IsValid);
-		Assert.Equal(["Type mismatch error. 'count' is must be 'Nullable`1'"], result.Messages);
+		Assert.Equal(["Type mismatch error. 'count' is must be 'integer'"], result.Messages);
 	}
 	
 	private static IntegerFieldInfo CreateField(string rule)

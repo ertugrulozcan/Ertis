@@ -4,7 +4,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<PackageId>Ertis.Schema</PackageId>
-		<PackageVersion>10.1.7</PackageVersion>
+		<PackageVersion>10.1.7-preview.1</PackageVersion>
 		<Version>10.1.7-preview.1</Version>
 		<Authors>Ertuğrul Özcan</Authors>
 	</PropertyGroup>

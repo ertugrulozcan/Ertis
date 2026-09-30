@@ -281,10 +281,10 @@ public class CollectionReferenceOptions
 			switch (this.Skip)
 			{
 				case < 0:
-					exception = new SchemaValidationException("The multiple reference 'skip' value can not be less than zero");
+					exception = new SchemaValidationException("The collection reference 'skip' value can not be less than zero");
 					return false;
 				case > 500:
-					exception = new SchemaValidationException("The multiple reference 'skip' value can not be greater than 500");
+					exception = new SchemaValidationException("The collection reference 'skip' value can not be greater than 500");
 					return false;
 			}
 		}
@@ -300,10 +300,10 @@ public class CollectionReferenceOptions
 			switch (this.Limit)
 			{
 				case <= 0:
-					exception = new SchemaValidationException("The multiple reference 'limit' value can not be less than or equal zero");
+					exception = new SchemaValidationException("The collection reference 'limit' value can not be less than or equal zero");
 					return false;
 				case > 500:
-					exception = new SchemaValidationException("The multiple reference 'limit' value can not be greater than 500");
+					exception = new SchemaValidationException("The collection reference 'limit' value can not be greater than 500");
 					return false;
 			}
 		}

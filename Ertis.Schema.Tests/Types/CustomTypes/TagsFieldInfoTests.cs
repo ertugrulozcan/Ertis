@@ -50,7 +50,17 @@ public class TagsFieldInfoTests
 		var result = SchemaValidation.ValidateField(new TagsFieldInfo { Name = "tags" }, $$"""{ "tags": {{jsonValue}} }""");
 		
 		Assert.False(result.IsValid);
-		Assert.Contains("Type mismatch error. 'tags' is must be 'String[]'", result.Messages);
+		Assert.Contains("Type mismatch error. 'tags' is must be 'string array'", result.Messages);
+	}
+	
+	[Theory]
+	[InlineData(-1, null, "The 'minLength' value can not be less than zero ('tags')")]
+	[InlineData(5, 2, "The 'minLength' value can not be greater than the 'maxLength' value ('tags')")]
+	public void Create_WithInvalidLengthRule_Throws(int minLength, int? maxLength, string expectedMessage)
+	{
+		var exception = Assert.Throws<Ertis.Schema.Exceptions.FieldValidationException>(() => new TagsFieldInfo { Name = "tags", MaxLength = maxLength, MinLength = minLength });
+		
+		Assert.Equal(expectedMessage, exception.Message);
 	}
 	
 	#endregion

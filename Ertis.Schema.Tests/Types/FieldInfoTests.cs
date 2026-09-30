@@ -101,6 +101,20 @@ public class FieldInfoTests
 		Assert.Same(address, city.Parent);
 	}
 	
+	[Theory]
+	[InlineData(1, "Validation failed (1 error)")]
+	[InlineData(3, "Validation failed (3 errors)")]
+	public void CumulativeValidationException_DescribesTheErrorCount(int errorCount, string expectedMessage)
+	{
+		var fieldInfo = new StringFieldInfo { Name = "title" };
+		var errors = Enumerable.Range(0, errorCount).Select(_ => new FieldValidationException("invalid", fieldInfo)).ToList();
+		
+		var exception = new CumulativeValidationException(errors);
+		
+		Assert.Equal(expectedMessage, exception.Message);
+		Assert.Equal(errorCount, exception.Errors.Count());
+	}
+	
 	#endregion
 	
 	#region Data Validation Methods

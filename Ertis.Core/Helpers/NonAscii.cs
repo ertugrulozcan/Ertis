@@ -5,104 +5,104 @@ namespace Ertis.Core.Helpers;
 
 public static class NonAscii
 {
-    #region Fields & Properties
+	#region Fields & Properties
 	
-    // International
-    private static ReadOnlyDictionary<char, string>? _international;
-    public static ReadOnlyDictionary<char, string> International
-    {
-	    get { return _international ??= new ReadOnlyDictionary<char, string>(InternationalChars); }
-    }
-    
-    // Latin
-    private static ReadOnlyDictionary<char, string>? _latin;
-    public static ReadOnlyDictionary<char, string> Latin
-    {
-	    get { return _latin ??= new ReadOnlyDictionary<char, string>(LatinChars); }
-    }
-    
-    // Turkish
-    private static ReadOnlyDictionary<char, string>? _turkish;
-    public static ReadOnlyDictionary<char, string> Turkish
-    {
-	    get { return _turkish ??= new ReadOnlyDictionary<char, string>(TurkishChars); }
-    }
-    
-    // Greek
-    private static ReadOnlyDictionary<char, string>? _greek;
-    public static ReadOnlyDictionary<char, string> Greek
-    {
-	    get { return _greek ??= new ReadOnlyDictionary<char, string>(GreekChars); }
-    }
-    
-    // Czech
-    private static ReadOnlyDictionary<char, string>? _czech;
-    public static ReadOnlyDictionary<char, string> Czech
-    {
-	    get { return _czech ??= new ReadOnlyDictionary<char, string>(CzechChars); }
-    }
-    
-    // Arabic
-    private static ReadOnlyDictionary<char, string>? _arabic;
-    public static ReadOnlyDictionary<char, string> Arabic
-    {
-	    get { return _arabic ??= new ReadOnlyDictionary<char, string>(ArabicChars); }
-    }
-    
-    // Vietnamese
-    private static ReadOnlyDictionary<char, string>? _vietnamese;
-    public static ReadOnlyDictionary<char, string> Vietnamese
-    {
-	    get { return _vietnamese ??= new ReadOnlyDictionary<char, string>(VietnameseChars); }
-    }
-    
-    // Polish
-    private static ReadOnlyDictionary<char, string>? _polish;
-    public static ReadOnlyDictionary<char, string> Polish
-    {
-	    get { return _polish ??= new ReadOnlyDictionary<char, string>(PolishChars); }
-    }
-    
-    // Latvian
-    private static ReadOnlyDictionary<char, string>? _latvian;
-    public static ReadOnlyDictionary<char, string> Latvian
-    {
-	    get { return _latvian ??= new ReadOnlyDictionary<char, string>(LatvianChars); }
-    }
-    
-    // German
-    private static ReadOnlyDictionary<char, string>? _german;
-    public static ReadOnlyDictionary<char, string> German
-    {
-	    get { return _german ??= new ReadOnlyDictionary<char, string>(GermanChars); }
-    }
-    
-    // Ukrainian
-    private static ReadOnlyDictionary<char, string>? _ukrainian;
-    public static ReadOnlyDictionary<char, string> Ukrainian
-    {
-	    get { return _ukrainian ??= new ReadOnlyDictionary<char, string>(UkrainianChars); }
-    }
-    
-    // Serbian
-    private static ReadOnlyDictionary<char, string>? _serbian;
-    public static ReadOnlyDictionary<char, string> Serbian
-    {
-	    get { return _serbian ??= new ReadOnlyDictionary<char, string>(SerbianChars); }
-    }
-    
-    // Russian
-    private static ReadOnlyDictionary<char, string>? _russian;
-    public static ReadOnlyDictionary<char, string> Russian
-    {
-	    get { return _russian ??= new ReadOnlyDictionary<char, string>(RussianChars); }
-    }
+	// International
+	private static ReadOnlyDictionary<char, string>? _international;
+	public static ReadOnlyDictionary<char, string> International
+	{
+		get { return _international ??= new ReadOnlyDictionary<char, string>(InternationalChars); }
+	}
 	
-    #endregion
-    
-    #region Constants
+	// Latin
+	private static ReadOnlyDictionary<char, string>? _latin;
+	public static ReadOnlyDictionary<char, string> Latin
+	{
+		get { return _latin ??= new ReadOnlyDictionary<char, string>(LatinChars); }
+	}
 	
-    private static readonly Dictionary<char, string> InternationalChars = new()
+	// Turkish
+	private static ReadOnlyDictionary<char, string>? _turkish;
+	public static ReadOnlyDictionary<char, string> Turkish
+	{
+		get { return _turkish ??= new ReadOnlyDictionary<char, string>(TurkishChars); }
+	}
+	
+	// Greek
+	private static ReadOnlyDictionary<char, string>? _greek;
+	public static ReadOnlyDictionary<char, string> Greek
+	{
+		get { return _greek ??= new ReadOnlyDictionary<char, string>(GreekChars); }
+	}
+	
+	// Czech
+	private static ReadOnlyDictionary<char, string>? _czech;
+	public static ReadOnlyDictionary<char, string> Czech
+	{
+		get { return _czech ??= new ReadOnlyDictionary<char, string>(CzechChars); }
+	}
+	
+	// Arabic
+	private static ReadOnlyDictionary<char, string>? _arabic;
+	public static ReadOnlyDictionary<char, string> Arabic
+	{
+		get { return _arabic ??= new ReadOnlyDictionary<char, string>(ArabicChars); }
+	}
+	
+	// Vietnamese
+	private static ReadOnlyDictionary<char, string>? _vietnamese;
+	public static ReadOnlyDictionary<char, string> Vietnamese
+	{
+		get { return _vietnamese ??= new ReadOnlyDictionary<char, string>(VietnameseChars); }
+	}
+	
+	// Polish
+	private static ReadOnlyDictionary<char, string>? _polish;
+	public static ReadOnlyDictionary<char, string> Polish
+	{
+		get { return _polish ??= new ReadOnlyDictionary<char, string>(PolishChars); }
+	}
+	
+	// Latvian
+	private static ReadOnlyDictionary<char, string>? _latvian;
+	public static ReadOnlyDictionary<char, string> Latvian
+	{
+		get { return _latvian ??= new ReadOnlyDictionary<char, string>(LatvianChars); }
+	}
+	
+	// German
+	private static ReadOnlyDictionary<char, string>? _german;
+	public static ReadOnlyDictionary<char, string> German
+	{
+		get { return _german ??= new ReadOnlyDictionary<char, string>(GermanChars); }
+	}
+	
+	// Ukrainian
+	private static ReadOnlyDictionary<char, string>? _ukrainian;
+	public static ReadOnlyDictionary<char, string> Ukrainian
+	{
+		get { return _ukrainian ??= new ReadOnlyDictionary<char, string>(UkrainianChars); }
+	}
+	
+	// Serbian
+	private static ReadOnlyDictionary<char, string>? _serbian;
+	public static ReadOnlyDictionary<char, string> Serbian
+	{
+		get { return _serbian ??= new ReadOnlyDictionary<char, string>(SerbianChars); }
+	}
+	
+	// Russian
+	private static ReadOnlyDictionary<char, string>? _russian;
+	public static ReadOnlyDictionary<char, string> Russian
+	{
+		get { return _russian ??= new ReadOnlyDictionary<char, string>(RussianChars); }
+	}
+	
+	#endregion
+	
+	#region Constants
+	
+	private static readonly Dictionary<char, string> InternationalChars = new()
 	{
 		{ 'À', "a" },
 		{ 'Á', "a" },
@@ -926,67 +926,67 @@ public static class NonAscii
 		{ 'ж', "zh" }
 	};
 	
-    #endregion
+	#endregion
 	
-    #region Methods
+	#region Methods
 	
-    internal static string RemapToAscii(char c)
-    {
-        if (International.ContainsKey(c))
-        {
-	        return International[c];
-        }
-        else if (Latin.ContainsKey(c))
-        {
-	        return Latin[c];
-        }
-        else if (Turkish.ContainsKey(c))
-        {
-	        return Turkish[c];
-        }
-        else if (Greek.ContainsKey(c))
-        {
-	        return Greek[c];
-        }
-        else if (Czech.ContainsKey(c))
-        {
-	        return Czech[c];
-        }
-        else if (Arabic.ContainsKey(c))
-        {
-	        return Arabic[c];
-        }
-        else if (Vietnamese.ContainsKey(c))
-        {
-	        return Vietnamese[c];
-        }
-        else if (Polish.ContainsKey(c))
-        {
-	        return Polish[c];
-        }
-        else if (Latvian.ContainsKey(c))
-        {
-	        return Latvian[c];
-        }
-        else if (German.ContainsKey(c))
-        {
-	        return German[c];
-        }
-        else if (Ukrainian.ContainsKey(c))
-        {
-	        return Ukrainian[c];
-        }
-        else if (Serbian.ContainsKey(c))
-        {
-	        return Serbian[c];
-        }
-        else if (Russian.ContainsKey(c))
-        {
-	        return Russian[c];
-        }
-        
-        return string.Empty;
-    }
+	internal static string RemapToAscii(char c)
+	{
+		if (International.ContainsKey(c))
+		{
+			return International[c];
+		}
+		else if (Latin.ContainsKey(c))
+		{
+			return Latin[c];
+		}
+		else if (Turkish.ContainsKey(c))
+		{
+			return Turkish[c];
+		}
+		else if (Greek.ContainsKey(c))
+		{
+			return Greek[c];
+		}
+		else if (Czech.ContainsKey(c))
+		{
+			return Czech[c];
+		}
+		else if (Arabic.ContainsKey(c))
+		{
+			return Arabic[c];
+		}
+		else if (Vietnamese.ContainsKey(c))
+		{
+			return Vietnamese[c];
+		}
+		else if (Polish.ContainsKey(c))
+		{
+			return Polish[c];
+		}
+		else if (Latvian.ContainsKey(c))
+		{
+			return Latvian[c];
+		}
+		else if (German.ContainsKey(c))
+		{
+			return German[c];
+		}
+		else if (Ukrainian.ContainsKey(c))
+		{
+			return Ukrainian[c];
+		}
+		else if (Serbian.ContainsKey(c))
+		{
+			return Serbian[c];
+		}
+		else if (Russian.ContainsKey(c))
+		{
+			return Russian[c];
+		}
+		
+		return string.Empty;
+	}
 	
-    #endregion
+	#endregion
 }

@@ -110,8 +110,8 @@ public class HttpQueryString : IQueryString
 	
 	public IQueryString Remove(string key)
 	{
-        this.QueryDictionary.Remove(key);
-        return this;
+		this.QueryDictionary.Remove(key);
+		return this;
 	}
 	
 	public IDictionary<string, object> ToDictionary()

@@ -6,8 +6,8 @@ namespace Ertis.Net.Rest;
 
 public class SystemRestHandler : ISystemRestHandler
 {
-    #region Constants
-    
+	#region Constants
+	
 	private static readonly string[] DefaultHeaders = 
 	{
 		"Accept",

@@ -114,8 +114,8 @@ public class RequestHeaders : IHeaderCollection
 	
 	public IHeaderCollection Remove(string key)
 	{
-        this.HeadersDictionary.Remove(key);
-        return this;
+		this.HeadersDictionary.Remove(key);
+		return this;
 	}
 	
 	public IDictionary<string, object> ToDictionary()

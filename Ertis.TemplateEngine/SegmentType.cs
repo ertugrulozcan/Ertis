@@ -2,6 +2,6 @@ namespace Ertis.TemplateEngine;
 
 public enum SegmentType
 {
-    PlaceHolder,
-    RawPart
+	PlaceHolder,
+	RawPart
 }

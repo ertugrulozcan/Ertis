@@ -8,7 +8,7 @@ namespace Ertis.Data.Repository;
 
 public interface IRepositoryBase<TEntity, in TIdentifier>
 {
-    #region Find & Query Methods
+	#region Find & Query Methods
 	
 	TEntity? FindOne(TIdentifier id);
 	

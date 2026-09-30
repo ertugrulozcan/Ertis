@@ -28,7 +28,8 @@ internal class QueryArray : List<IQuery>, IQuery
 		if (this.Operator != null)
 		{
 			// Simplify $and operators
-			if (this.Operator == MongoOperator.And && this.All(x => x is IQueryExpression))
+			// The field expressions are merged into one object, unless a field is repeated (a duplicate key would drop a condition)
+			if (this.Operator == MongoOperator.And && this.All(x => x is IQueryExpression) && this.Cast<IQueryExpression>().Select(x => x.Field).Distinct().Count() == this.Count)
 			{
 				return "{ " + string.Join(", ", this.Select(x => x.ToString().Trim().Trim('{').Trim('}').Trim())) + " }";
 			}

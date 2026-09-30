@@ -1,3 +1,6 @@
+using System.Globalization;
+using System.Text;
+
 namespace Ertis.MongoDB.Queries;
 
 internal static class QueryHelper
@@ -35,28 +38,92 @@ internal static class QueryHelper
 	
 	internal static string? ConvertRegexOptions(RegexOptions? options)
 	{
-		string? regexOptions = null;
-		
-		if (options != null)
+		if (options == null)
 		{
-			var flagValue = (int) options.Value;
-			regexOptions = flagValue switch
-			{
-				1 => "i",
-				2 => "m",
-				4 => "x",
-				8 => "s",
-				3 => "mi",
-				5 => "xi",
-				9 => "si",
-				6 => "xm",
-				10 => "sm",
-				12 => "sx",
-				_ => null
-			};
+			return null;
 		}
 		
-		return regexOptions;
+		var builder = new StringBuilder(4);
+		if (options.Value.HasFlag(RegexOptions.AllowDot))
+		{
+			builder.Append('s');
+		}
+		
+		if (options.Value.HasFlag(RegexOptions.Extended))
+		{
+			builder.Append('x');
+		}
+		
+		if (options.Value.HasFlag(RegexOptions.Multiline))
+		{
+			builder.Append('m');
+		}
+		
+		if (options.Value.HasFlag(RegexOptions.CaseInsensitivity))
+		{
+			builder.Append('i');
+		}
+		
+		return builder.Length > 0 ? builder.ToString() : null;
+	}
+	
+	/// <summary>
+	/// Converts the date time to UTC before it is written with a 'Z' suffix (a date time without a kind is UTC)
+	/// </summary>
+	internal static DateTime ToUniversalTime(DateTime dateTime)
+	{
+		return dateTime.Kind switch
+		{
+			DateTimeKind.Utc => dateTime,
+			DateTimeKind.Local => dateTime.ToUniversalTime(),
+			_ => DateTime.SpecifyKind(dateTime, DateTimeKind.Utc)
+		};
+	}
+	
+	/// <summary>
+	/// Writes the text as a json string (quoted and escaped), so a value or a field name can not change the structure of the query.
+	/// Only the characters that json requires are escaped (quote, backslash and the control characters), the others are kept as they are.
+	/// </summary>
+	internal static string ToJsonString(string text)
+	{
+		var builder = new StringBuilder(text.Length + 2);
+		builder.Append('"');
+		foreach (var character in text)
+		{
+			switch (character)
+			{
+				case '"':
+					builder.Append("\\\"");
+					break;
+				case '\\':
+					builder.Append("\\\\");
+					break;
+				case '\n':
+					builder.Append("\\n");
+					break;
+				case '\r':
+					builder.Append("\\r");
+					break;
+				case '\t':
+					builder.Append("\\t");
+					break;
+				case '\b':
+					builder.Append("\\b");
+					break;
+				case '\f':
+					builder.Append("\\f");
+					break;
+				case < ' ':
+					builder.Append("\\u").Append(((int) character).ToString("x4", CultureInfo.InvariantCulture));
+					break;
+				default:
+					builder.Append(character);
+					break;
+			}
+		}
+		
+		builder.Append('"');
+		return builder.ToString();
 	}
 	
 	internal static string GetInnerQuery(IQuery query)

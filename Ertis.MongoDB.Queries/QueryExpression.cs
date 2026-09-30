@@ -32,7 +32,7 @@ internal class QueryExpression : IQueryExpression, IHasChildren
 		if (this.Children.Count == 1)
 		{
 			var expressionJson = this.Value.ToString();
-			return "{ \"" + this.Field + "\": " + expressionJson + " }";
+			return "{ " + QueryHelper.ToJsonString(this.Field) + ": " + expressionJson + " }";
 		}
 		else
 		{
@@ -46,7 +46,7 @@ internal class QueryExpression : IQueryExpression, IHasChildren
 				}
 			}
 			
-			return "{ \"" + this.Field + "\": { " + string.Join(", ", expressionJsons) + " } }";
+			return "{ " + QueryHelper.ToJsonString(this.Field) + ": { " + string.Join(", ", expressionJsons) + " } }";
 		}
 	}
 	

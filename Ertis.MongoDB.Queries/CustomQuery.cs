@@ -59,7 +59,7 @@ internal class CustomQuery : IQuery, IHasChildren
 		
 		if (this.ShowOperatorTag && !string.IsNullOrEmpty(this.Operator))
 		{
-			return "{ \"" + this.Operator + "\": { " + string.Join(", ", expressionJsons) + " } }";
+			return "{ " + QueryHelper.ToJsonString(this.Operator) + ": { " + string.Join(", ", expressionJsons) + " } }";
 		}
 		else
 		{

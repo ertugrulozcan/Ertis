@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Ertis.MongoDB.Queries;
 
 public class QueryValue<T> : IQuery
@@ -26,72 +28,31 @@ public class QueryValue<T> : IQuery
 	
 	public override string ToString()
 	{
-		if (this.Value == null)
+		switch (this.Value)
 		{
-			return "null";
+			case null:
+				return "null";
+			case IQuery query:
+				return query.ToString();
+			case string text:
+				return QueryHelper.ToJsonString(text);
+			case char character:
+				return QueryHelper.ToJsonString(character.ToString());
+			case bool boolean:
+				return boolean ? "true" : "false";
+			case DateTime dateTime:
+				return QueryHelper.ToJsonString(QueryHelper.ToUniversalTime(dateTime).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture));
+			case DateTimeOffset dateTimeOffset:
+				return QueryHelper.ToJsonString(dateTimeOffset.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture));
+			case Guid guid:
+				return QueryHelper.ToJsonString(guid.ToString());
+			case Enum enumValue:
+				return QueryHelper.ToJsonString(enumValue.ToString());
+			case byte or sbyte or short or ushort or int or uint or long or ulong or nint or nuint or float or double or decimal:
+				return ((IFormattable) this.Value).ToString(null, CultureInfo.InvariantCulture);
+			default:
+				return this.Value.ToString() ?? "null";
 		}
-		
-		var stringValue = this.Value.ToString();
-		if (stringValue == null)
-		{
-			return "null";
-		}
-		
-		if (this.Value is IQuery query)
-		{
-			return query.ToString();
-		}
-		else if (typeof(T) == typeof(string) || this.Value is string)
-		{
-			return "\"" + this.Value + "\"";
-		}
-		else if (typeof(T) == typeof(bool) || this.Value is bool)
-		{
-			return stringValue.ToLower();
-		}
-		else if (typeof(T) == typeof(DateTime) || this.Value is DateTime)
-		{
-			var dateTime = this.Value is DateTime time ? time : default;
-			return "\"" + dateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ") + "\"";
-		}
-		else if (IsNumericType(typeof(T)))
-		{
-			return stringValue.Replace(',', '.');
-		}
-		else
-		{
-			return stringValue;
-		}
-	}
-	
-	private static bool IsNumericType(Type type)
-	{
-		return
-			IsIntegralNumericType(type) ||
-			IsFloatingPointNumericType(type);
-	}
-	
-	private static bool IsIntegralNumericType(Type type)
-	{
-		return
-			type == typeof(byte) ||
-			type == typeof(sbyte) ||
-			type == typeof(short) ||
-			type == typeof(ushort) ||
-			type == typeof(int) ||
-			type == typeof(uint) ||
-			type == typeof(nint) ||
-			type == typeof(nuint) ||
-			type == typeof(long) ||
-			type == typeof(ulong);
-	}
-	
-	private static bool IsFloatingPointNumericType(Type type)
-	{
-		return
-			type == typeof(float) ||
-			type == typeof(double) ||
-			type == typeof(decimal);
 	}
 	
 	#endregion

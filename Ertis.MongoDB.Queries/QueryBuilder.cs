@@ -703,8 +703,7 @@ public static class QueryBuilder
 	/// <param name="type">Bson Type</param>
 	public static IQueryExpression TypeOf(string key, BsonType type)
 	{
-		var bsonTypeName = type.ToString();
-		bsonTypeName = char.ToLower(bsonTypeName[0]) + bsonTypeName.Substring(1);
+		var bsonTypeName = GetTypeAlias(type);
 		
 		return new QueryExpression
 		{
@@ -723,8 +722,7 @@ public static class QueryBuilder
 	/// <param name="type">Bson Type</param>
 	public static IQuery TypeOf(BsonType type)
 	{
-		var bsonTypeName = type.ToString();
-		bsonTypeName = char.ToLower(bsonTypeName[0]) + bsonTypeName.Substring(1);
+		var bsonTypeName = GetTypeAlias(type);
 		
 		return new Query
 		{
@@ -751,7 +749,7 @@ public static class QueryBuilder
 			Value = new Query
 			{
 				Operator = MongoOperator.Regex,
-				Value = new QueryValue<string>(regex.TrimStart('/').TrimEnd('/'))
+				Value = new QueryValue<string>(TrimRegexDelimiters(regex))
 			}
 		};
 		
@@ -815,6 +813,32 @@ public static class QueryBuilder
 		}
 		
 		return query;
+	}
+	
+	#endregion
+	
+	#region Helper Methods
+	
+	/// <summary>
+	/// The MongoDB alias of the type (e.g. 'objectId', 'timestamp')
+	/// </summary>
+	private static string GetTypeAlias(BsonType type)
+	{
+		if (type == BsonType.TimeStamp)
+		{
+			return "timestamp";
+		}
+		
+		var typeName = type.ToString();
+		return char.ToLowerInvariant(typeName[0]) + typeName[1..];
+	}
+	
+	/// <summary>
+	/// Removes the delimiters of a '/pattern/' form (the slashes of the pattern itself are kept)
+	/// </summary>
+	private static string TrimRegexDelimiters(string regex)
+	{
+		return regex.Length >= 2 && regex[0] == '/' && regex[^1] == '/' ? regex[1..^1] : regex;
 	}
 	
 	#endregion

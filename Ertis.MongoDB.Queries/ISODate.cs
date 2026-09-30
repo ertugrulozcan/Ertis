@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Ertis.MongoDB.Queries;
 
 public class ISODate : QueryValue<DateTime>
@@ -25,7 +27,9 @@ public class ISODate : QueryValue<DateTime>
 	
 	public override string ToString()
 	{
-		return $"ISODate(\"{this.Date:yyyy-MM-ddTHH:mm:ssZ}\")";
+		var date = QueryHelper.ToUniversalTime(this.Date);
+		var format = date.Millisecond == 0 ? "yyyy-MM-ddTHH:mm:ssZ" : "yyyy-MM-ddTHH:mm:ss.fffZ";
+		return $"ISODate(\"{date.ToString(format, CultureInfo.InvariantCulture)}\")";
 	}
 	
 	#endregion

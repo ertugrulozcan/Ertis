@@ -200,9 +200,12 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
 	
 	public virtual bool ValidateSchema(out Exception? exception)
 	{
-		this.ValidateName(out exception);
-		this.ValidateSchemaCore(out exception);
+		if (!this.ValidateName(out exception))
+		{
+			return false;
+		}
 		
+		this.ValidateSchemaCore(out exception);
 		return exception == null;
 	}
 	
@@ -234,13 +237,20 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
 	
 	private bool ValidateName(out Exception? exception)
 	{
-		if (string.IsNullOrEmpty(this.Name.Trim()) || string.IsNullOrWhiteSpace(this.Name))
+		// The item schemas of the arrays are named by the library ('$schema'), not by the schema designers
+		if (this.Parent is ArrayFieldInfo)
+		{
+			exception = null;
+			return true;
+		}
+		
+		if (string.IsNullOrWhiteSpace(this.Name))
 		{
 			exception = new FieldValidationException("The field name is required", this);
 			return false;
 		}
 		
-		if (this.Name.Contains(' '))
+		if (this.Name.Any(char.IsWhiteSpace))
 		{
 			exception = new FieldValidationException("The field name can not include any whitespace", this);
 			return false;
@@ -252,9 +262,15 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
 			return false;
 		}
 		
-		if (!this.Name.Where(x => x != '_').All(char.IsLetterOrDigit))
+		if (!this.Name.All(x => char.IsLetterOrDigit(x) || x is '_' or '-'))
 		{
-			exception = new FieldValidationException("The field names can only use letters, digits and underscore", this);
+			exception = new FieldValidationException("The field names can only use letters, digits, underscore and hyphen", this);
+			return false;
+		}
+		
+		if (this.Name.StartsWith('-') || this.Name.EndsWith('-'))
+		{
+			exception = new FieldValidationException("The field name can not start or end with a hyphen", this);
 			return false;
 		}
 		

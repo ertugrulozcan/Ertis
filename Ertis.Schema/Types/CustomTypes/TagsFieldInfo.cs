@@ -88,13 +88,11 @@ public class TagsFieldInfo : FieldInfo<string[]>
 	
 	public override bool ValidateSchema(out Exception? exception)
 	{
-		base.ValidateSchema(out exception);
-		this.ValidateMinCount(out exception);
-		this.ValidateMaxCount(out exception);
-		this.ValidateMinLength(out exception);
-		this.ValidateMaxLength(out exception);
-		
-		return exception == null;
+		return base.ValidateSchema(out exception) &&
+			this.ValidateMinCount(out exception) &&
+			this.ValidateMaxCount(out exception) &&
+			this.ValidateMinLength(out exception) &&
+			this.ValidateMaxLength(out exception);
 	}
 	
 	protected internal override bool Validate(object? obj, IValidationContext validationContext)

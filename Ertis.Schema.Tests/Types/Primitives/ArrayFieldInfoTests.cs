@@ -9,7 +9,7 @@ public class ArrayFieldInfoTests
 {
 	#region Schema Methods
 	
-	[Theory(Skip = "Bug: ValidateSchema overwrites the missing item schema error with the result of the next validation step")]
+	[Theory]
 	[InlineData("tags")]
 	public void ValidateSchema_WithoutItemSchema_Fails(string name)
 	{

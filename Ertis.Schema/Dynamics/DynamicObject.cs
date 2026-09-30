@@ -435,8 +435,11 @@ public class DynamicObject : ICloneable, IDisposable
 		{
 			if (segments.Length > 1)
 			{
+				var subDictionary = new Dictionary<string, object?>();
+				dictionary.Add(key, subDictionary);
+				
 				var subPath = string.Join(".", segments.Skip(1));
-				SetValueCore(subPath, obj, new Dictionary<string, object?>(), true);
+				SetValueCore(subPath, obj, subDictionary, true);
 			}
 			else
 			{

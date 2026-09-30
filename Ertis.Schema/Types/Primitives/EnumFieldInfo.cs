@@ -46,10 +46,8 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
 	
 	public override bool ValidateSchema(out Exception? exception)
 	{
-		base.ValidateSchema(out exception);
-		this.ValidateItems(out exception);
-		
-		return exception == null;
+		return base.ValidateSchema(out exception) &&
+			this.ValidateItems(out exception);
 	}
 	
 	protected internal override bool Validate(object? obj, IValidationContext validationContext)

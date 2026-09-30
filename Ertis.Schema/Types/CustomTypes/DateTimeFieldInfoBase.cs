@@ -75,11 +75,9 @@ public abstract class DateTimeFieldInfoBase : StringFieldInfo, IDateTimeFieldInf
 	
 	public override bool ValidateSchema(out Exception? exception)
 	{
-		base.ValidateSchema(out exception);
-		this.ValidateMinValue(out exception);
-		this.ValidateMaxValue(out exception);
-		
-		return exception == null;
+		return base.ValidateSchema(out exception) &&
+			this.ValidateMinValue(out exception) &&
+			this.ValidateMaxValue(out exception);
 	}
 	
 	protected internal override bool Validate(object? obj, IValidationContext validationContext)

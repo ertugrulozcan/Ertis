@@ -239,14 +239,16 @@ public class DynamicObjectTests
 		Assert.Equal(1, dynamicObject.GetValue(path));
 	}
 	
-	[Fact(Skip = "Bug (finding #5): SetValue(createIfNotExist) with a missing intermediate object creates a detached dictionary, so the value is lost")]
+	[Fact]
 	public void SetValue_WithCreateIfNotExistAndMissingParent_AddsTheParentAndTheProperty()
 	{
 		var dynamicObject = DynamicObject.Parse(SAMPLE_JSON);
 		
 		dynamicObject.SetValue("contact.email", "jane@example.com", createIfNotExist: true);
+		dynamicObject.SetValue("a.b.c", 1, createIfNotExist: true);
 		
 		Assert.Equal("jane@example.com", dynamicObject.GetValue("contact.email"));
+		Assert.Equal(1, dynamicObject.GetValue("a.b.c"));
 	}
 	
 	[Theory]

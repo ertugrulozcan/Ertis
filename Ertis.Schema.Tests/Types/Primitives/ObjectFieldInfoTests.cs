@@ -97,7 +97,7 @@ public class ObjectFieldInfoTests
 		Assert.Equal("test-schema.level1.level2.level3.value", Assert.Single(result.Errors).FieldPath);
 	}
 	
-	[Fact(Skip = "Bug (finding #6): default values of nested fields are not applied")]
+	[Fact]
 	public void Validate_WithNestedDefaultValue_SetsTheDefault()
 	{
 		var fieldInfo = new ObjectFieldInfo([
@@ -114,7 +114,7 @@ public class ObjectFieldInfoTests
 		Assert.Equal("TR", result.Content.GetValue("address.country"));
 	}
 	
-	[Fact(Skip = "Bug (finding #6): format patterns of nested fields are not applied")]
+	[Fact]
 	public void Validate_WithNestedFormatPattern_FillsTheValue()
 	{
 		var fieldInfo = new ObjectFieldInfo([
@@ -129,6 +129,63 @@ public class ObjectFieldInfoTests
 		
 		Assert.True(result.IsValid);
 		Assert.Equal("Istanbul", result.Content.GetValue("address.label"));
+	}
+	
+	[Theory]
+	[InlineData("{}")]
+	[InlineData("""{ "address": null }""")]
+	public void Validate_WithoutTheParentObject_DoesNotApplyTheNestedDefault(string json)
+	{
+		var fieldInfo = new ObjectFieldInfo([new StringFieldInfo { Name = "country", DefaultValue = "TR" }]) { Name = "address" };
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, json);
+		
+		Assert.True(result.IsValid);
+		Assert.False(result.Content.ContainsProperty("address.country"));
+	}
+	
+	[Fact]
+	public void Validate_WithDeeplyNestedDefault_SetsTheDefault()
+	{
+		var fieldInfo = new ObjectFieldInfo([
+			new ObjectFieldInfo([new StringFieldInfo { Name = "code", DefaultValue = "34" }]) { Name = "region" }
+		])
+		{
+			Name = "address"
+		};
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, """{ "address": { "region": {} } }""");
+		
+		Assert.Equal("34", result.Content.GetValue("address.region.code"));
+	}
+	
+	[Fact]
+	public void Validate_WithNestedDate_ConvertsTheValueToDateTime()
+	{
+		var fieldInfo = new ObjectFieldInfo([new Ertis.Schema.Types.CustomTypes.DateFieldInfo { Name = "since" }]) { Name = "membership" };
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, """{ "membership": { "since": "2026-01-31" } }""");
+		
+		Assert.True(result.IsValid);
+		Assert.IsType<DateTime>(result.Content.GetValue("membership.since"));
+	}
+	
+	/// <summary>
+	/// The post validation steps are applied to the objects only, the array items are out of scope for now
+	/// </summary>
+	[Fact]
+	public void Validate_ArrayItemDefault_IsNotApplied()
+	{
+		var fieldInfo = new ArrayFieldInfo
+		{
+			Name = "phones",
+			ItemSchema = new ObjectFieldInfo([new StringFieldInfo { Name = "number" }, new StringFieldInfo { Name = "label", DefaultValue = "home" }]) { Name = "$schema" }
+		};
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, """{ "phones": [{ "number": "1" }] }""");
+		
+		Assert.True(result.IsValid);
+		Assert.False(result.Content.ContainsProperty("phones[0].label"));
 	}
 	
 	private static ObjectFieldInfo CreateAddress()

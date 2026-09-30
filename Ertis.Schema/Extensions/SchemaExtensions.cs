@@ -299,32 +299,46 @@ public static class SchemaExtensions
 	
 	#endregion
 	
+	#region Post Validation Methods
+	
+	/// <summary>
+	/// Returns the fields that the post validation steps (default values, constants, format patterns, dates) apply to:
+	/// the top-level fields and the fields of the nested objects that exist in the model
+	/// </summary>
+	private static IEnumerable<IFieldInfo> GetApplicableFields(ISchema schema, IEnumerable<IFieldInfo> properties, DynamicObject model)
+	{
+		foreach (var fieldInfo in properties)
+		{
+			yield return fieldInfo;
+			
+			if (fieldInfo is ObjectFieldInfo objectFieldInfo && model.TryGetValue(fieldInfo.GetSelfPath(schema), out var value) && value is IDictionary<string, object?>)
+			{
+				foreach (var childFieldInfo in GetApplicableFields(schema, objectFieldInfo.Properties, model))
+				{
+					yield return childFieldInfo;
+				}
+			}
+		}
+	}
+	
+	#endregion
+	
 	#region DefaultValue Methods
 	
 	private static void SetDefaultValues(this ISchema schema, DynamicObject model)
 	{
-		SetDefaultValues(schema, schema.Properties, model);
-	}
-	
-	private static void SetDefaultValues(ISchema schema, IEnumerable<IFieldInfo> properties, DynamicObject model)
-	{
-		foreach (var fieldInfo in properties)
+		foreach (var fieldInfo in GetApplicableFields(schema, schema.Properties, model))
 		{
-			SetDefaultValues(schema, fieldInfo, model);
-		}
-	}
-	
-	private static void SetDefaultValues(ISchema schema, IFieldInfo fieldInfo, DynamicObject model)
-	{
-		if (fieldInfo is IHasDefault hasDefault)
-		{
-			var defaultValue = hasDefault.GetDefaultValue();
-			if (defaultValue != null)
+			if (fieldInfo is IHasDefault hasDefault)
 			{
-				var path = fieldInfo.GetSelfPath(schema);
-				if (!model.TryGetValue(path, out var currentValue, out _) || currentValue == null)
+				var defaultValue = hasDefault.GetDefaultValue();
+				if (defaultValue != null)
 				{
-					model.TrySetValue(path, defaultValue, out _, true);
+					var path = fieldInfo.GetSelfPath(schema);
+					if (!model.TryGetValue(path, out var currentValue, out _) || currentValue == null)
+					{
+						model.TrySetValue(path, defaultValue, out _, true);
+					}
 				}
 			}
 		}
@@ -336,23 +350,13 @@ public static class SchemaExtensions
 	
 	private static void SetConstants(this ISchema schema, DynamicObject model)
 	{
-		SetConstants(schema, schema.Properties, model);
-	}
-	
-	private static void SetConstants(ISchema schema, IEnumerable<IFieldInfo> properties, DynamicObject model)
-	{
-		foreach (var fieldInfo in properties)
+		foreach (var fieldInfo in GetApplicableFields(schema, schema.Properties, model))
 		{
-			SetConstants(schema, fieldInfo, model);
-		}
-	}
-	
-	private static void SetConstants(ISchema schema, IFieldInfo fieldInfo, DynamicObject model)
-	{
-		if (fieldInfo is ConstantFieldInfo constantFieldInfo)
-		{
-			var path = fieldInfo.GetSelfPath(schema);
-			model.TrySetValue(path, constantFieldInfo, out _, true);
+			if (fieldInfo is ConstantFieldInfo { Value: not null } constantFieldInfo)
+			{
+				var path = fieldInfo.GetSelfPath(schema);
+				model.TrySetValue(path, constantFieldInfo.Value, out _, true);
+			}
 		}
 	}
 	
@@ -362,25 +366,15 @@ public static class SchemaExtensions
 	
 	private static void SetDateTimes(this ISchema schema, DynamicObject model)
 	{
-		SetDateTimes(schema, schema.Properties, model);
-	}
-	
-	private static void SetDateTimes(ISchema schema, IEnumerable<IFieldInfo> properties, DynamicObject model)
-	{
-		foreach (var fieldInfo in properties)
+		foreach (var fieldInfo in GetApplicableFields(schema, schema.Properties, model))
 		{
-			SetDateTimes(schema, fieldInfo, model);
-		}
-	}
-	
-	private static void SetDateTimes(ISchema schema, IFieldInfo fieldInfo, DynamicObject model)
-	{
-		if (fieldInfo is IDateTimeFieldInfo)
-		{
-			var path = fieldInfo.GetSelfPath(schema);
-			if (model.TryGetValue<string>(path, out var stringValue, out _) && DateTime.TryParse(stringValue, out var dateValue))
+			if (fieldInfo is IDateTimeFieldInfo)
 			{
-				model.TrySetValue(path, dateValue, out _, true);
+				var path = fieldInfo.GetSelfPath(schema);
+				if (model.TryGetValue<string>(path, out var stringValue, out _) && DateTime.TryParse(stringValue, out var dateValue))
+				{
+					model.TrySetValue(path, dateValue, out _, true);
+				}
 			}
 		}
 	}
@@ -391,25 +385,15 @@ public static class SchemaExtensions
 	
 	private static void SetFormatPatterns(this ISchema schema, DynamicObject model)
 	{
-		SetFormatPatterns(schema, schema.Properties, model);
-	}
-	
-	private static void SetFormatPatterns(ISchema schema, IEnumerable<IFieldInfo> properties, DynamicObject model)
-	{
-		foreach (var fieldInfo in properties)
+		foreach (var fieldInfo in GetApplicableFields(schema, schema.Properties, model))
 		{
-			SetFormatPatterns(schema, fieldInfo, model);
-		}
-	}
-	
-	private static void SetFormatPatterns(ISchema schema, IFieldInfo fieldInfo, DynamicObject model)
-	{
-		if (fieldInfo is StringFieldInfo stringFieldInfo && !string.IsNullOrEmpty(stringFieldInfo.FormatPattern))
-		{
-			if (stringFieldInfo.TryFormat(model, out var formattedString) && !string.IsNullOrEmpty(formattedString))
+			if (fieldInfo is StringFieldInfo stringFieldInfo && !string.IsNullOrEmpty(stringFieldInfo.FormatPattern))
 			{
-				var path = fieldInfo.GetSelfPath(schema);
-				model.TrySetValue(path, formattedString, out _, true);
+				if (stringFieldInfo.TryFormat(model, out var formattedString) && !string.IsNullOrEmpty(formattedString))
+				{
+					var path = fieldInfo.GetSelfPath(schema);
+					model.TrySetValue(path, formattedString, out _, true);
+				}
 			}
 		}
 	}

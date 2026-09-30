@@ -23,8 +23,7 @@ public class BooleanFieldInfo : FieldInfo<bool?>, IPrimitiveType
 	
 	public override bool ValidateSchema(out Exception? exception)
 	{
-		base.ValidateSchema(out exception);
-		return exception == null;
+		return base.ValidateSchema(out exception);
 	}
 	
 	public override object Clone()

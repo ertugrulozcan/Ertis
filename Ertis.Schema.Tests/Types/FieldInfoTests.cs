@@ -14,6 +14,8 @@ public class FieldInfoTests
 	[InlineData("_id")]
 	[InlineData("address2")]
 	[InlineData("şehir")]
+	[InlineData("first-name")]
+	[InlineData("a-b-c")]
 	public void ValidateSchema_WithValidName_Succeeds(string name)
 	{
 		var fieldInfo = new StringFieldInfo { Name = name };
@@ -24,13 +26,17 @@ public class FieldInfoTests
 		Assert.Null(exception);
 	}
 	
-	[Theory(Skip = "Bug: ValidateSchema overwrites the name validation error with the result of the next validation step, so invalid names are accepted")]
+	[Theory]
 	[InlineData("")]
 	[InlineData(" ")]
 	[InlineData("first name")]
+	[InlineData("first\tname")]
 	[InlineData("2nd")]
-	[InlineData("first-name")]
 	[InlineData("first.name")]
+	[InlineData("first$name")]
+	[InlineData("-name")]
+	[InlineData("name-")]
+	[InlineData("-")]
 	public void ValidateSchema_WithInvalidName_Fails(string name)
 	{
 		var fieldInfo = new StringFieldInfo { Name = name };
@@ -39,6 +45,33 @@ public class FieldInfoTests
 		
 		Assert.False(isValid);
 		Assert.IsType<FieldValidationException>(exception);
+	}
+	
+	[Fact]
+	public void ValidateSchema_WithSeveralErrors_ReturnsTheFirstOne()
+	{
+		var fieldInfo = new StringFieldInfo { Name = "first name", MaxLength = 5 };
+		
+		fieldInfo.ValidateSchema(out var exception);
+		
+		Assert.Equal("The field name can not include any whitespace", exception?.Message);
+	}
+	
+	[Fact]
+	public void Create_ObjectWithAnInvalidPropertyName_Throws()
+	{
+		var exception = Assert.Throws<FieldValidationException>(() => new ObjectFieldInfo([new StringFieldInfo { Name = "first name" }]) { Name = "person" });
+		
+		Assert.Equal("The field name can not include any whitespace", exception.Message);
+	}
+	
+	[Fact]
+	public void Create_ArrayItemSchemaWithTheLibraryName_Succeeds()
+	{
+		var fieldInfo = new ArrayFieldInfo { Name = "tags", ItemSchema = new StringFieldInfo { Name = "$schema" } };
+		
+		Assert.True(fieldInfo.ValidateSchema(out var exception));
+		Assert.Null(exception);
 	}
 	
 	[Fact]

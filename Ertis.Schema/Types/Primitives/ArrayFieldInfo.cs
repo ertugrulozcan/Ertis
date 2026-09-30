@@ -119,12 +119,10 @@ public class ArrayFieldInfo : FieldInfo<Array>
 	
 	public override bool ValidateSchema(out Exception? exception)
 	{
-		base.ValidateSchema(out exception);
-		this.ValidateItemSchema(out exception);
-		this.ValidateMinCount(out exception);
-		this.ValidateMaxCount(out exception);
-		
-		return exception == null;
+		return base.ValidateSchema(out exception) &&
+			this.ValidateItemSchema(out exception) &&
+			this.ValidateMinCount(out exception) &&
+			this.ValidateMaxCount(out exception);
 	}
 	
 	protected internal override bool Validate(object? obj, IValidationContext validationContext)

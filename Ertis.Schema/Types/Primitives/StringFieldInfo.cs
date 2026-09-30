@@ -103,12 +103,10 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 	
 	public override bool ValidateSchema(out Exception? exception)
 	{
-		base.ValidateSchema(out exception);
-		this.ValidateMinLength(out exception);
-		this.ValidateMaxLength(out exception);
-		this.ValidateFormatPattern(out exception);
-		
-		return exception == null;
+		return base.ValidateSchema(out exception) &&
+			this.ValidateMinLength(out exception) &&
+			this.ValidateMaxLength(out exception) &&
+			this.ValidateFormatPattern(out exception);
 	}
 	
 	protected internal override bool Validate(object? obj, IValidationContext validationContext)

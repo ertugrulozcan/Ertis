@@ -66,11 +66,9 @@ public class RichTextFieldInfo : StringFieldInfo
 	
 	public override bool ValidateSchema(out Exception? exception)
 	{
-		base.ValidateSchema(out exception);
-		this.ValidateMinWordCount(out exception);
-		this.ValidateMaxWordCount(out exception);
-		
-		return exception == null;
+		return base.ValidateSchema(out exception) &&
+			this.ValidateMinWordCount(out exception) &&
+			this.ValidateMaxWordCount(out exception);
 	}
 	
 	protected internal override bool Validate(object? obj, IValidationContext validationContext)

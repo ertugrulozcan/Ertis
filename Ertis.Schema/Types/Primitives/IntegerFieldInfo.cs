@@ -126,14 +126,12 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
 	
 	public override bool ValidateSchema(out Exception? exception)
 	{
-		base.ValidateSchema(out exception);
-		this.ValidateMinimum(out exception);
-		this.ValidateMaximum(out exception);
-		this.ValidateExclusiveMinimum(out exception);
-		this.ValidateExclusiveMaximum(out exception);
-		this.ValidateMultipleOf(out exception);
-		
-		return exception == null;
+		return base.ValidateSchema(out exception) &&
+			this.ValidateMinimum(out exception) &&
+			this.ValidateMaximum(out exception) &&
+			this.ValidateExclusiveMinimum(out exception) &&
+			this.ValidateExclusiveMaximum(out exception) &&
+			this.ValidateMultipleOf(out exception);
 	}
 	
 	protected internal override bool Validate(object? obj, IValidationContext validationContext)

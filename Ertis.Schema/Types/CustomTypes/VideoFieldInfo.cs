@@ -104,10 +104,8 @@ public sealed class VideoFieldInfo : ObjectFieldInfoBase
 	
 	public override bool ValidateSchema(out Exception? exception)
 	{
-		base.ValidateSchema(out exception);
-		this.ValidateMaxSize(out exception);
-		
-		return exception == null;
+		return base.ValidateSchema(out exception) &&
+			this.ValidateMaxSize(out exception);
 	}
 	
 	private bool ValidateMaxSize(out Exception? exception)

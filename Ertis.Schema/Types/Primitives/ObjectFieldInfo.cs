@@ -97,7 +97,7 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
 			}
 		}
 	}
-
+	
 	
 	#endregion
 	
@@ -150,10 +150,8 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
 	
 	public override bool ValidateSchema(out Exception? exception)
 	{
-		base.ValidateSchema(out exception);
-		this.Validate(out exception);
-		
-		return exception == null;
+		return base.ValidateSchema(out exception) &&
+			this.ValidateProperties(out exception);
 	}
 	
 	protected internal override bool Validate(object? obj, IValidationContext validationContext)

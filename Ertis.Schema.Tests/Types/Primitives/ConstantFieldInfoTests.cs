@@ -35,7 +35,7 @@ public class ConstantFieldInfoTests
 		Assert.Equal([$"Constant value is must be {valueType}"], result.Messages);
 	}
 	
-	[Fact(Skip = "Bug (finding #4): SetConstants writes the ConstantFieldInfo object itself into the content instead of its value")]
+	[Fact]
 	public void Validate_SetsTheConstantValue()
 	{
 		var fieldInfo = new ConstantFieldInfo { Name = "kind", ValueType = ConstantFieldInfo.ConstantType.@string, Value = "user" };
@@ -44,6 +44,28 @@ public class ConstantFieldInfoTests
 		
 		Assert.True(result.IsValid);
 		Assert.Equal("user", result.Content.GetValue("kind"));
+	}
+	
+	[Fact]
+	public void Validate_OverridesTheSentValue()
+	{
+		var fieldInfo = new ConstantFieldInfo { Name = "kind", ValueType = ConstantFieldInfo.ConstantType.@string, Value = "user" };
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, """{ "kind": "admin" }""");
+		
+		Assert.True(result.IsValid);
+		Assert.Equal("user", result.Content.GetValue("kind"));
+	}
+	
+	[Fact]
+	public void Validate_NestedConstant_SetsTheConstantValue()
+	{
+		var fieldInfo = new ObjectFieldInfo([new ConstantFieldInfo { Name = "version", ValueType = ConstantFieldInfo.ConstantType.integer, Value = 2 }]) { Name = "meta" };
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, """{ "meta": {} }""");
+		
+		Assert.True(result.IsValid);
+		Assert.Equal(2, result.Content.GetValue("meta.version"));
 	}
 	
 	#endregion

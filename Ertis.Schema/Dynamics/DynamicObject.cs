@@ -49,7 +49,7 @@ public class DynamicObject : ICloneable, IDisposable
 		}
 		else
 		{
-			this.PropertyDictionary = obj.ToDictionary();   
+			this.PropertyDictionary = DynamicValues.FromObject(obj);
 		}
 	}
 	
@@ -59,10 +59,9 @@ public class DynamicObject : ICloneable, IDisposable
 	
 	public static DynamicObject Create(IDictionary<string, object?> dictionary)
 	{
-		object model = dictionary.ToDynamic();
 		return new DynamicObject
 		{
-			PropertyDictionary = model.ToDictionary()
+			PropertyDictionary = DynamicValues.FromObject(dictionary)
 		};
 	}
 	
@@ -70,7 +69,15 @@ public class DynamicObject : ICloneable, IDisposable
 	{
 		return new DynamicObject
 		{
-			PropertyDictionary = Newtonsoft.Json.Linq.JToken.Parse(json).ToDictionary()
+			PropertyDictionary = DynamicValues.FromJson(json)
+		};
+	}
+	
+	internal static DynamicObject FromJsonElement(JsonElement element)
+	{
+		return new DynamicObject
+		{
+			PropertyDictionary = DynamicValues.FromJsonObject(element)
 		};
 	}
 	
@@ -161,50 +168,36 @@ public class DynamicObject : ICloneable, IDisposable
 	public T? GetValue<T>(string path)
 	{
 		var value = GetValueCore(path, this.PropertyDictionary);
-		if (value == null)
+		return value == null ? default : (T?) ConvertValue(value, typeof(T));
+	}
+	
+	private static object? ConvertValue(object value, Type type)
+	{
+		if (value is IDictionary<string, object?> dictionary && !type.IsInstanceOfType(value))
 		{
-			return default;
+			return Create(dictionary).Deserialize(type);
 		}
 		
-		if (value is IDictionary<string, object?> dictionary)
+		if (type.IsArray && value is Array array)
 		{
-			return Create(dictionary).Deserialize<T>();
+			var itemType = type.GetElementType()!;
+			var typedArray = Array.CreateInstance(itemType, array.Length);
+			for (var i = 0; i < array.Length; i++)
+			{
+				var item = array.GetValue(i);
+				typedArray.SetValue(item == null ? null : ConvertValue(item, itemType), i);
+			}
+			
+			return typedArray;
 		}
-		else if (typeof(T).IsArray && value.GetType().IsArray && value is object[] array)
+		
+		try
 		{
-			var itemType = typeof(T).GetElementType();
-			if (itemType != null)
-			{
-				if (itemType.IsPrimitive)
-				{
-					return (T) (array.ToArray() as object);
-				}
-				else if (itemType == typeof(string))
-				{
-					return (T) (array.Select(x => x.ToString()).ToArray() as object);
-				}
-				
-				return (T) (array.Select(x => Cast(x, itemType)).ToArray() as object);
-			}
-			else
-			{
-				return default;
-			}
+			return DynamicValues.ConvertTo(value, type);
 		}
-		else if (typeof(T).IsEnum && Enum.TryParse(typeof(T), value.ToString(), false, out var enumValue))
+		catch (Exception ex) when (ex is FormatException or InvalidCastException or OverflowException or ArgumentException)
 		{
-			return (T) enumValue;
-		}
-		else
-		{
-			try
-			{
-				return (T) Convert.ChangeType(value, typeof(T));
-			}
-			catch
-			{
-				return (T) value;
-			}
+			return value;
 		}
 	}
 	
@@ -564,7 +557,10 @@ public class DynamicObject : ICloneable, IDisposable
 	
 	public object Clone()
 	{
-		return Parse(this.ToJson());
+		return new DynamicObject
+		{
+			PropertyDictionary = (Dictionary<string, object?>) DynamicValues.DeepCopy(this.PropertyDictionary)!
+		};
 	}
 	
 	#endregion

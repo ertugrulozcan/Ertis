@@ -229,7 +229,7 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 				var segment = text.Substring(openIndex + OPEN_FORMAT_BRACKETS.Length, closeIndex - openIndex - OPEN_FORMAT_BRACKETS.Length);
 				if (content.TryGetValue(segment.Trim(), out var value, out _))
 				{
-					text = text.Replace($"{OPEN_FORMAT_BRACKETS}{segment}{CLOSE_FORMAT_BRACKETS}", value != null ? value.ToString() : "null");
+					text = text.Replace($"{OPEN_FORMAT_BRACKETS}{segment}{CLOSE_FORMAT_BRACKETS}", value != null ? DynamicValues.ToInvariantString(value) : "null");
 				}
 				else
 				{

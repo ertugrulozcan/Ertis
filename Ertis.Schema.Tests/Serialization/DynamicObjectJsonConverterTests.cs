@@ -59,7 +59,7 @@ public class DynamicObjectJsonConverterTests
 		Assert.Equal(json, JsonSerializer.Serialize(model, Options));
 	}
 	
-	[Fact(Skip = "Bug (backlog #9): date-time strings are read as DateTime and written back in another format")]
+	[Fact]
 	public void RoundTrip_PreservesDateTimeStrings()
 	{
 		const string json = """{"id":"1","document":{"startsAt":"2026-01-31T10:00:00.000Z"}}""";

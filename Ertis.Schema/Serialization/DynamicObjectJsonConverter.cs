@@ -22,9 +22,7 @@ public class DynamicObjectJsonConverter : JsonConverter<DynamicObject>
 		}
 		
 		using var document = JsonDocument.ParseValue(ref reader);
-		var json = document.RootElement.GetRawText();
-		
-		return string.IsNullOrEmpty(json) ? null : DynamicObject.Parse(json);
+		return DynamicObject.FromJsonElement(document.RootElement);
 	}
 	
 	public override void Write(Utf8JsonWriter writer, DynamicObject dynamicObject, JsonSerializerOptions options)

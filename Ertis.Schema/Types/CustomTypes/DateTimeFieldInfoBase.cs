@@ -31,6 +31,13 @@ public abstract class DateTimeFieldInfoBase : StringFieldInfo, IDateTimeFieldInf
 	[Newtonsoft.Json.JsonIgnore]
 	protected abstract string StringFormat { get; }
 	
+	/// <summary>
+	/// The formats accepted in the string values (StringFormat by default)
+	/// </summary>
+	[JsonIgnore]
+	[Newtonsoft.Json.JsonIgnore]
+	protected virtual string[] AcceptedFormats => [this.StringFormat];
+	
 	#endregion
 	
 	#region Properties
@@ -84,40 +91,66 @@ public abstract class DateTimeFieldInfoBase : StringFieldInfo, IDateTimeFieldInf
 	{
 		var isValid = base.Validate(obj, validationContext);
 		
-		DateTime? dateTime = null;
-		switch (obj)
+		if (obj is string && !this.TryGetUtcDateTime(obj, out _))
 		{
-			case DateTime _dateTime:
-				dateTime = _dateTime;
-				break;
-			case string dateStr:
-			{
-				if (!IsValidDateTime(dateStr, out dateTime))
-				{
-					isValid = false;
-					validationContext.Errors.Add(new FieldValidationException($"Datetime is not valid. Datetime values must be '{this.StringFormat}' format.", this));
-				}
-				
-				break;
-			}
+			isValid = false;
+			validationContext.Errors.Add(new FieldValidationException($"Datetime is not valid. Datetime values must be '{this.StringFormat}' format.", this));
 		}
-		
-		if (dateTime != null)
+		else if (this.TryGetUtcDateTime(obj, out var dateTime))
 		{
-			if (this.MaxValue != null && dateTime.Value > this.MaxValue.Value)
+			if (this.MaxValue != null && dateTime > ToUtc(this.MaxValue.Value))
 			{
 				isValid = false;
-				validationContext.Errors.Add(new FieldValidationException($"Date can not be greater than {this.MaxValue}", this));
+				validationContext.Errors.Add(new FieldValidationException($"Date can not be greater than {FormatBound(this.MaxValue.Value)}", this));
 			}
 			
-			if (this.MinValue != null && dateTime.Value < this.MinValue.Value)
+			if (this.MinValue != null && dateTime < ToUtc(this.MinValue.Value))
 			{
 				isValid = false;
-				validationContext.Errors.Add(new FieldValidationException($"Date can not be less than {this.MinValue}", this));
+				validationContext.Errors.Add(new FieldValidationException($"Date can not be less than {FormatBound(this.MinValue.Value)}", this));
 			}
 		}
 		
 		return isValid;
+	}
+	
+	/// <summary>
+	/// Gets the value as a UTC date time; the strings are parsed by the accepted formats (a value without an offset is UTC)
+	/// </summary>
+	internal bool TryGetUtcDateTime(object? value, out DateTime dateTime)
+	{
+		switch (value)
+		{
+			case DateTime dateTimeValue:
+				dateTime = ToUtc(dateTimeValue);
+				return true;
+			case DateTimeOffset dateTimeOffset:
+				dateTime = dateTimeOffset.UtcDateTime;
+				return true;
+			case string text when !string.IsNullOrWhiteSpace(text):
+				return DateTime.TryParseExact(text, this.AcceptedFormats, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out dateTime);
+			default:
+				dateTime = default;
+				return false;
+		}
+	}
+	
+	/// <summary>
+	/// Normalizes the date time to UTC (a date time without a kind is UTC)
+	/// </summary>
+	private static DateTime ToUtc(DateTime dateTime)
+	{
+		return dateTime.Kind switch
+		{
+			DateTimeKind.Utc => dateTime,
+			DateTimeKind.Local => dateTime.ToUniversalTime(),
+			_ => DateTime.SpecifyKind(dateTime, DateTimeKind.Utc)
+		};
+	}
+	
+	private string FormatBound(DateTime dateTime)
+	{
+		return ToUtc(dateTime).ToString(this.StringFormat, CultureInfo.InvariantCulture);
 	}
 	
 	private bool ValidateMinValue(out Exception? exception)
@@ -148,20 +181,6 @@ public abstract class DateTimeFieldInfoBase : StringFieldInfo, IDateTimeFieldInf
 		
 		exception = null;
 		return true;
-	}
-	
-	private bool IsValidDateTime(string dateString, out DateTime? dateTime)
-	{
-		if (string.IsNullOrWhiteSpace(dateString))
-		{
-			dateTime = null;
-			return false;
-		}
-		
-		var isValid = DateTime.TryParseExact(dateString, this.StringFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var _dateTime);
-		dateTime = isValid ? _dateTime : null;
-		
-		return isValid;
 	}
 	
 	#endregion

@@ -1,5 +1,5 @@
 using System.Dynamic;
-using Newtonsoft.Json.Linq;
+using Ertis.Schema.Dynamics;
 
 namespace Ertis.Schema.Extensions;
 
@@ -9,44 +9,7 @@ public static class DynamicExtensions
 	
 	public static IDictionary<string, object?> ToDictionary(this object model)
 	{
-		var jObject = JObject.FromObject(model);
-		return jObject.ToDictionary();
-	}
-	
-	internal static object? ToDictionaryCore(this object model)
-	{
-		var jToken = JToken.FromObject(model);
-		switch (jToken)
-		{
-			case JProperty jProperty:
-			{
-				if (jProperty.Value is JValue jValue)
-				{
-					return jValue.Value;
-				}
-				else
-				{
-					dynamic dynamicObject = jProperty.Value;
-					return ToDictionaryCore(dynamicObject);
-				}
-			}
-			case JValue jValue:
-			{
-				return jValue.Value;
-			}
-			case JObject jObject:
-			{
-				return jObject.Children().ToDictionary(childToken => childToken.GetFullPath(), ToDictionaryCore);
-			}
-			case JArray jArray:
-			{
-				return jArray.Select(ToDictionaryCore).ToArray();
-			}
-			default:
-			{
-				throw new Exception("Unknown json node in ToDictionaryCore");
-			}
-		}
+		return DynamicValues.FromObject(model);
 	}
 	
 	public static dynamic ToDynamic(this IDictionary<string, object?> dictionary)

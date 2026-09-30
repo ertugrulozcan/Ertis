@@ -111,7 +111,7 @@ public class ReferenceFieldInfo : FieldInfo
 		return obj switch
 		{
 			string referenceId => referenceId,
-			Dictionary<string, object> objectDictionary when objectDictionary.ContainsKey("_id") => objectDictionary["_id"].ToString(),
+			IDictionary<string, object?> objectDictionary when objectDictionary.TryGetValue("_id", out var id) => id?.ToString(),
 			_ => null
 		};
 	}

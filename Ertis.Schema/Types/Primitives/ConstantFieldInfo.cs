@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Text.Json.Serialization;
+using Ertis.Schema.Dynamics;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
 
@@ -42,17 +44,17 @@ public class ConstantFieldInfo : FieldInfo<object>
 					incompatibleType = type != typeof(string);
 					break;
 				case ConstantType.integer:
-					incompatibleType = !int.TryParse(obj.ToString(), out _);
+					incompatibleType = !long.TryParse(DynamicValues.ToInvariantString(obj), NumberStyles.Integer, CultureInfo.InvariantCulture, out _);
 					break;
 				case ConstantType.@float:
-					incompatibleType = !double.TryParse(obj.ToString(), out _);
+					incompatibleType = !double.TryParse(DynamicValues.ToInvariantString(obj), NumberStyles.Float, CultureInfo.InvariantCulture, out _);
 					break;
 				case ConstantType.boolean:
-					incompatibleType = !bool.TryParse(obj.ToString(), out _);
+					incompatibleType = !bool.TryParse(DynamicValues.ToInvariantString(obj), out _);
 					break;
 				case ConstantType.date:
 				case ConstantType.datetime:
-					incompatibleType = !DateTime.TryParse(obj.ToString(), out _);
+					incompatibleType = obj is not DateTime && !DateTime.TryParse(DynamicValues.ToInvariantString(obj), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out _);
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();

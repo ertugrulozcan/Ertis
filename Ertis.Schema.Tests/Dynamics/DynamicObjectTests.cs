@@ -156,7 +156,7 @@ public class DynamicObjectTests
 		Assert.Equal("Istanbul", address.City);
 	}
 	
-	[Fact(Skip = "Bug (finding #12): GetValue<T[]> of object items converts the items but returns an object[], the cast to T[] throws InvalidCastException")]
+	[Fact]
 	public void GetValueOfT_WithObjectArray_DeserializesTheItems()
 	{
 		var dynamicObject = DynamicObject.Parse(SAMPLE_JSON);
@@ -167,7 +167,7 @@ public class DynamicObjectTests
 		Assert.Equal(["555", "556"], phones.Select(x => x.Number));
 	}
 	
-	[Fact(Skip = "Bug (finding #12): GetValue<T[]> of primitive items returns an object[], the cast to T[] throws InvalidCastException")]
+	[Fact]
 	public void GetValueOfT_WithPrimitiveArray_ConvertsTheItems()
 	{
 		var dynamicObject = DynamicObject.Parse("""{ "numbers": [1, 2] }""");
@@ -175,7 +175,7 @@ public class DynamicObjectTests
 		Assert.Equal([1L, 2L], dynamicObject.GetValue<long[]>("numbers")!);
 	}
 	
-	[Fact(Skip = "Bug (finding #8): GetValue<string> formats numbers with the current culture ('0,5' under tr-TR)")]
+	[Fact]
 	public void GetValueOfT_StringOfDouble_IsCultureInvariant()
 	{
 		using var _ = new CultureScope("tr-TR");

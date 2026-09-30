@@ -368,12 +368,12 @@ public static class SchemaExtensions
 	{
 		foreach (var fieldInfo in GetApplicableFields(schema, schema.Properties, model))
 		{
-			if (fieldInfo is IDateTimeFieldInfo)
+			if (fieldInfo is DateTimeFieldInfoBase dateTimeFieldInfo)
 			{
 				var path = fieldInfo.GetSelfPath(schema);
-				if (model.TryGetValue<string>(path, out var stringValue, out _) && DateTime.TryParse(stringValue, out var dateValue))
+				if (model.TryGetValue(path, out var value) && dateTimeFieldInfo.TryGetUtcDateTime(value, out var dateTime))
 				{
-					model.TrySetValue(path, dateValue, out _, true);
+					model.TrySetValue(path, dateTime, out _, true);
 				}
 			}
 		}

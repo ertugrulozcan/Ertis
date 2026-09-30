@@ -150,12 +150,12 @@ public class StringFieldInfoTests
 	public void Validate_WithDateOnlyString_Succeeds()
 	{
 		var result = SchemaValidation.ValidateField(new StringFieldInfo { Name = "code" }, """{ "code": "2026-01-01" }""");
-
+		
 		Assert.True(result.IsValid);
 		Assert.Equal("2026-01-01", result.Content.GetValue("code"));
 	}
-
-	[Theory(Skip = "Bug (backlog #9): DynamicObject.Parse turns ISO date-time strings into DateTime, so string fields reject them")]
+	
+	[Theory]
 	[InlineData("2026-01-01T10:00:00Z")]
 	[InlineData("2026-01-01T10:00:00+03:00")]
 	[InlineData("2026-01-01T10:00:00")]

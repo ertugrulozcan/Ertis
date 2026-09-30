@@ -35,7 +35,7 @@ public class ObjectFieldInfoTests
 		Assert.Equal("Istanbul", result.Content.GetValue("address.city"));
 	}
 	
-	[Theory(Skip = "Bug (finding #9): a primitive or array value for an object field throws ArgumentException (JObject.FromObject) instead of a validation error")]
+	[Theory]
 	[InlineData("\"Istanbul\"")]
 	[InlineData("5")]
 	[InlineData("[1]")]

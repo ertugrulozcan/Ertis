@@ -45,7 +45,7 @@ public abstract class ObjectFieldInfoBase : FieldInfo<object>, ISchema
 	{
 		using (ValidationPath.Begin(this.Path))
 		{
-			return this.Validate(obj.ToDynamic(), validationContext);
+			return this.Validate(obj.ToDictionary(), validationContext);
 		}
 	}
 	
@@ -158,20 +158,10 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
 	{
 		var isValid = base.Validate(obj, validationContext);
 		
-		if (obj != null)
+		if (obj is IDictionary<string, object?> dictionary)
 		{
-			DynamicObject dynamicObject;
-			if (obj is ExpandoObject expandoObject)
-			{
-				dynamicObject = DynamicObject.Create(expandoObject.ToDictionary());
-			}
-			else
-			{
-				dynamicObject = new DynamicObject(obj);
-			}
-			
 			var validatedProperties = new List<string>();
-			foreach (var (propertyName, propertyValue) in dynamicObject.ToDictionary())
+			foreach (var (propertyName, propertyValue) in dictionary)
 			{
 				var fieldInfo = this.Properties.FirstOrDefault(x => x.Name == propertyName);
 				if (fieldInfo != null)

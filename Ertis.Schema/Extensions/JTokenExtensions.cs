@@ -15,12 +15,38 @@ public static class JTokenExtensions
 			if (childToken is JProperty jProperty)
 			{
 				var propertyName = jProperty.Name;
-				dynamic dynamicObject = jProperty.Value;
-				dictionary.Add(propertyName, DynamicExtensions.ToDictionaryCore(dynamicObject));
+				dictionary.Add(propertyName, ToDictionaryCore(jProperty.Value));
 			}
 		}
 		
 		return dictionary;
+	}
+	
+	private static object? ToDictionaryCore(JToken jToken)
+	{
+		switch (jToken)
+		{
+			case JProperty jProperty:
+			{
+				return jProperty.Value is JValue jValue ? jValue.Value : ToDictionaryCore(jProperty.Value);
+			}
+			case JValue jValue:
+			{
+				return jValue.Value;
+			}
+			case JObject jObject:
+			{
+				return jObject.Children().ToDictionary(childToken => childToken.GetFullPath(), ToDictionaryCore);
+			}
+			case JArray jArray:
+			{
+				return jArray.Select(ToDictionaryCore).ToArray();
+			}
+			default:
+			{
+				throw new Exception("Unknown json node in ToDictionaryCore");
+			}
+		}
 	}
 	
 	public static string GetFullPath(this JToken jToken)

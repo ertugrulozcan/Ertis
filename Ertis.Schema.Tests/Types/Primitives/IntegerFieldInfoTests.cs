@@ -70,10 +70,7 @@ public class IntegerFieldInfoTests
 		Assert.IsType<long>(content.GetValue("count"));
 	}
 	
-	/// <summary>
-	/// The bounds are checked only for Int32 values; values coming from DynamicObject.Parse are Int64
-	/// </summary>
-	[Theory(Skip = "Bug (backlog #7): numeric bounds are not enforced for Int64 values (every value parsed from json)")]
+	[Theory]
 	[InlineData("{ \"minimum\": 0 }", -1)]
 	[InlineData("{ \"maximum\": 100 }", 101)]
 	[InlineData("{ \"exclusiveMinimum\": 0 }", -1)]
@@ -86,7 +83,7 @@ public class IntegerFieldInfoTests
 		Assert.False(result.IsValid);
 	}
 	
-	[Theory(Skip = "Bug (backlog #7): exclusiveMinimum accepts the boundary value itself ('<' instead of '<=')")]
+	[Theory]
 	[InlineData(0)]
 	public void Validate_ValueEqualToExclusiveMinimum_Fails(int value)
 	{
@@ -126,6 +123,40 @@ public class IntegerFieldInfoTests
 		
 		Assert.False(result.IsValid);
 		Assert.Equal([expectedMessage], result.Messages);
+	}
+	
+	public static TheoryData<object, bool> ClrValues()
+	{
+		return new TheoryData<object, bool>
+		{
+			{ 101L, false }, { 101, false }, { (short) 101, false }, { (byte) 101, false }, { (sbyte) 101, false },
+			{ (ushort) 101, false }, { 101u, false },
+			{ 100L, true }, { 100, true }, { (short) 100, true }, { 100u, true }
+		};
+	}
+	
+	[Theory]
+	[MemberData(nameof(ClrValues))]
+	public void Validate_IntegralClrValue_EnforcesTheBounds(object value, bool expected)
+	{
+		var content = DynamicObject.Create(new Dictionary<string, object?>());
+		content.SetValue("count", value, true);
+		
+		var result = SchemaValidation.Validate(TestSchema.Of(new IntegerFieldInfo { Name = "count", Maximum = 100 }), content);
+		
+		Assert.True(expected == result.IsValid, $"{value.GetType().Name}: {string.Join(" | ", result.Messages)}");
+	}
+	
+	[Fact]
+	public void Validate_UInt64Value_FailsWithTypeMismatchOnly()
+	{
+		var content = DynamicObject.Create(new Dictionary<string, object?>());
+		content.SetValue("count", 101UL, true);
+		
+		var result = SchemaValidation.Validate(TestSchema.Of(new IntegerFieldInfo { Name = "count", Maximum = 100 }), content);
+		
+		Assert.False(result.IsValid);
+		Assert.Equal(["Type mismatch error. 'count' is must be 'Nullable`1'"], result.Messages);
 	}
 	
 	private static IntegerFieldInfo CreateField(string rule)

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Helpers;
@@ -76,7 +77,7 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
 	}
 	
 	/// <summary>
-	/// Less than or equal
+	/// Less than
 	/// </summary>
 	[JsonPropertyName("exclusiveMaximum")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -119,38 +120,39 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
 	{
 		var isValid = base.Validate(obj, validationContext);
 		
-		if (obj != null)
+		if (NumericTypeHelper.TryGetDouble(obj, out var value))
 		{
-			var isCompatibleForDouble = NumericTypeHelper.IsAssignableTo(obj.GetType(), typeof(double));
-			if (isCompatibleForDouble != null && isCompatibleForDouble.Value && double.TryParse(obj.ToString(), out var doubleValue))
+			if (this.Maximum != null && value > this.Maximum.Value)
 			{
-				if (this.Maximum != null && doubleValue > this.Maximum.Value)
-				{
-					isValid = false;
-					validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be greater than {this.Maximum}", this));
-				}
-				
-				if (this.Minimum != null && doubleValue < this.Minimum.Value)
-				{
-					isValid = false;
-					validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be less than {this.Minimum}", this));
-				}
-				
-				if (this.ExclusiveMaximum != null && doubleValue >= this.ExclusiveMaximum.Value)
-				{
-					isValid = false;
-					validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be greater than or equal {this.ExclusiveMaximum}", this));
-				}
-				
-				if (this.ExclusiveMinimum != null && doubleValue < this.ExclusiveMinimum.Value)
-				{
-					isValid = false;
-					validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be less than or equal {this.ExclusiveMinimum}", this));
-				}
+				isValid = false;
+				validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be greater than {Format(this.Maximum.Value)}", this));
+			}
+			
+			if (this.Minimum != null && value < this.Minimum.Value)
+			{
+				isValid = false;
+				validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be less than {Format(this.Minimum.Value)}", this));
+			}
+			
+			if (this.ExclusiveMaximum != null && value >= this.ExclusiveMaximum.Value)
+			{
+				isValid = false;
+				validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be greater than or equal {Format(this.ExclusiveMaximum.Value)}", this));
+			}
+			
+			if (this.ExclusiveMinimum != null && value <= this.ExclusiveMinimum.Value)
+			{
+				isValid = false;
+				validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be less than or equal {Format(this.ExclusiveMinimum.Value)}", this));
 			}
 		}
 		
 		return isValid;
+	}
+	
+	private static string Format(double value)
+	{
+		return value.ToString(CultureInfo.InvariantCulture);
 	}
 	
 	private bool ValidateMinimum(out Exception? exception)

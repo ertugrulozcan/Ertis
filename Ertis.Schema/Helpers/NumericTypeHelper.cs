@@ -35,7 +35,7 @@ internal static class NumericTypeHelper
 				return null;
 			}
 			
-			return size1 < size2;
+			return size1 <= size2;
 		}
 		else if (type1.IsFloatingPointNumericType() && type2.IsFloatingPointNumericType())
 		{
@@ -51,7 +51,7 @@ internal static class NumericTypeHelper
 				return null;
 			}
 			
-			return size1 < size2;
+			return size1 <= size2;
 		}
 		else if (type1.IsIntegralNumericType() && type2.IsFloatingPointNumericType())
 		{
@@ -64,6 +64,76 @@ internal static class NumericTypeHelper
 		}
 		
 		return false;
+	}
+	
+	/// <summary>
+	/// Gets the value of an integral number that fits into Int64
+	/// </summary>
+	internal static bool TryGetInt64(object? obj, out long value)
+	{
+		switch (obj)
+		{
+			case long longValue:
+				value = longValue;
+				return true;
+			case int intValue:
+				value = intValue;
+				return true;
+			case short shortValue:
+				value = shortValue;
+				return true;
+			case sbyte sbyteValue:
+				value = sbyteValue;
+				return true;
+			case byte byteValue:
+				value = byteValue;
+				return true;
+			case ushort ushortValue:
+				value = ushortValue;
+				return true;
+			case uint uintValue:
+				value = uintValue;
+				return true;
+			case nint nintValue:
+				value = nintValue;
+				return true;
+			default:
+				value = 0;
+				return false;
+		}
+	}
+	
+	/// <summary>
+	/// Gets the value of a number that is assignable to Double (every integral and binary floating point number, not decimal)
+	/// </summary>
+	internal static bool TryGetDouble(object? obj, out double value)
+	{
+		switch (obj)
+		{
+			case double doubleValue:
+				value = doubleValue;
+				return true;
+			case float floatValue:
+				value = floatValue;
+				return true;
+			case ulong ulongValue:
+				value = ulongValue;
+				return true;
+			case nuint nuintValue:
+				value = nuintValue;
+				return true;
+			default:
+			{
+				if (TryGetInt64(obj, out var longValue))
+				{
+					value = longValue;
+					return true;
+				}
+				
+				value = 0;
+				return false;
+			}
+		}
 	}
 	
 	private static bool IsNumericType(this Type type)
@@ -98,13 +168,14 @@ internal static class NumericTypeHelper
 	
 	private static int? SizeOf(Type type)
 	{
+		// The sizes are the value bits (signed types: n - 1, unsigned types: n), so a type is assignable to another one with an equal or greater size
 		if (type == typeof(byte))
 		{
-			return 7;
+			return 8;
 		}
 		else if (type == typeof(sbyte))
 		{
-			return 8;
+			return 7;
 		}
 		else if (type == typeof(short))
 		{
@@ -118,11 +189,15 @@ internal static class NumericTypeHelper
 		{
 			return 31;
 		}
-		else if (type == typeof(long))
+		else if (type == typeof(uint))
+		{
+			return 32;
+		}
+		else if (type == typeof(long) || type == typeof(nint))
 		{
 			return 63;
 		}
-		else if (type == typeof(ulong))
+		else if (type == typeof(ulong) || type == typeof(nuint))
 		{
 			return 64;
 		}

@@ -51,7 +51,7 @@ public class FloatFieldInfoTests
 		Assert.IsType<double>(content.GetValue("ratio"));
 	}
 	
-	[Theory(Skip = "Bug (backlog #7): float bounds are not enforced for Double values (every decimal parsed from json)")]
+	[Theory]
 	[InlineData(-0.5)]
 	[InlineData(1.5)]
 	public void Validate_ParsedDecimalOutOfTheBounds_Fails(double value)
@@ -61,9 +61,59 @@ public class FloatFieldInfoTests
 		var result = SchemaValidation.ValidateField(fieldInfo, $$"""{ "ratio": {{value.ToString(System.Globalization.CultureInfo.InvariantCulture)}} }""");
 		
 		Assert.False(result.IsValid);
+		Assert.Single(result.Errors);
 	}
 	
-	[Theory(Skip = "Bug (backlog #7): exclusiveMinimum accepts the boundary value itself ('<' instead of '<=')")]
+	[Theory]
+	[InlineData(0.5, true)]
+	[InlineData(1.0, false)]
+	[InlineData(0.0, false)]
+	public void Validate_ParsedDecimalWithExclusiveBounds_ValidatesTheRange(double value, bool expected)
+	{
+		var fieldInfo = new FloatFieldInfo { Name = "ratio", ExclusiveMinimum = 0, ExclusiveMaximum = 1 };
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, $$"""{ "ratio": {{value.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)}} }""");
+		
+		Assert.Equal(expected, result.IsValid);
+	}
+	
+	[Theory]
+	[InlineData(1.5f, false)]
+	[InlineData(0.5f, true)]
+	public void Validate_SingleValue_EnforcesTheBounds(float value, bool expected)
+	{
+		var content = DynamicObject.Create(new Dictionary<string, object?>());
+		content.SetValue("ratio", value, true);
+		
+		var result = SchemaValidation.Validate(TestSchema.Of(new FloatFieldInfo { Name = "ratio", Maximum = 1 }), content);
+		
+		Assert.Equal(expected, result.IsValid);
+	}
+	
+	[Fact]
+	public void Validate_DecimalValue_FailsWithTypeMismatchOnly()
+	{
+		var content = DynamicObject.Create(new Dictionary<string, object?>());
+		content.SetValue("ratio", 1.5m, true);
+		
+		var result = SchemaValidation.Validate(TestSchema.Of(new FloatFieldInfo { Name = "ratio", Maximum = 1 }), content);
+		
+		Assert.False(result.IsValid);
+		Assert.Equal(["Type mismatch error. 'ratio' is must be 'Nullable`1'"], result.Messages);
+	}
+	
+	[Fact]
+	public void Validate_OutOfTheBounds_WritesTheBoundCultureInvariant()
+	{
+		using var _ = new CultureScope("tr-TR");
+		var fieldInfo = new FloatFieldInfo { Name = "ratio", Maximum = 1.5 };
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, """{ "ratio": 2.5 }""");
+		
+		Assert.Equal(["The 'ratio' value can not be greater than 1.5"], result.Messages);
+	}
+	
+	[Theory]
 	[InlineData(0)]
 	public void Validate_ValueEqualToExclusiveMinimum_Fails(long value)
 	{

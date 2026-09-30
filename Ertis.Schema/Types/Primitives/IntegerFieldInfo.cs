@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
+using Ertis.Schema.Helpers;
 using Ertis.Schema.Validation;
 
 namespace Ertis.Schema.Types.Primitives;
@@ -75,7 +76,7 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
 	}
 	
 	/// <summary>
-	/// Less than or equal
+	/// Less than
 	/// </summary>
 	[JsonPropertyName("exclusiveMaximum")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -139,33 +140,33 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
 	{
 		var isValid = base.Validate(obj, validationContext);
 		
-		if (obj is int intValue)
+		if (NumericTypeHelper.TryGetInt64(obj, out var value))
 		{
-			if (this.Maximum != null && intValue > this.Maximum.Value)
+			if (this.Maximum != null && value > this.Maximum.Value)
 			{
 				isValid = false;
 				validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be greater than {this.Maximum}", this));
 			}
 			
-			if (this.Minimum != null && intValue < this.Minimum.Value)
+			if (this.Minimum != null && value < this.Minimum.Value)
 			{
 				isValid = false;
 				validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be less than {this.Minimum}", this));
 			}
 			
-			if (this.ExclusiveMaximum != null && intValue >= this.ExclusiveMaximum.Value)
+			if (this.ExclusiveMaximum != null && value >= this.ExclusiveMaximum.Value)
 			{
 				isValid = false;
 				validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be greater than or equal {this.ExclusiveMaximum}", this));
 			}
 			
-			if (this.ExclusiveMinimum != null && intValue < this.ExclusiveMinimum.Value)
+			if (this.ExclusiveMinimum != null && value <= this.ExclusiveMinimum.Value)
 			{
 				isValid = false;
 				validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value can not be less than or equal {this.ExclusiveMinimum}", this));
 			}
 			
-			if (this.MultipleOf != null && intValue % this.MultipleOf != 0)
+			if (this.MultipleOf != null && value % this.MultipleOf.Value != 0)
 			{
 				isValid = false;
 				validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' value must be an exact multiple of the {this.MultipleOf}", this));

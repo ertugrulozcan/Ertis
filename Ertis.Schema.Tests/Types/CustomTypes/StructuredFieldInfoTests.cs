@@ -18,7 +18,7 @@ public class StructuredFieldInfoTests
 		Assert.True(result.IsValid);
 	}
 	
-	[Theory(Skip = "Bug (finding #11): the predefined properties of location/code/image/video fields are never validated (ObjectFieldInfoBase has no content validation)")]
+	[Theory]
 	[InlineData("{ \"latitude\": 91.5, \"longitude\": 28.97 }")]
 	[InlineData("{ \"latitude\": 41.01 }")]
 	[InlineData("{ \"latitude\": \"41\", \"longitude\": 28.97 }")]
@@ -42,7 +42,7 @@ public class StructuredFieldInfoTests
 		Assert.True(result.IsValid);
 	}
 	
-	[Fact(Skip = "Bug (finding #11): the predefined properties of location/code/image/video fields are never validated (ObjectFieldInfoBase has no content validation)")]
+	[Fact]
 	public void Validate_CodeWithoutLanguage_Fails()
 	{
 		var result = SchemaValidation.ValidateField(new CodeFieldInfo { Name = "snippet" }, """{ "snippet": { "code": "let a = 1;" } }""");
@@ -84,12 +84,72 @@ public class StructuredFieldInfoTests
 		Assert.True(result.IsValid);
 	}
 	
-	[Fact(Skip = "Bug (finding #11): the predefined properties of location/code/image/video fields are never validated (ObjectFieldInfoBase has no content validation)")]
-	public void Validate_VideoWithoutRequiredProperties_Fails()
+	[Theory]
+	[InlineData("""{ "fullPath": "/files/a.mp4" }""")]
+	[InlineData("{}")]
+	public void Validate_VideoWithOnlySomeOfTheProperties_Succeeds(string jsonValue)
 	{
-		var result = SchemaValidation.ValidateField(new VideoFieldInfo { Name = "clip" }, """{ "clip": { "name": "a.mp4" } }""");
+		var result = SchemaValidation.ValidateField(new VideoFieldInfo { Name = "clip" }, $$"""{ "clip": {{jsonValue}} }""");
+		
+		Assert.True(result.IsValid);
+	}
+	
+	[Fact]
+	public void Validate_ImageWithAdditionalProperties_Succeeds()
+	{
+		var result = SchemaValidation.ValidateField(new ImageFieldInfo { Name = "photo" }, """{ "photo": { "fullPath": "/a.png", "width": 640, "alt": "A photo" } }""");
+		
+		Assert.True(result.IsValid);
+	}
+	
+	[Theory]
+	[InlineData("""{ "fullPath": "/a.png", "size": "large" }""", "test-schema.photo.size")]
+	[InlineData("\"/a.png\"", "test-schema.photo")]
+	[InlineData("[{ \"fullPath\": \"/a.png\" }]", "test-schema.photo")]
+	public void Validate_InvalidImage_Fails(string jsonValue, string expectedPath)
+	{
+		var result = SchemaValidation.ValidateField(new ImageFieldInfo { Name = "photo" }, $$"""{ "photo": {{jsonValue}} }""");
 		
 		Assert.False(result.IsValid);
+		Assert.Equal(expectedPath, Assert.Single(result.Errors).FieldPath);
+	}
+	
+	[Fact]
+	public void Validate_MultipleImages_ValidatesEachItem()
+	{
+		var fieldInfo = new ImageFieldInfo { Name = "photos", Multiple = true };
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, """{ "photos": [{ "fullPath": "/a.png" }, { "fullPath": "/b.png", "size": "large" }, "c.png"] }""");
+		
+		Assert.False(result.IsValid);
+		Assert.Equal(["test-schema.photos[1].size", "test-schema.photos[2]"], result.Errors.Select(x => x.FieldPath));
+		Assert.Equal("Type mismatch error. Array items are must be 'object'", result.Errors[1].Message);
+	}
+	
+	[Fact]
+	public void Validate_MultipleImagesWithSingleObject_FailsWithTypeMismatch()
+	{
+		var fieldInfo = new ImageFieldInfo { Name = "photos", Multiple = true };
+		
+		var result = SchemaValidation.ValidateField(fieldInfo, """{ "photos": { "fullPath": "/a.png" } }""");
+		
+		Assert.Equal(["Type mismatch error. 'photos' is must be 'array'"], result.Messages);
+	}
+	
+	[Fact]
+	public void Validate_LocationWithAdditionalProperties_Succeeds()
+	{
+		var result = SchemaValidation.ValidateField(new LocationFieldInfo { Name = "position" }, """{ "position": { "latitude": 41.01, "longitude": 28.97, "label": "Istanbul" } }""");
+		
+		Assert.True(result.IsValid);
+	}
+	
+	[Fact]
+	public void Validate_InvalidLocation_ReportsTheFieldPaths()
+	{
+		var result = SchemaValidation.ValidateField(new LocationFieldInfo { Name = "position" }, """{ "position": { "latitude": 91.5 } }""");
+		
+		Assert.Equal(["test-schema.position.latitude", "test-schema.position.longitude"], result.Errors.Select(x => x.FieldPath));
 	}
 	
 	private static string FileJson(string mimeType)

@@ -23,33 +23,4 @@ public class DateFieldInfo : DateTimeFieldInfoBase
 	protected override string StringFormat => STRING_FORMAT;
 	
 	#endregion
-	
-	#region Methods
-	
-	public override object Clone()
-	{
-		return new DateFieldInfo
-		{
-			Name = this.Name,
-			Description = this.Description,
-			DisplayName = this.DisplayName,
-			Parent = this.Parent,
-			IsRequired = this.IsRequired,
-			IsUnique = this.IsUnique,
-			IsVirtual = this.IsVirtual,
-			IsHidden = this.IsHidden,
-			IsReadonly = this.IsReadonly,
-			DefaultValue = this.DefaultValue,
-			MinValue = this.MinValue,
-			MaxValue = this.MaxValue,
-			MinLength = this.MinLength,
-			MaxLength = this.MaxLength,
-			FormatPattern = this.FormatPattern,
-			RegexPattern = this.RegexPattern,
-			RestrictRegexPattern = this.RestrictRegexPattern,
-			CaseInsensitive = this.CaseInsensitive
-		};
-	}
-	
-	#endregion
 }

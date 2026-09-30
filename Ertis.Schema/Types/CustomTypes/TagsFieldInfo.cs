@@ -240,25 +240,5 @@ public class TagsFieldInfo : FieldInfo<string[]>
 		return true;
 	}
 	
-	public override object Clone()
-	{
-		return new TagsFieldInfo
-		{
-			Name = this.Name,
-			Description = this.Description,
-			DisplayName = this.DisplayName,
-			Parent = this.Parent,
-			IsRequired = this.IsRequired,
-			IsVirtual = this.IsVirtual,
-			IsHidden = this.IsHidden,
-			IsReadonly = this.IsReadonly,
-			DefaultValue = this.DefaultValue,
-			MinCount = this.MinCount,
-			MaxCount = this.MaxCount,
-			MinLength = this.MinLength,
-			MaxLength = this.MaxLength
-		};
-	}
-	
 	#endregion
 }

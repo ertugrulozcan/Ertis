@@ -121,23 +121,6 @@ public class ReferenceFieldInfo : FieldInfo
 		return null;
 	}
 	
-	public override object Clone()
-	{
-		return new ReferenceFieldInfo
-		{
-			Name = this.Name,
-			Description = this.Description,
-			DisplayName = this.DisplayName,
-			Parent = this.Parent,
-			ContentType = this.ContentType,
-			IsRequired = this.IsRequired,
-			IsVirtual = this.IsVirtual,
-			IsHidden = this.IsHidden,
-			IsReadonly = this.IsReadonly,
-			ReferenceType = this.ReferenceType
-		};
-	}
-	
 	#endregion
 }
 

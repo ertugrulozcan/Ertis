@@ -18,6 +18,11 @@ public sealed class VideoFieldInfo : ObjectFieldInfoBase
 	[Newtonsoft.Json.JsonIgnore]
 	public override IReadOnlyCollection<IFieldInfo> Properties { get; init; }
 	
+	/// <summary>
+	/// The values of the predefined types may carry additional data (e.g. image metadata)
+	/// </summary>
+	protected override bool AcceptsAdditionalProperties => true;
+	
 	[JsonPropertyName("maxSize")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[Newtonsoft.Json.JsonProperty("maxSize", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
@@ -51,35 +56,35 @@ public sealed class VideoFieldInfo : ObjectFieldInfoBase
 				Name = "id",
 				DisplayName = "Id",
 				Description = "File Id",
-				IsRequired = true
+				IsRequired = false
 			},
 			new StringFieldInfo
 			{
 				Name = "name",
 				DisplayName = "File Name",
 				Description = "File Name",
-				IsRequired = true
+				IsRequired = false
 			},
 			new StringFieldInfo
 			{
 				Name = "path",
 				DisplayName = "File Path",
 				Description = "File Path",
-				IsRequired = true
+				IsRequired = false
 			},
 			new StringFieldInfo
 			{
 				Name = "fullPath",
 				DisplayName = "Full Path",
 				Description = "File Full Path",
-				IsRequired = true
+				IsRequired = false
 			},
 			new StringFieldInfo
 			{
 				Name = "mimeType",
 				DisplayName = "Mime Type",
 				Description = "File Mime Type",
-				IsRequired = true
+				IsRequired = false
 			},
 			new FloatFieldInfo
 			{
@@ -93,7 +98,7 @@ public sealed class VideoFieldInfo : ObjectFieldInfoBase
 				Name = "url",
 				DisplayName = "Url",
 				Description = "Url",
-				IsRequired = true
+				IsRequired = false
 			}
 		};
 	}
@@ -118,24 +123,6 @@ public sealed class VideoFieldInfo : ObjectFieldInfoBase
 		
 		exception = null;
 		return true;
-	}
-	
-	public override object Clone()
-	{
-		return new ImageFieldInfo
-		{
-			Name = this.Name,
-			Description = this.Description,
-			DisplayName = this.DisplayName,
-			Parent = this.Parent,
-			IsRequired = this.IsRequired,
-			IsVirtual = this.IsVirtual,
-			IsHidden = this.IsHidden,
-			IsReadonly = this.IsReadonly,
-			DefaultValue = this.DefaultValue,
-			Properties = this.Properties,
-			MaxSize = this.MaxSize
-		};
 	}
 	
 	#endregion

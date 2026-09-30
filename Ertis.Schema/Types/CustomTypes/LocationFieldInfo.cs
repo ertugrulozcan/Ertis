@@ -17,6 +17,11 @@ public sealed class LocationFieldInfo : ObjectFieldInfoBase
 	[Newtonsoft.Json.JsonIgnore]
 	public override IReadOnlyCollection<IFieldInfo> Properties { get; init; }
 	
+	/// <summary>
+	/// The values of the predefined types may carry additional data (e.g. image metadata)
+	/// </summary>
+	protected override bool AcceptsAdditionalProperties => true;
+	
 	#endregion
 	
 	#region Constructors
@@ -46,23 +51,6 @@ public sealed class LocationFieldInfo : ObjectFieldInfoBase
 				Maximum = 180.0d,
 				IsRequired = true
 			}
-		};
-	}
-	
-	public override object Clone()
-	{
-		return new LocationFieldInfo
-		{
-			Name = this.Name,
-			Description = this.Description,
-			DisplayName = this.DisplayName,
-			Parent = this.Parent,
-			IsRequired = this.IsRequired,
-			IsVirtual = this.IsVirtual,
-			IsHidden = this.IsHidden,
-			IsReadonly = this.IsReadonly,
-			DefaultValue = this.DefaultValue,
-			Properties = this.Properties
 		};
 	}
 	

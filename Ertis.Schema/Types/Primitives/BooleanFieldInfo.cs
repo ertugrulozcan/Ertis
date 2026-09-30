@@ -26,22 +26,5 @@ public class BooleanFieldInfo : FieldInfo<bool?>, IPrimitiveType
 		return base.ValidateSchema(out exception);
 	}
 	
-	public override object Clone()
-	{
-		return new BooleanFieldInfo
-		{
-			Name = this.Name,
-			Description = this.Description,
-			DisplayName = this.DisplayName,
-			Parent = this.Parent,
-			IsRequired = this.IsRequired,
-			IsUnique = this.IsUnique,
-			IsVirtual = this.IsVirtual,
-			IsHidden = this.IsHidden,
-			IsReadonly = this.IsReadonly,
-			DefaultValue = this.DefaultValue
-		};
-	}
-	
 	#endregion
 }

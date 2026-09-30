@@ -45,28 +45,5 @@ public class UriFieldInfo : StringFieldInfo
 		return Uri.IsWellFormedUriString(uri, UriKind.Absolute) && Uri.TryCreate(uri, UriKind.Absolute, out _);
 	}
 	
-	public override object Clone()
-	{
-		return new UriFieldInfo
-		{
-			Name = this.Name,
-			Description = this.Description,
-			DisplayName = this.DisplayName,
-			Parent = this.Parent,
-			IsRequired = this.IsRequired,
-			IsUnique = this.IsUnique,
-			IsVirtual = this.IsVirtual,
-			IsHidden = this.IsHidden,
-			IsReadonly = this.IsReadonly,
-			DefaultValue = this.DefaultValue,
-			MinLength = this.MinLength,
-			MaxLength = this.MaxLength,
-			FormatPattern = this.FormatPattern,
-			RegexPattern = this.RegexPattern,
-			RestrictRegexPattern = this.RestrictRegexPattern,
-			CaseInsensitive = this.CaseInsensitive
-		};
-	}
-	
 	#endregion
 }

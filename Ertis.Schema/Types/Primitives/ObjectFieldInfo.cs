@@ -27,6 +27,16 @@ public abstract class ObjectFieldInfoBase : FieldInfo<object>, ISchema
 	[NewtonsoftJsonProperty("allowAdditionalProperties", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
 	public bool AllowAdditionalProperties { get; init; }
 	
+	/// <summary>
+	/// Whether the object accepts the properties which are not declared in its schema
+	/// </summary>
+	protected virtual bool AcceptsAdditionalProperties => this.AllowAdditionalProperties;
+	
+	/// <summary>
+	/// Whether the value is an array of objects instead of a single object
+	/// </summary>
+	protected virtual bool IsMultiple => false;
+	
 	#endregion
 	
 	#region Abstract Properties
@@ -47,6 +57,83 @@ public abstract class ObjectFieldInfoBase : FieldInfo<object>, ISchema
 		{
 			return this.Validate(obj.ToDictionary(), validationContext);
 		}
+	}
+	
+	protected internal override bool Validate(object? obj, IValidationContext validationContext)
+	{
+		var isValid = base.Validate(obj, validationContext);
+		
+		switch (obj)
+		{
+			case null:
+				break;
+			case IDictionary<string, object?> dictionary when !this.IsMultiple:
+				isValid &= this.ValidateObject(dictionary, validationContext);
+				break;
+			case object?[] array when this.IsMultiple:
+			{
+				for (var i = 0; i < array.Length; i++)
+				{
+					using (ValidationPath.PushIndex(i))
+					{
+						if (array[i] is IDictionary<string, object?> item)
+						{
+							isValid &= this.ValidateObject(item, validationContext);
+						}
+						else
+						{
+							isValid = false;
+							validationContext.Errors.Add(new FieldValidationException("Type mismatch error. Array items are must be 'object'", this));
+						}
+					}
+				}
+				
+				break;
+			}
+			default:
+				isValid = false;
+				validationContext.Errors.Add(new FieldValidationException($"Type mismatch error. '{this.Name}' is must be '{(this.IsMultiple ? "array" : "object")}'", this));
+				break;
+		}
+		
+		return isValid;
+	}
+	
+	private bool ValidateObject(IDictionary<string, object?> dictionary, IValidationContext validationContext)
+	{
+		var isValid = true;
+		var validatedProperties = new List<string>();
+		foreach (var (propertyName, propertyValue) in dictionary)
+		{
+			var fieldInfo = this.Properties.FirstOrDefault(x => x.Name == propertyName);
+			if (fieldInfo != null)
+			{
+				using (ValidationPath.Push(propertyName))
+				{
+					isValid &= ((FieldInfo) fieldInfo).Validate(propertyValue, validationContext);
+				}
+			}
+			else if (!this.AcceptsAdditionalProperties)
+			{
+				isValid = false;
+				validationContext.Errors.Add(new FieldValidationException($"Additional properties not allowed in this object schema. ({propertyName})", this));
+			}
+			
+			validatedProperties.Add(propertyName);
+		}
+		
+		foreach (var fieldInfo in this.Properties)
+		{
+			if (!validatedProperties.Contains(fieldInfo.Name))
+			{
+				using (ValidationPath.Push(fieldInfo.Name))
+				{
+					isValid &= ((FieldInfo) fieldInfo).Validate(null, validationContext);
+				}
+			}
+		}
+		
+		return isValid;
 	}
 	
 	#endregion
@@ -154,47 +241,6 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
 			this.ValidateProperties(out exception);
 	}
 	
-	protected internal override bool Validate(object? obj, IValidationContext validationContext)
-	{
-		var isValid = base.Validate(obj, validationContext);
-		
-		if (obj is IDictionary<string, object?> dictionary)
-		{
-			var validatedProperties = new List<string>();
-			foreach (var (propertyName, propertyValue) in dictionary)
-			{
-				var fieldInfo = this.Properties.FirstOrDefault(x => x.Name == propertyName);
-				if (fieldInfo != null)
-				{
-					using (ValidationPath.Push(propertyName))
-					{
-						isValid &= ((FieldInfo) fieldInfo).Validate(propertyValue, validationContext);
-					}
-				}
-				else if (!this.AllowAdditionalProperties)
-				{
-					isValid = false;
-					validationContext.Errors.Add(new FieldValidationException($"Additional properties not allowed in this object schema. ({propertyName})", this));
-				}
-				
-				validatedProperties.Add(propertyName);
-			}
-			
-			foreach (var fieldInfo in this.Properties)
-			{
-				if (!validatedProperties.Contains(fieldInfo.Name))
-				{
-					using (ValidationPath.Push(fieldInfo.Name))
-					{
-						isValid &= ((FieldInfo) fieldInfo).Validate(null, validationContext);
-					}
-				}
-			}   
-		}
-		
-		return isValid;
-	}
-	
 	public override object Clone()
 	{
 		return new ObjectFieldInfo(this.Properties.Select(x => (IFieldInfo)x.Clone()))
@@ -207,6 +253,9 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
 			IsVirtual = this.IsVirtual,
 			IsHidden = this.IsHidden,
 			IsReadonly = this.IsReadonly,
+			IsSearchable = this.IsSearchable,
+			SearchWeight = this.SearchWeight,
+			Appearance = this.Appearance,
 			DefaultValue = this.DefaultValue,
 			AllowAdditionalProperties = this.AllowAdditionalProperties
 		};

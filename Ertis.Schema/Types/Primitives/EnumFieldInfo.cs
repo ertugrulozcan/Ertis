@@ -116,25 +116,6 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
 		return true;
 	}
 	
-	public override object Clone()
-	{
-		return new EnumFieldInfo
-		{
-			Name = this.Name,
-			Description = this.Description,
-			DisplayName = this.DisplayName,
-			Parent = this.Parent,
-			IsRequired = this.IsRequired,
-			IsUnique = this.IsUnique,
-			IsVirtual = this.IsVirtual,
-			IsHidden = this.IsHidden,
-			IsReadonly = this.IsReadonly,
-			DefaultValue = this.DefaultValue,
-			Items = this.Items,
-			IsMultiple = this.IsMultiple
-		};
-	}
-	
 	#endregion
 	
 	#region Helper Classes

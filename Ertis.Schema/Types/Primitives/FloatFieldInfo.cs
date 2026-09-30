@@ -225,26 +225,5 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
 		return true;
 	}
 	
-	public override object Clone()
-	{
-		return new FloatFieldInfo
-		{
-			Name = this.Name,
-			Description = this.Description,
-			DisplayName = this.DisplayName,
-			Parent = this.Parent,
-			IsRequired = this.IsRequired,
-			IsUnique = this.IsUnique,
-			IsVirtual = this.IsVirtual,
-			IsHidden = this.IsHidden,
-			IsReadonly = this.IsReadonly,
-			DefaultValue = this.DefaultValue,
-			Minimum = this.Minimum,
-			Maximum = this.Maximum,
-			ExclusiveMinimum = this.ExclusiveMinimum,
-			ExclusiveMaximum = this.ExclusiveMaximum
-		};
-	}
-	
 	#endregion
 }

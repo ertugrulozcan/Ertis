@@ -187,11 +187,17 @@ public abstract class FieldInfo : IFieldInfo, IHasDefault
 	
 	public abstract object? GetDefaultValue();
 	
-	public abstract object Clone();
-	
 	#endregion
 	
 	#region Methods
+	
+	/// <summary>
+	/// Creates a copy of the field info with all its properties (the reference type values are shared)
+	/// </summary>
+	public virtual object Clone()
+	{
+		return this.MemberwiseClone();
+	}
 	
 	protected virtual void OnPropertyChanged(string propertyName)
 	{
@@ -334,11 +340,6 @@ public abstract class FieldInfo<T> : FieldInfo, IHasDefault<T>
 				isValid = false;
 				validationContext.Errors.Add(new FieldValidationException($"Type mismatch error. '{this.Name}' is must be '{GetPrimitiveName(typeof(T))}'", this));
 			}
-		}
-		else if (this.Type == FieldType.@object && obj is not IDictionary<string, object>)
-		{
-			isValid = false;
-			validationContext.Errors.Add(new FieldValidationException($"Type mismatch error. '{this.Name}' is must be 'object'", this));
 		}
 		
 		return isValid;

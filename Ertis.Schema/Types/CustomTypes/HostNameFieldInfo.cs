@@ -86,28 +86,5 @@ public class HostNameFieldInfo : StringFieldInfo
 		}
 	}
 	
-	public override object Clone()
-	{
-		return new HostNameFieldInfo
-		{
-			Name = this.Name,
-			Description = this.Description,
-			DisplayName = this.DisplayName,
-			Parent = this.Parent,
-			IsRequired = this.IsRequired,
-			IsUnique = this.IsUnique,
-			IsVirtual = this.IsVirtual,
-			IsHidden = this.IsHidden,
-			IsReadonly = this.IsReadonly,
-			DefaultValue = this.DefaultValue,
-			MinLength = this.MinLength,
-			MaxLength = this.MaxLength,
-			FormatPattern = this.FormatPattern,
-			RegexPattern = this.RegexPattern,
-			RestrictRegexPattern = this.RestrictRegexPattern,
-			CaseInsensitive = this.CaseInsensitive
-		};
-	}
-	
 	#endregion
 }

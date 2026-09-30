@@ -17,6 +17,11 @@ public sealed class CodeFieldInfo : ObjectFieldInfoBase
 	[Newtonsoft.Json.JsonIgnore]
 	public override IReadOnlyCollection<IFieldInfo> Properties { get; init; }
 	
+	/// <summary>
+	/// The values of the predefined types may carry additional data (e.g. image metadata)
+	/// </summary>
+	protected override bool AcceptsAdditionalProperties => true;
+	
 	#endregion
 	
 	#region Constructors
@@ -42,27 +47,6 @@ public sealed class CodeFieldInfo : ObjectFieldInfoBase
 				Description = "Programming or Script Language",
 				IsRequired = true
 			}
-		};
-	}
-	
-	#endregion
-	
-	#region Methods
-	
-	public override object Clone()
-	{
-		return new CodeFieldInfo
-		{
-			Name = this.Name,
-			Description = this.Description,
-			DisplayName = this.DisplayName,
-			Parent = this.Parent,
-			IsRequired = this.IsRequired,
-			IsVirtual = this.IsVirtual,
-			IsHidden = this.IsHidden,
-			IsReadonly = this.IsReadonly,
-			DefaultValue = this.DefaultValue,
-			Properties = this.Properties
 		};
 	}
 	

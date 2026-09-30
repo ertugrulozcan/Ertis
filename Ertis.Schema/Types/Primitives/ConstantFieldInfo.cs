@@ -70,24 +70,6 @@ public class ConstantFieldInfo : FieldInfo<object>
 		return isValid;
 	}
 	
-	public override object Clone()
-	{
-		return new ConstantFieldInfo
-		{
-			Name = this.Name,
-			Description = this.Description,
-			DisplayName = this.DisplayName,
-			Parent = this.Parent,
-			IsRequired = this.IsRequired,
-			IsVirtual = this.IsVirtual,
-			IsHidden = this.IsHidden,
-			IsReadonly = this.IsReadonly,
-			DefaultValue = this.DefaultValue,
-			Value = this.Value,
-			ValueType = this.ValueType
-		};
-	}
-	
 	#endregion
 	
 	#region Enums

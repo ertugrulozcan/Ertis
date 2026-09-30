@@ -24,6 +24,5 @@ public enum FieldType
     reference,
     code,
     image,
-    video,
-    nestedType
+    video
 }

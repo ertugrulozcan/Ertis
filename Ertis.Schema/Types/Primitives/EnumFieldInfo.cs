@@ -62,6 +62,11 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
 				if (obj is object[] array)
 				{
 					isExistInEnums = array.All(item => this.Items.Any(x => x.Value.Equals(item)));
+					if (array.Distinct().Count() != array.Length)
+					{
+						isValid = false;
+						validationContext.Errors.Add(new FieldValidationException($"The '{this.Name}' values must be unique", this));
+					}
 				}
 				else
 				{

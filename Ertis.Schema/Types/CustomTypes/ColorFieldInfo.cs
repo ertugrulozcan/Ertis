@@ -1,9 +1,12 @@
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
+using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
+using Ertis.Schema.Validation;
 
 namespace Ertis.Schema.Types.CustomTypes;
 
-public class ColorFieldInfo : StringFieldInfo
+public partial class ColorFieldInfo : StringFieldInfo
 {
 	#region Properties
 	
@@ -13,26 +16,33 @@ public class ColorFieldInfo : StringFieldInfo
 	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	public override FieldType Type => FieldType.color;
 	
-	#endregion
-	
-	#region Constructors
-	
 	/// <summary>
-	/// Constructor
+	/// The color is validated by the built-in rule below; a regexPattern (e.g. stored by the older versions) is ignored
 	/// </summary>
-	public ColorFieldInfo()
-	{
-		this.RegexPattern = "(?:#|0x)(?:[a-f0-9]{3}|[a-f0-9]{6})\\b|(?:rgb|hsl)a?\\([^\\)]*\\)";
-	}
+	protected override bool UsesRegexPattern => false;
 	
 	#endregion
 	
 	#region Methods
 	
-	protected override string GetRegexPatternErrorMessage()
+	protected internal override bool Validate(object? obj, IValidationContext validationContext)
 	{
-		return "Color code is not valid";
+		var isValid = base.Validate(obj, validationContext);
+		
+		if (obj is string color && !string.IsNullOrEmpty(color) && !ColorRegex().IsMatch(color))
+		{
+			isValid = false;
+			validationContext.Errors.Add(new FieldValidationException("Color code is not valid", this));
+		}
+		
+		return isValid;
 	}
+	
+	/// <summary>
+	/// #RGB, #RGBA, #RRGGBB, #RRGGBBAA, 0xRGB, 0xRRGGBB and rgb/rgba/hsl/hsla with 3 or 4 numeric (or percentage) arguments
+	/// </summary>
+	[GeneratedRegex(@"^(?:#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})|0x(?:[0-9a-f]{3}|[0-9a-f]{6})|(?:rgba?|hsla?)\(\s*-?\d+(?:\.\d+)?%?\s*(?:,\s*-?\d+(?:\.\d+)?%?\s*){2,3}\))$", RegexOptions.IgnoreCase)]
+	private static partial Regex ColorRegex();
 	
 	#endregion
 }

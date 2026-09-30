@@ -164,12 +164,12 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 				validationContext.Errors.Add(new FieldValidationException($"String length can not be less than {this.MinLength}", this));
 			}
 			
-			if (!string.IsNullOrEmpty(text) && this._regex != null)
+			if (!string.IsNullOrEmpty(text) && this._regex != null && this.UsesRegexPattern)
 			{
 				if (!this._regex.IsMatch(text))
 				{
 					isValid = false;
-					validationContext.Errors.Add(new FieldValidationException(this.GetRegexPatternErrorMessage(), this));
+					validationContext.Errors.Add(new FieldValidationException($"String value is not valid by the regular expression rule. ('{this.RegexPattern}')", this));
 				}
 			}
 			
@@ -187,12 +187,9 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 	}
 	
 	/// <summary>
-	/// The error message of a value which doesn't match the regexPattern
+	/// Whether the regexPattern is applied to the values (the types with a built-in format rule ignore it)
 	/// </summary>
-	protected virtual string GetRegexPatternErrorMessage()
-	{
-		return $"String value is not valid by the regular expression rule. ('{this.RegexPattern}')";
-	}
+	protected virtual bool UsesRegexPattern => true;
 	
 	/// <summary>
 	/// Creates the regex once (instead of the static regex cache of each validation), an invalid pattern is rejected when the field is created

@@ -92,6 +92,15 @@ public class EnumFieldInfoTests
 	}
 	
 	[Fact]
+	public void Validate_MultipleWithDuplicateValues_Fails()
+	{
+		var result = SchemaValidation.ValidateField(CreateField(isMultiple: true), """{ "country": ["tr", "de", "tr"] }""");
+		
+		Assert.False(result.IsValid);
+		Assert.Equal(["The 'country' values must be unique"], result.Messages);
+	}
+	
+	[Fact]
 	public void Validate_MultipleWithSingleValue_Fails()
 	{
 		var result = SchemaValidation.ValidateField(CreateField(isMultiple: true), """{ "country": "tr" }""");

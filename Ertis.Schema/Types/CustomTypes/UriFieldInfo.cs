@@ -7,6 +7,15 @@ namespace Ertis.Schema.Types.CustomTypes;
 
 public class UriFieldInfo : StringFieldInfo
 {
+	#region Fields
+	
+	/// <summary>
+	/// The schemes that can run code or read local resources when the uri is opened (e.g. rendered as a link)
+	/// </summary>
+	private static readonly HashSet<string> UnsafeSchemes = new(StringComparer.OrdinalIgnoreCase) { "javascript", "vbscript", "data", "file" };
+	
+	#endregion
+	
 	#region Properties
 	
 	[Newtonsoft.Json.JsonProperty("type")]
@@ -42,7 +51,9 @@ public class UriFieldInfo : StringFieldInfo
 			return false;
 		}
 		
-		return Uri.IsWellFormedUriString(uri, UriKind.Absolute) && Uri.TryCreate(uri, UriKind.Absolute, out _);
+		return Uri.IsWellFormedUriString(uri, UriKind.Absolute) &&
+			Uri.TryCreate(uri, UriKind.Absolute, out var parsedUri) &&
+			!UnsafeSchemes.Contains(parsedUri.Scheme);
 	}
 	
 	#endregion

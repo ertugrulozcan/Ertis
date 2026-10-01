@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Collections.ObjectModel;
 
 // ReSharper disable MemberCanBePrivate.Global
@@ -926,66 +927,34 @@ public static class NonAscii
 		{ 'ж', "zh" }
 	};
 	
+	/// <summary>
+	/// All the maps in one table (declared after the maps, the static fields are initialized in their order)
+	/// </summary>
+	private static readonly FrozenDictionary<char, string> RemapTable = CreateRemapTable();
+	
 	#endregion
 	
 	#region Methods
 	
 	internal static string RemapToAscii(char c)
 	{
-		if (International.ContainsKey(c))
+		return RemapTable.GetValueOrDefault(c, string.Empty);
+	}
+	
+	private static FrozenDictionary<char, string> CreateRemapTable()
+	{
+		// The first map containing a character wins; the slugs are lowercase, so the remapped texts are lowercase too (e.g. Ș -> s)
+		var maps = new[] { InternationalChars, LatinChars, TurkishChars, GreekChars, CzechChars, ArabicChars, VietnameseChars, PolishChars, LatvianChars, GermanChars, UkrainianChars, SerbianChars, RussianChars };
+		var table = new Dictionary<char, string>();
+		foreach (var map in maps)
 		{
-			return International[c];
-		}
-		else if (Latin.ContainsKey(c))
-		{
-			return Latin[c];
-		}
-		else if (Turkish.ContainsKey(c))
-		{
-			return Turkish[c];
-		}
-		else if (Greek.ContainsKey(c))
-		{
-			return Greek[c];
-		}
-		else if (Czech.ContainsKey(c))
-		{
-			return Czech[c];
-		}
-		else if (Arabic.ContainsKey(c))
-		{
-			return Arabic[c];
-		}
-		else if (Vietnamese.ContainsKey(c))
-		{
-			return Vietnamese[c];
-		}
-		else if (Polish.ContainsKey(c))
-		{
-			return Polish[c];
-		}
-		else if (Latvian.ContainsKey(c))
-		{
-			return Latvian[c];
-		}
-		else if (German.ContainsKey(c))
-		{
-			return German[c];
-		}
-		else if (Ukrainian.ContainsKey(c))
-		{
-			return Ukrainian[c];
-		}
-		else if (Serbian.ContainsKey(c))
-		{
-			return Serbian[c];
-		}
-		else if (Russian.ContainsKey(c))
-		{
-			return Russian[c];
+			foreach (var (c, ascii) in map)
+			{
+				table.TryAdd(c, ascii.ToLowerInvariant());
+			}
 		}
 		
-		return string.Empty;
+		return table.ToFrozenDictionary();
 	}
 	
 	#endregion

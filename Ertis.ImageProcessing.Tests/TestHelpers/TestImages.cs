@@ -47,6 +47,76 @@ public static class TestImages
 		return stream;
 	}
 	
+	/// <summary>
+	/// A detailed (textured) jpeg photo-like image
+	/// </summary>
+	public static byte[] CreateDetailedJpeg(int width, int height)
+	{
+		using var image = new Image<Rgb24>(width, height);
+		var random = new Random(42);
+		image.ProcessPixelRows(accessor =>
+		{
+			for (var y = 0; y < accessor.Height; y++)
+			{
+				var row = accessor.GetRowSpan(y);
+				for (var x = 0; x < row.Length; x++)
+				{
+					var stripe = (x / 3 + y / 5) % 2 == 0 ? 60 : 0;
+					row[x] = new Rgb24((byte) (x * 255 / width), (byte) Math.Clamp(y * 255 / height + stripe, 0, 255), (byte) random.Next(80, 120));
+				}
+			}
+		});
+		
+		using var stream = new MemoryStream();
+		image.SaveAsJpeg(stream, new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder { Quality = 90 });
+		return stream.ToArray();
+	}
+	
+	/// <summary>
+	/// A png of random pixels (every position is distinguishable) with an EXIF orientation
+	/// </summary>
+	public static byte[] CreateRandomPng(int width, int height, ushort orientation)
+	{
+		using var image = new Image<Rgb24>(width, height);
+		var random = new Random(orientation);
+		image.ProcessPixelRows(accessor =>
+		{
+			for (var y = 0; y < accessor.Height; y++)
+			{
+				var row = accessor.GetRowSpan(y);
+				for (var x = 0; x < row.Length; x++)
+				{
+					row[x] = new Rgb24((byte) random.Next(256), (byte) random.Next(256), (byte) random.Next(256));
+				}
+			}
+		});
+		
+		image.Metadata.ExifProfile = new ExifProfile();
+		image.Metadata.ExifProfile.SetValue(ExifTag.Orientation, orientation);
+		using var stream = new MemoryStream();
+		image.SaveAsPng(stream);
+		return stream.ToArray();
+	}
+	
+	public static double Psnr(Image<Rgb24> expected, Image<Rgb24> actual)
+	{
+		double sum = 0;
+		long count = 0;
+		for (var y = 0; y < expected.Height; y++)
+		{
+			for (var x = 0; x < expected.Width; x++)
+			{
+				var a = expected[x, y];
+				var b = actual[x, y];
+				sum += Math.Pow(a.R - b.R, 2) + Math.Pow(a.G - b.G, 2) + Math.Pow(a.B - b.B, 2);
+				count += 3;
+			}
+		}
+		
+		var mse = sum / count;
+		return mse == 0 ? double.PositiveInfinity : 10 * Math.Log10(255 * 255 / mse);
+	}
+	
 	public static Image Load(MemoryStream stream)
 	{
 		stream.Position = 0;

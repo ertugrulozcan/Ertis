@@ -6,6 +6,7 @@ using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Metadata;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Processing.Processors.Transforms;
 using ResizeModeEnum = SixLabors.ImageSharp.Processing.ResizeMode;
 using ImageProcessingException = Ertis.ImageProcessing.Exceptions.ImageProcessingException;
 
@@ -25,9 +26,7 @@ public static class ImageProcessor
 		{
 			var encoder = FormatEncoder.GetDefaultFormatter(destinationFormat, quality, level);
 			using var image = Image.Load(imageStream);
-			Prepare(image, stripMetadata);
-			var rectangle = bounds.ToRectangle(image.Width, image.Height);
-			image.Mutate(x => x.Crop(rectangle));
+			CropCore(image, bounds, stripMetadata);
 			image.Save(outputStream, encoder);
 		}
 		catch (Exception ex) when (ToImageProcessingException(ex) is { } exception)
@@ -42,9 +41,7 @@ public static class ImageProcessor
 		{
 			var encoder = FormatEncoder.GetDefaultFormatter(destinationFormat, quality, level);
 			using var image = await Image.LoadAsync(imageStream, cancellationToken: cancellationToken);
-			Prepare(image, stripMetadata);
-			var rectangle = bounds.ToRectangle(image.Width, image.Height);
-			image.Mutate(x => x.Crop(rectangle));
+			CropCore(image, bounds, stripMetadata);
 			await image.SaveAsync(outputStream, encoder, cancellationToken: cancellationToken);
 		}
 		catch (Exception ex) when (ToImageProcessingException(ex) is { } exception)
@@ -65,9 +62,10 @@ public static class ImageProcessor
 		int? quality = null, 
 		int? level = null,
 		TargetSizeMode targetSizeMode = TargetSizeMode.Auto,
-		bool stripMetadata = false)
+		bool stripMetadata = false,
+		ResizeQuality resizeQuality = ResizeQuality.Balanced)
 	{
-		ResizeAsync(imageStream, outputStream, width, height, destinationFormat, mode, anchor, sampler, quality, level, targetSizeMode, stripMetadata).ConfigureAwait(false).GetAwaiter().GetResult();
+		ResizeAsync(imageStream, outputStream, width, height, destinationFormat, mode, anchor, sampler, quality, level, targetSizeMode, stripMetadata, resizeQuality).ConfigureAwait(false).GetAwaiter().GetResult();
 	}
 	
 	/// <summary>
@@ -86,6 +84,7 @@ public static class ImageProcessor
 		int? level = null,
 		TargetSizeMode targetSizeMode = TargetSizeMode.Auto, 
 		bool stripMetadata = false,
+		ResizeQuality resizeQuality = ResizeQuality.Balanced,
 		CancellationToken cancellationToken = default)
 	{
 		if (width is <= 0 || height is <= 0)
@@ -104,21 +103,35 @@ public static class ImageProcessor
 		{
 			var encoder = FormatEncoder.GetDefaultFormatter(destinationFormat, quality, level);
 			
-			// The image is identified first (for the decoder target size), then decoded from the same position
-			if (!imageStream.CanSeek)
+			var resizeMode = mode ?? ResizeModeEnum.Crop;
+			var resampler = (sampler ?? SamplerAlgorithm.Bicubic).ToResampler()!;
+			DecoderOptions decoderOptions;
+			int targetWidth, targetHeight;
+			if (targetSizeMode == TargetSizeMode.Auto)
 			{
-				bufferedStream = new MemoryStream();
-				await imageStream.CopyToAsync(bufferedStream, cancellationToken);
-				bufferedStream.Position = 0;
-				imageStream = bufferedStream;
+				// The image is identified first (for the decoder target size), then decoded from the same position
+				if (!imageStream.CanSeek)
+				{
+					bufferedStream = new MemoryStream();
+					await imageStream.CopyToAsync(bufferedStream, cancellationToken);
+					bufferedStream.Position = 0;
+					imageStream = bufferedStream;
+				}
+				
+				var startPosition = imageStream.Position;
+				var sourceInfo = await Image.IdentifyAsync(imageStream, cancellationToken);
+				imageStream.Position = startPosition;
+				
+				decoderOptions = GetDecoderOptions(sourceInfo, resizeMode, resampler, resizeQuality, width, height, out targetWidth, out targetHeight);
+			}
+			else
+			{
+				// The whole image is decoded, a missing dimension (0) keeps the aspect ratio
+				decoderOptions = new DecoderOptions();
+				targetWidth = width ?? 0;
+				targetHeight = height ?? 0;
 			}
 			
-			var startPosition = imageStream.Position;
-			var sourceInfo = await Image.IdentifyAsync(imageStream, cancellationToken);
-			imageStream.Position = startPosition;
-			
-			var resizeMode = mode ?? ResizeModeEnum.Crop;
-			var decoderOptions = GetDecoderOptions(sourceInfo, targetSizeMode, resizeMode, width, height, out var targetWidth, out var targetHeight);
 			using var image = await Image.LoadAsync(decoderOptions, imageStream, cancellationToken: cancellationToken);
 			Prepare(image, stripMetadata);
 			var options = new ResizeOptions
@@ -126,7 +139,7 @@ public static class ImageProcessor
 				Size = new Size(targetWidth, targetHeight),
 				Mode = resizeMode,
 				Position = anchor ?? AnchorPositionMode.Center,
-				Sampler = (sampler ?? SamplerAlgorithm.Bicubic).ToResampler()!
+				Sampler = resampler
 			};
 			
 			image.Mutate(x => x.Resize(options)); 
@@ -192,6 +205,52 @@ public static class ImageProcessor
 	}
 	
 	/// <summary>
+	/// Crops the image by the bounds given in the displayed (EXIF oriented) coordinates: the stored image is cropped first, then only the cropped part is oriented
+	/// </summary>
+	private static void CropCore(Image image, CropBounds bounds, bool stripMetadata)
+	{
+		var orientation = GetOrientation(image.Metadata);
+		var isRotated = orientation is >= ExifOrientationMode.LeftTop and <= ExifOrientationMode.LeftBottom;
+		var rectangle = isRotated ? bounds.ToRectangle(image.Height, image.Width) : bounds.ToRectangle(image.Width, image.Height);
+		var storedRectangle = ToStoredRectangle(rectangle, orientation, image.Width, image.Height);
+		image.Mutate(x => x.Crop(storedRectangle));
+		Prepare(image, stripMetadata);
+	}
+	
+	/// <summary>
+	/// The rectangle of the stored image which is displayed as the given rectangle (the bounding box of its mapped corner pixels)
+	/// </summary>
+	private static Rectangle ToStoredRectangle(Rectangle rectangle, ushort orientation, int storedWidth, int storedHeight)
+	{
+		var (x1, y1) = ToStoredPixel(rectangle.Left, rectangle.Top, orientation, storedWidth, storedHeight);
+		var (x2, y2) = ToStoredPixel(rectangle.Right - 1, rectangle.Bottom - 1, orientation, storedWidth, storedHeight);
+		return Rectangle.FromLTRB(Math.Min(x1, x2), Math.Min(y1, y2), Math.Max(x1, x2) + 1, Math.Max(y1, y2) + 1);
+	}
+	
+	/// <summary>
+	/// The stored pixel which is displayed at the given pixel
+	/// </summary>
+	private static (int X, int Y) ToStoredPixel(int x, int y, ushort orientation, int storedWidth, int storedHeight)
+	{
+		return orientation switch
+		{
+			ExifOrientationMode.TopRight => (storedWidth - 1 - x, y),
+			ExifOrientationMode.BottomRight => (storedWidth - 1 - x, storedHeight - 1 - y),
+			ExifOrientationMode.BottomLeft => (x, storedHeight - 1 - y),
+			ExifOrientationMode.LeftTop => (y, x),
+			ExifOrientationMode.RightTop => (y, storedHeight - 1 - x),
+			ExifOrientationMode.RightBottom => (storedWidth - 1 - y, storedHeight - 1 - x),
+			ExifOrientationMode.LeftBottom => (storedWidth - 1 - y, x),
+			_ => (x, y)
+		};
+	}
+	
+	private static ushort GetOrientation(ImageMetadata metadata)
+	{
+		return metadata.ExifProfile != null && metadata.ExifProfile.TryGetValue(ExifTag.Orientation, out var orientation) ? orientation.Value : ExifOrientationMode.Unknown;
+	}
+	
+	/// <summary>
 	/// Applies the EXIF orientation (the pixels are processed as they are displayed) and removes the metadata if requested
 	/// </summary>
 	private static void Prepare(Image image, bool stripMetadata)
@@ -222,46 +281,37 @@ public static class ImageProcessor
 		};
 	}
 	
-	private static DecoderOptions GetDecoderOptions(ImageInfo sourceInfo, TargetSizeMode targetSizeMode, ResizeModeEnum resizeMode, int? width, int? height, out int targetWidth, out int targetHeight)
+	private static DecoderOptions GetDecoderOptions(ImageInfo sourceInfo, ResizeModeEnum resizeMode, IResampler resampler, ResizeQuality resizeQuality, int? width, int? height, out int targetWidth, out int targetHeight)
 	{
-		Size? targetSize = null;
-		if (targetSizeMode == TargetSizeMode.Auto)
+		// The size as the image is displayed (the EXIF orientations 5-8 swap the width and the height)
+		var isRotated = IsRotated(sourceInfo);
+		var sourceWidth = isRotated ? sourceInfo.Height : sourceInfo.Width;
+		var sourceHeight = isRotated ? sourceInfo.Width : sourceInfo.Height;
+		
+		targetWidth = width ?? Math.Max(1, (int)Math.Round(sourceWidth * ((double)height!.Value / sourceHeight)));
+		targetHeight = height ?? Math.Max(1, (int)Math.Round(sourceHeight * ((double)width!.Value / sourceWidth)));
+		
+		var targetSize = GetDecoderTargetSize(new Size(sourceWidth, sourceHeight), new Size(targetWidth, targetHeight), resizeMode, resizeQuality);
+		if (targetSize != null && isRotated)
 		{
-			// The size as the image is displayed (the EXIF orientations 5-8 swap the width and the height)
-			var isRotated = IsRotated(sourceInfo);
-			var sourceWidth = isRotated ? sourceInfo.Height : sourceInfo.Width;
-			var sourceHeight = isRotated ? sourceInfo.Width : sourceInfo.Height;
-			
-			targetWidth = width ?? Math.Max(1, (int)Math.Round(sourceWidth * ((double)height!.Value / sourceHeight)));
-			targetHeight = height ?? Math.Max(1, (int)Math.Round(sourceHeight * ((double)width!.Value / sourceWidth)));
-			
-			targetSize = GetDecoderTargetSize(new Size(sourceWidth, sourceHeight), new Size(targetWidth, targetHeight), resizeMode);
-			if (targetSize != null && isRotated)
-			{
-				// The decoder works on the stored (not rotated) image
-				targetSize = new Size(targetSize.Value.Height, targetSize.Value.Width);
-			}
-		}
-		else
-		{
-			targetWidth = width ?? 0;
-			targetHeight = height ?? 0;
+			// The decoder works on the stored (not rotated) image
+			targetSize = new Size(targetSize.Value.Height, targetSize.Value.Width);
 		}
 		
+		// The decoder resizes its scaled image to the target size with the requested sampler (its default is the Box sampler)
 		return new DecoderOptions
 		{
-			TargetSize = targetSize
+			TargetSize = targetSize,
+			Sampler = resampler
 		};
 	}
 	
 	private static bool IsRotated(ImageInfo imageInfo)
 	{
-		return imageInfo.Metadata.ExifProfile != null && 
-			imageInfo.Metadata.ExifProfile.TryGetValue(ExifTag.Orientation, out var orientation) && 
-			orientation.Value is >= ExifOrientationMode.LeftTop and <= ExifOrientationMode.LeftBottom;
+		return GetOrientation(imageInfo.Metadata) is >= ExifOrientationMode.LeftTop and <= ExifOrientationMode.LeftBottom;
 	}
 	
-	private static Size? GetDecoderTargetSize(Size sourceSize, Size targetSize, ResizeModeEnum mode)
+	private static Size? GetDecoderTargetSize(Size sourceSize, Size targetSize, ResizeModeEnum mode, ResizeQuality resizeQuality)
 	{
 		var scaleX = (double)targetSize.Width / sourceSize.Width;
 		var scaleY = (double)targetSize.Height / sourceSize.Height;
@@ -271,6 +321,12 @@ public static class ImageProcessor
 			ResizeModeEnum.Max or ResizeModeEnum.Pad or ResizeModeEnum.BoxPad => Math.Min(scaleX, scaleY),
 			_ => Math.Max(scaleX, scaleY)
 		};
+		
+		// High: the decoder scales down to twice the target size at most, the last halving is done by the requested sampler
+		if (resizeQuality == ResizeQuality.High)
+		{
+			scale *= 2;
+		}
 		
 		const double DecodeScaleThreshold = 0.5;
 		if (scale >= DecodeScaleThreshold)

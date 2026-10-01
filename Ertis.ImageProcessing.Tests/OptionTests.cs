@@ -1,3 +1,4 @@
+using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
@@ -74,6 +75,16 @@ public class OptionTests
 		
 		Assert.Equal(expected, encoder.Method);
 		Assert.Equal(80, encoder.Quality);
+	}
+	
+	[Theory]
+	[InlineData(null, PngCompressionLevel.DefaultCompression)]
+	[InlineData(1, PngCompressionLevel.BestSpeed)]
+	[InlineData(9, PngCompressionLevel.BestCompression)]
+	[InlineData(12, PngCompressionLevel.DefaultCompression)]
+	public void FormatEncoder_Png_UsesTheLevel(int? level, PngCompressionLevel expected)
+	{
+		Assert.Equal(expected, Assert.IsType<PngEncoder>(FormatEncoder.GetDefaultFormatter(ImageFormat.Png, level: level)).CompressionLevel);
 	}
 	
 	[Fact]

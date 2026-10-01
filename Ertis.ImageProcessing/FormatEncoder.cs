@@ -34,7 +34,11 @@ public static class FormatEncoder
 				Interleaved = true
 			},
 			ImageFormat.Pbm => new PbmEncoder(),
-			ImageFormat.Png => new PngEncoder(),
+			ImageFormat.Png => new PngEncoder
+			{
+				// The level is the (lossless) compression level, 1 (the fastest) to 9 (the smallest); the default is 6
+				CompressionLevel = level is >= 1 and <= 9 ? (PngCompressionLevel) level.Value : PngCompressionLevel.DefaultCompression
+			},
 			ImageFormat.Tga => new TgaEncoder(),
 			ImageFormat.Tiff => new TiffEncoder(),
 			ImageFormat.Webp => new WebpEncoder

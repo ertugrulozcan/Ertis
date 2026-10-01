@@ -5,6 +5,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using ImageProcessingException = Ertis.ImageProcessing.Exceptions.ImageProcessingException;
 
 namespace Ertis.ImageProcessing.Tests;
@@ -128,6 +129,52 @@ public class ImageProcessorTests
 		Assert.Equal("CropBoundsOverflow", exception.ErrorCode);
 	}
 	
+	/// <summary>
+	/// The stored image is cropped before it is oriented: the result is the same as orienting the whole image first
+	/// </summary>
+	[Theory]
+	[InlineData((ushort) 1)]
+	[InlineData((ushort) 2)]
+	[InlineData((ushort) 3)]
+	[InlineData((ushort) 4)]
+	[InlineData((ushort) 5)]
+	[InlineData((ushort) 6)]
+	[InlineData((ushort) 7)]
+	[InlineData((ushort) 8)]
+	public void Crop_WithAnExifOrientation_CropsTheDisplayedImage(ushort orientation)
+	{
+		var bytes = TestImages.CreateRandomPng(23, 17, orientation);
+		using (var oriented = Image.Load(bytes))
+		{
+			oriented.Mutate(x => x.AutoOrient());
+			Assert.Equal(orientation >= 5 ? (17, 23) : (23, 17), (oriented.Width, oriented.Height));
+		}
+		
+		var boundsList = new[]
+		{
+			new CropBounds { X = 2, Y = 3, Width = 5, Height = 7 },
+			new CropBounds { X = 0, Y = 0, Width = 1, Height = 1 },
+			new CropBounds { X = 4 },
+			new CropBounds { Y = 6, Height = 2 },
+			new CropBounds()
+		};
+		
+		foreach (var bounds in boundsList)
+		{
+			using var expected = Image.Load<Rgb24>(bytes);
+			expected.Mutate(x => x.AutoOrient());
+			expected.Mutate(x => x.Crop(bounds.ToRectangle(expected.Width, expected.Height)));
+			
+			using var output = new MemoryStream();
+			ImageProcessor.Crop(new MemoryStream(bytes), output, bounds, ImageFormat.Png);
+			output.Position = 0;
+			using var actual = Image.Load<Rgb24>(output);
+			
+			Assert.Equal((expected.Width, expected.Height), (actual.Width, actual.Height));
+			Assert.True(double.IsPositiveInfinity(TestImages.Psnr(expected, actual)), $"orientation {orientation}, bounds {bounds.X},{bounds.Y},{bounds.Width},{bounds.Height}");
+		}
+	}
+	
 	#endregion
 	
 	#region Resize Methods
@@ -219,6 +266,59 @@ public class ImageProcessorTests
 		
 		using var result = TestImages.Load(output);
 		Assert.Equal(10, result.Width);
+	}
+	
+	/// <summary>
+	/// A large downscale is done by the decoder: its result is resized with the requested sampler (the decoder default, Box, loses quality)
+	/// </summary>
+	[Fact]
+	public async Task Resize_WithALargeDownscale_KeepsTheQualityOfTheSampler()
+	{
+		var bytes = TestImages.CreateDetailedJpeg(2048, 1536);
+		
+		var balanced = await this.ResizeToPsnrAsync(bytes, 300, ResizeQuality.Balanced);
+		var high = await this.ResizeToPsnrAsync(bytes, 300, ResizeQuality.High);
+		
+		using var boxDecoded = Image.Load<Rgb24>(new SixLabors.ImageSharp.Formats.DecoderOptions { TargetSize = new Size(300, 225) }, bytes);
+		using var reference = CreateReference(bytes, 300, 225);
+		var box = TestImages.Psnr(reference, boxDecoded);
+		
+		Assert.True(balanced > box + 3, $"balanced {balanced:F2} dB, box {box:F2} dB");
+		Assert.True(high > balanced + 3, $"high {high:F2} dB, balanced {balanced:F2} dB");
+	}
+	
+	[Theory]
+	[InlineData(ResizeQuality.Balanced)]
+	[InlineData(ResizeQuality.High)]
+	public void Resize_WithAResizeQuality_ResizesTheImage(ResizeQuality resizeQuality)
+	{
+		using var input = new MemoryStream(TestImages.CreateDetailedJpeg(800, 600));
+		using var output = new MemoryStream();
+		
+		ImageProcessor.Resize(input, output, 100, null, ImageFormat.Jpeg, resizeQuality: resizeQuality);
+		
+		using var image = TestImages.Load(output);
+		Assert.Equal((100, 75), (image.Width, image.Height));
+	}
+	
+	private async Task<double> ResizeToPsnrAsync(byte[] bytes, int width, ResizeQuality resizeQuality)
+	{
+		using var output = new MemoryStream();
+		await ImageProcessor.ResizeAsync(new MemoryStream(bytes), output, width, null, ImageFormat.Png, resizeQuality: resizeQuality, cancellationToken: CancellationToken);
+		output.Position = 0;
+		using var result = await Image.LoadAsync<Rgb24>(output, CancellationToken);
+		using var reference = CreateReference(bytes, result.Width, result.Height);
+		return TestImages.Psnr(reference, result);
+	}
+	
+	/// <summary>
+	/// The full image decoded and resized with the default sampler (Bicubic)
+	/// </summary>
+	private static Image<Rgb24> CreateReference(byte[] bytes, int width, int height)
+	{
+		var reference = Image.Load<Rgb24>(bytes);
+		reference.Mutate(x => x.Resize(new ResizeOptions { Size = new Size(width, height), Mode = SixLabors.ImageSharp.Processing.ResizeMode.Crop, Sampler = KnownResamplers.Bicubic }));
+		return reference;
 	}
 	
 	#endregion

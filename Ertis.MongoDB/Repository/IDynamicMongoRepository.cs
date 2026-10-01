@@ -5,6 +5,7 @@ using Ertis.MongoDB.Models;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMemberInSuper.Global
+// ReSharper disable UnusedMethodReturnValue.Global
 namespace Ertis.MongoDB.Repository;
 
 public interface IDynamicMongoRepository : IDynamicRepository<string>

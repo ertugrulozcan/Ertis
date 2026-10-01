@@ -18,9 +18,9 @@ public class RequestBodyTests
 	#region Json Methods
 	
 	[Fact]
-	public async Task SystemJsonRequestBody_SerializesThePayload()
+	public async Task JsonRequestBody_SerializesThePayload()
 	{
-		var body = new SystemJsonRequestBody(new { name = "Jane", tags = new[] { "a" } });
+		var body = new JsonRequestBody(new { name = "Jane", tags = new[] { "a" } });
 		
 		var (content, contentType, _) = await ReadAsync(body);
 		
@@ -31,38 +31,36 @@ public class RequestBodyTests
 	}
 	
 	[Fact]
-	public async Task SystemJsonRequestBody_WithAStringPayload_SendsItAsItIs()
+	public async Task JsonRequestBody_SerializesTheComplexPayload()
 	{
-		var (content, _, _) = await ReadAsync(new SystemJsonRequestBody("""{ "where": { "a": 1 } }"""));
+		var objectBody = new JsonRequestBody(new { name = "Jane" });
+		var stringBody = new JsonRequestBody("""{ "a": 1 }""");
+		var nullBody = new JsonRequestBody(null!);
+		
+		Assert.Equal("""{"name":"Jane"}""", (await ReadAsync(objectBody)).Content);
+		Assert.Equal("""{ "a": 1 }""", (await ReadAsync(stringBody)).Content);
+		Assert.Equal(string.Empty, (await ReadAsync(nullBody)).Content);
+		Assert.Equal(BodyTypes.Json, objectBody.Type);
+	}
+	
+	[Fact]
+	public async Task JsonRequestBody_WithAStringPayload_SendsItAsItIs()
+	{
+		var (content, _, _) = await ReadAsync(new JsonRequestBody("""{ "where": { "a": 1 } }"""));
 		
 		Assert.Equal("""{ "where": { "a": 1 } }""", content);
 	}
 	
 	[Fact]
-	public async Task SystemJsonRequestBody_WithANullPayload_SendsAnEmptyContent()
+	public async Task JsonRequestBody_WithANullPayload_SendsAnEmptyContent()
 	{
-		var body = new SystemJsonRequestBody(null!);
+		var body = new JsonRequestBody(null!);
 		
 		var (content, contentType, _) = await ReadAsync(body);
 		
 		Assert.Null(body.Json);
 		Assert.Equal(string.Empty, content);
 		Assert.Equal("text/plain", contentType);
-	}
-	
-	[Fact]
-	public async Task JsonRequestBody_SerializesThePayload()
-	{
-#pragma warning disable CS0618
-		var objectBody = new JsonRequestBody(new { name = "Jane" });
-		var stringBody = new JsonRequestBody("""{ "a": 1 }""");
-		var nullBody = new JsonRequestBody(null!);
-#pragma warning restore CS0618
-		
-		Assert.Equal("""{"name":"Jane"}""", (await ReadAsync(objectBody)).Content);
-		Assert.Equal("""{ "a": 1 }""", (await ReadAsync(stringBody)).Content);
-		Assert.Equal(string.Empty, (await ReadAsync(nullBody)).Content);
-		Assert.Equal(BodyTypes.Json, objectBody.Type);
 	}
 	
 	#endregion
@@ -82,6 +80,7 @@ public class RequestBodyTests
 	[Fact]
 	public async Task RawRequestBody_SendsTheBytes()
 	{
+		// ReSharper disable once UseUtf8StringLiteral
 		var body = new RawRequestBody(Encoding.UTF8.GetBytes("çay"), BodyTypes.Binary, "application/octet-stream", "utf-8");
 		
 		Assert.Equal(("çay", "application/octet-stream", "utf-8"), await ReadAsync(body));
@@ -128,8 +127,10 @@ public class RequestBodyTests
 	
 	#region Test Types
 	
+	// ReSharper disable once MemberCanBePrivate.Global
 	public sealed class Item
 	{
+		// ReSharper disable once UnusedAutoPropertyAccessor.Global
 		public string? Name { get; set; }
 	}
 	

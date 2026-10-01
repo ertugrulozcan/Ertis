@@ -27,9 +27,9 @@ public interface IMongoDatabase
 	
 	Task<IEnumerable<string>> ListCollectionsAsync(Expression<Func<BsonDocument, bool>>? filterExpression = null, CancellationToken cancellationToken = default);
 	
-	MongoDbStatistics? GetDatabaseStatistics();
+	MongoDbStatistics GetDatabaseStatistics();
 	
-	Task<MongoDbStatistics?> GetDatabaseStatisticsAsync(CancellationToken cancellationToken = default);
+	Task<MongoDbStatistics> GetDatabaseStatisticsAsync(CancellationToken cancellationToken = default);
 	
 	BsonDocument GetDatabaseStatisticsDocument();
 	

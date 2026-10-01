@@ -44,7 +44,7 @@ internal static class ObjectExtensions
 			case string or bool or char or DateTime or DateTimeOffset or DateOnly or TimeOnly or TimeSpan or Guid or Uri or decimal or double or float or long or int or short or sbyte or byte or ulong or uint or ushort:
 				return value;
 			case Enum enumValue:
-				// Written as its number, like the former Newtonsoft conversion (a [JsonConverter] on the property writes its name)
+				// Written as its number (a [JsonConverter] on the property writes its name)
 				return Convert.ChangeType(enumValue, Enum.GetUnderlyingType(enumValue.GetType()), CultureInfo.InvariantCulture);
 			case JsonElement jsonElement:
 				return FromJsonElement(jsonElement);

@@ -4,6 +4,7 @@ using Ertis.MongoDB.Models;
 using Ertis.MongoDB.Tests.TestHelpers;
 using MongoDB.Bson;
 
+// ReSharper disable MethodHasAsyncOverload
 namespace Ertis.MongoDB.Tests.Repository;
 
 public class MongoRepositoryTests(MongoDbContainerFixture fixture) : MongoTestBase(fixture)

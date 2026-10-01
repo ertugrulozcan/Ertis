@@ -1,10 +1,10 @@
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Ertis.Schema.Tests.TestHelpers;
-
 using DynamicObject = Ertis.Schema.Dynamics.DynamicObject;
 
 namespace Ertis.Schema.Tests.Dynamics;
@@ -196,6 +196,7 @@ public class DynamicValueMappingTests
 		Active = 2
 	}
 	
+	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 	public sealed class Poco
 	{
 		[JsonPropertyName("_id")]
@@ -218,6 +219,7 @@ public class DynamicValueMappingTests
 		[JsonPropertyName("level")]
 		public PocoStatus Level { get; init; }
 		
+		// ReSharper disable once NotAccessedField.Global
 		public int Field;
 	}
 	
@@ -229,6 +231,7 @@ public class DynamicValueMappingTests
 	{
 		public string Value { get; } = value;
 		
+		// ReSharper disable once UnusedMember.Global
 		public int Timestamp => 1;
 		
 		public override string ToString() => this.Value;

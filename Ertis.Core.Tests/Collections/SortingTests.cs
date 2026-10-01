@@ -24,20 +24,24 @@ public class SortingTests
 	public void CollectionMethods_ChangeTheFields()
 	{
 		var field = new SortField("a");
-		var sorting = new Sorting(field);
+		var sorting = new Sorting(field)
+		{
+			new SortField("b")
+		};
 		
-		sorting.Add(new SortField("b"));
 		Assert.Equal(2, sorting.Count);
 		Assert.False(sorting.IsReadOnly);
 		Assert.Contains(field, sorting);
+		
 		var array = new SortField[2];
 		sorting.CopyTo(array, 0);
 		Assert.Same(field, array[0]);
 		Assert.True(sorting.Remove(field));
 		Assert.Equal("b", Assert.Single(sorting).OrderBy);
+		
 		sorting.Clear();
 		Assert.Empty(sorting);
-		Assert.Empty((System.Collections.IEnumerable) sorting);
+		Assert.Empty(sorting);
 	}
 	
 	[Fact]

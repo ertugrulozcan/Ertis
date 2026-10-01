@@ -7,8 +7,6 @@ using Ertis.Schema.Tests.TestHelpers;
 using Ertis.Schema.Types;
 using Ertis.Schema.Types.Primitives;
 
-using LegacyFieldInfoCollectionJsonConverter = Ertis.Schema.Serialization.Legacy.FieldInfoCollectionJsonConverter;
-
 namespace Ertis.Schema.Tests.Serialization;
 
 public class FieldInfoJsonConverterTests
@@ -198,61 +196,7 @@ public class FieldInfoJsonConverterTests
 	
 	#endregion
 	
-	#region Legacy Equivalence Methods
-	
-	public static TheoryData<string> NonArrayFieldNames()
-	{
-		return new TheoryData<string>(SampleFields.All().Where(x => x.Type != FieldType.array).Select(x => x.Name));
-	}
-	
-	public static TheoryData<string> ArrayFieldNames()
-	{
-		return new TheoryData<string>(SampleFields.All().Where(x => x.Type == FieldType.array).Select(x => x.Name));
-	}
-	
-	[Theory]
-	[MemberData(nameof(NonArrayFieldNames))]
-	public void LegacyDeserialize_OfSystemTextJsonOutput_ProducesTheSameField(string fieldName)
-	{
-		AssertLegacyReadsTheSameField(fieldName);
-	}
-	
-	[Theory(Skip = "Bug (finding #13): the legacy (Newtonsoft) converter can not read any array field, the ItemSchema setter throws NullReferenceException")]
-	[MemberData(nameof(ArrayFieldNames))]
-	public void LegacyDeserialize_OfSystemTextJsonOutput_ProducesTheSameArrayField(string fieldName)
-	{
-		AssertLegacyReadsTheSameField(fieldName);
-	}
-	
-	[Theory]
-	[MemberData(nameof(FieldNames))]
-	public void Deserialize_OfLegacyOutput_ProducesTheSameField(string fieldName)
-	{
-		var properties = SampleFields.All();
-		var json = JsonSerializer.Serialize(new PropertiesModel { Properties = properties }, Options);
-		var legacyPropertiesJson = LegacyFieldInfoCollectionJsonConverter.Serialize(properties);
-		
-		var deserialized = JsonSerializer.Deserialize<PropertiesModel>($$"""{ "properties": {{legacyPropertiesJson}} }""", Options)!;
-		var roundTrippedJson = JsonSerializer.Serialize(deserialized, Options);
-		
-		Assert.Equal(FieldJson(json, fieldName), FieldJson(roundTrippedJson, fieldName));
-	}
-	
-	#endregion
-	
 	#region Helper Methods
-	
-	private static void AssertLegacyReadsTheSameField(string fieldName)
-	{
-		var properties = SampleFields.All().Where(x => x.Name == fieldName).ToArray();
-		var json = JsonSerializer.Serialize(new PropertiesModel { Properties = properties }, Options);
-		var propertiesJson = JsonNode.Parse(json)!["properties"]!.ToJsonString();
-		
-		var legacyProperties = LegacyFieldInfoCollectionJsonConverter.Deserialize(propertiesJson)!.ToArray();
-		var legacyJson = JsonSerializer.Serialize(new PropertiesModel { Properties = legacyProperties }, Options);
-		
-		Assert.Equal(FieldJson(json, fieldName), FieldJson(legacyJson, fieldName));
-	}
 	
 	private static string FieldJson(string json, string fieldName)
 	{

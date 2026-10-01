@@ -9,12 +9,9 @@ public sealed class CodeFieldInfo : ObjectFieldInfoBase
 	
 	[JsonPropertyName("type")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
-	[Newtonsoft.Json.JsonProperty("type")]
-	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	public override FieldType Type => FieldType.code;
 	
 	[JsonIgnore]
-	[Newtonsoft.Json.JsonIgnore]
 	public override IReadOnlyCollection<IFieldInfo> Properties { get; init; }
 	
 	/// <summary>

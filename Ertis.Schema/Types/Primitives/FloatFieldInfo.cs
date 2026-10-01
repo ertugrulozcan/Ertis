@@ -4,6 +4,7 @@ using Ertis.Schema.Exceptions;
 using Ertis.Schema.Helpers;
 using Ertis.Schema.Validation;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.Schema.Types.Primitives;
 
 public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
@@ -12,8 +13,6 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
 	
 	[JsonPropertyName("type")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
-	[Newtonsoft.Json.JsonProperty("type")]
-	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	public override FieldType Type => FieldType.@float;
 	
 	/// <summary>
@@ -21,7 +20,6 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
 	/// </summary>
 	[JsonPropertyName("minimum")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("minimum", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public double? Minimum
 	{
 		get;
@@ -41,7 +39,6 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
 	/// </summary>
 	[JsonPropertyName("maximum")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maximum", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public double? Maximum
 	{
 		get;
@@ -61,7 +58,6 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
 	/// </summary>
 	[JsonPropertyName("exclusiveMinimum")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("exclusiveMinimum", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public double? ExclusiveMinimum
 	{
 		get;
@@ -81,7 +77,6 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
 	/// </summary>
 	[JsonPropertyName("exclusiveMaximum")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("exclusiveMaximum", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public double? ExclusiveMaximum
 	{
 		get;
@@ -98,7 +93,6 @@ public class FloatFieldInfo : FieldInfo<double?>, IPrimitiveType
 	
 	[JsonPropertyName("isUnique")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("isUnique", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
 	public bool IsUnique { get; set; }
 	
 	#endregion

@@ -4,6 +4,7 @@ using Ertis.Extensions.AspNetCore.Controllers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 namespace Ertis.Extensions.AspNetCore.Tests.TestHelpers;
 
 /// <summary>
@@ -40,10 +41,15 @@ public sealed class TestQueryController : QueryControllerBase
 	
 	public static TestQueryController Create(string? body, string queryString = "")
 	{
-		var httpContext = new DefaultHttpContext();
-		httpContext.Request.Method = "POST";
-		httpContext.Request.QueryString = new QueryString(queryString);
-		httpContext.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(body ?? string.Empty));
+		var httpContext = new DefaultHttpContext
+		{
+			Request =
+			{
+				Method = "POST",
+				QueryString = new QueryString(queryString),
+				Body = new MemoryStream(Encoding.UTF8.GetBytes(body ?? string.Empty))
+			}
+		};
 		
 		return new TestQueryController
 		{

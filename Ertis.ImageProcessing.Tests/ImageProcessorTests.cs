@@ -1,5 +1,4 @@
 using System.Net;
-using Ertis.ImageProcessing.Exceptions;
 using Ertis.ImageProcessing.Tests.TestHelpers;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -37,6 +36,8 @@ public class ImageProcessorTests
 		
 		await ImageProcessor.ConvertAsync(input, output, format, cancellationToken: CancellationToken);
 		input.Position = 0;
+		
+		// ReSharper disable once MethodHasAsyncOverload
 		ImageProcessor.Convert(input, syncOutput, format);
 		
 		Assert.Equal(expectedFormat, TestImages.DetectFormat(output).Name);
@@ -95,6 +96,8 @@ public class ImageProcessorTests
 		
 		await ImageProcessor.CropAsync(input, output, new CropBounds { X = 10, Y = 2, Width = 5, Height = 4 }, ImageFormat.Png, cancellationToken: CancellationToken);
 		input.Position = 0;
+		
+		// ReSharper disable once MethodHasAsyncOverload
 		ImageProcessor.Crop(input, syncOutput, new CropBounds { X = 12 }, ImageFormat.Png);
 		
 		using var image = TestImages.Load(output).CloneAs<Rgba32>();
@@ -163,7 +166,9 @@ public class ImageProcessorTests
 		{
 			using var expected = Image.Load<Rgb24>(bytes);
 			expected.Mutate(x => x.AutoOrient());
-			expected.Mutate(x => x.Crop(bounds.ToRectangle(expected.Width, expected.Height)));
+			var width = expected.Width;
+			var height = expected.Height;
+			expected.Mutate(x => x.Crop(bounds.ToRectangle(width, height)));
 			
 			using var output = new MemoryStream();
 			ImageProcessor.Crop(new MemoryStream(bytes), output, bounds, ImageFormat.Png);
@@ -246,6 +251,8 @@ public class ImageProcessorTests
 		using var image = TestImages.Create(20, 10);
 		using var input = new MemoryStream();
 		input.Write([1, 2, 3]);
+		
+		// ReSharper disable once MethodHasAsyncOverload
 		image.CopyTo(input);
 		input.Position = 3;
 		using var output = new MemoryStream();
@@ -347,6 +354,7 @@ public class ImageProcessorTests
 			Assert.Throws<ImageProcessingException>(() => ImageProcessor.Convert(new MemoryStream("x"u8.ToArray()), new MemoryStream(), ImageFormat.Png))
 		};
 		
+		// ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
 		Assert.All(exceptions, x =>
 		{
 			Assert.Equal(HttpStatusCode.BadRequest, x.StatusCode);
@@ -425,8 +433,12 @@ public class ImageProcessorTests
 		using var cropped = new MemoryStream();
 		
 		await ImageProcessor.ConvertAsync(TestImages.Create(20, 10, new JpegEncoder(), withGps: true), kept, ImageFormat.Jpeg, cancellationToken: CancellationToken);
+		
+		// ReSharper disable once MethodHasAsyncOverload
 		ImageProcessor.Convert(TestImages.Create(20, 10, new JpegEncoder(), withGps: true), stripped, ImageFormat.Jpeg, stripMetadata: true);
 		await ImageProcessor.ResizeAsync(TestImages.Create(20, 10, new JpegEncoder(), withGps: true), resized, 10, null, ImageFormat.Jpeg, stripMetadata: true, cancellationToken: CancellationToken);
+		
+		// ReSharper disable once MethodHasAsyncOverload
 		ImageProcessor.Crop(TestImages.Create(20, 10, new JpegEncoder(), withGps: true), cropped, new CropBounds { Width = 5 }, ImageFormat.Webp, stripMetadata: true);
 		
 		Assert.NotNull((await ImageProcessor.GetMetadataAsync(Rewind(kept), CancellationToken))?.ExifProfile);

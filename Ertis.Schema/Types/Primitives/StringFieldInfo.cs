@@ -4,7 +4,9 @@ using Ertis.Schema.Dynamics;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
 
+// ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 namespace Ertis.Schema.Types.Primitives;
 
 public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
@@ -18,8 +20,8 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 	
 	#region Fields
 	
-	private Regex? _regex;
-	private Regex? _restrictRegex;
+	private readonly Regex? _regex;
+	private readonly Regex? _restrictRegex;
 	
 	#endregion
 	
@@ -27,13 +29,10 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 	
 	[JsonPropertyName("type")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
-	[Newtonsoft.Json.JsonProperty("type")]
-	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	public override FieldType Type => FieldType.@string;
 	
 	[JsonPropertyName("minLength")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("minLength", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MinLength
 	{
 		get;
@@ -50,7 +49,6 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 	
 	[JsonPropertyName("maxLength")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maxLength", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MaxLength
 	{
 		get;
@@ -67,7 +65,6 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 	
 	[JsonPropertyName("formatPattern")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("formatPattern", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
 	public string? FormatPattern
 	{
 		get;
@@ -86,7 +83,6 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 	
 	[JsonPropertyName("regexPattern")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("regexPattern", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
 	public string? RegexPattern
 	{
 		get;
@@ -99,7 +95,6 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 	
 	[JsonPropertyName("restrictRegexPattern")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("restrictRegexPattern", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
 	public string? RestrictRegexPattern
 	{
 		get;
@@ -112,12 +107,10 @@ public class StringFieldInfo : FieldInfo<string>, IPrimitiveType
 	
 	[JsonPropertyName("caseInsensitive")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("caseInsensitive", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
 	public bool CaseInsensitive { get; init; }
 	
 	[JsonPropertyName("isUnique")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("isUnique", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
 	public bool IsUnique { get; set; }
 	
 	#endregion

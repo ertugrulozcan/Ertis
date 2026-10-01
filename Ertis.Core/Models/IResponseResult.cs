@@ -2,43 +2,37 @@ using System.Net;
 using System.Text.Json.Serialization;
 
 // ReSharper disable UnusedMemberInSuper.Global
-namespace Ertis.Core.Models.Response;
+namespace Ertis.Core.Models;
 
 public interface IResponseResult
 {
 	#region Properties
 	
 	[JsonPropertyName("isSuccess")]
-	[Newtonsoft.Json.JsonProperty("isSuccess")]
 	bool IsSuccess { get; }
 	
 	[JsonPropertyName("statusCode")]
-	[Newtonsoft.Json.JsonProperty("statusCode")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	HttpStatusCode? StatusCode { get; }
 	
 	[JsonPropertyName("headers")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("headers", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	IDictionary<string, string>? Headers { get; }
 	
 	[JsonPropertyName("message")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("message", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	string? Message { get; set; }
 	
 	[JsonPropertyName("rawData")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("rawData", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	byte[]? RawData { get; set; }
 	
 	[JsonPropertyName("json")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("json", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	string? Json { get; set; }
 	
 	[JsonPropertyName("exception")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("exception", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	Exception? Exception { get; set; }
 	
 	#endregion
@@ -49,7 +43,6 @@ public interface IResponseResult<out T> : IResponseResult
 	#region Properties
 	
 	[JsonPropertyName("data")]
-	[Newtonsoft.Json.JsonProperty("data")]
 	T? Data { get; }
 	
 	#endregion
@@ -67,7 +60,6 @@ public class ResponseResult<T> : IResponseResult<T>
 	#region Properties
 	
 	[JsonPropertyName("isSuccess")]
-	[Newtonsoft.Json.JsonProperty("isSuccess")]
 	public bool IsSuccess
 	{
 		get
@@ -98,37 +90,31 @@ public class ResponseResult<T> : IResponseResult<T>
 	}
 	
 	[JsonPropertyName("statusCode")]
-	[Newtonsoft.Json.JsonProperty("statusCode")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public HttpStatusCode? StatusCode { get; private set; }
 	
 	[JsonPropertyName("headers")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("headers", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public IDictionary<string, string>? Headers { get; set; }
 	
 	[JsonPropertyName("message")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("message", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public string? Message { get; set; }
 	
 	[JsonPropertyName("data")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("data", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public T? Data { get; set; }
 	
 	[JsonPropertyName("rawData")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("rawData", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public byte[]? RawData { get; set; }
 	
 	[JsonPropertyName("json")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("json", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public string? Json { get; set; }
 	
 	[JsonPropertyName("exception")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("exception", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public Exception? Exception { get; set; }
 	
 	#endregion

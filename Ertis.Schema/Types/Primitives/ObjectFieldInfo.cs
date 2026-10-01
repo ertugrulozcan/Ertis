@@ -1,16 +1,10 @@
 using System.Collections.ObjectModel;
-using System.Dynamic;
 using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
 using Ertis.Schema.Serialization;
-using Ertis.Schema.Serialization.Legacy;
 using Ertis.Schema.Validation;
-
 using DynamicObject = Ertis.Schema.Dynamics.DynamicObject;
-using NewtonsoftJsonIgnore = Newtonsoft.Json.JsonIgnoreAttribute;
-using NewtonsoftJsonProperty = Newtonsoft.Json.JsonPropertyAttribute;
-using NewtonsoftJsonConverter = Newtonsoft.Json.JsonConverterAttribute;
 
 namespace Ertis.Schema.Types.Primitives;
 
@@ -19,12 +13,10 @@ public abstract class ObjectFieldInfoBase : FieldInfo<object>, ISchema
 	#region Properties
 	
 	[JsonIgnore]
-	[NewtonsoftJsonIgnore]
 	public string Slug => this.Name;
 	
 	[JsonPropertyName("allowAdditionalProperties")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[NewtonsoftJsonProperty("allowAdditionalProperties", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
 	public bool AllowAdditionalProperties { get; init; }
 	
 	/// <summary>
@@ -48,8 +40,6 @@ public abstract class ObjectFieldInfoBase : FieldInfo<object>, ISchema
 	
 	[JsonPropertyName("properties")]
 	[JsonConverter(typeof(FieldInfoCollectionJsonConverterFactory))]
-	[NewtonsoftJsonProperty("properties")]
-	[NewtonsoftJsonConverter(typeof(FieldInfoCollectionJsonConverter))]
 	public abstract IReadOnlyCollection<IFieldInfo> Properties { get; init; }
 	
 	#endregion
@@ -168,14 +158,10 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
 	
 	[JsonPropertyName("type")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
-	[NewtonsoftJsonProperty("type")]
-	[NewtonsoftJsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	public override FieldType Type => FieldType.@object;
 	
 	[JsonPropertyName("properties")]
 	[JsonConverter(typeof(FieldInfoCollectionJsonConverterFactory))]
-	[NewtonsoftJsonProperty("properties")]
-	[NewtonsoftJsonConverter(typeof(FieldInfoCollectionJsonConverter))]
 	public override IReadOnlyCollection<IFieldInfo> Properties
 	{
 		get;
@@ -207,6 +193,7 @@ public sealed class ObjectFieldInfo : ObjectFieldInfoBase
 	/// <summary>
 	/// Constructor
 	/// </summary>
+	// ReSharper disable once UnusedMember.Global
 	public ObjectFieldInfo()
 	{
 		this.Properties = new ReadOnlyCollection<IFieldInfo>(new List<IFieldInfo>());

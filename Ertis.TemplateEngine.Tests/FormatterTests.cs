@@ -8,6 +8,8 @@ using System.Text.Json.Serialization;
 using Ertis.TemplateEngine.Tests.TestHelpers;
 using Microsoft.AspNetCore.Routing;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Local
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.TemplateEngine.Tests;
 
 public class FormatterTests
@@ -292,20 +294,18 @@ public class FormatterTests
 	
 	#region Test Types
 	
-	public sealed class Poco
+	private sealed class Poco
 	{
 		[JsonPropertyName("first_name")]
-		[Newtonsoft.Json.JsonProperty("first_name")]
 		public string? FirstName { get; set; }
 		
 		[JsonPropertyName("address")]
-		[Newtonsoft.Json.JsonProperty("address")]
 		public PocoAddress? Address { get; set; }
 		
 		public DayOfWeek Day { get; set; }
 	}
 	
-	public sealed class ContractPoco
+	private sealed class ContractPoco
 	{
 		[JsonPropertyName("status")]
 		[JsonConverter(typeof(JsonStringEnumConverter))]
@@ -314,15 +314,15 @@ public class FormatterTests
 		[JsonIgnore]
 		public string? Secret { get; set; }
 		
+		// ReSharper disable once NotAccessedField.Local
 		public string? Field;
 		
 		public int[]? Numbers { get; set; }
 	}
 	
-	public sealed class PocoAddress
+	private sealed class PocoAddress
 	{
 		[JsonPropertyName("city")]
-		[Newtonsoft.Json.JsonProperty("city")]
 		public string? City { get; set; }
 	}
 	

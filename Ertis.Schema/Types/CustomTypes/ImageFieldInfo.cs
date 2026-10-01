@@ -3,6 +3,8 @@ using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 namespace Ertis.Schema.Types.CustomTypes;
 
 public sealed class ImageFieldInfo : ObjectFieldInfoBase
@@ -11,12 +13,9 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
 	
 	[JsonPropertyName("type")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
-	[Newtonsoft.Json.JsonProperty("type")]
-	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	public override FieldType Type => FieldType.image;
 	
 	[JsonIgnore]
-	[Newtonsoft.Json.JsonIgnore]
 	public override IReadOnlyCollection<IFieldInfo> Properties { get; init; }
 	
 	/// <summary>
@@ -28,12 +27,10 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
 	
 	[JsonPropertyName("multiple")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("multiple", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public bool Multiple { get; set; }
 	
 	[JsonPropertyName("maxSize")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maxSize", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MaxSize
 	{
 		get;
@@ -50,7 +47,6 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
 	
 	[JsonPropertyName("minCount")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("minCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MinCount
 	{
 		get;
@@ -67,7 +63,6 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
 	
 	[JsonPropertyName("maxCount")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maxCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MaxCount
 	{
 		get;
@@ -84,7 +79,6 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
 	
 	[JsonPropertyName("minWidth")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("minWidth", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MinWidth
 	{
 		get;
@@ -101,7 +95,6 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
 	
 	[JsonPropertyName("minHeight")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("minHeight", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MinHeight
 	{
 		get;
@@ -118,7 +111,6 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
 	
 	[JsonPropertyName("maxWidth")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maxWidth", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MaxWidth
 	{
 		get;
@@ -135,7 +127,6 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
 	
 	[JsonPropertyName("maxHeight")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maxHeight", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MaxHeight
 	{
 		get;
@@ -152,47 +143,38 @@ public sealed class ImageFieldInfo : ObjectFieldInfoBase
 	
 	[JsonPropertyName("recommendedWidth")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("recommendedWidth", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? RecommendedWidth { get; set; }
 	
 	[JsonPropertyName("recommendedHeight")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("recommendedHeight", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? RecommendedHeight { get; set; }
 	
 	[JsonPropertyName("maxSizesRequired")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("maxSizesRequired")]
 	public bool MaxSizesRequired { get; set; }
 	
 	[JsonPropertyName("minSizesRequired")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("minSizesRequired")]
 	public bool MinSizesRequired { get; set; }
 	
 	[JsonPropertyName("aspectRatioRequired")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("aspectRatioRequired")]
 	public bool AspectRatioRequired { get; set; }
 	
 	[JsonPropertyName("formWidth")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("formWidth", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public string? FormWidth { get; set; }
 	
 	[JsonPropertyName("formHeight")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("formHeight", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public string? FormHeight { get; set; }
 	
 	[JsonPropertyName("maxFormWidth")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maxFormWidth", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public string? MaxFormWidth { get; set; }
 	
 	[JsonPropertyName("maxFormHeight")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maxFormHeight", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public string? MaxFormHeight { get; set; }
 	
 	#endregion

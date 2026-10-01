@@ -1,4 +1,3 @@
-using Ertis.Core.Collections;
 using Ertis.MongoDB.Exceptions;
 using Ertis.MongoDB.Models;
 using Ertis.MongoDB.Tests.TestHelpers;
@@ -215,7 +214,7 @@ public class IndexTests(MongoDbContainerFixture fixture) : MongoTestBase(fixture
 	[Fact]
 	public async Task CreateIndex_WithAnUnsupportedType_Throws()
 	{
-		var definition = NSubstitute.Substitute.For<IIndexDefinition>();
+		var definition = Substitute.For<IIndexDefinition>();
 		definition.Type.Returns(IndexType.Hashed);
 		
 		await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => this.CreateRepository().CreateIndexAsync(definition, CancellationToken));

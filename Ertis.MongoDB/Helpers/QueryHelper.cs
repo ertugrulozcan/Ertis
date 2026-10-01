@@ -25,10 +25,13 @@ public static class QueryHelper
 	/// </summary>
 	public static string EnsureObjectIdsAndISODates(string json)
 	{
-		return Ensure(json, convertObjectIds: true, convertDates: true);
+		return EnsureQuery(json, convertObjectIds: true, convertDates: true);
 	}
 	
-	internal static string Ensure(string json, bool convertObjectIds, bool convertDates)
+	/// <summary>
+	/// Returns the query with the converted values in the shell syntax; an empty or invalid query is returned as it is
+	/// </summary>
+	public static string EnsureQuery(string json, bool convertObjectIds, bool convertDates)
 	{
 		if (string.IsNullOrEmpty(json))
 		{

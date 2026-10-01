@@ -1,5 +1,6 @@
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMemberInSuper.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.Extensions.AspNetCore.Versioning;
 

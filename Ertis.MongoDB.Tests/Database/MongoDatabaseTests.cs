@@ -37,13 +37,19 @@ public class MongoDatabaseTests(MongoDbContainerFixture fixture) : MongoTestBase
 		var database = this.CreateDatabase();
 		
 		await database.CreateCollectionAsync("a", CancellationToken);
+		
+		// ReSharper disable once MethodHasAsyncOverload
 		database.CreateCollection("b");
 		await database.RenameCollectionAsync("a", "c", CancellationToken);
+		
+		// ReSharper disable once MethodHasAsyncOverload
 		database.RenameCollection("b", "d");
 		Assert.Equal(["c", "d"], (await database.ListCollectionsAsync(cancellationToken: CancellationToken)).Order());
 		Assert.Equal(["c"], await database.ListCollectionsAsync(x => x["name"] == "c", CancellationToken));
 		
 		await database.DropCollectionAsync("c", CancellationToken);
+		
+		// ReSharper disable once MethodHasAsyncOverload
 		database.DropCollection("d");
 		Assert.Empty(await database.ListCollectionsAsync(cancellationToken: CancellationToken));
 	}
@@ -58,7 +64,10 @@ public class MongoDatabaseTests(MongoDbContainerFixture fixture) : MongoTestBase
 		await database.CreateCollectionAsync("a", CancellationToken);
 		await database.CreateCollectionAsync("b", CancellationToken);
 		
+		// ReSharper disable once MethodHasAsyncOverload
 		Assert.Equal(["a", "b"], database.ListCollections().Order());
+		
+		// ReSharper disable once MethodHasAsyncOverload
 		Assert.Equal(["b"], database.ListCollections(x => x["name"] == "b"));
 	}
 	
@@ -73,6 +82,8 @@ public class MongoDatabaseTests(MongoDbContainerFixture fixture) : MongoTestBase
 		var database = this.CreateDatabase();
 		
 		var statistics = await database.GetDatabaseStatisticsAsync(CancellationToken);
+		
+		// ReSharper disable once MethodHasAsyncOverload
 		var syncStatistics = database.GetDatabaseStatistics();
 		
 		Assert.NotNull(statistics);
@@ -83,7 +94,7 @@ public class MongoDatabaseTests(MongoDbContainerFixture fixture) : MongoTestBase
 		Assert.True(statistics.StorageSize > 0);
 		Assert.Equal(1, statistics.IndexCount);
 		Assert.Equal(1, statistics.State);
-		Assert.Equal(statistics.DatabaseName, syncStatistics?.DatabaseName);
+		Assert.Equal(statistics.DatabaseName, syncStatistics.DatabaseName);
 	}
 	
 	#endregion

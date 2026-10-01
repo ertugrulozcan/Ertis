@@ -1,6 +1,7 @@
 using Ertis.Core.Collections;
 using MongoDB.Bson;
 
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.MongoDB.Models;
 

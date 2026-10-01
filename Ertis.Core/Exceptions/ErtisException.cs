@@ -1,9 +1,10 @@
 using System.Net;
-using Ertis.Core.Models.Response;
+using Ertis.Core.Models;
 
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 namespace Ertis.Core.Exceptions;
 
 public class ErtisException<T> : ErtisException

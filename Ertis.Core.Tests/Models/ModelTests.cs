@@ -1,7 +1,6 @@
 using System.Net;
 using System.Text.Json;
-using Ertis.Core.Models.Resources;
-using Ertis.Core.Models.Response;
+using Ertis.Core.Models;
 
 namespace Ertis.Core.Tests.Models;
 

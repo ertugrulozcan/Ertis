@@ -13,10 +13,11 @@ using MongoDB.Driver;
 using SortDirection = Ertis.Core.Collections.SortDirection;
 using UpdateOptions = Ertis.Data.Models.UpdateOptions;
 
+// ReSharper disable once UnusedType.Global
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMethodReturnValue.Global
 namespace Ertis.MongoDB.Repository;
 
-// ReSharper disable once UnusedType.Global
 public abstract class DynamicMongoRepository : IDynamicMongoRepository
 {
 	#region Services
@@ -1004,7 +1005,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		var actionBinder = this._actionBinder;
 		if (actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 		{
-			return entities.Select(x => actionBinder.BeforeInsert(x)).ToArray();
+			return entities.Select(actionBinder.BeforeInsert).ToArray();
 		}
 		
 		return entities.ToArray();
@@ -1015,7 +1016,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		var actionBinder = this._actionBinder;
 		if (actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
 		{
-			return entities.Select(x => actionBinder.AfterInsert(x)).ToArray();
+			return entities.Select(actionBinder.AfterInsert).ToArray();
 		}
 		
 		return entities;

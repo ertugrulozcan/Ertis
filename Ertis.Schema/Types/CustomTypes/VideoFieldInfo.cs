@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Exceptions;
 
+// ReSharper disable UnusedMember.Global
 namespace Ertis.Schema.Types.CustomTypes;
 
 public sealed class VideoFieldInfo : ObjectFieldInfoBase
@@ -10,12 +11,9 @@ public sealed class VideoFieldInfo : ObjectFieldInfoBase
 	
 	[JsonPropertyName("type")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
-	[Newtonsoft.Json.JsonProperty("type")]
-	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	public override FieldType Type => FieldType.video;
 	
 	[JsonIgnore]
-	[Newtonsoft.Json.JsonIgnore]
 	public override IReadOnlyCollection<IFieldInfo> Properties { get; init; }
 	
 	/// <summary>
@@ -25,7 +23,6 @@ public sealed class VideoFieldInfo : ObjectFieldInfoBase
 	
 	[JsonPropertyName("maxSize")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maxSize", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MaxSize
 	{
 		get;

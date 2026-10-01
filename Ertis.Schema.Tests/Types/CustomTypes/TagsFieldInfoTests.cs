@@ -58,7 +58,7 @@ public class TagsFieldInfoTests
 	[InlineData(5, 2, "The 'minLength' value can not be greater than the 'maxLength' value ('tags')")]
 	public void Create_WithInvalidLengthRule_Throws(int minLength, int? maxLength, string expectedMessage)
 	{
-		var exception = Assert.Throws<Ertis.Schema.Exceptions.FieldValidationException>(() => new TagsFieldInfo { Name = "tags", MaxLength = maxLength, MinLength = minLength });
+		var exception = Assert.Throws<Exceptions.FieldValidationException>(() => new TagsFieldInfo { Name = "tags", MaxLength = maxLength, MinLength = minLength });
 		
 		Assert.Equal(expectedMessage, exception.Message);
 	}

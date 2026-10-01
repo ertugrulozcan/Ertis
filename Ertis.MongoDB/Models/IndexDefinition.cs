@@ -3,6 +3,7 @@ using Ertis.Core.Collections;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMemberInSuper.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 namespace Ertis.MongoDB.Models;
 
 public enum IndexType
@@ -54,7 +55,6 @@ public abstract class IndexDefinitionBase : IIndexDefinition
 	
 	public abstract string Key { get; }
 	
-	// ReSharper disable once UnusedAutoPropertyAccessor.Global
 	public bool IsUnique { get; set; }
 	
 	#endregion

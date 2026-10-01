@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 namespace Ertis.Core.Collections;
 
 public class Sorting : ICollection<SortField>
@@ -111,13 +112,10 @@ public class SortField
 	#region Properties
 	
 	[JsonPropertyName("orderBy")]
-	[Newtonsoft.Json.JsonProperty("orderBy")]
 	public string OrderBy { get; set; }
 	
 	[JsonPropertyName("sortDirection")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
-	[Newtonsoft.Json.JsonProperty("sortDirection")]
-	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	public SortDirection? SortDirection { get; set; }
 	
 	#endregion

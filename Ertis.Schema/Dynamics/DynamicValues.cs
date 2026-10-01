@@ -132,7 +132,7 @@ internal static class DynamicValues
 		return decimal.TryParse(Encoding.UTF8.GetString(rawNumber), NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
 	}
 	
-	internal static object? FromJsonElement(JsonElement element)
+	private static object? FromJsonElement(JsonElement element)
 	{
 		switch (element.ValueKind)
 		{
@@ -215,7 +215,7 @@ internal static class DynamicValues
 	/// <summary>
 	/// Converts a CLR value into the dynamic value model, keeping the primitive CLR types (numbers, dates) as they are
 	/// </summary>
-	internal static object? FromValue(object? value)
+	private static object? FromValue(object? value)
 	{
 		switch (value)
 		{

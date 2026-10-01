@@ -1,9 +1,11 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
 using DynamicObject = Ertis.Schema.Dynamics.DynamicObject;
 
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.Schema.Tests.Dynamics;
 
 /// <summary>
@@ -164,6 +166,7 @@ public class DynamicObjectSerializationTests
 	{
 		var dynamicObject = DynamicObject.Parse("""{ "status": "Monday" }""");
 		
+		// ReSharper disable once ConvertClosureToMethodGroup
 		Assert.Throws<JsonException>(() => dynamicObject.Deserialize<TypedModel>());
 	}
 	

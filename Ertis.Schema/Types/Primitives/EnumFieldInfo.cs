@@ -2,6 +2,8 @@ using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
 
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.Schema.Types.Primitives;
 
 public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
@@ -10,12 +12,9 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
 	
 	[JsonPropertyName("type")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
-	[Newtonsoft.Json.JsonProperty("type")]
-	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	public override FieldType Type => FieldType.@enum;
 	
 	[JsonPropertyName("items")]
-	[Newtonsoft.Json.JsonProperty("items")]
 	public EnumItem[] Items
 	{
 		get => field ?? Array.Empty<EnumItem>();
@@ -32,12 +31,10 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
 	
 	[JsonPropertyName("isUnique")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("isUnique", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
 	public bool IsUnique { get; set; }
 	
 	[JsonPropertyName("isMultiple")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("isMultiple", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
 	public bool IsMultiple { get; set; }
 	
 	#endregion
@@ -127,11 +124,9 @@ public class EnumFieldInfo : FieldInfo<object>, IPrimitiveType
 		#region Properties
 		
 		[JsonPropertyName("displayName")]
-		[Newtonsoft.Json.JsonProperty("displayName")]
 		public required string DisplayName { get; set; }
 		
 		[JsonPropertyName("value")]
-		[Newtonsoft.Json.JsonProperty("value")]
 		public required string Value { get; set; }
 		
 		#endregion

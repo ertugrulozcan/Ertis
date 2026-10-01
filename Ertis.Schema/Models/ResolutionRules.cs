@@ -1,6 +1,8 @@
 using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 namespace Ertis.Schema.Models;
 
 public struct ResolutionRules : ICloneable
@@ -9,7 +11,6 @@ public struct ResolutionRules : ICloneable
 	
 	[JsonPropertyName("minWidth")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("minWidth", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MinWidth
 	{
 		get;
@@ -26,7 +27,6 @@ public struct ResolutionRules : ICloneable
 	
 	[JsonPropertyName("minHeight")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("minHeight", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MinHeight
 	{
 		get;
@@ -43,7 +43,6 @@ public struct ResolutionRules : ICloneable
 	
 	[JsonPropertyName("maxWidth")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maxWidth", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MaxWidth
 	{
 		get;
@@ -60,7 +59,6 @@ public struct ResolutionRules : ICloneable
 	
 	[JsonPropertyName("maxHeight")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maxHeight", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MaxHeight
 	{
 		get;
@@ -77,27 +75,22 @@ public struct ResolutionRules : ICloneable
 	
 	[JsonPropertyName("recommendedWidth")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("recommendedWidth", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? RecommendedWidth { get; set; }
 	
 	[JsonPropertyName("recommendedHeight")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("recommendedHeight", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? RecommendedHeight { get; set; }
 	
 	[JsonPropertyName("maxSizesRequired")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("maxSizesRequired", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
 	public bool MaxSizesRequired { get; set; }
 	
 	[JsonPropertyName("minSizesRequired")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("minSizesRequired", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
 	public bool MinSizesRequired { get; set; }
 	
 	[JsonPropertyName("aspectRatioRequired")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("aspectRatioRequired", DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
 	public bool AspectRatioRequired { get; set; }
 	
 	#endregion

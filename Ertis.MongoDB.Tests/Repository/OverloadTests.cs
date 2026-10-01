@@ -6,6 +6,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using SortDirection = Ertis.Core.Collections.SortDirection;
 
+// ReSharper disable MethodHasAsyncOverload
 namespace Ertis.MongoDB.Tests.Repository;
 
 /// <summary>
@@ -150,7 +151,7 @@ public class OverloadTests(MongoDbContainerFixture fixture) : MongoTestBase(fixt
 		repository.Increment(x => x.Name == "a", "age", 1);
 		await repository.IncrementAsync(x => x.Name == "a", "age", 1, CancellationToken);
 		await repository.IncrementAsync(x => x.Name == "a", "age", 1L, CancellationToken);
-		repository.Increment(x => x.Name == "a", x => x.Age, 1);
+		repository.Increment(x => x.Name == "a", x => x.Age);
 		repository.Increment(x => x.Name == "a", x => x.Age, 1L);
 		await repository.IncrementAsync(x => x.Name == "a", x => x.Age, 1L, CancellationToken);
 		

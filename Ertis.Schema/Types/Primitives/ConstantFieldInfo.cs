@@ -4,19 +4,17 @@ using Ertis.Schema.Dynamics;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Validation;
 
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 namespace Ertis.Schema.Types.Primitives;
 
 public class ConstantFieldInfo : FieldInfo<object>
 {
 	#region Properties
 	
-	[Newtonsoft.Json.JsonProperty("type")]
-	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	[JsonPropertyName("type")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
 	public override FieldType Type => FieldType.@const;
 	
-	[Newtonsoft.Json.JsonProperty("value")]
 	[JsonPropertyName("value")]
 	public object? Value
 	{
@@ -24,8 +22,6 @@ public class ConstantFieldInfo : FieldInfo<object>
 		set => field = DynamicValues.FromDeserializedValue(value);
 	}
 	
-	[Newtonsoft.Json.JsonProperty("valueType")]
-	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	[JsonPropertyName("valueType")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
 	public ConstantType ValueType { get; set; }

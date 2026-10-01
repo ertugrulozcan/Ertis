@@ -103,12 +103,12 @@ public class MongoDatabase : IMongoDatabase
 		}
 	}
 	
-	public MongoDbStatistics? GetDatabaseStatistics()
+	public MongoDbStatistics GetDatabaseStatistics()
 	{
 		return ToStatistics(this.GetDatabaseStatisticsDocument());
 	}
 	
-	public async Task<MongoDbStatistics?> GetDatabaseStatisticsAsync(CancellationToken cancellationToken = default)
+	public async Task<MongoDbStatistics> GetDatabaseStatisticsAsync(CancellationToken cancellationToken = default)
 	{
 		return ToStatistics(await this.GetDatabaseStatisticsDocumentAsync(cancellationToken: cancellationToken));
 	}

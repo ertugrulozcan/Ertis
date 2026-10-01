@@ -96,7 +96,7 @@ public class QueryBuilderLogicalTests
 	[Fact]
 	public void Where_OnAFieldWithQueries_CombinesTheOperators()
 	{
-		var query = QueryBuilder.Where("age", new IQuery[] { QueryBuilder.GreaterThan(18), QueryBuilder.LessThan(65) });
+		var query = QueryBuilder.Where("age", [QueryBuilder.GreaterThan(18), QueryBuilder.LessThan(65)]);
 		
 		Assert.Equal("""{ "age": { $gt: 18, $lt: 65 } }""", query.ToString());
 		QueryAssert.Filter("""{ "age": { "$gt": 18, "$lt": 65 } }""", query);

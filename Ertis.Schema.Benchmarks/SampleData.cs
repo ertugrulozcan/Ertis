@@ -4,9 +4,9 @@ using Ertis.Schema.Types;
 using Ertis.Schema.Types.CustomTypes;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
-
 using DynamicObject = Ertis.Schema.Dynamics.DynamicObject;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 namespace Ertis.Schema.Benchmarks;
 
 /// <summary>

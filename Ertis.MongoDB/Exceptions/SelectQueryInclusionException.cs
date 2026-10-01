@@ -1,6 +1,7 @@
 using System.Net;
 using Ertis.Core.Exceptions;
 
+// ReSharper disable UnusedMember.Global
 namespace Ertis.MongoDB.Exceptions;
 
 public class SelectQueryInclusionException : ErtisException

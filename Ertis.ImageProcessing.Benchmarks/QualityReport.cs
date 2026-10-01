@@ -39,7 +39,10 @@ public static class QualityReport
 						using var result = await Image.LoadAsync<Rgb24>(output);
 						
 						using var reference = Image.Load<Rgb24>(bytes);
-						reference.Mutate(x => x.AutoOrient().Resize(new ResizeOptions { Size = new Size(result.Width, result.Height), Mode = ResizeModeEnum.Crop, Sampler = resampler }));
+						
+						var resultWidth = result.Width;
+						var resultHeight = result.Height;
+						reference.Mutate(x => x.AutoOrient().Resize(new ResizeOptions { Size = new Size(resultWidth, resultHeight), Mode = ResizeModeEnum.Crop, Sampler = resampler }));
 						
 						Console.WriteLine($"{name,-12} {resizeQuality,-9} {samplerName,-8} {result.Width,6} {result.Height,6} {Psnr(reference, result),10:F2}");
 					}

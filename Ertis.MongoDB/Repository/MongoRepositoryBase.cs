@@ -1374,7 +1374,7 @@ public abstract class MongoRepositoryBase<TEntity> : IMongoRepository<TEntity> w
 		var actionBinder = this._actionBinder;
 		if (actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
 		{
-			return entities.Select(x => actionBinder.BeforeInsert(x)).ToArray();
+			return entities.Select(actionBinder.BeforeInsert).ToArray();
 		}
 		
 		return entities.ToArray();

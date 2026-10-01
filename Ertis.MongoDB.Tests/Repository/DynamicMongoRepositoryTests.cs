@@ -7,6 +7,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using SortDirection = Ertis.Core.Collections.SortDirection;
 
+// ReSharper disable MethodHasAsyncOverload
 namespace Ertis.MongoDB.Tests.Repository;
 
 public class DynamicMongoRepositoryTests(MongoDbContainerFixture fixture) : MongoTestBase(fixture)

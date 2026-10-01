@@ -15,7 +15,7 @@ public class QueryHelperTests
 	
 	#region Methods
 	
-	private static BsonDocument Ensure(string query)
+	private static BsonDocument EnsureQuery(string query)
 	{
 		return BsonDocument.Parse(QueryHelper.EnsureObjectIdsAndISODates(query));
 	}
@@ -41,7 +41,7 @@ public class QueryHelperTests
 	[Fact]
 	public void EnsureObjectIdsAndISODates_KeepsTheOtherValues()
 	{
-		var query = Ensure("""{ "name": "Jane", "age": { "$gt": 18 }, "ratio": 1.5, "active": true, "none": null, "tags": { "$in": ["a", "b"] } }""");
+		var query = EnsureQuery("""{ "name": "Jane", "age": { "$gt": 18 }, "ratio": 1.5, "active": true, "none": null, "tags": { "$in": ["a", "b"] } }""");
 		
 		Assert.Equal(BsonDocument.Parse("""{ "name": "Jane", "age": { "$gt": 18 }, "ratio": 1.5, "active": true, "none": null, "tags": { "$in": ["a", "b"] } }"""), query);
 	}
@@ -49,7 +49,7 @@ public class QueryHelperTests
 	[Fact]
 	public void EnsureObjectIdsAndISODates_WithTheShellSyntax_ReadsIt()
 	{
-		var query = Ensure($$"""{ _id: "{{Id1}}", age: { $gt: 18 } }""");
+		var query = EnsureQuery($$"""{ _id: "{{Id1}}", age: { $gt: 18 } }""");
 		
 		Assert.Equal(new BsonDocument { { "_id", ObjectId.Parse(Id1) }, { "age", new BsonDocument("$gt", 18) } }, query);
 	}
@@ -57,7 +57,7 @@ public class QueryHelperTests
 	[Fact]
 	public void EnsureObjectIdsAndISODates_WithShellConstructors_KeepsThem()
 	{
-		var query = Ensure($$"""{ "_id": ObjectId("{{Id1}}"), "created_at": { "$gt": ISODate("2026-01-31T10:00:00Z") } }""");
+		var query = EnsureQuery($$"""{ "_id": ObjectId("{{Id1}}"), "created_at": { "$gt": ISODate("2026-01-31T10:00:00Z") } }""");
 		
 		Assert.Equal(ObjectId.Parse(Id1), query["_id"]);
 		Assert.Equal(new DateTime(2026, 1, 31, 10, 0, 0, DateTimeKind.Utc), query["created_at"]["$gt"].ToUniversalTime());
@@ -71,7 +71,7 @@ public class QueryHelperTests
 	{
 		var filter = new BsonDocument { { "_id", ObjectId.Parse(Id1) }, { "created_at", new DateTime(2026, 1, 31, 10, 0, 0, DateTimeKind.Utc) } };
 		
-		Assert.Equal(filter, Ensure(filter.ToJson()));
+		Assert.Equal(filter, EnsureQuery(filter.ToJson()));
 	}
 	
 	[Fact]
@@ -90,13 +90,13 @@ public class QueryHelperTests
 	[Fact]
 	public void EnsureObjectIdsAndISODates_ConvertsTheIdValues()
 	{
-		Assert.Equal(ObjectId.Parse(Id1), Ensure($$"""{ "_id": "{{Id1}}" }""")["_id"]);
+		Assert.Equal(ObjectId.Parse(Id1), EnsureQuery($$"""{ "_id": "{{Id1}}" }""")["_id"]);
 	}
 	
 	[Fact]
 	public void EnsureObjectIdsAndISODates_ConvertsTheIdOperatorValues()
 	{
-		var query = Ensure($$"""{ "_id": { "$in": ["{{Id1}}", "{{Id2}}"] } }""");
+		var query = EnsureQuery($$"""{ "_id": { "$in": ["{{Id1}}", "{{Id2}}"] } }""");
 		
 		Assert.Equal(new BsonArray { ObjectId.Parse(Id1), ObjectId.Parse(Id2) }, query["_id"]["$in"]);
 	}
@@ -104,8 +104,8 @@ public class QueryHelperTests
 	[Fact]
 	public void EnsureObjectIdsAndISODates_ConvertsTheNestedIdValues()
 	{
-		Assert.Equal(ObjectId.Parse(Id1), Ensure($$"""{ "owner": { "_id": "{{Id1}}" } }""")["owner"]["_id"]);
-		Assert.Equal(ObjectId.Parse(Id1), Ensure($$"""{ "$and": [{ "_id": "{{Id1}}" }] }""")["$and"][0]["_id"]);
+		Assert.Equal(ObjectId.Parse(Id1), EnsureQuery($$"""{ "owner": { "_id": "{{Id1}}" } }""")["owner"]["_id"]);
+		Assert.Equal(ObjectId.Parse(Id1), EnsureQuery($$"""{ "$and": [{ "_id": "{{Id1}}" }] }""")["$and"][0]["_id"]);
 	}
 	
 	[Theory]
@@ -115,13 +115,13 @@ public class QueryHelperTests
 	[InlineData("""{ "_id": 5 }""")]
 	public void EnsureObjectIdsAndISODates_KeepsTheOtherIdLikeValues(string json)
 	{
-		Assert.Equal(BsonDocument.Parse(json), Ensure(json));
+		Assert.Equal(BsonDocument.Parse(json), EnsureQuery(json));
 	}
 	
 	[Fact]
 	public void EnsureObjectIdsAndISODates_ConvertsTheIdOperatorValuesInLogicalOperators()
 	{
-		var query = Ensure($$"""{ "$or": [{ "_id": { "$ne": "{{Id1}}" } }, { "owner._id": { "$in": ["{{Id2}}"] } }] }""");
+		var query = EnsureQuery($$"""{ "$or": [{ "_id": { "$ne": "{{Id1}}" } }, { "owner._id": { "$in": ["{{Id2}}"] } }] }""");
 		
 		Assert.Equal(ObjectId.Parse(Id1), query["$or"][0]["_id"]["$ne"]);
 		Assert.Equal(ObjectId.Parse(Id2), query["$or"][1]["owner._id"]["$in"][0]);
@@ -130,7 +130,7 @@ public class QueryHelperTests
 	[Fact]
 	public void EnsureObjectIdsAndISODates_ConvertsTheDottedIdFields()
 	{
-		Assert.Equal(ObjectId.Parse(Id1), Ensure($$"""{ "owner._id": "{{Id1}}" }""")["owner._id"]);
+		Assert.Equal(ObjectId.Parse(Id1), EnsureQuery($$"""{ "owner._id": "{{Id1}}" }""")["owner._id"]);
 	}
 	
 	#endregion
@@ -140,7 +140,7 @@ public class QueryHelperTests
 	[Fact]
 	public void EnsureObjectIdsAndISODates_ConvertsTheUtcDates()
 	{
-		var value = Ensure("""{ "created_at": { "$gt": "2026-01-31T10:00:00Z" } }""")["created_at"]["$gt"];
+		var value = EnsureQuery("""{ "created_at": { "$gt": "2026-01-31T10:00:00Z" } }""")["created_at"]["$gt"];
 		
 		Assert.True(value.IsValidDateTime);
 	}
@@ -148,7 +148,7 @@ public class QueryHelperTests
 	[Fact]
 	public void EnsureObjectIdsAndISODates_KeepsTheInstantOfTheDates()
 	{
-		var query = Ensure("""{ "a": "2026-01-31T10:00:00Z", "b": "2026-01-31T13:00:00+03:00" }""");
+		var query = EnsureQuery("""{ "a": "2026-01-31T10:00:00Z", "b": "2026-01-31T13:00:00+03:00" }""");
 		
 		var expected = new DateTime(2026, 1, 31, 10, 0, 0, DateTimeKind.Utc);
 		Assert.Equal(expected, query["a"].ToUniversalTime());
@@ -158,7 +158,7 @@ public class QueryHelperTests
 	[Fact]
 	public void EnsureObjectIdsAndISODates_KeepsTheMilliseconds()
 	{
-		var value = Ensure("""{ "a": "2026-01-31T10:00:00.123Z" }""")["a"];
+		var value = EnsureQuery("""{ "a": "2026-01-31T10:00:00.123Z" }""")["a"];
 		
 		Assert.Equal(new DateTime(2026, 1, 31, 10, 0, 0, 123, DateTimeKind.Utc), value.ToUniversalTime());
 	}
@@ -166,7 +166,7 @@ public class QueryHelperTests
 	[Fact]
 	public void EnsureObjectIdsAndISODates_ConvertsTheDatesWithoutTime()
 	{
-		var value = Ensure("""{ "a": "2026-01-31" }""")["a"];
+		var value = EnsureQuery("""{ "a": "2026-01-31" }""")["a"];
 		
 		Assert.Equal(new DateTime(2026, 1, 31, 0, 0, 0, DateTimeKind.Utc), value.ToUniversalTime());
 	}
@@ -179,7 +179,7 @@ public class QueryHelperTests
 	{
 		var json = new BsonDocument("a", value).ToJson();
 		
-		Assert.Equal(BsonDocument.Parse(json), Ensure(json));
+		Assert.Equal(BsonDocument.Parse(json), EnsureQuery(json));
 	}
 	
 	[Theory]
@@ -191,7 +191,7 @@ public class QueryHelperTests
 	{
 		var json = new BsonDocument("a", value).ToJson();
 		
-		Assert.Equal(BsonDocument.Parse(json), Ensure(json));
+		Assert.Equal(BsonDocument.Parse(json), EnsureQuery(json));
 	}
 	
 	#endregion
@@ -201,7 +201,7 @@ public class QueryHelperTests
 	[Fact]
 	public void ObjectIdHelper_ConvertsOnlyTheIds()
 	{
-		var query = BsonDocument.Parse(ObjectIdHelper.EnsureObjectIds($$"""{ "_id": "{{Id1}}", "a": "2026-01-31T10:00:00Z" }""")!);
+		var query = BsonDocument.Parse(QueryHelper.EnsureQuery($$"""{ "_id": "{{Id1}}", "a": "2026-01-31T10:00:00Z" }""", convertObjectIds: true, convertDates: false));
 		
 		Assert.Equal(ObjectId.Parse(Id1), query["_id"]);
 		Assert.Equal("2026-01-31T10:00:00Z", query["a"]);
@@ -210,7 +210,7 @@ public class QueryHelperTests
 	[Fact]
 	public void ISODateHelper_ConvertsOnlyTheDates()
 	{
-		var query = BsonDocument.Parse(ISODateHelper.EnsureDatetimeFieldsToISODate($$"""{ "_id": "{{Id1}}", "a": "2026-01-31T10:00:00Z" }""")!);
+		var query = BsonDocument.Parse(ISODateHelper.EnsureDatetimeFieldsToISODate($$"""{ "_id": "{{Id1}}", "a": "2026-01-31T10:00:00Z" }"""));
 		
 		Assert.Equal(Id1, query["_id"]);
 		Assert.Equal(new DateTime(2026, 1, 31, 10, 0, 0, DateTimeKind.Utc), query["a"].ToUniversalTime());

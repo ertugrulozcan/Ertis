@@ -94,9 +94,8 @@ public sealed class FieldInfoCollectionJsonConverter<TCollection> : JsonConverte
 			{
 				throw new JsonException($"Expected PropertyName but got {reader.TokenType}.");
 			}
-				
-				var name = reader.GetString();
 			
+			var name = reader.GetString();
 			reader.Read();
 			
 			var node = JsonNode.Parse(ref reader)!.AsObject();
@@ -118,7 +117,6 @@ public sealed class FieldInfoCollectionJsonConverter<TCollection> : JsonConverte
 		
 		throw new JsonException("Unexpected end of JSON.");
 	}
-	
 	
 	#endregion
 }

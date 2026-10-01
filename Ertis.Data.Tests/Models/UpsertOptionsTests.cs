@@ -11,6 +11,7 @@ public class UpsertOptionsTests
 	{
 		UpsertOptions[] options = [InsertOptions.Default, UpdateOptions.Default];
 		
+		// ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
 		Assert.All(options, x =>
 		{
 			Assert.True(x.TriggerBeforeActionBinder);
@@ -23,6 +24,7 @@ public class UpsertOptionsTests
 	{
 		UpsertOptions[] options = [new InsertOptions(), new UpdateOptions()];
 		
+		// ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
 		Assert.All(options, x =>
 		{
 			Assert.False(x.TriggerBeforeActionBinder);

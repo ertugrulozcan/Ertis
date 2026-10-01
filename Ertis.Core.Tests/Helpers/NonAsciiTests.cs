@@ -15,7 +15,7 @@ public class NonAsciiTests
 			NonAscii.Polish, NonAscii.Latvian, NonAscii.German, NonAscii.Ukrainian, NonAscii.Serbian, NonAscii.Russian
 		};
 		
-		Assert.All(maps, x => Assert.NotEmpty(x));
+		Assert.All(maps, Assert.NotEmpty);
 		Assert.Same(NonAscii.Turkish, NonAscii.Turkish);
 		Assert.Equal("S", NonAscii.Turkish['Ş']);
 	}

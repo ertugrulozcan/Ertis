@@ -10,13 +10,10 @@ public class TagsFieldInfo : FieldInfo<string[]>
 	
 	[JsonPropertyName("type")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
-	[Newtonsoft.Json.JsonProperty("type")]
-	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	public override FieldType Type => FieldType.tags;
 	
 	[JsonPropertyName("minCount")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("minCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MinCount
 	{
 		get;
@@ -33,7 +30,6 @@ public class TagsFieldInfo : FieldInfo<string[]>
 	
 	[JsonPropertyName("maxCount")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maxCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MaxCount
 	{
 		get;
@@ -50,7 +46,6 @@ public class TagsFieldInfo : FieldInfo<string[]>
 	
 	[JsonPropertyName("minLength")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("minLength", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MinLength
 	{
 		get;
@@ -67,7 +62,6 @@ public class TagsFieldInfo : FieldInfo<string[]>
 	
 	[JsonPropertyName("maxLength")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maxLength", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MaxLength
 	{
 		get;

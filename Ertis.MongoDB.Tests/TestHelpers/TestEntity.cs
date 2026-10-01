@@ -2,6 +2,10 @@ using Ertis.Data.Models;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 namespace Ertis.MongoDB.Tests.TestHelpers;
 
 [BsonIgnoreExtraElements]

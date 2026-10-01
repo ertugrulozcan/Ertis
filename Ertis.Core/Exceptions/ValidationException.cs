@@ -2,6 +2,7 @@ using System.Net;
 
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 namespace Ertis.Core.Exceptions;
 
 public class ValidationException : ErtisException

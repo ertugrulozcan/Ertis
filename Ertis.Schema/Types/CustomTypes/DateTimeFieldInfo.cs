@@ -16,19 +16,15 @@ public class DateTimeFieldInfo : DateTimeFieldInfoBase
 	
 	[JsonPropertyName("type")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
-	[Newtonsoft.Json.JsonProperty("type")]
-	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	public override FieldType Type => FieldType.datetime;
 	
 	[JsonIgnore]
-	[Newtonsoft.Json.JsonIgnore]
 	protected override string StringFormat => STRING_FORMAT;
 	
 	/// <summary>
 	/// ISO 8601 date times with 'Z', with an offset or without an offset (UTC), with or without fractional seconds
 	/// </summary>
 	[JsonIgnore]
-	[Newtonsoft.Json.JsonIgnore]
 	protected override string[] AcceptedFormats => ACCEPTED_FORMATS;
 	
 	#endregion

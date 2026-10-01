@@ -4,7 +4,6 @@ using System.Net.Http.Headers;
 // ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.Net.Http;
 
-[Obsolete("This class uses Newtonsoft library for json serialization and is no longer supported. Please use SystemJsonRequestBody.")]
 public class JsonRequestBody : IRequestBody
 {
 	#region Properties
@@ -13,12 +12,15 @@ public class JsonRequestBody : IRequestBody
 	
 	public BodyTypes Type => BodyTypes.Json;
 	
-	public string? Json => 
+	/// <summary>
+	/// The serialized payload; a string payload is the json itself
+	/// </summary>
+	public string? Json =>
 		this.Payload switch
 		{
 			null => null,
-			string => this.Payload.ToString(),
-			_ => Newtonsoft.Json.JsonConvert.SerializeObject(this.Payload)
+			string json => json,
+			_ => System.Text.Json.JsonSerializer.Serialize(this.Payload)
 		};
 	
 	#endregion
@@ -46,7 +48,7 @@ public class JsonRequestBody : IRequestBody
 			var buffer = System.Text.Encoding.UTF8.GetBytes(json);
 			var content = new ByteArrayContent(buffer);
 			content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-			return content;
+			return content;	
 		}
 		else
 		{

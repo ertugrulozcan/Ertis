@@ -18,8 +18,6 @@ public class UriFieldInfo : StringFieldInfo
 	
 	#region Properties
 	
-	[Newtonsoft.Json.JsonProperty("type")]
-	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	[JsonPropertyName("type")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
 	public override FieldType Type => FieldType.uri;

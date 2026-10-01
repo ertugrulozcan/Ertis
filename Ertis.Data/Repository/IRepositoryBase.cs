@@ -4,6 +4,7 @@ using Ertis.Data.Models;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMemberInSuper.Global
+// ReSharper disable UnusedMethodReturnValue.Global
 namespace Ertis.Data.Repository;
 
 public interface IRepositoryBase<TEntity, in TIdentifier>

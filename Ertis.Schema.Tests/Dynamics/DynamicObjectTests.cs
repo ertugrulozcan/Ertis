@@ -4,6 +4,7 @@ using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
 using Ertis.Schema.Tests.TestHelpers;
 
+// ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.Schema.Tests.Dynamics;
 
 public class DynamicObjectTests

@@ -4,6 +4,7 @@ using Ertis.Schema.Exceptions;
 using Ertis.Schema.Types.Primitives;
 using Ertis.Schema.Validation;
 
+// ReSharper disable UnusedMemberInSuper.Global
 namespace Ertis.Schema.Types.CustomTypes;
 
 public interface IDateTimeFieldInfo
@@ -12,12 +13,10 @@ public interface IDateTimeFieldInfo
 	
 	[JsonPropertyName("minValue")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("minValue", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public DateTime? MinValue { get; init; }
 	
 	[JsonPropertyName("maxValue")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maxValue", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public DateTime? MaxValue { get; init; }
 	
 	#endregion
@@ -28,14 +27,12 @@ public abstract class DateTimeFieldInfoBase : StringFieldInfo, IDateTimeFieldInf
 	#region Abstract Properties
 	
 	[JsonIgnore]
-	[Newtonsoft.Json.JsonIgnore]
 	protected abstract string StringFormat { get; }
 	
 	/// <summary>
 	/// The formats accepted in the string values (StringFormat by default)
 	/// </summary>
 	[JsonIgnore]
-	[Newtonsoft.Json.JsonIgnore]
 	protected virtual string[] AcceptedFormats => [this.StringFormat];
 	
 	#endregion
@@ -44,7 +41,6 @@ public abstract class DateTimeFieldInfoBase : StringFieldInfo, IDateTimeFieldInf
 	
 	[JsonPropertyName("minValue")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("minValue", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public DateTime? MinValue
 	{
 		get;
@@ -61,7 +57,6 @@ public abstract class DateTimeFieldInfoBase : StringFieldInfo, IDateTimeFieldInf
 	
 	[JsonPropertyName("maxValue")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maxValue", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public DateTime? MaxValue
 	{
 		get;

@@ -3,6 +3,7 @@ using Ertis.Schema.Exceptions;
 using Ertis.Schema.Helpers;
 using Ertis.Schema.Validation;
 
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 namespace Ertis.Schema.Types.Primitives;
 
 public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
@@ -11,8 +12,6 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
 	
 	[JsonPropertyName("type")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
-	[Newtonsoft.Json.JsonProperty("type")]
-	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	public override FieldType Type => FieldType.integer;
 	
 	/// <summary>
@@ -20,7 +19,6 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
 	/// </summary>
 	[JsonPropertyName("minimum")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("minimum", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? Minimum
 	{
 		get;
@@ -40,7 +38,6 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
 	/// </summary>
 	[JsonPropertyName("maximum")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maximum", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? Maximum
 	{
 		get;
@@ -60,7 +57,6 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
 	/// </summary>
 	[JsonPropertyName("exclusiveMinimum")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("exclusiveMinimum", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? ExclusiveMinimum
 	{
 		get;
@@ -80,7 +76,6 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
 	/// </summary>
 	[JsonPropertyName("exclusiveMaximum")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("exclusiveMaximum", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? ExclusiveMaximum
 	{
 		get;
@@ -100,7 +95,6 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
 	/// </summary>
 	[JsonPropertyName("multipleOf")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("multipleOf", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MultipleOf
 	{
 		get;
@@ -117,7 +111,6 @@ public class IntegerFieldInfo : FieldInfo<long?>, IPrimitiveType
 	
 	[JsonPropertyName("isUnique")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("isUnique", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
 	public bool IsUnique { get; set; }
 	
 	#endregion

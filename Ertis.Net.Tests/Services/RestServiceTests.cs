@@ -1,9 +1,9 @@
-using Ertis.Core.Models.Response;
 using Ertis.Net.Http;
 using Ertis.Net.Rest;
 using Ertis.Net.Services;
 using NSubstitute;
 
+// ReSharper disable MethodHasAsyncOverloadWithCancellation
 namespace Ertis.Net.Tests.Services;
 
 public class RestServiceTests

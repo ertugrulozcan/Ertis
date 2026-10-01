@@ -1,5 +1,8 @@
 using BenchmarkDotNet.Attributes;
 
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 namespace Ertis.ImageProcessing.Benchmarks;
 
 /// <summary>

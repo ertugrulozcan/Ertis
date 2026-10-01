@@ -20,7 +20,7 @@ public class OptionTests
 	[InlineData("manual", ResizeModeEnum.Manual)]
 	public void ResizeMode_Parse_ReturnsTheMode(string key, ResizeModeEnum expected)
 	{
-		Assert.Equal(expected, (ResizeModeEnum) Ertis.ImageProcessing.ResizeMode.Parse(key)!);
+		Assert.Equal(expected, (ResizeModeEnum) ResizeMode.Parse(key)!);
 	}
 	
 	[Theory]
@@ -56,7 +56,7 @@ public class OptionTests
 	[InlineData("")]
 	public void Parse_WithAnUnknownKey_ReturnsNull(string key)
 	{
-		Assert.Null(Ertis.ImageProcessing.ResizeMode.Parse(key));
+		Assert.Null(ResizeMode.Parse(key));
 		Assert.Null(Anchor.Parse(key));
 		Assert.Null(SamplerAlgorithm.Parse(key));
 	}

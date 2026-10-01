@@ -37,6 +37,7 @@ public static class SampleImages
 	
 	#region Properties
 	
+	// ReSharper disable once MemberCanBePrivate.Global
 	public static string Folder => Environment.GetEnvironmentVariable("ERTIS_BENCHMARK_ASSETS") ?? Path.Combine(Path.GetTempPath(), "ertis-benchmark-assets");
 	
 	#endregion

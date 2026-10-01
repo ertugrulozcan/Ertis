@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 
+// ReSharper disable UnusedMemberInSuper.Global
 namespace Ertis.Schema.Types;
 
 public interface IHasDefault
@@ -17,7 +18,6 @@ public interface IHasDefault<out T>
 	
 	[JsonPropertyName("defaultValue")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-	[Newtonsoft.Json.JsonProperty("defaultValue", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore, DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore)]
 	T? DefaultValue { get; }
 	
 	#endregion

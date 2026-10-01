@@ -4,6 +4,7 @@ using Ertis.Schema.Exceptions;
 using Ertis.Schema.Models;
 using Ertis.Schema.Validation;
 
+// ReSharper disable UnusedMember.Global
 namespace Ertis.Schema.Types.CustomTypes;
 
 public class RichTextFieldInfo : StringFieldInfo
@@ -12,13 +13,10 @@ public class RichTextFieldInfo : StringFieldInfo
 	
 	[JsonPropertyName("type")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
-	[Newtonsoft.Json.JsonProperty("type")]
-	[Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
 	public override FieldType Type => FieldType.richtext;
 	
 	[JsonPropertyName("minWordCount")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("minWordCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MinWordCount
 	{
 		get;
@@ -35,7 +33,6 @@ public class RichTextFieldInfo : StringFieldInfo
 	
 	[JsonPropertyName("maxWordCount")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("maxWordCount", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? MaxWordCount
 	{
 		get;
@@ -52,12 +49,10 @@ public class RichTextFieldInfo : StringFieldInfo
 	
 	[JsonPropertyName("embeddedImageRules")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("embeddedImageRules", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public ResolutionRules? EmbeddedImageRules { get; set; }
 	
 	[JsonPropertyName("embeddedImageMaxSize")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-	[Newtonsoft.Json.JsonProperty("embeddedImageMaxSize", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
 	public int? EmbeddedImageMaxSize { get; set; }
 	
 	#endregion

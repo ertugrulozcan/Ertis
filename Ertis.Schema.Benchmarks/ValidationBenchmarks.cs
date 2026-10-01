@@ -1,6 +1,5 @@
 using BenchmarkDotNet.Attributes;
 using Ertis.Schema.Validation;
-
 using DynamicObject = Ertis.Schema.Dynamics.DynamicObject;
 
 namespace Ertis.Schema.Benchmarks;

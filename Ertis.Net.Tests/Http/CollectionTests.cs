@@ -1,4 +1,3 @@
-using System.Collections;
 using Ertis.Net.Http;
 using Ertis.Net.Tests.TestHelpers;
 
@@ -16,9 +15,9 @@ public class CollectionTests
 		Assert.Equal("a=2&b=x%20y", queryString.ToString());
 		Assert.True(queryString.ContainsKey("b"));
 		Assert.Equal(2, queryString.ToDictionary().Count);
-		Assert.Equal([2, (object) "x y"], queryString);
+		Assert.Equal([2, "x y"], queryString);
 		Assert.Equal("b=x%20y", queryString.Remove("a").ToString());
-		Assert.Single(((IEnumerable) queryString).Cast<KeyValuePair<string, object>>());
+		Assert.Single(queryString.Cast<KeyValuePair<string, object>>());
 	}
 	
 	[Fact]
@@ -66,12 +65,12 @@ public class CollectionTests
 		var headers = HeaderCollection.Create().Add("A", 1).Add(new KeyValuePair<string, object>("B", "x")).Add("A", 2);
 		
 		Assert.Equal(["A", "B"], headers.Keys);
-		Assert.Equal([2, (object) "x"], headers.Values);
+		Assert.Equal([2, "x"], headers.Values);
 		Assert.True(headers.ContainsKey("B"));
 		Assert.Equal(["x"], headers.Remove("A").Values);
 		Assert.Equal("B=x", headers.ToString());
-		Assert.Single(((IEnumerable) headers).Cast<KeyValuePair<string, object>>());
-		Assert.Equal(["x"], (IEnumerable<object>) headers);
+		Assert.Single(headers.Cast<KeyValuePair<string, object>>());
+		Assert.Equal(["x"], headers);
 	}
 	
 	[Fact]

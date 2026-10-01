@@ -9,6 +9,7 @@ using TextSearchOptions = Ertis.MongoDB.Queries.TextSearchOptions;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMemberInSuper.Global
+// ReSharper disable UnusedMethodReturnValue.Global
 namespace Ertis.MongoDB.Repository;
 
 public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where TEntity : IEntity<string>

@@ -37,6 +37,7 @@ public class ControllerExtensionsTests
 	{
 		var controller = TestQueryController.Create("""{ "where": { "a": 1 } }""");
 		
+		// ReSharper disable once MethodHasAsyncOverload
 		Assert.Equal(1, System.Text.Json.Nodes.JsonNode.Parse(controller.ExtractWhereQuery()!)!["a"]!.GetValue<int>());
 		Assert.Equal(1, System.Text.Json.Nodes.JsonNode.Parse((await controller.ExtractWhereQueryAsync(TestContext.Current.CancellationToken))!)!["a"]!.GetValue<int>());
 	}

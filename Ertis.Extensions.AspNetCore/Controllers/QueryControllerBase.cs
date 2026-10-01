@@ -1,6 +1,6 @@
 using Ertis.Core.Collections;
 using Ertis.Core.Exceptions;
-using Ertis.Core.Models.Response;
+using Ertis.Core.Models;
 using Ertis.Extensions.AspNetCore.Exceptions;
 using Ertis.Extensions.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +19,7 @@ public abstract class QueryControllerBase : ControllerBase
 		string? sortField, 
 		SortDirection? sortDirection,
 		IDictionary<string, bool> selectFields,
+		// ReSharper disable once UnusedParameter.Global
 		CancellationToken cancellationToken = default);
 	
 	[HttpPost("_query")]

@@ -888,7 +888,7 @@ public static class QueryBuilder
 	/// </summary>
 	private static string TrimRegexDelimiters(string regex)
 	{
-		return regex.Length >= 2 && regex[0] == '/' && regex[^1] == '/' ? regex[1..^1] : regex;
+		return regex is ['/', _, ..] && regex[^1] == '/' ? regex[1..^1] : regex;
 	}
 	
 	#endregion

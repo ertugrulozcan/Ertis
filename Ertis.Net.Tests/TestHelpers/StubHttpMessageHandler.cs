@@ -2,6 +2,8 @@ using System.Net;
 using System.Net.Http.Headers;
 using NSubstitute;
 
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 namespace Ertis.Net.Tests.TestHelpers;
 
 /// <summary>

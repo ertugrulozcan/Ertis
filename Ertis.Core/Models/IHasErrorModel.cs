@@ -1,10 +1,9 @@
 using System.Text.Json.Serialization;
 
-namespace Ertis.Core.Models.Response;
+namespace Ertis.Core.Models;
 
 public interface IHasErrorModel
 {
 	[JsonPropertyName("error")]
-	[Newtonsoft.Json.JsonProperty("error")]
 	ErrorModel Error { get; }
 }

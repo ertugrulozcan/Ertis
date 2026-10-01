@@ -2,7 +2,7 @@ using System.Net;
 using System.Text.Json.Nodes;
 using Ertis.Core.Collections;
 using Ertis.Core.Exceptions;
-using Ertis.Core.Models.Response;
+using Ertis.Core.Models;
 using Ertis.Extensions.AspNetCore.Tests.TestHelpers;
 using Microsoft.AspNetCore.Mvc;
 

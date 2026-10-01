@@ -13,17 +13,17 @@ public class MongoDbStatistics
 	[JsonPropertyName("collections")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[Newtonsoft.Json.JsonProperty("collections", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-	public int? CollectionCount { get; set; }
+	public long? CollectionCount { get; set; }
 	
 	[JsonPropertyName("views")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[Newtonsoft.Json.JsonProperty("views", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-	public int? ViewCount { get; set; }
+	public long? ViewCount { get; set; }
 	
 	[JsonPropertyName("objects")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[Newtonsoft.Json.JsonProperty("objects", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-	public int? ObjectCount { get; set; }
+	public long? ObjectCount { get; set; }
 	
 	[JsonPropertyName("avgObjSize")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -43,7 +43,7 @@ public class MongoDbStatistics
 	[JsonPropertyName("indexes")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	[Newtonsoft.Json.JsonProperty("indexes", NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-	public int? IndexCount { get; set; }
+	public long? IndexCount { get; set; }
 	
 	[JsonPropertyName("indexSize")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

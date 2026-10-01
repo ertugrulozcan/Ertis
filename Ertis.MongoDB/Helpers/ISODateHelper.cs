@@ -7,29 +7,22 @@ namespace Ertis.MongoDB.Helpers;
 
 public static class ISODateHelper
 {
+	#region Fields
+	
+	private static readonly string[] DateFormats =
+	[
+		"yyyy-MM-dd'T'HH:mm:ss.FFFFFFFK",
+		"yyyy-MM-dd'T'HH:mmK",
+		"yyyy-MM-dd"
+	];
+	
+	#endregion
+	
 	#region Methods
 	
 	public static string? EnsureDatetimeFieldsToISODate(string json)
 	{
-		if (string.IsNullOrEmpty(json))
-		{
-			return json;
-		}
-		
-		try
-		{
-			var root = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
-			if (root is JToken jToken)
-			{
-				return EnsureDatetimeFieldsToISODate(jToken)?.ToString();	
-			}
-			
-			return json;
-		}
-		catch
-		{
-			return json;
-		}
+		return QueryHelper.Ensure(json, convertObjectIds: false, convertDates: true);
 	}
 	
 	public static JToken? EnsureDatetimeFieldsToISODate(JToken? node)
@@ -66,32 +59,12 @@ public static class ISODateHelper
 		}
 	}
 	
+	/// <summary>
+	/// Parses an ISO 8601 date (with or without the time); the result is in UTC, a value without an offset is taken as UTC
+	/// </summary>
 	public static bool TryParseDateTime(string dateTimeString, out DateTime dateTime)
 	{
-		if (DateTime.TryParseExact(dateTimeString, "yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out dateTime))
-		{
-			return true;
-		}
-		else
-		{
-			var availableFormats = new[]
-			{
-				"yyyy-MM-ddTHH:mm:ss.fffZ",
-				"yyyy-MM-ddTHH:mm:ssZ",
-				"dd/MM/yyyy HH:mm:ssZ"
-			};
-			
-			foreach (var pattern in availableFormats)
-			{
-				if (DateTime.TryParse(dateTimeString, new DateTimeFormatInfo { LongTimePattern = pattern }, out dateTime))
-				{
-					return true;
-				}
-			}
-			
-			dateTime = new DateTime();
-			return false;
-		}
+		return DateTime.TryParseExact(dateTimeString, DateFormats, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out dateTime);
 	}
 	
 	#endregion

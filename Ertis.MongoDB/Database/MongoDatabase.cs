@@ -3,7 +3,6 @@ using Ertis.MongoDB.Client;
 using Ertis.MongoDB.Configuration;
 using Ertis.MongoDB.Models;
 using MongoDB.Bson;
-using MongoDB.Bson.IO;
 using MongoDB.Driver;
 using MongoDriver = MongoDB.Driver;
 
@@ -73,16 +72,12 @@ public class MongoDatabase : IMongoDatabase
 				Filter = new ExpressionFilterDefinition<BsonDocument>(filterExpression)
 			});
 			
-			var collectionNames = new List<string>();
-			result.ForEachAsync(collectionNames.Add);
-			return collectionNames;
+			return result.ToList();
 		}
 		else
 		{
 			var result = this.Database.ListCollectionNames();
-			var collectionNames = new List<string>();
-			result.ForEachAsync(collectionNames.Add);
-			return collectionNames;
+			return result.ToList();
 		}
 	}
 	
@@ -110,24 +105,43 @@ public class MongoDatabase : IMongoDatabase
 	
 	public MongoDbStatistics? GetDatabaseStatistics()
 	{
-		var resultDocument = this.GetDatabaseStatisticsDocument();
-		var json = resultDocument.ToJson(new JsonWriterSettings
-		{
-			OutputMode = JsonOutputMode.RelaxedExtendedJson
-		});
-		
-		return Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbStatistics>(json);
+		return ToStatistics(this.GetDatabaseStatisticsDocument());
 	}
 	
 	public async Task<MongoDbStatistics?> GetDatabaseStatisticsAsync(CancellationToken cancellationToken = default)
 	{
-		var resultDocument = await this.GetDatabaseStatisticsDocumentAsync(cancellationToken: cancellationToken);
-		var json = resultDocument.ToJson(new JsonWriterSettings
+		return ToStatistics(await this.GetDatabaseStatisticsDocumentAsync(cancellationToken: cancellationToken));
+	}
+	
+	private static MongoDbStatistics ToStatistics(BsonDocument document)
+	{
+		return new MongoDbStatistics
 		{
-			OutputMode = JsonOutputMode.RelaxedExtendedJson
-		});
-		
-		return Newtonsoft.Json.JsonConvert.DeserializeObject<MongoDbStatistics>(json);
+			DatabaseName = document.TryGetValue("db", out var databaseName) && databaseName.IsString ? databaseName.AsString : null,
+			CollectionCount = GetInt64(document, "collections"),
+			ViewCount = GetInt64(document, "views"),
+			ObjectCount = GetInt64(document, "objects"),
+			AverageObjectSize = GetDouble(document, "avgObjSize"),
+			DataSize = GetDouble(document, "dataSize"),
+			StorageSize = GetDouble(document, "storageSize"),
+			IndexCount = GetInt64(document, "indexes"),
+			IndexSize = GetDouble(document, "indexSize"),
+			TotalSize = GetDouble(document, "totalSize"),
+			ScaleFactor = GetDouble(document, "scaleFactor"),
+			FileStorageUsedSize = GetDouble(document, "fsUsedSize"),
+			FileStorageTotalSize = GetDouble(document, "fsTotalSize"),
+			State = GetDouble(document, "ok")
+		};
+	}
+	
+	private static long? GetInt64(BsonDocument document, string name)
+	{
+		return document.TryGetValue(name, out var value) && value.IsNumeric ? value.ToInt64() : null;
+	}
+	
+	private static double? GetDouble(BsonDocument document, string name)
+	{
+		return document.TryGetValue(name, out var value) && value.IsNumeric ? value.ToDouble() : null;
 	}
 	
 	public BsonDocument GetDatabaseStatisticsDocument()

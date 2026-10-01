@@ -12,25 +12,7 @@ public static class ObjectIdHelper
 	
 	public static string? EnsureObjectIds(string json)
 	{
-		if (string.IsNullOrEmpty(json))
-		{
-			return json;
-		}
-		
-		try
-		{
-			var root = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
-			if (root is JToken jToken)
-			{
-				return EnsureObjectIds(jToken)?.ToString();	
-			}
-			
-			return json;
-		}
-		catch
-		{
-			return json;
-		}
+		return QueryHelper.Ensure(json, convertObjectIds: true, convertDates: false);
 	}
 	
 	public static JToken? EnsureObjectIds(JToken? node)

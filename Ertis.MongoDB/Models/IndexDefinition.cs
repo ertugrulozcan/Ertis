@@ -224,7 +224,11 @@ public class TextIndexDefinition : IndexDefinitionBase
 	
 	public override IndexType Type => IndexType.Text;
 	
-	public override string Key => $"{string.Join('_', this.Fields)}_text";
+	/// <summary>
+	/// MongoDB's default name of the index (f1_text_f2_text) with the fields in alphabetical order:
+	/// MongoDB lists the fields of a text index (its weights) in alphabetical order, the order of the fields has no effect on a text index
+	/// </summary>
+	public override string Key => string.Join('_', this.Fields.Order(StringComparer.Ordinal).Select(x => $"{x}_text"));
 	
 	#endregion
 	

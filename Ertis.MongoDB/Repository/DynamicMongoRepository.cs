@@ -9,9 +9,6 @@ using Ertis.MongoDB.Exceptions;
 using Ertis.MongoDB.Helpers;
 using Ertis.MongoDB.Models;
 using MongoDB.Bson;
-using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using SortDirection = Ertis.Core.Collections.SortDirection;
 using UpdateOptions = Ertis.Data.Models.UpdateOptions;
@@ -380,8 +377,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
-		query = QueryHelper.EnsureObjectIdsAndISODates(query);
-		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+		var filterDefinition = QueryHelper.CreateFilterDefinition<dynamic>(query);
 		var sorting = string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection);
 		return this.Filter(filterDefinition, skip, limit, withCount, sorting, indexOptions, collationOptions);
 	}
@@ -396,8 +392,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
-		query = QueryHelper.EnsureObjectIdsAndISODates(query);
-		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+		var filterDefinition = QueryHelper.CreateFilterDefinition<dynamic>(query);
 		return this.Filter(filterDefinition, skip, limit, withCount, sorting, indexOptions, collationOptions);
 	}
 	
@@ -412,8 +407,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default)
 	{
-		query = QueryHelper.EnsureObjectIdsAndISODates(query);
-		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+		var filterDefinition = QueryHelper.CreateFilterDefinition<dynamic>(query);
 		var sorting = string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection);
 		return await this.FilterAsync(filterDefinition, skip, limit, withCount, sorting, indexOptions, collationOptions, cancellationToken: cancellationToken);
 	}
@@ -428,8 +422,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default)
 	{
-		query = QueryHelper.EnsureObjectIdsAndISODates(query);
-		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+		var filterDefinition = QueryHelper.CreateFilterDefinition<dynamic>(query);
 		return await this.FilterAsync(filterDefinition, skip, limit, withCount, sorting, indexOptions, collationOptions, cancellationToken: cancellationToken);
 	}
 	
@@ -447,7 +440,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		long totalCount = 0;
 		if (withCount != null && withCount.Value)
 		{
-			totalCount = this.Collection.CountDocuments(predicate);
+			totalCount = this.Count(predicate, indexOptions, collationOptions);
 		}
 		
 		return new PaginationCollection<dynamic>
@@ -472,7 +465,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		long totalCount = 0;
 		if (withCount != null && withCount.Value)
 		{
-			totalCount = await this.Collection.CountDocumentsAsync(predicate, cancellationToken: cancellationToken);
+			totalCount = await this.CountAsync(predicate, indexOptions, collationOptions, cancellationToken);
 		}
 		
 		return new PaginationCollection<dynamic>
@@ -534,19 +527,10 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	
 	private FindOptions GetFindOptions(IndexOptions? indexOptions = null, CollationOptions? collationOptions = null)
 	{
-		Collation? collation = null;
-		if (collationOptions is { Locale: not null })
-		{
-			collation = new Collation(
-				LocaleHelper.GetLanguageCode(collationOptions.Locale.Value),
-				strength: collationOptions.CaseInsensitive ? CollationStrength.Primary : null
-			);
-		}
-		
 		return new FindOptions
 		{
 			AllowDiskUse = this._settings.AllowDiskUse,
-			Collation = collation,
+			Collation = collationOptions?.GetCollation(),
 			Hint = indexOptions?.GetIndexHint()
 		};
 	}
@@ -565,32 +549,16 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
-		try
-		{
-			query = QueryHelper.EnsureObjectIdsAndISODates(query);
-			var filterDefinition = new JsonFilterDefinition<dynamic>(query);
-			return this.ExecuteQuery(
-				filterDefinition,
-				skip,
-				limit,
-				withCount,
-				sorting, 
-				selectFields, 
-				indexOptions,
-				collationOptions);
-		}
-		catch (MongoCommandException ex)
-		{
-			switch (ex.Code)
-			{
-				case 31249:
-					throw new SelectQueryPathCollisionException(ex);
-				case 31254:
-					throw new SelectQueryInclusionException(ex);
-				default:
-					throw;
-			}
-		}
+		var filterDefinition = QueryHelper.CreateFilterDefinition<dynamic>(query);
+		return this.ExecuteQuery(
+			filterDefinition,
+			skip,
+			limit,
+			withCount,
+			sorting, 
+			selectFields, 
+			indexOptions,
+			collationOptions);
 	}
 	
 	public IPaginationCollection<dynamic> Query(
@@ -625,31 +593,16 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
-		try
-		{
-			var filterDefinition = new ExpressionFilterDefinition<dynamic>(expression);
-			return this.ExecuteQuery(
-				filterDefinition,
-				skip,
-				limit,
-				withCount,
-				sorting,
-				selectFields, 
-				indexOptions,
-				collationOptions);
-		}
-		catch (MongoCommandException ex)
-		{
-			switch (ex.Code)
-			{
-				case 31249:
-					throw new SelectQueryPathCollisionException(ex);
-				case 31254:
-					throw new SelectQueryInclusionException(ex);
-				default:
-					throw;
-			}
-		}
+		var filterDefinition = new ExpressionFilterDefinition<dynamic>(expression);
+		return this.ExecuteQuery(
+			filterDefinition,
+			skip,
+			limit,
+			withCount,
+			sorting,
+			selectFields, 
+			indexOptions,
+			collationOptions);
 	}
 	
 	public IPaginationCollection<dynamic> Query(
@@ -685,33 +638,17 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		CollationOptions? collationOptions = null,
 		CancellationToken cancellationToken = default)
 	{
-		try
-		{
-			query = QueryHelper.EnsureObjectIdsAndISODates(query);
-			var filterDefinition = new JsonFilterDefinition<dynamic>(query);
-			return await this.ExecuteQueryAsync(
-				filterDefinition,
-				skip,
-				limit,
-				withCount,
-				sorting, 
-				selectFields, 
-				indexOptions,
-				collationOptions, 
-				cancellationToken: cancellationToken);
-		}
-		catch (MongoCommandException ex)
-		{
-			switch (ex.Code)
-			{
-				case 31249:
-					throw new SelectQueryPathCollisionException(ex);
-				case 31254:
-					throw new SelectQueryInclusionException(ex);
-				default:
-					throw;
-			}
-		}
+		var filterDefinition = QueryHelper.CreateFilterDefinition<dynamic>(query);
+		return await this.ExecuteQueryAsync(
+			filterDefinition,
+			skip,
+			limit,
+			withCount,
+			sorting, 
+			selectFields, 
+			indexOptions,
+			collationOptions, 
+			cancellationToken: cancellationToken);
 	}
 	
 	public async Task<IPaginationCollection<dynamic>> QueryAsync(
@@ -773,32 +710,17 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default)
 	{
-		try
-		{
-			var filterDefinition = new ExpressionFilterDefinition<dynamic>(expression);
-			return await this.ExecuteQueryAsync(
-				filterDefinition,
-				skip,
-				limit,
-				withCount,
-				sorting,
-				selectFields, 
-				indexOptions,
-				collationOptions, 
-				cancellationToken: cancellationToken);
-		}
-		catch (MongoCommandException ex)
-		{
-			switch (ex.Code)
-			{
-				case 31249:
-					throw new SelectQueryPathCollisionException(ex);
-				case 31254:
-					throw new SelectQueryInclusionException(ex);
-				default:
-					throw;
-			}
-		}
+		var filterDefinition = new ExpressionFilterDefinition<dynamic>(expression);
+		return await this.ExecuteQueryAsync(
+			filterDefinition,
+			skip,
+			limit,
+			withCount,
+			sorting,
+			selectFields, 
+			indexOptions,
+			collationOptions, 
+			cancellationToken: cancellationToken);
 	}
 	
 	private IPaginationCollection<dynamic> ExecuteQuery(
@@ -820,7 +742,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			long totalCount = 0;
 			if (withCount != null && withCount.Value)
 			{
-				totalCount = this.Collection.CountDocuments(filterDefinition);
+				totalCount = this.Count(filterDefinition, indexOptions, collationOptions);
 			}
 			
 			var documents = collection.ToList();
@@ -866,7 +788,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			long totalCount = 0;
 			if (withCount != null && withCount.Value)
 			{
-				totalCount = await this.Collection.CountDocumentsAsync(filterDefinition, cancellationToken: cancellationToken);
+				totalCount = await this.CountAsync(filterDefinition, indexOptions, collationOptions, cancellationToken);
 			}
 			
 			var documents = await collection.ToListAsync(cancellationToken: cancellationToken);
@@ -899,17 +821,15 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	public TField[] Distinct<TField>(string distinctBy, string? query = null)
 	{
 		FieldDefinition<dynamic, TField> fieldDefinition = new StringFieldDefinition<dynamic, TField>(distinctBy);
-		query = query != null ? QueryHelper.EnsureObjectIdsAndISODates(query) : query;
-		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+		var filterDefinition = QueryHelper.CreateFilterDefinition<dynamic>(query);
 		var cursor = this.Collection.Distinct(fieldDefinition, filterDefinition);
-		return cursor.Current.ToArray();
+		return cursor.ToList().ToArray();
 	}
 	
 	public async Task<TField[]> DistinctAsync<TField>(string distinctBy, string? query = null, CancellationToken cancellationToken = default)
 	{
 		FieldDefinition<dynamic, TField> fieldDefinition = new StringFieldDefinition<dynamic, TField>(distinctBy);
-		query = query != null ? QueryHelper.EnsureObjectIdsAndISODates(query) : query;
-		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+		var filterDefinition = QueryHelper.CreateFilterDefinition<dynamic>(query);
 		var cursor = await this.Collection.DistinctAsync(fieldDefinition, filterDefinition, cancellationToken: cancellationToken);
 		var result = await cursor.ToListAsync(cancellationToken: cancellationToken);
 		return result.ToArray();
@@ -932,7 +852,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		predicate ??= new ExpressionFilterDefinition<dynamic>(item => true);
 		FieldDefinition<dynamic, TField> fieldDefinition = new StringFieldDefinition<dynamic, TField>(distinctBy);
 		var cursor = this.Collection.Distinct(fieldDefinition, predicate);
-		return cursor.Current.ToArray();
+		return cursor.ToList().ToArray();
 	}
 	
 	private async Task<TField[]> DistinctCoreAsync<TField>(string distinctBy, FilterDefinition<dynamic>? predicate, CancellationToken cancellationToken = default)
@@ -1018,93 +938,84 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	
 	public void BulkInsert(IEnumerable<object> entities, InsertOptions? options = null)
 	{
-		var enumerable = entities as object[] ?? entities.ToArray();
-		
-		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
-		{
-			foreach (var entity in enumerable)
-			{
-				this._actionBinder.BeforeInsert(entity);	
-			}
-		}
-		
-		this.Collection.InsertMany(enumerable);
-		
-		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
-		{
-			foreach (var entity in enumerable)
-			{
-				this._actionBinder.AfterInsert(entity);	
-			}
-		}
+		var items = this.BeforeBulkInsert(entities, options);
+		this.InsertManyCore(items);
+		this.AfterBulkInsert(items, options);
 	}
 	
 	public async Task BulkInsertAsync(IEnumerable<object> entities, InsertOptions? options = null, CancellationToken cancellationToken = default)
 	{
-		var enumerable = entities as object[] ?? entities.ToArray();
-		
-		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
-		{
-			foreach (var entity in enumerable)
-			{
-				this._actionBinder.BeforeInsert(entity);	
-			}
-		}
-		
-		await this.Collection.InsertManyAsync(enumerable, cancellationToken: cancellationToken);
-		
-		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
-		{
-			foreach (var entity in enumerable)
-			{
-				this._actionBinder.AfterInsert(entity);	
-			}
-		}
+		var items = this.BeforeBulkInsert(entities, options);
+		await this.InsertManyCoreAsync(items, cancellationToken);
+		this.AfterBulkInsert(items, options);
 	}
 	
 	// ReSharper disable once UnusedMember.Global
 	public ICollection<dynamic> InsertMany(ICollection<object> entities, InsertOptions? options = null)
 	{
-		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
-		{
-			foreach (var entity in entities)
-			{
-				this._actionBinder.BeforeInsert(entity);	
-			}
-		}
-		
-		this.Collection.InsertMany(entities);
-		
-		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
-		{
-			foreach (var entity in entities)
-			{
-				this._actionBinder.AfterInsert(entity);	
-			}
-		}
-		
-		return entities;
+		var items = this.BeforeBulkInsert(entities, options);
+		this.InsertManyCore(items);
+		return this.AfterBulkInsert(items, options);
 	}
 	
 	// ReSharper disable once UnusedMember.Global
 	public async Task<ICollection<dynamic>> InsertManyAsync(ICollection<object> entities, InsertOptions? options = null, CancellationToken cancellationToken = default)
 	{
-		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
+		var items = this.BeforeBulkInsert(entities, options);
+		await this.InsertManyCoreAsync(items, cancellationToken);
+		return this.AfterBulkInsert(items, options);
+	}
+	
+	/// <summary>
+	/// The BsonDocuments are inserted into the document collection (the dynamic collection stores them wrapped as _t/_v), like Insert does
+	/// </summary>
+	private void InsertManyCore(object[] entities)
+	{
+		var documents = entities.OfType<BsonDocument>().ToArray();
+		var others = entities.Where(x => x is not BsonDocument).ToArray();
+		if (documents.Length > 0)
 		{
-			foreach (var entity in entities)
-			{
-				this._actionBinder.BeforeInsert(entity);	
-			}
+			this.DocumentCollection.InsertMany(documents);
 		}
 		
-		await this.Collection.InsertManyAsync(entities, cancellationToken: cancellationToken);
-		
-		if (this._actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
+		if (others.Length > 0)
 		{
-			foreach (var entity in entities)
-			{
-				this._actionBinder.AfterInsert(entity);	
-			}
+			this.Collection.InsertMany(others);
+		}
+	}
+	
+	private async Task InsertManyCoreAsync(object[] entities, CancellationToken cancellationToken)
+	{
+		var documents = entities.OfType<BsonDocument>().ToArray();
+		var others = entities.Where(x => x is not BsonDocument).ToArray();
+		if (documents.Length > 0)
+		{
+			await this.DocumentCollection.InsertManyAsync(documents, cancellationToken: cancellationToken);
+		}
+		
+		if (others.Length > 0)
+		{
+			await this.Collection.InsertManyAsync(others, cancellationToken: cancellationToken);
+		}
+	}
+	
+	private object[] BeforeBulkInsert(IEnumerable<object> entities, InsertOptions? options)
+	{
+		var actionBinder = this._actionBinder;
+		if (actionBinder != null && (options ?? InsertOptions.Default).TriggerBeforeActionBinder)
+		{
+			return entities.Select(x => actionBinder.BeforeInsert(x)).ToArray();
+		}
+		
+		return entities.ToArray();
+	}
+	
+	private object[] AfterBulkInsert(object[] entities, InsertOptions? options)
+	{
+		var actionBinder = this._actionBinder;
+		if (actionBinder != null && (options ?? InsertOptions.Default).TriggerAfterActionBinder)
+		{
+			return entities.Select(x => actionBinder.AfterInsert(x)).ToArray();
 		}
 		
 		return entities;
@@ -1226,42 +1137,40 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	{
 		var filterDefinition = new ExpressionFilterDefinition<dynamic>(expression);
 		var result = this.Collection.DeleteMany(filterDefinition);
-		return result.IsAcknowledged && result.DeletedCount == 1;
+		return result.IsAcknowledged;
 	}
 	
 	public async Task<bool> DeleteManyAsync(Expression<Func<dynamic, bool>> expression, CancellationToken cancellationToken = default)
 	{
 		var filterDefinition = new ExpressionFilterDefinition<dynamic>(expression);
 		var result = await this.Collection.DeleteManyAsync(filterDefinition, cancellationToken: cancellationToken);
-		return result.IsAcknowledged && result.DeletedCount == 1;
+		return result.IsAcknowledged;
 	}
 	
 	public bool DeleteMany(string query)
 	{
-		query = QueryHelper.EnsureObjectIdsAndISODates(query);
-		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+		var filterDefinition = QueryHelper.CreateFilterDefinition<dynamic>(query);
 		var result = this.Collection.DeleteMany(filterDefinition);
-		return result.IsAcknowledged && result.DeletedCount == 1;
+		return result.IsAcknowledged;
 	}
 	
 	public async Task<bool> DeleteManyAsync(string query, CancellationToken cancellationToken = default)
 	{
-		query = QueryHelper.EnsureObjectIdsAndISODates(query);
-		var filterDefinition = string.IsNullOrEmpty(query) ? FilterDefinition<dynamic>.Empty : new JsonFilterDefinition<dynamic>(query);
+		var filterDefinition = QueryHelper.CreateFilterDefinition<dynamic>(query);
 		var result = await this.Collection.DeleteManyAsync(filterDefinition, cancellationToken: cancellationToken);
-		return result.IsAcknowledged && result.DeletedCount == 1;
+		return result.IsAcknowledged;
 	}
 	
 	public bool Clear()
 	{
 		var result = this.Collection.DeleteMany(Builders<dynamic>.Filter.Empty);
-		return result.IsAcknowledged && result.DeletedCount == 1;
+		return result.IsAcknowledged;
 	}
 	
 	public async Task<bool> ClearAsync(CancellationToken cancellationToken = default)
 	{
 		var result = await this.Collection.DeleteManyAsync(Builders<dynamic>.Filter.Empty, cancellationToken: cancellationToken);
-		return result.IsAcknowledged && result.DeletedCount == 1;
+		return result.IsAcknowledged;
 	}
 	
 	#endregion
@@ -1314,41 +1223,37 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	
 	public long Count(string query)
 	{
-		query = QueryHelper.EnsureObjectIdsAndISODates(query);
-		var filterDefinition = new JsonFilterDefinition<dynamic>(query);
+		var filterDefinition = QueryHelper.CreateFilterDefinition<dynamic>(query);
 		return this.Count(filterDefinition);
 	}
 	
 	public long Count(string query, IndexOptions? indexOptions)
 	{
-		query = QueryHelper.EnsureObjectIdsAndISODates(query);
-		var filterDefinition = new JsonFilterDefinition<dynamic>(query);
+		var filterDefinition = QueryHelper.CreateFilterDefinition<dynamic>(query);
 		return this.Count(filterDefinition, indexOptions);
 	}
 	
 	public async Task<long> CountAsync(string query, CancellationToken cancellationToken = default)
 	{
-		query = QueryHelper.EnsureObjectIdsAndISODates(query);
-		var filterDefinition = new JsonFilterDefinition<dynamic>(query);
+		var filterDefinition = QueryHelper.CreateFilterDefinition<dynamic>(query);
 		return await this.CountAsync(filterDefinition, cancellationToken: cancellationToken);
 	}
 	
 	public async Task<long> CountAsync(string query, IndexOptions? indexOptions = null, CancellationToken cancellationToken = default)
 	{
-		query = QueryHelper.EnsureObjectIdsAndISODates(query);
-		var filterDefinition = new JsonFilterDefinition<dynamic>(query);
+		var filterDefinition = QueryHelper.CreateFilterDefinition<dynamic>(query);
 		return await this.CountAsync(filterDefinition, indexOptions, cancellationToken: cancellationToken);
 	}
 	
-	private long Count(FilterDefinition<dynamic> filterDefinition, IndexOptions? indexOptions = null)
+	private long Count(FilterDefinition<dynamic> filterDefinition, IndexOptions? indexOptions = null, CollationOptions? collationOptions = null)
 	{
-		var countOptions = new CountOptions { Hint = indexOptions?.GetIndexHint() };
+		var countOptions = new CountOptions { Hint = indexOptions?.GetIndexHint(), Collation = collationOptions?.GetCollation() };
 		return this.Collection.CountDocuments(filterDefinition, countOptions);
 	}
 	
-	private async Task<long> CountAsync(FilterDefinition<dynamic> filterDefinition, IndexOptions? indexOptions = null, CancellationToken cancellationToken = default)
+	private async Task<long> CountAsync(FilterDefinition<dynamic> filterDefinition, IndexOptions? indexOptions = null, CollationOptions? collationOptions = null, CancellationToken cancellationToken = default)
 	{
-		var countOptions = new CountOptions { Hint = indexOptions?.GetIndexHint() };
+		var countOptions = new CountOptions { Hint = indexOptions?.GetIndexHint(), Collation = collationOptions?.GetCollation() };
 		return await this.Collection.CountDocumentsAsync(filterDefinition, countOptions, cancellationToken: cancellationToken);
 	}
 	
@@ -1370,26 +1275,11 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	{
 		try
 		{
-			query = QueryHelper.EnsureObjectIdsAndISODates(query);
-			
-			using var jsonReader = new JsonReader(query);
-			var serializer = new BsonArraySerializer();
-			var bsonArray = serializer.Deserialize(BsonDeserializationContext.CreateRoot(jsonReader));
-			var bsonDocuments = bsonArray.Select(x => BsonDocument.Parse(x.ToString()));
-			var pipelineDefinition = PipelineDefinition<dynamic, BsonDocument>.Create(bsonDocuments);
-			
-			Collation? collation = null;
-			if (collationOptions is { Locale: not null })
-			{
-				collation = new Collation(
-					LocaleHelper.GetLanguageCode(collationOptions.Locale.Value),
-					strength: collationOptions.CaseInsensitive ? CollationStrength.Primary : null
-				);
-			}
+			var pipelineDefinition = QueryHelper.CreatePipelineDefinition<dynamic>(query);
 			
 			var aggregationOptions = new AggregateOptions
 			{
-				Collation = collation,
+				Collation = collationOptions?.GetCollation(),
 				Hint = indexOptions?.GetIndexHint()
 			};
 			
@@ -1416,26 +1306,11 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	{
 		try
 		{
-			query = QueryHelper.EnsureObjectIdsAndISODates(query);
-			
-			using var jsonReader = new JsonReader(query);
-			var serializer = new BsonArraySerializer();
-			var bsonArray = serializer.Deserialize(BsonDeserializationContext.CreateRoot(jsonReader));
-			var bsonDocuments = bsonArray.Select(x => BsonDocument.Parse(x.ToString()));
-			var pipelineDefinition = PipelineDefinition<dynamic, BsonDocument>.Create(bsonDocuments);
-			
-			Collation? collation = null;
-			if (collationOptions is { Locale: not null })
-			{
-				collation = new Collation(
-					LocaleHelper.GetLanguageCode(collationOptions.Locale.Value),
-					strength: collationOptions.CaseInsensitive ? CollationStrength.Primary : null
-				);
-			}
+			var pipelineDefinition = QueryHelper.CreatePipelineDefinition<dynamic>(query);
 			
 			var aggregationOptions = new AggregateOptions
 			{
-				Collation = collation,
+				Collation = collationOptions?.GetCollation(),
 				Hint = indexOptions?.GetIndexHint()
 			};
 			
@@ -1466,113 +1341,12 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	{
 		var indexesCursor = await this.Collection.Indexes.ListAsync(cancellationToken: cancellationToken);
 		var indexes = await indexesCursor.ToListAsync(cancellationToken: cancellationToken);
-		var indexDefinitions = new List<IIndexDefinition>();
-		foreach (var index in indexes)
-		{
-			if (index.Contains("key") && index["key"].IsBsonDocument)
-			{
-				var nodes = index["key"].AsBsonDocument.Elements.ToArray();
-				if (nodes.Length > 0)
-				{
-					if (nodes.Length == 1)
-					{
-						// Single index
-						var node = nodes[0];
-						indexDefinitions.Add(new SingleIndexDefinition(node.Name,
-							node.Value.IsInt32
-								? node.Value.AsInt32 == -1
-									? SortDirection.Descending
-									: SortDirection.Ascending
-								: null));
-					}
-					else
-					{
-						if (nodes.Any(x => x.Name == "_fts" && x.Value.AsString == "text"))
-						{
-							// Text index
-							if (index.Contains("name"))
-							{
-								var names = index["name"].AsString;
-								if (!string.IsNullOrEmpty(names))
-								{
-									var parts = names.Split('_');
-									if (parts.LastOrDefault() == "text")
-									{
-										var weightedFields = parts.SkipLast(1).ToDictionary(x => x, _ => 0);
-										if (weightedFields.Count != 0)
-										{
-											if (index.Contains("weights"))
-											{
-												var weights = index["weights"].AsBsonDocument;
-												foreach (var (field, _) in weightedFields)
-												{
-													if (weights.Contains(field) && weights[field].IsInt32)
-													{
-														var weight = weights[field].AsInt32;
-														weightedFields[field] = weight;
-													}
-												}
-											}
-											
-											IndexLocale? locale = null;
-											if (index.Contains("default_language"))
-											{
-												var defaultLocale = index["default_language"].AsString;
-												if (!string.IsNullOrEmpty(defaultLocale) && Enum.TryParse<IndexLocale>(defaultLocale, out var locale_))
-												{
-													locale = locale_;
-												}
-											}
-											
-											indexDefinitions.Add(new TextIndexDefinition(weightedFields, locale ?? IndexLocale.none));
-										}
-									}
-								}
-							}
-						}
-						else
-						{
-							// Compound index
-							var subIndexDefinitions = new List<SingleIndexDefinition>();
-							foreach (var node in nodes)
-							{
-								subIndexDefinitions.Add(new SingleIndexDefinition(node.Name,
-									node.Value.IsInt32
-										? node.Value.AsInt32 == -1
-											? SortDirection.Descending
-											: SortDirection.Ascending
-										: null));
-							}
-							
-							indexDefinitions.Add(new CompoundIndexDefinition(subIndexDefinitions.ToArray()));
-						}
-					}
-				}
-				else
-				{
-					return Enumerable.Empty<IIndexDefinition>();
-				}
-			}
-		}
-		
-		return indexDefinitions;
+		return IndexHelper.ToIndexDefinitions(indexes).ToArray();
 	}
 	
 	public async Task<string> CreateIndexAsync(IIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
 	{
-		switch (indexDefinition.Type)
-		{
-			case IndexType.Single:
-				return await this.CreateSingleIndexAsync((SingleIndexDefinition)indexDefinition, cancellationToken: cancellationToken);
-			case IndexType.Compound:
-				return await this.CreateCompoundIndexAsync((CompoundIndexDefinition)indexDefinition, cancellationToken: cancellationToken);
-			case IndexType.Text:
-				return await this.CreateTextIndexAsync((TextIndexDefinition)indexDefinition, cancellationToken: cancellationToken);
-			case IndexType.TTL:
-				return await this.CreateTTLIndexAsync((TTLIndexDefinition)indexDefinition, cancellationToken: cancellationToken);
-			default:
-				throw new ArgumentOutOfRangeException();
-		}
+		return await this.Collection.Indexes.CreateOneAsync(IndexHelper.ToIndexModel<dynamic>(indexDefinition), cancellationToken: cancellationToken);
 	}
 	
 	public async Task<string[]> CreateManyIndexAsync(IEnumerable<IIndexDefinition> indexDefinitions, CancellationToken cancellationToken = default)
@@ -1588,96 +1362,33 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	
 	public async Task<string> CreateSingleIndexAsync(string fieldName, SortDirection? direction = null, CancellationToken cancellationToken = default)
 	{
-		var indexKeysDefinition = direction is SortDirection.Descending ?
-			Builders<dynamic>.IndexKeys.Descending(fieldName) :
-			Builders<dynamic>.IndexKeys.Ascending(fieldName);
-		
-		return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(indexKeysDefinition), cancellationToken: cancellationToken);
+		return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(IndexHelper.GetKeys<dynamic>(fieldName, direction)), cancellationToken: cancellationToken);
 	}
 	
 	public async Task<string> CreateSingleIndexAsync(SingleIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
 	{
-		var indexKeysDefinition = indexDefinition.Direction is SortDirection.Descending ?
-			Builders<dynamic>.IndexKeys.Descending(indexDefinition.Field) :
-			Builders<dynamic>.IndexKeys.Ascending(indexDefinition.Field);
-		
-		return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(indexKeysDefinition, new CreateIndexOptions { Unique = indexDefinition.IsUnique }), cancellationToken: cancellationToken);
+		return await this.CreateIndexAsync(indexDefinition, cancellationToken: cancellationToken);
 	}
 	
 	public async Task<string> CreateTTLIndexAsync(TTLIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
 	{
-		var indexKeysDefinition = indexDefinition.Direction is SortDirection.Descending ?
-			Builders<dynamic>.IndexKeys.Descending(indexDefinition.Field) :
-			Builders<dynamic>.IndexKeys.Ascending(indexDefinition.Field);
-		
-		return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(indexKeysDefinition, new CreateIndexOptions { ExpireAfter = indexDefinition.ExpireAfter, Unique = indexDefinition.IsUnique }), cancellationToken: cancellationToken);
+		return await this.CreateIndexAsync(indexDefinition, cancellationToken: cancellationToken);
 	}
 	
 	public async Task<string> CreateCompoundIndexAsync(IDictionary<string, SortDirection> indexFieldDefinitions, CancellationToken cancellationToken = default)
 	{
-		var indexKeyDefinitions = new List<IndexKeysDefinition<dynamic>>();
-		foreach (var (fieldName, direction) in indexFieldDefinitions)
-		{
-			indexKeyDefinitions.Add(direction is SortDirection.Descending ?
-				Builders<dynamic>.IndexKeys.Descending(fieldName) :
-				Builders<dynamic>.IndexKeys.Ascending(fieldName));
-		}
-		
-		var combinedIndexDefinition = Builders<dynamic>.IndexKeys.Combine(indexKeyDefinitions);
+		var combinedIndexDefinition = Builders<dynamic>.IndexKeys.Combine(indexFieldDefinitions.Select(x => IndexHelper.GetKeys<dynamic>(x.Key, x.Value)));
 		return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(combinedIndexDefinition), cancellationToken: cancellationToken);
 	}
 	
 	public async Task<string> CreateCompoundIndexAsync(CompoundIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
 	{
-		var indexKeyDefinitions = new List<IndexKeysDefinition<dynamic>>();
-		foreach (var index in indexDefinition.Indexes)
-		{
-			indexKeyDefinitions.Add(index.Direction is SortDirection.Descending ?
-				Builders<dynamic>.IndexKeys.Descending(index.Field) :
-				Builders<dynamic>.IndexKeys.Ascending(index.Field));
-		}
-		
-		var combinedIndexDefinition = Builders<dynamic>.IndexKeys.Combine(indexKeyDefinitions);
-		return await this.Collection.Indexes.CreateOneAsync(new CreateIndexModel<dynamic>(combinedIndexDefinition, new CreateIndexOptions { Unique = indexDefinition.IsUnique }), cancellationToken: cancellationToken);
+		return await this.CreateIndexAsync(indexDefinition, cancellationToken: cancellationToken);
 	}
 	
 	public async Task<string> CreateTextIndexAsync(TextIndexDefinition indexDefinition, CancellationToken cancellationToken = default)
 	{
-		if (indexDefinition.WeightedFields != null && indexDefinition.WeightedFields.Count != 0)
-		{
-			var indexOptions = new CreateIndexOptions
-			{
-				Name = indexDefinition.Key,
-				DefaultLanguage = indexDefinition.Locale.ToString(),
-				Unique = indexDefinition.IsUnique
-			};
-			
-			var isWeighted = indexDefinition.WeightedFields.Any(x => x.Value > 1) && indexDefinition.WeightedFields.Count > 1;
-			if (isWeighted)
-			{
-				indexOptions.Weights = new BsonDocument(indexDefinition.WeightedFields);
-				var indexKeys = Builders<dynamic>.IndexKeys.Combine(indexDefinition.Fields.Select(field => Builders<dynamic>.IndexKeys.Text(field)));
-				var index = new CreateIndexModel<dynamic>(indexKeys, indexOptions);
-				return await this.Collection.Indexes.CreateOneAsync(index, cancellationToken: cancellationToken);
-			}
-			else if (indexDefinition.Fields.Length > 1)
-			{
-				var indexKeys = Builders<dynamic>.IndexKeys.Combine(indexDefinition.Fields.Select(field => Builders<dynamic>.IndexKeys.Text(field)));
-				var index = new CreateIndexModel<dynamic>(indexKeys, indexOptions);
-				return await this.Collection.Indexes.CreateOneAsync(index, cancellationToken: cancellationToken);
-			}
-			else
-			{
-				var field = indexDefinition.Fields.FirstOrDefault();
-				var indexKeys = Builders<dynamic>.IndexKeys.Text(field);
-				var index = new CreateIndexModel<dynamic>(indexKeys, indexOptions);
-				return await this.Collection.Indexes.CreateOneAsync(index, cancellationToken: cancellationToken);
-			}
-		}
-		else
-		{
-			throw new IndexException("No fields defined");
-		}
+		return await this.CreateIndexAsync(indexDefinition, cancellationToken: cancellationToken);
 	}
 	
 	#endregion

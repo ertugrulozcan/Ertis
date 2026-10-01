@@ -12,7 +12,16 @@ public class SystemJsonRequestBody : IRequestBody
 	
 	public BodyTypes Type => BodyTypes.Json;
 	
-	public string? Json => this.Payload == null ? null : System.Text.Json.JsonSerializer.Serialize(this.Payload);
+	/// <summary>
+	/// The serialized payload; a string payload is the json itself
+	/// </summary>
+	public string? Json =>
+		this.Payload switch
+		{
+			null => null,
+			string json => json,
+			_ => System.Text.Json.JsonSerializer.Serialize(this.Payload)
+		};
 	
 	#endregion
 	
@@ -33,9 +42,10 @@ public class SystemJsonRequestBody : IRequestBody
 	
 	public HttpContent GetHttpContent()
 	{
-		if (this.Json != null)
+		var json = this.Json;
+		if (json != null)
 		{
-			var buffer = System.Text.Encoding.UTF8.GetBytes(this.Json);
+			var buffer = System.Text.Encoding.UTF8.GetBytes(json);
 			var content = new ByteArrayContent(buffer);
 			content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 			return content;	

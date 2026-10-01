@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Globalization;
 
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
@@ -129,7 +130,7 @@ public class HttpQueryString : IQueryString
 		return string.Join("&", 
 			this.QueryDictionary
 				.Where(x => !string.IsNullOrEmpty(x.Key))
-				.Select(x => $"{x.Key}={Uri.EscapeDataString(x.Value.ToString() ?? "")}"));
+				.Select(x => $"{Uri.EscapeDataString(x.Key)}={Uri.EscapeDataString(Convert.ToString(x.Value, CultureInfo.InvariantCulture) ?? string.Empty)}"));
 	}
 	
 	public IEnumerator GetEnumerator()

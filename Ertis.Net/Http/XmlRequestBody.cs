@@ -23,7 +23,8 @@ public class XmlRequestBody : IRequestBody
 				return null;
 			}
 			
-			using var stringWriter = new StringWriter();
+			// The xml declares the encoding of the writer, the content is sent as UTF-8
+			using var stringWriter = new Utf8StringWriter();
 			using var xmlWriter = XmlWriter.Create(stringWriter);
 			var xmlSerializer = new XmlSerializer(this.Payload.GetType());
 			xmlSerializer.Serialize(xmlWriter, this.Payload);
@@ -50,9 +51,10 @@ public class XmlRequestBody : IRequestBody
 	
 	public HttpContent GetHttpContent()
 	{
-		if (this.Xml != null)
+		var xml = this.Xml;
+		if (xml != null)
 		{
-			var buffer = System.Text.Encoding.UTF8.GetBytes(this.Xml);
+			var buffer = System.Text.Encoding.UTF8.GetBytes(xml);
 			var content = new ByteArrayContent(buffer);
 			content.Headers.ContentType = new MediaTypeHeaderValue("application/xml");
 			return content;
@@ -61,6 +63,15 @@ public class XmlRequestBody : IRequestBody
 		{
 			return new StringContent(string.Empty);
 		}
+	}
+	
+	#endregion
+	
+	#region Helper Types
+	
+	private sealed class Utf8StringWriter : StringWriter
+	{
+		public override System.Text.Encoding Encoding => System.Text.Encoding.UTF8;
 	}
 	
 	#endregion

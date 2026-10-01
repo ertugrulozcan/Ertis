@@ -1,3 +1,8 @@
+using System.Collections.Frozen;
+using System.Globalization;
+using System.Net;
+using System.Text;
+using System.Text.Json;
 using Ertis.Core.Models.Response;
 using Ertis.Net.Http;
 
@@ -8,38 +13,10 @@ public class SystemRestHandler : ISystemRestHandler
 {
 	#region Constants
 	
-	private static readonly string[] DefaultHeaders = 
-	{
-		"Accept",
-		"Accept-Charset",
-		"Accept-Encoding",
-		"Accept-Language",
-		"Authorization",
-		"Cache-Control",
-		"Connection",
-		"Date",
-		"Expect",
-		"From",
-		"Host",
-		"If-Match",
-		"If-Modified-Since",
-		"If-None-Match",
-		"If-Range",
-		"If-Unmodified-Since",
-		"Max-Forwards",
-		"Pragma",
-		"Proxy-Authorization",
-		"Referrer",
-		"Range",
-		"Transfer-Encoding",
-		"Trailer",
-		"TE",
-		"Upgrade",
-		"Via",
-		"Warning"
-	};
-	
-	private static readonly string[] ContentHeaders = 
+	/// <summary>
+	/// The headers of the content (the other headers are the headers of the request)
+	/// </summary>
+	private static readonly FrozenSet<string> ContentHeaders = new[]
 	{
 		"Allow",
 		"Content-Disposition",
@@ -47,11 +24,12 @@ public class SystemRestHandler : ISystemRestHandler
 		"Content-Language",
 		"Content-Length",
 		"Content-Location",
+		"Content-MD5",
 		"Content-Range",
 		"Content-Type",
 		"Expires",
 		"Last-Modified"
-	};
+	}.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
 	
 	#endregion
 	
@@ -120,56 +98,24 @@ public class SystemRestHandler : ISystemRestHandler
 		IRequestBody? body = null,
 		CancellationToken cancellationToken = default)
 	{
-		var request = new HttpRequestMessage(method, url);
-		if (headers != null)
-		{
-			foreach (var (key, value) in headers.ToDictionary())
-			{
-				if (DefaultHeaders.Contains(key))
-				{
-					httpClient.DefaultRequestHeaders.Add(key, value.ToString());
-				}
-				else if (ContentHeaders.Contains(key))
-				{
-					request.Content?.Headers.Add(key, value.ToString());
-				}
-				else
-				{
-					request.Headers.Add(key, value.ToString());
-				}
-			}
-		}
-		
-		var httpContent = body?.GetHttpContent();
-		if (httpContent != null)
-		{
-			request.Content = httpContent;
-		}
-		
-		var response = await httpClient.SendAsync(request, cancellationToken: cancellationToken);
-		var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken: cancellationToken);
-		var json = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
-		var responseHeaders = response.Headers
-			.Where(x => x.Value.Any(y => !string.IsNullOrEmpty(y)))
-			.ToDictionary(x => x.Key, y => y.Value.First());
-		
-		if (response.IsSuccessStatusCode)
+		var response = await SendAsync(httpClient, method, url, headers, body, cancellationToken);
+		if (response.IsSuccess)
 		{
 			return new ResponseResult<TResult>(response.StatusCode)
 			{
-				Json = json,
-				RawData = rawData,
-				Data = System.Text.Json.JsonSerializer.Deserialize<TResult>(json)!,
-				Headers = responseHeaders
+				Json = response.Json,
+				RawData = response.RawData,
+				Data = string.IsNullOrWhiteSpace(response.Json) ? default : JsonSerializer.Deserialize<TResult>(response.Json),
+				Headers = response.Headers
 			};
 		}
 		else
 		{
-			return new ResponseResult<TResult>(response.StatusCode, json)
+			return new ResponseResult<TResult>(response.StatusCode, response.Json)
 			{
-				Json = json,
-				RawData = rawData,
-				Headers = responseHeaders
+				Json = response.Json,
+				RawData = response.RawData,
+				Headers = response.Headers
 			};
 		}
 	}
@@ -195,7 +141,7 @@ public class SystemRestHandler : ISystemRestHandler
 	{
 		if (queryString != null && queryString.Any())
 		{
-			var url = $"{baseUrl}?{queryString}";
+			var url = AppendQueryString(baseUrl, queryString);
 			return this.ExecuteRequest<TResult>(httpClient, method, url, headers, body);
 		}
 		else
@@ -227,7 +173,7 @@ public class SystemRestHandler : ISystemRestHandler
 	{
 		if (queryString != null && queryString.Any())
 		{
-			var url = $"{baseUrl}?{queryString}";
+			var url = AppendQueryString(baseUrl, queryString);
 			return await this.ExecuteRequestAsync<TResult>(httpClient, method, url, headers, body, cancellationToken: cancellationToken);
 		}
 		else
@@ -275,55 +221,23 @@ public class SystemRestHandler : ISystemRestHandler
 		IRequestBody? body = null,
 		CancellationToken cancellationToken = default)
 	{
-		var request = new HttpRequestMessage(method, url);
-		var httpContent = body?.GetHttpContent();
-		if (httpContent != null)
-		{
-			request.Content = httpContent;
-		}
-		
-		if (headers != null)
-		{
-			foreach (var (key, value) in headers.ToDictionary())
-			{
-				if (DefaultHeaders.Contains(key))
-				{
-					httpClient.DefaultRequestHeaders.Add(key, value.ToString());
-				}
-				else if (ContentHeaders.Contains(key))
-				{
-					request.Content?.Headers.Add(key, value.ToString());
-				}
-				else
-				{
-					request.Headers.Add(key, value.ToString());	
-				}
-			}
-		}
-		
-		var response = await httpClient.SendAsync(request, cancellationToken: cancellationToken);
-		var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken: cancellationToken);
-		var json = await response.Content.ReadAsStringAsync(cancellationToken: cancellationToken);
-		var responseHeaders = response.Headers
-			.Where(x => x.Value.Any(y => !string.IsNullOrEmpty(y)))
-			.ToDictionary(x => x.Key, y => y.Value.First());
-		
-		if (response.IsSuccessStatusCode)
+		var response = await SendAsync(httpClient, method, url, headers, body, cancellationToken);
+		if (response.IsSuccess)
 		{
 			return new ResponseResult(response.StatusCode)
 			{
-				Json = json,
-				RawData = rawData,
-				Headers = responseHeaders
+				Json = response.Json,
+				RawData = response.RawData,
+				Headers = response.Headers
 			};
 		}
 		else
 		{
-			return new ResponseResult(response.StatusCode, json)
+			return new ResponseResult(response.StatusCode, response.Json)
 			{
-				Json = json,
-				RawData = rawData,
-				Headers = responseHeaders
+				Json = response.Json,
+				RawData = response.RawData,
+				Headers = response.Headers
 			};
 		}
 	}
@@ -349,7 +263,7 @@ public class SystemRestHandler : ISystemRestHandler
 	{
 		if (queryString != null && queryString.Any())
 		{
-			var url = $"{baseUrl}?{queryString}";
+			var url = AppendQueryString(baseUrl, queryString);
 			return this.ExecuteRequest(httpClient, method, url, headers, body);
 		}
 		else
@@ -381,7 +295,7 @@ public class SystemRestHandler : ISystemRestHandler
 	{
 		if (queryString != null && queryString.Any())
 		{
-			var url = $"{baseUrl}?{queryString}";
+			var url = AppendQueryString(baseUrl, queryString);
 			return await this.ExecuteRequestAsync(httpClient, method, url, headers, body, cancellationToken: cancellationToken);
 		}
 		else
@@ -389,6 +303,94 @@ public class SystemRestHandler : ISystemRestHandler
 			return await this.ExecuteRequestAsync(httpClient, method, baseUrl, headers, body, cancellationToken: cancellationToken);
 		}
 	}
+	
+	private static async Task<Response> SendAsync(
+		HttpClient httpClient, 
+		HttpMethod method, 
+		string url, 
+		IHeaderCollection? headers, 
+		IRequestBody? body,
+		CancellationToken cancellationToken)
+	{
+		using var request = CreateRequest(method, url, headers, body);
+		using var response = await httpClient.SendAsync(request, cancellationToken: cancellationToken);
+		var rawData = await response.Content.ReadAsByteArrayAsync(cancellationToken: cancellationToken);
+		var json = ReadString(rawData, response.Content.Headers.ContentType?.CharSet);
+		var responseHeaders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+		foreach (var (key, values) in response.Headers)
+		{
+			var value = values.FirstOrDefault(x => !string.IsNullOrEmpty(x));
+			if (value != null)
+			{
+				responseHeaders[key] = value;
+			}
+		}
+		
+		return new Response(response.IsSuccessStatusCode, response.StatusCode, rawData, json, responseHeaders);
+	}
+	
+	/// <summary>
+	/// The headers are added to the request (not to the client, which may be shared between the requests)
+	/// </summary>
+	private static HttpRequestMessage CreateRequest(HttpMethod method, string url, IHeaderCollection? headers, IRequestBody? body)
+	{
+		var request = new HttpRequestMessage(method, url);
+		var httpContent = body?.GetHttpContent();
+		if (httpContent != null)
+		{
+			request.Content = httpContent;
+		}
+		
+		if (headers != null)
+		{
+			foreach (var (key, value) in headers.ToDictionary())
+			{
+				var text = Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
+				if (ContentHeaders.Contains(key))
+				{
+					// The content headers are dropped for a request without content
+					request.Content?.Headers.Remove(key);
+					request.Content?.Headers.Add(key, text);
+				}
+				else
+				{
+					request.Headers.Add(key, text);
+				}
+			}
+		}
+		
+		return request;
+	}
+	
+	private static string ReadString(byte[] rawData, string? charSet)
+	{
+		var encoding = Encoding.UTF8;
+		if (!string.IsNullOrEmpty(charSet))
+		{
+			try
+			{
+				encoding = Encoding.GetEncoding(charSet.Trim('"'));
+			}
+			catch (ArgumentException)
+			{
+				// An unknown charset is read as UTF-8
+			}
+		}
+		
+		using var reader = new StreamReader(new MemoryStream(rawData), encoding, detectEncodingFromByteOrderMarks: true);
+		return reader.ReadToEnd();
+	}
+	
+	private static string AppendQueryString(string baseUrl, IQueryString queryString)
+	{
+		return $"{baseUrl}{(baseUrl.Contains('?') ? '&' : '?')}{queryString}";
+	}
+	
+	#endregion
+	
+	#region Helper Types
+	
+	private sealed record Response(bool IsSuccess, HttpStatusCode StatusCode, byte[] RawData, string Json, Dictionary<string, string> Headers);
 	
 	#endregion
 }

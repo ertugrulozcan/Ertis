@@ -46,7 +46,9 @@ public class Formatter
 				var value = ExtractData(placeHolder.Value, dataDictionary);
 				if (value != null)
 				{
-					stringBuilder.Append(value);
+					var text = value is IFormattable formattable ? formattable.ToString(null, this.Parser.Options.FormatProvider) : value.ToString() ?? string.Empty;
+					var valueEncoder = this.Parser.Options.ValueEncoder;
+					stringBuilder.Append(valueEncoder != null ? valueEncoder(text) : text);
 				}
 				else
 				{
@@ -85,7 +87,7 @@ public class Formatter
 		return this.Parser.Parse(template).ToArray();
 	}
 	
-	private static object? ExtractData(string? path, IDictionary<string, object> dictionary)
+	private static object? ExtractData(string? path, IDictionary<string, object?> dictionary)
 	{
 		if (string.IsNullOrEmpty(path))
 		{
@@ -100,7 +102,7 @@ public class Formatter
 			{
 				return dictionary[key];
 			}
-			else if (dictionary[key] is IDictionary<string, object> subDictionary)
+			else if (dictionary[key] is IDictionary<string, object?> subDictionary)
 			{
 				return ExtractData(string.Join(".", pathParts.Skip(1)), subDictionary);
 			}
@@ -117,21 +119,23 @@ public class Formatter
 					var fieldKey = key[..arrayStartIndex];
 					if (dictionary.TryGetValue(fieldKey, out var obj) && obj is IList array)
 					{
+						// A negative index counts from the end of the array (-1 is the last item)
 						if (index < 0)
 						{
-							index = array.Count - index;
+							index += array.Count;
 						}
 						
-						if (index > array.Count)
+						// An index out of the range is an undefined value
+						if (index < 0 || index >= array.Count)
 						{
-							throw new ArgumentOutOfRangeException(fieldKey, array, "The index parameter was greater than array length");
+							return null;
 						}
 						
 						if (pathParts.Length == 1)
 						{
 							return array[index];
 						}
-						else if (array[index] is IDictionary<string, object> subDictionary)
+						else if (array[index] is IDictionary<string, object?> subDictionary)
 						{
 							return ExtractData(string.Join(".", pathParts.Skip(1)), subDictionary);
 						}

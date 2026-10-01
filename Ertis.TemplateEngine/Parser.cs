@@ -88,8 +88,14 @@ public class Parser
 	private PlaceHolder? FindPlaceHolder(string template)
 	{
 		var startIndex = template.IndexOf(this.Options.OpenBrackets, StringComparison.Ordinal);
-		var endIndex = template.IndexOf(this.Options.CloseBrackets, StringComparison.Ordinal);
-		if (startIndex < 0 || endIndex < 0 || startIndex >= endIndex)
+		if (startIndex < 0)
+		{
+			return null;
+		}
+		
+		// The close brackets are searched after the open brackets (a close bracket in the raw text before a placeholder is not its end)
+		var endIndex = template.IndexOf(this.Options.CloseBrackets, startIndex + this.Options.OpenBrackets.Length, StringComparison.Ordinal);
+		if (endIndex < 0)
 		{
 			return null;
 		}

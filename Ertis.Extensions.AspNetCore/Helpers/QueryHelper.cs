@@ -26,7 +26,7 @@ public static class QueryHelper
 	/// Returns the fields of the 'select' node of the query body (1, true, "true" or a non-zero number includes a field, 0 or false excludes it)
 	/// </summary>
 	/// <exception cref="JsonException">The body is not a valid json</exception>
-	public static Dictionary<string, bool> ExtractSelectFields(dynamic body)
+	public static Dictionary<string, bool> ExtractProjection(dynamic body)
 	{
 		var fieldDictionary = new Dictionary<string, bool>();
 		

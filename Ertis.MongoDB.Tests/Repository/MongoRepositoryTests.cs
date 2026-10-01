@@ -238,7 +238,7 @@ public class MongoRepositoryTests(MongoDbContainerFixture fixture) : MongoTestBa
 		var (repository, _) = await this.SeedAsync();
 		var collation = new CollationOptions { Locale = Locale.English, CaseInsensitive = true };
 		
-		var result = await repository.QueryAsync("""{ "name": "JANE" }""", skip: null, limit: null, withCount: true, sorting: null, selectFields: null, indexOptions: null, collationOptions: collation, CancellationToken);
+		var result = await repository.QueryAsync("""{ "name": "JANE" }""", skip: null, limit: null, withCount: true, sorting: null, projection: null, indexOptions: null, collationOptions: collation, CancellationToken);
 		var found = await repository.FindAsync("""{ "name": "JANE" }""", skip: null, limit: null, withCount: true, sorting: null, indexOptions: null, collationOptions: collation, CancellationToken);
 		
 		Assert.Equal(2, result.Count);
@@ -301,12 +301,12 @@ public class MongoRepositoryTests(MongoDbContainerFixture fixture) : MongoTestBa
 	}
 	
 	[Fact]
-	public async Task Query_WithSelectFields_ProjectsTheDocuments()
+	public async Task Query_WithProjection_ProjectsTheDocuments()
 	{
 		var (repository, _) = await this.SeedAsync();
 		
-		var included = repository.Query("{}", skip: null, limit: null, withCount: null, orderBy: "age", sortDirection: null, selectFields: new Dictionary<string, bool> { ["name"] = true });
-		var excluded = await repository.QueryAsync(x => x.Age == 20, skip: null, limit: null, withCount: null, orderBy: null, sortDirection: null, selectFields: new Dictionary<string, bool> { ["tags"] = false, ["created_at"] = false }, cancellationToken: CancellationToken);
+		var included = repository.Query("{}", skip: null, limit: null, withCount: null, orderBy: "age", sortDirection: null, projection: new Dictionary<string, bool> { ["name"] = true });
+		var excluded = await repository.QueryAsync(x => x.Age == 20, skip: null, limit: null, withCount: null, orderBy: null, sortDirection: null, projection: new Dictionary<string, bool> { ["tags"] = false, ["created_at"] = false }, cancellationToken: CancellationToken);
 		
 		Assert.All(included.Items, x => Assert.Equal(["_id", "name"], ((Dictionary<string, object>) x).Keys.Order()));
 		Assert.Equal(["_id", "age", "name", "owner_id"], ((Dictionary<string, object>) Assert.Single(excluded.Items)).Keys.Order());
@@ -317,7 +317,7 @@ public class MongoRepositoryTests(MongoDbContainerFixture fixture) : MongoTestBa
 	{
 		var (repository, _) = await this.SeedAsync();
 		
-		await Assert.ThrowsAsync<SelectQueryInclusionException>(() => repository.QueryAsync("{}", skip: null, limit: null, withCount: null, orderBy: null, sortDirection: null, selectFields: new Dictionary<string, bool> { ["name"] = true, ["age"] = false }, cancellationToken: CancellationToken));
+		await Assert.ThrowsAsync<SelectQueryInclusionException>(() => repository.QueryAsync("{}", skip: null, limit: null, withCount: null, orderBy: null, sortDirection: null, projection: new Dictionary<string, bool> { ["name"] = true, ["age"] = false }, cancellationToken: CancellationToken));
 	}
 	
 	[Fact]
@@ -325,7 +325,7 @@ public class MongoRepositoryTests(MongoDbContainerFixture fixture) : MongoTestBa
 	{
 		var (repository, _) = await this.SeedAsync();
 		
-		Assert.Throws<SelectQueryPathCollisionException>(() => repository.Query("{}", skip: null, limit: null, withCount: null, orderBy: null, sortDirection: null, selectFields: new Dictionary<string, bool> { ["tags"] = true, ["tags.x"] = true }));
+		Assert.Throws<SelectQueryPathCollisionException>(() => repository.Query("{}", skip: null, limit: null, withCount: null, orderBy: null, sortDirection: null, projection: new Dictionary<string, bool> { ["tags"] = true, ["tags.x"] = true }));
 	}
 	
 	[Fact]

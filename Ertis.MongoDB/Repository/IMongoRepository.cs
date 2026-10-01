@@ -141,7 +141,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		string? orderBy = null, 
 		SortDirection? sortDirection = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null);
 	
@@ -152,7 +152,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		string? orderBy = null, 
 		SortDirection? sortDirection = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null);
 	
@@ -162,7 +162,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting? sorting = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null);
 	
@@ -172,7 +172,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting? sorting = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null);
 	
@@ -183,7 +183,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		string? orderBy = null, 
 		SortDirection? sortDirection = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null);
 	
@@ -194,7 +194,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		string? orderBy = null, 
 		SortDirection? sortDirection = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null);
 	
@@ -204,7 +204,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting? sorting = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null);
 	
@@ -214,7 +214,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting? sorting = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null);
 	
@@ -225,7 +225,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		string? orderBy = null, 
 		SortDirection? sortDirection = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default);
@@ -237,7 +237,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		string? orderBy = null, 
 		SortDirection? sortDirection = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default);
@@ -248,7 +248,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting? sorting = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default);
@@ -259,7 +259,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting? sorting = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default);
@@ -271,7 +271,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		string? orderBy = null, 
 		SortDirection? sortDirection = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default);
@@ -283,7 +283,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		bool? withCount = null, 
 		string? orderBy = null, 
 		SortDirection? sortDirection = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default);
@@ -294,7 +294,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting? sorting = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default);
@@ -305,7 +305,7 @@ public interface IMongoRepository<TEntity> : IRepository<TEntity, string> where 
 		int? limit = null, 
 		bool? withCount = null, 
 		Sorting? sorting = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default);

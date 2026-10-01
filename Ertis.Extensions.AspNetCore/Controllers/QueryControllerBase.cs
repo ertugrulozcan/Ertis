@@ -18,7 +18,7 @@ public abstract class QueryControllerBase : ControllerBase
 		bool? withCount, 
 		string? sortField, 
 		SortDirection? sortDirection,
-		IDictionary<string, bool> selectFields,
+		IDictionary<string, bool> projection,
 		// ReSharper disable once UnusedParameter.Global
 		CancellationToken cancellationToken = default);
 	
@@ -37,11 +37,11 @@ public abstract class QueryControllerBase : ControllerBase
 			
 			var body = await this.ExtractRequestBodyAsync(cancellationToken: cancellationToken);
 			string? whereQuery;
-			Dictionary<string, bool> selectFields;
+			Dictionary<string, bool> projection;
 			try
 			{
 				whereQuery = this.ExtractWhereQuery(body, body);
-				selectFields = Helpers.QueryHelper.ExtractSelectFields(body);
+				projection = Helpers.QueryHelper.ExtractProjection(body);
 			}
 			catch (System.Text.Json.JsonException ex)
 			{
@@ -49,7 +49,7 @@ public abstract class QueryControllerBase : ControllerBase
 			}
 			
 			this.ExtractSortingParameters(out var sortField, out var sortDirection);
-			var result = await this.GetDataAsync(whereQuery ?? string.Empty, skip, limit, withCount, sortField, sortDirection, selectFields, cancellationToken: cancellationToken);
+			var result = await this.GetDataAsync(whereQuery ?? string.Empty, skip, limit, withCount, sortField, sortDirection, projection, cancellationToken: cancellationToken);
 			
 			return this.Ok(result);
 		}

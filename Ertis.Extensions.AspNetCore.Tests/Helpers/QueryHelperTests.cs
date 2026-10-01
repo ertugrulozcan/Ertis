@@ -24,18 +24,18 @@ public class QueryHelperTests
 	}
 	
 	[Fact]
-	public void ExtractSelectFields_WithNull_ReturnsAnEmptyDictionary()
+	public void ExtractProjection_WithNull_ReturnsAnEmptyDictionary()
 	{
-		Assert.Empty(QueryHelper.ExtractSelectFields(null!));
+		Assert.Empty(QueryHelper.ExtractProjection(null!));
 	}
 	
 	[Theory]
 	[InlineData("""{ "select": [ "name" ] }""")]
 	[InlineData("""{ "where": {} }""")]
 	[InlineData("[1]")]
-	public void ExtractSelectFields_WithoutASelectObject_ReturnsAnEmptyDictionary(string body)
+	public void ExtractProjection_WithoutASelectObject_ReturnsAnEmptyDictionary(string body)
 	{
-		Assert.Empty(QueryHelper.ExtractSelectFields(body));
+		Assert.Empty(QueryHelper.ExtractProjection(body));
 	}
 	
 	[Theory]
@@ -54,11 +54,11 @@ public class QueryHelperTests
 	[InlineData("\"1\"", true)]
 	[InlineData("\"0\"", false)]
 	[InlineData("\"5\"", false)]
-	public void ExtractSelectFields_ReadsTheSelection(string jsonValue, bool expected)
+	public void ExtractProjection_ReadsTheSelection(string jsonValue, bool expected)
 	{
-		var selectFields = QueryHelper.ExtractSelectFields($$"""{ "select": { "field": {{jsonValue}} } }""");
+		var projection = QueryHelper.ExtractProjection($$"""{ "select": { "field": {{jsonValue}} } }""");
 		
-		Assert.Equal(expected, Assert.Contains("field", selectFields));
+		Assert.Equal(expected, Assert.Contains("field", projection));
 	}
 	
 	[Theory]
@@ -66,11 +66,11 @@ public class QueryHelperTests
 	[InlineData("null")]
 	[InlineData("{}")]
 	[InlineData("[]")]
-	public void ExtractSelectFields_WithAnUnsupportedValue_SkipsTheField(string jsonValue)
+	public void ExtractProjection_WithAnUnsupportedValue_SkipsTheField(string jsonValue)
 	{
-		var selectFields = QueryHelper.ExtractSelectFields($$"""{ "select": { "field": {{jsonValue}}, "other": 1 } }""");
+		var projection = QueryHelper.ExtractProjection($$"""{ "select": { "field": {{jsonValue}}, "other": 1 } }""");
 		
-		Assert.Equal(["other"], selectFields.Keys);
+		Assert.Equal(["other"], projection.Keys);
 	}
 	
 	[Theory]
@@ -89,7 +89,7 @@ public class QueryHelperTests
 	public void ExtractWhereQuery_WithAnEmptyBody_ReturnsNull(string body)
 	{
 		Assert.Null(QueryHelper.ExtractWhereQuery(body));
-		Assert.Empty(QueryHelper.ExtractSelectFields(body));
+		Assert.Empty(QueryHelper.ExtractProjection(body));
 	}
 	
 	[Fact]
@@ -123,11 +123,11 @@ public class QueryHelperTests
 	}
 	
 	[Fact]
-	public void ExtractSelectFields_WithARepeatedField_KeepsTheLastValue()
+	public void ExtractProjection_WithARepeatedField_KeepsTheLastValue()
 	{
-		var selectFields = QueryHelper.ExtractSelectFields("""{ "select": { "name": 1, "name": 0 } }""");
+		var projection = QueryHelper.ExtractProjection("""{ "select": { "name": 1, "name": 0 } }""");
 		
-		Assert.False(selectFields["name"]);
+		Assert.False(projection["name"]);
 	}
 	
 	#endregion

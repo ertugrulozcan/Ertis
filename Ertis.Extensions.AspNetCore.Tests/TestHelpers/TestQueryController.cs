@@ -26,7 +26,7 @@ public sealed class TestQueryController : QueryControllerBase
 	
 	public SortDirection? SortDirection { get; private set; }
 	
-	public IDictionary<string, bool>? SelectFields { get; private set; }
+	public IDictionary<string, bool>? Projection { get; private set; }
 	
 	/// <summary>
 	/// The exception thrown by the data request (e.g. a database error)
@@ -64,7 +64,7 @@ public sealed class TestQueryController : QueryControllerBase
 		bool? withCount,
 		string? sortField,
 		SortDirection? sortDirection,
-		IDictionary<string, bool> selectFields,
+		IDictionary<string, bool> projection,
 		CancellationToken cancellationToken = default)
 	{
 		this.ReceivedQuery = query;
@@ -73,7 +73,7 @@ public sealed class TestQueryController : QueryControllerBase
 		this.WithCount = withCount;
 		this.SortField = sortField;
 		this.SortDirection = sortDirection;
-		this.SelectFields = selectFields;
+		this.Projection = projection;
 		
 		if (this.DataException != null)
 		{

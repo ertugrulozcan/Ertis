@@ -49,13 +49,13 @@ public class QueryControllerBaseTests
 	}
 	
 	[Fact]
-	public async Task Query_WithASelectNode_PassesTheSelectFields()
+	public async Task Query_WithASelectNode_PassesTheProjection()
 	{
 		var controller = TestQueryController.Create("""{ "where": {}, "select": { "name": 1, "age": true, "secret": 0, "other": false, "ignored": "x" } }""");
 		
 		await controller.Query(TestContext.Current.CancellationToken);
 		
-		Assert.Equal(new Dictionary<string, bool> { ["name"] = true, ["age"] = true, ["secret"] = false, ["other"] = false }, controller.SelectFields);
+		Assert.Equal(new Dictionary<string, bool> { ["name"] = true, ["age"] = true, ["secret"] = false, ["other"] = false }, controller.Projection);
 	}
 	
 	[Fact]

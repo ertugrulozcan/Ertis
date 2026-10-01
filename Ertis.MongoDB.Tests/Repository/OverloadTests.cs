@@ -112,10 +112,10 @@ public class OverloadTests(MongoDbContainerFixture fixture) : MongoTestBase(fixt
 	{
 		var repository = await this.SeedRepositoryAsync();
 		
-		Assert.Throws<SelectQueryInclusionException>(() => repository.Query<TestEntity>("{}", selectFields: MixedProjection, skip: null, limit: null, withCount: null, sorting: null));
-		await Assert.ThrowsAsync<SelectQueryInclusionException>(() => repository.QueryAsync<TestEntity>("{}", selectFields: MixedProjection, skip: null, limit: null, withCount: null, sorting: null, cancellationToken: CancellationToken));
-		Assert.Throws<SelectQueryInclusionException>(() => repository.Query(x => true, selectFields: MixedProjection, skip: null, limit: null, withCount: null, sorting: null));
-		await Assert.ThrowsAsync<SelectQueryInclusionException>(() => repository.QueryAsync(x => true, selectFields: MixedProjection, skip: null, limit: null, withCount: null, sorting: null, cancellationToken: CancellationToken));
+		Assert.Throws<SelectQueryInclusionException>(() => repository.Query<TestEntity>("{}", projection: MixedProjection, skip: null, limit: null, withCount: null, sorting: null));
+		await Assert.ThrowsAsync<SelectQueryInclusionException>(() => repository.QueryAsync<TestEntity>("{}", projection: MixedProjection, skip: null, limit: null, withCount: null, sorting: null, cancellationToken: CancellationToken));
+		Assert.Throws<SelectQueryInclusionException>(() => repository.Query(x => true, projection: MixedProjection, skip: null, limit: null, withCount: null, sorting: null));
+		await Assert.ThrowsAsync<SelectQueryInclusionException>(() => repository.QueryAsync(x => true, projection: MixedProjection, skip: null, limit: null, withCount: null, sorting: null, cancellationToken: CancellationToken));
 		Assert.Throws<SelectQueryInclusionException>(() => repository.Aggregate("""[{ "$project": { "name": 1, "age": 0 } }]"""));
 		await Assert.ThrowsAsync<SelectQueryInclusionException>(() => repository.AggregateAsync("""[{ "$project": { "name": 1, "age": 0 } }]""", cancellationToken: CancellationToken));
 	}
@@ -222,7 +222,7 @@ public class OverloadTests(MongoDbContainerFixture fixture) : MongoTestBase(fixt
 		};
 		
 		Assert.All(results, x => Assert.Equal("b", ((Dictionary<string, object>) Assert.Single(x.Items))["name"]));
-		Assert.Throws<SelectQueryInclusionException>(() => repository.Query(x => true, selectFields: MixedProjection, skip: null, limit: null, withCount: null, sorting: null));
+		Assert.Throws<SelectQueryInclusionException>(() => repository.Query(x => true, projection: MixedProjection, skip: null, limit: null, withCount: null, sorting: null));
 		Assert.Throws<SelectQueryInclusionException>(() => repository.Aggregate("""[{ "$project": { "name": 1, "age": 0 } }]"""));
 		Assert.Equal(3, await repository.CountAsync(NoHint, CancellationToken));
 		Assert.Equal(3, await repository.CountAsync(x => true, NoHint, CancellationToken));

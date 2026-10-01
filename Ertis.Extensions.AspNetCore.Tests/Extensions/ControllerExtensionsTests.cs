@@ -56,13 +56,13 @@ public class ControllerExtensionsTests
 	#region Query String Methods
 	
 	[Fact]
-	public void ExtractSelectFieldsFromQuery_ReadsIncludeAndExclude()
+	public void ExtractProjectionFromQuery_ReadsIncludeAndExclude()
 	{
 		var controller = TestQueryController.Create("{}", "?include=name,age&exclude=secret,age");
 		
-		var selectFields = controller.ExtractSelectFieldsFromQuery();
+		var projection = controller.ExtractProjectionFromQuery();
 		
-		Assert.Equal(new Dictionary<string, bool> { ["name"] = true, ["age"] = false, ["secret"] = false }, selectFields);
+		Assert.Equal(new Dictionary<string, bool> { ["name"] = true, ["age"] = false, ["secret"] = false }, projection);
 	}
 	
 	[Theory]

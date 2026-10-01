@@ -213,7 +213,7 @@ public class DynamicMongoRepositoryTests(MongoDbContainerFixture fixture) : Mong
 		var (repository, _) = await this.SeedAsync();
 		var collation = new CollationOptions { Locale = Locale.English, CaseInsensitive = true };
 		
-		var result = await repository.QueryAsync("""{ "name": "JANE" }""", skip: null, limit: null, withCount: true, sorting: null, selectFields: null, indexOptions: null, collationOptions: collation, CancellationToken);
+		var result = await repository.QueryAsync("""{ "name": "JANE" }""", skip: null, limit: null, withCount: true, sorting: null, projection: null, indexOptions: null, collationOptions: collation, CancellationToken);
 		
 		Assert.Equal(2, result.Count);
 	}
@@ -223,7 +223,7 @@ public class DynamicMongoRepositoryTests(MongoDbContainerFixture fixture) : Mong
 	{
 		var (repository, ids) = await this.SeedAsync();
 		
-		var result = await repository.QueryAsync("""{ "age": 30 }""", skip: null, limit: null, withCount: true, orderBy: null, sortDirection: null, selectFields: new Dictionary<string, bool> { ["name"] = true }, cancellationToken: CancellationToken);
+		var result = await repository.QueryAsync("""{ "age": 30 }""", skip: null, limit: null, withCount: true, orderBy: null, sortDirection: null, projection: new Dictionary<string, bool> { ["name"] = true }, cancellationToken: CancellationToken);
 		var syncResult = repository.Query("""{ "age": { "$lt": 35 } }""", skip: null, limit: null, withCount: true, orderBy: "age", sortDirection: null);
 		
 		Assert.Equal(1, result.Count);
@@ -238,8 +238,8 @@ public class DynamicMongoRepositoryTests(MongoDbContainerFixture fixture) : Mong
 	{
 		var (repository, _) = await this.SeedAsync();
 		
-		await Assert.ThrowsAsync<SelectQueryInclusionException>(() => repository.QueryAsync("{}", skip: null, limit: null, withCount: null, orderBy: null, sortDirection: null, selectFields: new Dictionary<string, bool> { ["name"] = true, ["age"] = false }, cancellationToken: CancellationToken));
-		Assert.Throws<SelectQueryPathCollisionException>(() => repository.Query("{}", skip: null, limit: null, withCount: null, orderBy: null, sortDirection: null, selectFields: new Dictionary<string, bool> { ["tags"] = true, ["tags.x"] = true }));
+		await Assert.ThrowsAsync<SelectQueryInclusionException>(() => repository.QueryAsync("{}", skip: null, limit: null, withCount: null, orderBy: null, sortDirection: null, projection: new Dictionary<string, bool> { ["name"] = true, ["age"] = false }, cancellationToken: CancellationToken));
+		Assert.Throws<SelectQueryPathCollisionException>(() => repository.Query("{}", skip: null, limit: null, withCount: null, orderBy: null, sortDirection: null, projection: new Dictionary<string, bool> { ["tags"] = true, ["tags.x"] = true }));
 	}
 	
 	[Fact]

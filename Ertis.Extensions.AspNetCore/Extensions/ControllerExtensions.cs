@@ -72,15 +72,15 @@ public static class ControllerExtensions
 		return controller.ExtractWhereQuery(query);
 	}
 	
-	public static Dictionary<string, bool> ExtractSelectFieldsFromQuery(this ControllerBase controller, char separator = ',')
+	public static Dictionary<string, bool> ExtractProjectionFromQuery(this ControllerBase controller, char separator = ',')
 	{
-		var selectFields = new Dictionary<string, bool>();
+		var projection = new Dictionary<string, bool>();
 		if (controller.Request.Query.TryGetValue("include", out var includeValues))
 		{
 			var includeFields = includeValues.ToString().Split(separator);
 			foreach (var field in includeFields)
 			{
-				selectFields.Add(field, true);
+				projection.Add(field, true);
 			}
 		}
 		
@@ -89,11 +89,11 @@ public static class ControllerExtensions
 			var excludeFields = excludeValues.ToString().Split(separator);
 			foreach (var field in excludeFields)
 			{
-				selectFields[field] = false;
+				projection[field] = false;
 			}
 		}
 		
-		return selectFields;
+		return projection;
 	}
 	
 	public static void ExtractPaginationParameters(this ControllerBase controller, out int? skip, out int? limit, out bool withCount)

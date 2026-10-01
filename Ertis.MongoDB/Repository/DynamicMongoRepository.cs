@@ -546,7 +546,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		int? limit = null,
 		bool? withCount = null,
 		Sorting? sorting = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
@@ -556,8 +556,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			skip,
 			limit,
 			withCount,
-			sorting, 
-			selectFields, 
+			sorting,
+			projection, 
 			indexOptions,
 			collationOptions);
 	}
@@ -569,7 +569,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		bool? withCount = null, 
 		string? orderBy = null, 
 		SortDirection? sortDirection = null,
-		IDictionary<string, bool>? selectFields = null, 
+		IDictionary<string, bool>? projection = null, 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
@@ -578,8 +578,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			skip,
 			limit,
 			withCount,
-			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection), 
-			selectFields,
+			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection),
+			projection,
 			indexOptions,
 			collationOptions);
 	}
@@ -590,7 +590,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		int? limit = null,
 		bool? withCount = null,
 		Sorting? sorting = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
@@ -601,7 +601,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			limit,
 			withCount,
 			sorting,
-			selectFields, 
+			projection, 
 			indexOptions,
 			collationOptions);
 	}
@@ -613,7 +613,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		bool? withCount = null,
 		string? orderBy = null,
 		SortDirection? sortDirection = null,
-		IDictionary<string, bool>? selectFields = null, 
+		IDictionary<string, bool>? projection = null, 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
@@ -622,8 +622,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			skip,
 			limit,
 			withCount,
-			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection), 
-			selectFields,
+			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection),
+			projection,
 			indexOptions,
 			collationOptions);
 	}
@@ -634,7 +634,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		int? limit = null,
 		bool? withCount = null,
 		Sorting? sorting = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null,
 		CancellationToken cancellationToken = default)
@@ -645,8 +645,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			skip,
 			limit,
 			withCount,
-			sorting, 
-			selectFields, 
+			sorting,
+			projection, 
 			indexOptions,
 			collationOptions, 
 			cancellationToken: cancellationToken);
@@ -659,7 +659,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		bool? withCount = null, 
 		string? orderBy = null, 
 		SortDirection? sortDirection = null,
-		IDictionary<string, bool>? selectFields = null, 
+		IDictionary<string, bool>? projection = null, 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default)
@@ -669,8 +669,8 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			skip,
 			limit,
 			withCount,
-			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection), 
-			selectFields,
+			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection),
+			projection,
 			indexOptions,
 			collationOptions,
 			cancellationToken: cancellationToken);
@@ -683,7 +683,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		bool? withCount = null,
 		string? orderBy = null,
 		SortDirection? sortDirection = null,
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null,
 		CancellationToken cancellationToken = default)
@@ -694,7 +694,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			limit,
 			withCount,
 			string.IsNullOrEmpty(orderBy) ? null : new Sorting(orderBy, sortDirection),
-			selectFields,
+			projection,
 			indexOptions,
 			collationOptions,
 			cancellationToken: cancellationToken);
@@ -706,7 +706,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		int? limit = null,
 		bool? withCount = null,
 		Sorting? sorting = null, 
-		IDictionary<string, bool>? selectFields = null,
+		IDictionary<string, bool>? projection = null,
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default)
@@ -718,7 +718,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 			limit,
 			withCount,
 			sorting,
-			selectFields, 
+			projection, 
 			indexOptions,
 			collationOptions, 
 			cancellationToken: cancellationToken);
@@ -730,14 +730,14 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		int? limit = null,
 		bool? withCount = null,
 		Sorting? sorting = null, 
-		IDictionary<string, bool>? selectFields = null, 
+		IDictionary<string, bool>? projection = null, 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null)
 	{
 		try
 		{
 			var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, indexOptions, collationOptions);
-			var projectionDefinition = ExecuteSelectQuery<dynamic>(selectFields);
+			var projectionDefinition = ExecuteSelectQuery<dynamic>(projection);
 			var collection = filterResult.Project(projectionDefinition);
 			
 			long totalCount = 0;
@@ -775,7 +775,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		int? limit = null,
 		bool? withCount = null,
 		Sorting? sorting = null, 
-		IDictionary<string, bool>? selectFields = null, 
+		IDictionary<string, bool>? projection = null, 
 		IndexOptions? indexOptions = null,
 		CollationOptions? collationOptions = null, 
 		CancellationToken cancellationToken = default)
@@ -783,7 +783,7 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 		try
 		{
 			var filterResult = this.ExecuteFilter(filterDefinition, skip, limit, sorting, indexOptions, collationOptions);
-			var projectionDefinition = ExecuteSelectQuery<dynamic>(selectFields);
+			var projectionDefinition = ExecuteSelectQuery<dynamic>(projection);
 			var collection = filterResult.Project(projectionDefinition);
 			
 			long totalCount = 0;
@@ -869,14 +869,14 @@ public abstract class DynamicMongoRepository : IDynamicMongoRepository
 	
 	#region Select Methods
 	
-	private static ProjectionDefinition<T> ExecuteSelectQuery<T>(IDictionary<string, bool>? selectFields)
+	private static ProjectionDefinition<T> ExecuteSelectQuery<T>(IDictionary<string, bool>? projection)
 	{
-		if (selectFields != null && selectFields.Any())
+		if (projection != null && projection.Any())
 		{
 			var selectDefinition = Builders<T>.Projection.Include("_id");
-			var includedFields = selectFields.Where(x => x.Value);
+			var includedFields = projection.Where(x => x.Value);
 			selectDefinition = includedFields.Aggregate(selectDefinition, (current, field) => current.Include(field.Key));
-			var excludedFields = selectFields.Where(x => !x.Value);
+			var excludedFields = projection.Where(x => !x.Value);
 			selectDefinition = excludedFields.Aggregate(selectDefinition, (current, field) => current.Exclude(field.Key));
 			
 			return selectDefinition;

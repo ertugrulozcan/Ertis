@@ -1,3 +1,4 @@
+using System.Net;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.Formats.Bmp;
 using SixLabors.ImageSharp.Formats.Gif;
@@ -8,6 +9,8 @@ using SixLabors.ImageSharp.Formats.Tga;
 using SixLabors.ImageSharp.Formats.Tiff;
 using SixLabors.ImageSharp.Formats.Webp;
 
+using ImageProcessingException = Ertis.ImageProcessing.Exceptions.ImageProcessingException;
+
 namespace Ertis.ImageProcessing;
 
 public static class FormatEncoder
@@ -16,6 +19,11 @@ public static class FormatEncoder
 	
 	public static IImageEncoder GetDefaultFormatter(ImageFormat format, int? quality = null, int? level = null)
 	{
+		if (quality is < 1 or > 100 && format is ImageFormat.Jpeg or ImageFormat.Webp)
+		{
+			throw new ImageProcessingException(HttpStatusCode.BadRequest, "Quality must be between 1 and 100.", "InvalidQuality");
+		}
+		
 		return format switch
 		{
 			ImageFormat.Bmp => new BmpEncoder(),

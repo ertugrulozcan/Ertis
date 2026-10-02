@@ -22,7 +22,7 @@ public class QueryBuilderLogicalTests
 	{
 		var query = QueryBuilder.And(QueryBuilder.Equals("a", 1), QueryBuilder.Or(QueryBuilder.Equals("b", 2), QueryBuilder.Equals("c", 3)));
 		
-		Assert.Equal("""{ $and: [ { "a": 1 }, { $or: [ { "b": 2 }, { "c": 3 } ] } ] }""", query.ToString());
+		Assert.Equal("""{ "$and": [ { "a": 1 }, { "$or": [ { "b": 2 }, { "c": 3 } ] } ] }""", query.ToString());
 		QueryAssert.Filter("""{ "$and": [{ "a": 1 }, { "$or": [{ "b": 2 }, { "c": 3 }] }] }""", query);
 	}
 	
@@ -42,7 +42,7 @@ public class QueryBuilderLogicalTests
 	{
 		var query = QueryBuilder.Or(QueryBuilder.Equals("a", 1), QueryBuilder.Equals("b", 2));
 		
-		Assert.Equal("""{ $or: [ { "a": 1 }, { "b": 2 } ] }""", query.ToString());
+		Assert.Equal("""{ "$or": [ { "a": 1 }, { "b": 2 } ] }""", query.ToString());
 		Assert.Equal(query.ToString(), QueryBuilder.Or(new List<IQuery> { QueryBuilder.Equals("a", 1), QueryBuilder.Equals("b", 2) }).ToString());
 	}
 	
@@ -51,7 +51,7 @@ public class QueryBuilderLogicalTests
 	{
 		var query = QueryBuilder.Nor(QueryBuilder.Equals("a", 1), QueryBuilder.Equals("b", 2));
 		
-		Assert.Equal("""{ $nor: [ { "a": 1 }, { "b": 2 } ] }""", query.ToString());
+		Assert.Equal("""{ "$nor": [ { "a": 1 }, { "b": 2 } ] }""", query.ToString());
 		Assert.Equal(query.ToString(), QueryBuilder.Nor(new List<IQuery> { QueryBuilder.Equals("a", 1), QueryBuilder.Equals("b", 2) }).ToString());
 	}
 	
@@ -90,7 +90,7 @@ public class QueryBuilderLogicalTests
 		Assert.Equal("""{ "where": { "d": 1.5 } }""", QueryBuilder.WhereOut("d", 1.5).ToString());
 		Assert.Equal("""{ "where": { "f": 1.5 } }""", QueryBuilder.WhereOut("f", 1.5f).ToString());
 		Assert.Equal("""{ "where": { "b": true } }""", QueryBuilder.WhereOut("b", true).ToString());
-		Assert.Equal("""{ "where": { "t": "2026-01-31T10:00:00.000Z" } }""", QueryBuilder.WhereOut("t", new DateTime(2026, 1, 31, 10, 0, 0, DateTimeKind.Utc)).ToString());
+		Assert.Equal("""{ "where": { "t": { "$date": "2026-01-31T10:00:00.000Z" } } }""", QueryBuilder.WhereOut("t", new DateTime(2026, 1, 31, 10, 0, 0, DateTimeKind.Utc)).ToString());
 	}
 	
 	[Fact]
@@ -98,7 +98,7 @@ public class QueryBuilderLogicalTests
 	{
 		var query = QueryBuilder.Where("age", [QueryBuilder.GreaterThan(18), QueryBuilder.LessThan(65)]);
 		
-		Assert.Equal("""{ "age": { $gt: 18, $lt: 65 } }""", query.ToString());
+		Assert.Equal("""{ "age": { "$gt": 18, "$lt": 65 } }""", query.ToString());
 		QueryAssert.Filter("""{ "age": { "$gt": 18, "$lt": 65 } }""", query);
 		Assert.Equal(query.ToString(), QueryBuilder.Combine("age", QueryBuilder.GreaterThan(18), QueryBuilder.LessThan(65)).ToString());
 	}

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using MongoDB.Bson;
 
 namespace Ertis.MongoDB.Queries.Tests.TestHelpers;
@@ -7,11 +8,17 @@ public static class QueryAssert
 	#region Methods
 	
 	/// <summary>
-	/// Parses the query with the MongoDB json parser (the consumers pass the query string to a JsonFilterDefinition)
+	/// Parses the query with the MongoDB json parser (the consumers pass the query string to a JsonFilterDefinition).
+	/// The query must be a strict json too (e.g. an API reading the body with System.Text.Json).
 	/// </summary>
 	public static BsonDocument Parse(IQuery query)
 	{
-		return BsonDocument.Parse(query.ToString());
+		var json = query.ToString();
+		using (JsonDocument.Parse(json))
+		{
+		}
+		
+		return BsonDocument.Parse(json);
 	}
 	
 	/// <summary>

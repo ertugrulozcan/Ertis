@@ -15,7 +15,7 @@ public class QueryBuilderSearchTests
 	{
 		var query = QueryBuilder.Regex("name", "^ja");
 		
-		Assert.Equal("""{ "name": { $regex: "^ja" } }""", query.ToString());
+		Assert.Equal("""{ "name": { "$regex": "^ja" } }""", query.ToString());
 		QueryAssert.SingleField("name", new BsonRegularExpression("^ja"), query);
 	}
 	
@@ -74,7 +74,7 @@ public class QueryBuilderSearchTests
 	{
 		var query = QueryBuilder.FullTextSearch("jane doe");
 		
-		Assert.Equal("""{ $text: { $search: "jane doe" } }""", query.ToString());
+		Assert.Equal("""{ "$text": { "$search": "jane doe" } }""", query.ToString());
 		QueryAssert.Filter("""{ "$text": { "$search": "jane doe" } }""", query);
 	}
 	

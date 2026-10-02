@@ -41,9 +41,13 @@ public class QueryValue<T> : IQuery
 			case bool boolean:
 				return boolean ? "true" : "false";
 			case DateTime dateTime:
-				return QueryHelper.ToJsonString(QueryHelper.ToUniversalTime(dateTime).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture));
+				return QueryHelper.ToExtendedJsonDate(QueryHelper.ToUniversalTime(dateTime));
 			case DateTimeOffset dateTimeOffset:
-				return QueryHelper.ToJsonString(dateTimeOffset.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture));
+				return QueryHelper.ToExtendedJsonDate(dateTimeOffset.UtcDateTime);
+			case double doubleValue when !double.IsFinite(doubleValue):
+				return QueryHelper.ToExtendedJsonDouble(doubleValue);
+			case float floatValue when !float.IsFinite(floatValue):
+				return QueryHelper.ToExtendedJsonDouble(floatValue);
 			case Guid guid:
 				return QueryHelper.ToJsonString(guid.ToString());
 			case Enum enumValue:

@@ -35,7 +35,7 @@ internal class Query : IQuery, IHasChildren
 			{
 				var operatorTag = QueryHelper.GetOperatorTag(this.Operator.Value);
 				var expressionJson = this.Value.ToString();
-				return "{ $" + operatorTag + ": " + expressionJson + " }";
+				return "{ \"$" + operatorTag + "\": " + expressionJson + " }";
 			}
 			else
 			{
@@ -57,7 +57,7 @@ internal class Query : IQuery, IHasChildren
 			if (this.Operator != null)
 			{
 				var operatorTag = QueryHelper.GetOperatorTag(this.Operator.Value);
-				return "{ $" + operatorTag + ": { " + string.Join(", ", expressionJsons) + " } }";
+				return "{ \"$" + operatorTag + "\": { " + string.Join(", ", expressionJsons) + " } }";
 			}
 			else
 			{

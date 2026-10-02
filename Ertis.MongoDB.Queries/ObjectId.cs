@@ -32,7 +32,8 @@ public class ObjectId : QueryValue<string>, IQueryExpression
 	
 	public override string ToString()
 	{
-		return $"ObjectId(\"{this.Id}\")";
+		// Extended JSON: a strict json, which MongoDB reads as an ObjectId
+		return "{ \"$oid\": \"" + this.Id + "\" }";
 	}
 	
 	/// <summary>

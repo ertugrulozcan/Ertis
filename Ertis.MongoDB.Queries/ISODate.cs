@@ -29,7 +29,8 @@ public class ISODate : QueryValue<DateTime>
 	{
 		var date = QueryHelper.ToUniversalTime(this.Date);
 		var format = date.Millisecond == 0 ? "yyyy-MM-ddTHH:mm:ssZ" : "yyyy-MM-ddTHH:mm:ss.fffZ";
-		return $"ISODate(\"{date.ToString(format, CultureInfo.InvariantCulture)}\")";
+		// Extended JSON: a strict json, which MongoDB reads as a date
+		return "{ \"$date\": \"" + date.ToString(format, CultureInfo.InvariantCulture) + "\" }";
 	}
 	
 	#endregion

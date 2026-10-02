@@ -127,6 +127,23 @@ internal static class QueryHelper
 		return builder.ToString();
 	}
 	
+	/// <summary>
+	/// A date in extended json (a strict json, which MongoDB reads as a date, not as a string)
+	/// </summary>
+	internal static string ToExtendedJsonDate(DateTime utcDateTime)
+	{
+		return "{ \"$date\": \"" + utcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) + "\" }";
+	}
+	
+	/// <summary>
+	/// NaN and the infinities in extended json (json numbers can't express them)
+	/// </summary>
+	internal static string ToExtendedJsonDouble(double value)
+	{
+		var text = double.IsNaN(value) ? "NaN" : double.IsPositiveInfinity(value) ? "Infinity" : "-Infinity";
+		return "{ \"$numberDouble\": \"" + text + "\" }";
+	}
+	
 	internal static string GetInnerQuery(IQuery query)
 	{
 		var expressionJson = query.ToString();

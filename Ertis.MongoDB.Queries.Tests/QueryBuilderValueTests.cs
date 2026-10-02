@@ -61,12 +61,13 @@ public class QueryBuilderValueTests
 	}
 	
 	[Fact]
-	public void Where_DateTime_WritesAnIsoString()
+	public void Where_DateTime_WritesADate()
 	{
+		// Extended json: MongoDB reads it as a date (a plain ISO string would be compared as a string)
 		var query = QueryBuilder.Where("t", SampleDate);
 		
-		Assert.Equal("""{ "t": "2026-01-31T10:00:00.123Z" }""", query.ToString());
-		QueryAssert.SingleField("t", "2026-01-31T10:00:00.123Z", query);
+		Assert.Equal("""{ "t": { "$date": "2026-01-31T10:00:00.123Z" } }""", query.ToString());
+		QueryAssert.SingleField("t", new BsonDateTime(SampleDate), query);
 	}
 	
 	[Fact]
@@ -110,13 +111,13 @@ public class QueryBuilderValueTests
 		
 		var query = QueryBuilder.Equals("a", local);
 		
-		Assert.Equal($$"""{ "a": "{{local.ToUniversalTime():yyyy-MM-ddTHH:mm:ss.fff}}Z" }""", query.ToString());
+		Assert.Equal($$"""{ "a": { "$date": "{{local.ToUniversalTime():yyyy-MM-ddTHH:mm:ss.fff}}Z" } }""", query.ToString());
 	}
 	
 	[Fact]
 	public void Equals_UnspecifiedDateTime_IsTreatedAsUtc()
 	{
-		Assert.Equal("""{ "a": "2026-01-31T10:00:00.000Z" }""", QueryBuilder.Equals("a", new DateTime(2026, 1, 31, 10, 0, 0)).ToString());
+		Assert.Equal("""{ "a": { "$date": "2026-01-31T10:00:00.000Z" } }""", QueryBuilder.Equals("a", new DateTime(2026, 1, 31, 10, 0, 0)).ToString());
 	}
 	
 	[Fact]
@@ -124,7 +125,7 @@ public class QueryBuilderValueTests
 	{
 		var query = QueryBuilder.Equals("a", new DateTimeOffset(2026, 1, 31, 10, 0, 0, TimeSpan.FromHours(3)));
 		
-		Assert.Equal("""{ "a": "2026-01-31T07:00:00.000Z" }""", query.ToString());
+		Assert.Equal("""{ "a": { "$date": "2026-01-31T07:00:00.000Z" } }""", query.ToString());
 	}
 	
 	[Fact]
@@ -135,26 +136,37 @@ public class QueryBuilderValueTests
 		QueryAssert.SingleField("a", double.PositiveInfinity, QueryBuilder.Equals("a", double.PositiveInfinity));
 	}
 	
+	/// <summary>
+	/// Json numbers can't express NaN and the infinities: they are written in extended json
+	/// </summary>
+	[Fact]
+	public void Equals_NaNAndNegativeInfinity_WriteExtendedJson()
+	{
+		Assert.Equal("""{ "a": { "$numberDouble": "NaN" } }""", QueryBuilder.Equals("a", double.NaN).ToString());
+		QueryAssert.SingleField("a", double.NaN, QueryBuilder.Equals("a", double.NaN));
+		QueryAssert.SingleField("a", double.NegativeInfinity, QueryBuilder.Equals("a", float.NegativeInfinity));
+	}
+	
 	#endregion
 	
 	#region ObjectId & ISODate Methods
 	
 	[Fact]
-	public void ObjectId_WritesTheShellFunction()
+	public void ObjectId_WritesExtendedJson()
 	{
 		var query = QueryBuilder.Equals("_id", QueryBuilder.ObjectId("65a0f0c2e4b0a1b2c3d4e5f6"));
 		
-		Assert.Equal("""ObjectId("65a0f0c2e4b0a1b2c3d4e5f6")""", QueryBuilder.ObjectId("65a0f0c2e4b0a1b2c3d4e5f6").ToString());
+		Assert.Equal("""{ "$oid": "65a0f0c2e4b0a1b2c3d4e5f6" }""", QueryBuilder.ObjectId("65a0f0c2e4b0a1b2c3d4e5f6").ToString());
 		Assert.Equal("_id", QueryBuilder.ObjectId("65a0f0c2e4b0a1b2c3d4e5f6").Field);
 		QueryAssert.SingleField("_id", new BsonObjectId(global::MongoDB.Bson.ObjectId.Parse("65a0f0c2e4b0a1b2c3d4e5f6")), query);
 	}
 	
 	[Fact]
-	public void ISODate_WritesTheShellFunction()
+	public void ISODate_WritesExtendedJson()
 	{
 		var query = QueryBuilder.Equals("t", QueryBuilder.ISODate(new DateTime(2026, 1, 31, 10, 0, 0, DateTimeKind.Utc)));
 		
-		Assert.Equal("""{ "t": ISODate("2026-01-31T10:00:00Z") }""", query.ToString());
+		Assert.Equal("""{ "t": { "$date": "2026-01-31T10:00:00Z" } }""", query.ToString());
 		QueryAssert.SingleField("t", new BsonDateTime(new DateTime(2026, 1, 31, 10, 0, 0, DateTimeKind.Utc)), query);
 	}
 	

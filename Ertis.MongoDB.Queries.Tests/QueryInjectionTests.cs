@@ -104,7 +104,7 @@ public class QueryInjectionTests
 	[InlineData("65A0F0C2E4B0A1B2C3D4E5F6")]
 	public void ObjectId_WithAValidId_IsAccepted(string id)
 	{
-		Assert.Equal($"ObjectId(\"{id}\")", QueryBuilder.ObjectId(id).ToString());
+		Assert.Equal($$"""{ "$oid": "{{id}}" }""", QueryBuilder.ObjectId(id).ToString());
 	}
 	
 	[Theory]

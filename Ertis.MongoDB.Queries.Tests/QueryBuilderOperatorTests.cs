@@ -14,11 +14,11 @@ public class QueryBuilderOperatorTests
 		return new TheoryData<IQuery, string>
 		{
 			{ QueryBuilder.Equals("a", 1), """{ "a": 1 }""" },
-			{ QueryBuilder.NotEquals("a", "x"), """{ "a": { $ne: "x" } }""" },
-			{ QueryBuilder.GreaterThan("a", 1), """{ "a": { $gt: 1 } }""" },
-			{ QueryBuilder.GreaterThanOrEqual("a", 1), """{ "a": { $gte: 1 } }""" },
-			{ QueryBuilder.LessThan("a", 1), """{ "a": { $lt: 1 } }""" },
-			{ QueryBuilder.LessThanOrEqual("a", 1), """{ "a": { $lte: 1 } }""" }
+			{ QueryBuilder.NotEquals("a", "x"), """{ "a": { "$ne": "x" } }""" },
+			{ QueryBuilder.GreaterThan("a", 1), """{ "a": { "$gt": 1 } }""" },
+			{ QueryBuilder.GreaterThanOrEqual("a", 1), """{ "a": { "$gte": 1 } }""" },
+			{ QueryBuilder.LessThan("a", 1), """{ "a": { "$lt": 1 } }""" },
+			{ QueryBuilder.LessThanOrEqual("a", 1), """{ "a": { "$lte": 1 } }""" }
 		};
 	}
 	
@@ -34,19 +34,19 @@ public class QueryBuilderOperatorTests
 	{
 		return new TheoryData<IQuery, string>
 		{
-			{ QueryBuilder.Equals(1), "{ $eq: 1 }" },
-			{ QueryBuilder.NotEquals("x"), """{ $ne: "x" }""" },
-			{ QueryBuilder.GreaterThan(1), "{ $gt: 1 }" },
-			{ QueryBuilder.GreaterThanOrEqual(1), "{ $gte: 1 }" },
-			{ QueryBuilder.LessThan(1), "{ $lt: 1 }" },
-			{ QueryBuilder.LessThanOrEqual(1), "{ $lte: 1 }" },
-			{ QueryBuilder.In(new[] { 1, 2 }), "{ $in: [ 1, 2 ] }" },
-			{ QueryBuilder.Contains(new[] { 1, 2 }), "{ $in: [ 1, 2 ] }" },
-			{ QueryBuilder.Nin(new[] { 1 }), "{ $nin: [ 1 ] }" },
-			{ QueryBuilder.NotContains(new[] { 1 }), "{ $nin: [ 1 ] }" },
-			{ QueryBuilder.Not(5), "{ $not: { $eq: 5 } }" },
-			{ QueryBuilder.Exists(false), "{ $exists: false }" },
-			{ QueryBuilder.TypeOf(BsonType.String), """{ $type: "string" }""" }
+			{ QueryBuilder.Equals(1), """{ "$eq": 1 }""" },
+			{ QueryBuilder.NotEquals("x"), """{ "$ne": "x" }""" },
+			{ QueryBuilder.GreaterThan(1), """{ "$gt": 1 }""" },
+			{ QueryBuilder.GreaterThanOrEqual(1), """{ "$gte": 1 }""" },
+			{ QueryBuilder.LessThan(1), """{ "$lt": 1 }""" },
+			{ QueryBuilder.LessThanOrEqual(1), """{ "$lte": 1 }""" },
+			{ QueryBuilder.In(new[] { 1, 2 }), """{ "$in": [ 1, 2 ] }""" },
+			{ QueryBuilder.Contains(new[] { 1, 2 }), """{ "$in": [ 1, 2 ] }""" },
+			{ QueryBuilder.Nin(new[] { 1 }), """{ "$nin": [ 1 ] }""" },
+			{ QueryBuilder.NotContains(new[] { 1 }), """{ "$nin": [ 1 ] }""" },
+			{ QueryBuilder.Not(5), """{ "$not": { "$eq": 5 } }""" },
+			{ QueryBuilder.Exists(false), """{ "$exists": false }""" },
+			{ QueryBuilder.TypeOf(BsonType.String), """{ "$type": "string" }""" }
 		};
 	}
 	
@@ -65,10 +65,10 @@ public class QueryBuilderOperatorTests
 	[Fact]
 	public void In_OnAField_WritesTheValues()
 	{
-		Assert.Equal("""{ "a": { $in: [ 1, 2 ] } }""", QueryBuilder.In("a", new[] { 1, 2 }).ToString());
-		Assert.Equal("""{ "a": { $in: [ "x", "y" ] } }""", QueryBuilder.Contains("a", new[] { "x", "y" }).ToString());
-		Assert.Equal("""{ "a": { $nin: [ "x" ] } }""", QueryBuilder.Nin("a", new[] { "x" }).ToString());
-		Assert.Equal("""{ "a": { $nin: [ "x" ] } }""", QueryBuilder.NotContains("a", new[] { "x" }).ToString());
+		Assert.Equal("""{ "a": { "$in": [ 1, 2 ] } }""", QueryBuilder.In("a", new[] { 1, 2 }).ToString());
+		Assert.Equal("""{ "a": { "$in": [ "x", "y" ] } }""", QueryBuilder.Contains("a", new[] { "x", "y" }).ToString());
+		Assert.Equal("""{ "a": { "$nin": [ "x" ] } }""", QueryBuilder.Nin("a", new[] { "x" }).ToString());
+		Assert.Equal("""{ "a": { "$nin": [ "x" ] } }""", QueryBuilder.NotContains("a", new[] { "x" }).ToString());
 	}
 	
 	[Fact]
@@ -134,8 +134,8 @@ public class QueryBuilderOperatorTests
 	[Fact]
 	public void Not_OfAnExpression_NegatesItsOperator()
 	{
-		Assert.Equal("""{ "age": { $not: { $gt: 18 } } }""", QueryBuilder.Not(QueryBuilder.GreaterThan("age", 18)).ToString());
-		Assert.Equal("""{ "name": { $not: { $regex: "^a" } } }""", QueryBuilder.Not(QueryBuilder.Regex("name", "^a")).ToString());
+		Assert.Equal("""{ "age": { "$not": { "$gt": 18 } } }""", QueryBuilder.Not(QueryBuilder.GreaterThan("age", 18)).ToString());
+		Assert.Equal("""{ "name": { "$not": { "$regex": "^a" } } }""", QueryBuilder.Not(QueryBuilder.Regex("name", "^a")).ToString());
 	}
 	
 	#endregion

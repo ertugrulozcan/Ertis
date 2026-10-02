@@ -15,7 +15,7 @@ public class QueryBuilderArrayTests
 	{
 		var query = QueryBuilder.ElemMatch("connected_accounts", QueryBuilder.Equals("provider", "google"), QueryBuilder.Equals("user_id", "123"));
 		
-		Assert.Equal("""{ "connected_accounts": { $elemMatch: { "provider": "google", "user_id": "123" } } }""", query.ToString());
+		Assert.Equal("""{ "connected_accounts": { "$elemMatch": { "provider": "google", "user_id": "123" } } }""", query.ToString());
 		QueryAssert.Filter("""{ "connected_accounts": { "$elemMatch": { "provider": "google", "user_id": "123" } } }""", query);
 	}
 	

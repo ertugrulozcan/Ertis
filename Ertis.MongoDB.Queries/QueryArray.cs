@@ -35,7 +35,7 @@ internal class QueryArray : List<IQuery>, IQuery
 			}
 			
 			var operatorTag = QueryHelper.GetOperatorTag(this.Operator.Value);
-			return "{ $" + operatorTag + ": [ " + string.Join(", ", this.Select(x => x.ToString())) + " ] }";
+			return "{ \"$" + operatorTag + "\": [ " + string.Join(", ", this.Select(x => x.ToString())) + " ] }";
 		}
 		else
 		{

@@ -181,6 +181,23 @@ public class DynamicMongoRepositoryTests(MongoDbContainerFixture fixture) : Mong
 	
 	#region Find And Query Methods
 	
+	/// <summary>
+	/// The queries of the QueryBuilder (strict json: quoted operators, extended json ids and dates) find the documents by the ObjectId and the date
+	/// </summary>
+	[Fact]
+	public async Task FindAsync_WithQueryBuilderQuery_MatchesObjectIdsAndDates()
+	{
+		var (repository, ids) = await this.SeedAsync();
+		var query = Queries.QueryBuilder.Where(
+			Queries.QueryBuilder.Contains("_id", new[] { Queries.QueryBuilder.ObjectId(ids[0].ToString()), Queries.QueryBuilder.ObjectId(ids[1].ToString()) }),
+			Queries.QueryBuilder.Combine("created_at", Queries.QueryBuilder.GreaterThan(Date.AddHours(1)), Queries.QueryBuilder.LessThan(Queries.QueryBuilder.ISODate(Date.AddDays(2)))));
+		
+		var result = await repository.FindAsync(query.ToString(), skip: null, limit: null, withCount: true, orderBy: null, sortDirection: null, cancellationToken: CancellationToken);
+		
+		IDictionary<string, object?> document = Assert.Single(result.Items);
+		Assert.Equal(ids[1], document["_id"]);
+	}
+	
 	[Fact]
 	public async Task Find_ReturnsTheMatchesAndTheCount()
 	{

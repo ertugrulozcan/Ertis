@@ -158,7 +158,7 @@ public static class QueryBuilder
 		return new CustomQuery
 		{
 			Operator = "where",
-			Children = queries.ToList(),
+			Children = Compose(queries),
 			ShowOperatorTag = showOperatorTag
 		};
 	}
@@ -194,7 +194,7 @@ public static class QueryBuilder
 	{
 		return new CustomQuery
 		{
-			Children = queries.ToList()
+			Children = Compose(queries)
 		};
 	}
 	
@@ -862,6 +862,84 @@ public static class QueryBuilder
 		{
 			Operator = MongoOperator.ElemMatch,
 			Value = CombineCore(queries)
+		};
+	}
+	
+	#endregion
+	
+	#region Composition Methods
+	
+	/// <summary>
+	/// The queries written into one object must have distinct keys (a repeated key is rejected by MongoDB or drops a condition):
+	/// the operators of a repeated field are merged ({ "age": { "$gt": 18, "$lt": 65 } }); the other repeated keys
+	/// (e.g. two values of a field, two $or) are combined with $and. The operators without a field are kept as they are.
+	/// </summary>
+	private static List<IQuery> Compose(IEnumerable<IQuery> queries)
+	{
+		var composed = MergeFieldOperators(queries.ToList());
+		var keys = composed.SelectMany(GetKeys).ToList();
+		if (keys.Count == keys.Distinct().Count() || composed.All(x => x is Query))
+		{
+			return composed;
+		}
+		
+		return [new QueryArray(composed) { Operator = MongoOperator.And }];
+	}
+	
+	/// <summary>
+	/// Merges the expressions of a repeated field into one expression, when each of them is a single operator and the operators are distinct
+	/// </summary>
+	private static List<IQuery> MergeFieldOperators(List<IQuery> queries)
+	{
+		var composed = new List<IQuery>(queries);
+		var repeatedFields = queries.OfType<QueryExpression>().GroupBy(x => x.Field).Where(x => x.Count() > 1);
+		foreach (var fieldExpressions in repeatedFields)
+		{
+			var operators = fieldExpressions.Select(GetSingleOperator).ToList();
+			if (operators.Any(x => x == null) || operators.Select(x => x!.Operator).Distinct().Count() != operators.Count)
+			{
+				continue;
+			}
+			
+			var merged = new QueryExpression
+			{
+				Field = fieldExpressions.Key,
+				Value = new CustomQuery { Children = operators.Cast<IQuery>().ToList() }
+			};
+			
+			// The merged expression takes the place of the first one
+			composed[composed.IndexOf(fieldExpressions.First())] = merged;
+			foreach (var expression in fieldExpressions.Skip(1))
+			{
+				composed.Remove(expression);
+			}
+		}
+		
+		return composed;
+	}
+	
+	/// <summary>
+	/// The operator of an expression like { "age": { "$gt": 18 } }; null when the expression is not a single operator (e.g. a value, a regex with options)
+	/// </summary>
+	private static Query? GetSingleOperator(QueryExpression expression)
+	{
+		return expression.Children.Count == 1 && expression.Value is Query { Operator: not null, Children.Count: 1 } query ? query : null;
+	}
+	
+	/// <summary>
+	/// The keys the query writes into the object it is combined in
+	/// </summary>
+	private static IEnumerable<string> GetKeys(IQuery query)
+	{
+		return query switch
+		{
+			QueryExpression expression => [expression.Field],
+			Query { Operator: not null } operatorQuery => ["$" + QueryHelper.GetOperatorTag(operatorQuery.Operator.Value)],
+			QueryArray { IsFlattened: true } andQuery => andQuery.Cast<IQueryExpression>().Select(x => x.Field),
+			QueryArray { Operator: not null } arrayQuery => ["$" + QueryHelper.GetOperatorTag(arrayQuery.Operator.Value)],
+			CustomQuery { ShowOperatorTag: true, Operator: not null } customQuery => [customQuery.Operator],
+			CustomQuery customQuery => customQuery.Children.SelectMany(GetKeys),
+			_ => []
 		};
 	}
 	

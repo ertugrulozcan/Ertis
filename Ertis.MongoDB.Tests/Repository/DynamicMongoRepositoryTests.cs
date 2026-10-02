@@ -198,6 +198,20 @@ public class DynamicMongoRepositoryTests(MongoDbContainerFixture fixture) : Mong
 		Assert.Equal(ids[1], document["_id"]);
 	}
 	
+	/// <summary>
+	/// A range written as two queries on the same field (regression: the repeated key was rejected by MongoDB's json reader)
+	/// </summary>
+	[Fact]
+	public async Task FindAsync_WithQueryBuilderRangeOnAField_ReturnsTheMatches()
+	{
+		var (repository, _) = await this.SeedAsync();
+		var query = Queries.QueryBuilder.Where(Queries.QueryBuilder.GreaterThan("age", 25), Queries.QueryBuilder.LessThan("age", 45));
+		
+		var result = await repository.FindAsync(query.ToString(), skip: null, limit: null, withCount: true, orderBy: "age", sortDirection: SortDirection.Ascending, cancellationToken: CancellationToken);
+		
+		Assert.Equal(["Jane", "jane"], result.Items.Select(x => (string) ((IDictionary<string, object?>) x)["name"]!));
+	}
+	
 	[Fact]
 	public async Task Find_ReturnsTheMatchesAndTheCount()
 	{

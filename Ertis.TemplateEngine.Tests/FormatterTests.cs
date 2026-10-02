@@ -164,6 +164,34 @@ public class FormatterTests
 		Assert.Equal("1/31/2026 1.2.3 00000000-0000-0000-0000-000000000000", new Formatter().Format("{{day}} {{version}} {{id}}", data));
 	}
 	
+	[Fact]
+	public void Format_WithConvertiblesWithoutBaseType_WritesThemAsStrings()
+	{
+		const string id = "65a0f0c2e4b0a1b2c3d4e5f6";
+		IDictionary<string, object?> expando = new ExpandoObject();
+		expando["_id"] = new FakeConvertibleId(id);
+		expando["document"] = new Dictionary<string, object?> { ["_id"] = new FakeConvertibleId(id) };
+		expando["refs"] = new[] { new FakeConvertibleId(id) };
+		
+		Assert.Equal($"{id} {id} {id}", new Formatter().Format("{{_id}} {{document._id}} {{refs[0]}}", expando));
+	}
+	
+	[Fact]
+	public void Format_WithConvertiblesWithBaseType_WritesThemAsTheirBaseTypes()
+	{
+		using var _ = new CultureScope("tr-TR");
+		var data = new { number = new FakeConvertibleNumber(1.5), text = new FakeConvertibleText("text"), dbNull = DBNull.Value };
+
+		// DBNull is null, so its placeholder is kept like the placeholder of any null value
+		Assert.Equal("1,5 text [{{dbNull}}]",new Formatter().Format("{{number}} {{text}} [{{dbNull}}]", data));
+	}
+	
+	[Fact]
+	public void Format_WithAConvertibleCollection_ReadsItAsCollection()
+	{
+		Assert.Equal("2", new Formatter().Format("{{items[1]}}", new { items = new FakeConvertibleCollection(1, 2) }));
+	}
+	
 	[Theory]
 	[InlineData("text")]
 	[InlineData(5)]
@@ -324,6 +352,91 @@ public class FormatterTests
 	{
 		[JsonPropertyName("city")]
 		public string? City { get; set; }
+	}
+	
+	/// <summary>
+	/// A convertible which supports no conversion unless overridden
+	/// </summary>
+	private abstract class BaseFakeConvertible : IConvertible
+	{
+		public abstract TypeCode GetTypeCode();
+		
+		public virtual object ToType(Type conversionType, IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public virtual string ToString(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public virtual double ToDouble(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public bool ToBoolean(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public byte ToByte(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public char ToChar(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public DateTime ToDateTime(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public decimal ToDecimal(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public short ToInt16(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public int ToInt32(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public long ToInt64(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public sbyte ToSByte(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public float ToSingle(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public ushort ToUInt16(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public uint ToUInt32(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public ulong ToUInt64(IFormatProvider? provider) => throw new InvalidCastException();
+	}
+	
+	/// <summary>
+	/// A convertible without a base type which converts only to string, like MongoDB.Bson.ObjectId
+	/// </summary>
+	private sealed class FakeConvertibleId(string value) : BaseFakeConvertible
+	{
+		// ReSharper disable once UnusedMember.Local
+		public int Timestamp => 1;
+		
+		public override TypeCode GetTypeCode() => TypeCode.Object;
+		
+		public override object ToType(Type conversionType, IFormatProvider? provider) => conversionType == typeof(string) ? value : throw new InvalidCastException();
+	}
+	
+	/// <summary>
+	/// A convertible with a Double base type, like MongoDB.Bson.BsonDouble
+	/// </summary>
+	private sealed class FakeConvertibleNumber(double value) : BaseFakeConvertible
+	{
+		public override TypeCode GetTypeCode() => TypeCode.Double;
+		
+		public override double ToDouble(IFormatProvider? provider) => value;
+	}
+	
+	/// <summary>
+	/// A convertible with a String base type, like MongoDB.Bson.BsonString
+	/// </summary>
+	private sealed class FakeConvertibleText(string value) : BaseFakeConvertible
+	{
+		public override TypeCode GetTypeCode() => TypeCode.String;
+		
+		public override string ToString(IFormatProvider? provider) => value;
+	}
+	
+	/// <summary>
+	/// A convertible collection which can not be converted to string, like MongoDB.Bson.BsonArray
+	/// </summary>
+	private sealed class FakeConvertibleCollection(params int[] items) : BaseFakeConvertible, IEnumerable<int>
+	{
+		public override TypeCode GetTypeCode() => TypeCode.Object;
+		
+		public IEnumerator<int> GetEnumerator() => ((IEnumerable<int>) items).GetEnumerator();
+		
+		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 	}
 	
 	#endregion

@@ -140,6 +140,63 @@ public class DynamicValueMappingTests
 		Assert.Equal(1L, dynamicObject.GetValue("json.a"));
 	}
 	
+	[Fact]
+	public void Constructor_WritesTheConvertiblesWithoutBaseTypeAsStrings()
+	{
+		const string id = "65a0f0c2e4b0a1b2c3d4e5f6";
+		IDictionary<string, object?> expando = new ExpandoObject();
+		expando["_id"] = new FakeConvertibleId(id);
+		expando["owner"] = new Dictionary<string, object?> { ["_id"] = new FakeConvertibleId(id) };
+		expando["refs"] = new List<FakeConvertibleId> { new(id) };
+		
+		var dynamicObject = new DynamicObject(expando);
+		
+		Assert.Equal(id, dynamicObject.GetValue("_id"));
+		Assert.Equal(id, dynamicObject.GetValue("owner._id"));
+		Assert.Equal(new object[] { id }, dynamicObject.GetValue("refs"));
+	}
+	
+	[Fact]
+	public void Constructor_ConvertsTheConvertiblesIntoTheBaseTypesOfTheirTypeCodes()
+	{
+		IDictionary<string, object?> expando = new ExpandoObject();
+		expando["number"] = new FakeConvertibleNumber(42);
+		expando["text"] = new FakeConvertibleText("text");
+		expando["dbNull"] = DBNull.Value;
+		
+		var dynamicObject = new DynamicObject(expando);
+		
+		Assert.Equal(42, dynamicObject.GetValue("number"));
+		Assert.Equal("text", dynamicObject.GetValue("text"));
+		Assert.Null(dynamicObject.GetValue("dbNull"));
+	}
+	
+	[Fact]
+	public void Constructor_KeepsTheConvertibleCollectionsAsCollections()
+	{
+		IDictionary<string, object?> expando = new ExpandoObject();
+		expando["items"] = new FakeConvertibleCollection(1, 2);
+		
+		var dynamicObject = new DynamicObject(expando);
+		
+		Assert.Equal(new object[] { 1, 2 }, dynamicObject.GetValue("items"));
+	}
+	
+	[Fact]
+	public void Deserialize_WithConvertibleId_ReadsTheIdAsString()
+	{
+		const string id = "65a0f0c2e4b0a1b2c3d4e5f6";
+		IDictionary<string, object?> expando = new ExpandoObject();
+		expando["_id"] = new FakeConvertibleId(id);
+		expando["name"] = "Jane";
+		
+		var model = new DynamicObject(expando).Deserialize<StringIdModel>();
+		
+		Assert.NotNull(model);
+		Assert.Equal(id, model.Id);
+		Assert.Equal("Jane", model.Name);
+	}
+	
 	[Theory]
 	[InlineData("text")]
 	[InlineData(5)]
@@ -224,7 +281,7 @@ public class DynamicValueMappingTests
 	}
 	
 	/// <summary>
-	/// A type with a string TypeConverter, like MongoDB.Bson.ObjectId
+	/// A type with a string TypeConverter
 	/// </summary>
 	[TypeConverter(typeof(FakeObjectIdConverter))]
 	public readonly struct FakeObjectId(string value)
@@ -248,6 +305,101 @@ public class DynamicValueMappingTests
 		{
 			return destinationType == typeof(string) && value is FakeObjectId id ? id.Value : base.ConvertTo(context, culture, value, destinationType);
 		}
+	}
+	
+	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+	public sealed class StringIdModel
+	{
+		[JsonPropertyName("_id")]
+		public string Id { get; init; } = null!;
+		
+		[JsonPropertyName("name")]
+		public string? Name { get; init; }
+	}
+	
+	/// <summary>
+	/// A convertible which supports no conversion unless overridden
+	/// </summary>
+	public abstract class BaseFakeConvertible : IConvertible
+	{
+		public abstract TypeCode GetTypeCode();
+		
+		public virtual object ToType(Type conversionType, IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public virtual string ToString(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public virtual int ToInt32(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public bool ToBoolean(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public byte ToByte(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public char ToChar(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public DateTime ToDateTime(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public decimal ToDecimal(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public double ToDouble(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public short ToInt16(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public long ToInt64(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public sbyte ToSByte(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public float ToSingle(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public ushort ToUInt16(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public uint ToUInt32(IFormatProvider? provider) => throw new InvalidCastException();
+		
+		public ulong ToUInt64(IFormatProvider? provider) => throw new InvalidCastException();
+	}
+	
+	/// <summary>
+	/// A convertible without a base type which converts only to string, like MongoDB.Bson.ObjectId
+	/// </summary>
+	public sealed class FakeConvertibleId(string value) : BaseFakeConvertible
+	{
+		// ReSharper disable once UnusedMember.Global
+		public int Timestamp => 1;
+		
+		public override TypeCode GetTypeCode() => TypeCode.Object;
+		
+		public override object ToType(Type conversionType, IFormatProvider? provider) => conversionType == typeof(string) ? value : throw new InvalidCastException();
+	}
+	
+	/// <summary>
+	/// A convertible with an Int32 base type, like MongoDB.Bson.BsonInt32
+	/// </summary>
+	public sealed class FakeConvertibleNumber(int value) : BaseFakeConvertible
+	{
+		public override TypeCode GetTypeCode() => TypeCode.Int32;
+		
+		public override int ToInt32(IFormatProvider? provider) => value;
+	}
+	
+	/// <summary>
+	/// A convertible with a String base type, like MongoDB.Bson.BsonString
+	/// </summary>
+	public sealed class FakeConvertibleText(string value) : BaseFakeConvertible
+	{
+		public override TypeCode GetTypeCode() => TypeCode.String;
+		
+		public override string ToString(IFormatProvider? provider) => value;
+	}
+	
+	/// <summary>
+	/// A convertible collection which can not be converted to string, like MongoDB.Bson.BsonArray
+	/// </summary>
+	public sealed class FakeConvertibleCollection(params int[] items) : BaseFakeConvertible, IEnumerable<int>
+	{
+		public override TypeCode GetTypeCode() => TypeCode.Object;
+		
+		public IEnumerator<int> GetEnumerator() => ((IEnumerable<int>) items).GetEnumerator();
+		
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => this.GetEnumerator();
 	}
 	
 	#endregion

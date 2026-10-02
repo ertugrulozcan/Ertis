@@ -269,16 +269,33 @@ internal static class DynamicValues
 			}
 			case IEnumerable enumerable:
 				return enumerable.Cast<object?>().Select(FromValue).ToArray();
+			case IConvertible convertible:
+				return FromConvertible(convertible);
 			default:
 				return FromComplexValue(value);
 		}
+	}
+	
+	/// <summary>
+	/// Converts a convertible which is not a primitive (e.g. MongoDB ObjectId, Decimal128, BsonInt32):
+	/// into the base type of its type code, or into a string when it has no base type (the collections are handled before)
+	/// </summary>
+	private static object? FromConvertible(IConvertible convertible)
+	{
+		var typeCode = convertible.GetTypeCode();
+		return typeCode switch
+		{
+			TypeCode.Object => convertible.ToType(typeof(string), CultureInfo.InvariantCulture),
+			TypeCode.Empty or TypeCode.DBNull => null,
+			_ => FromValue(Convert.ChangeType(convertible, typeCode, CultureInfo.InvariantCulture))
+		};
 	}
 	
 	private static object? FromComplexValue(object value)
 	{
 		var type = value.GetType();
 		
-		// The types which declare a string conversion (e.g. MongoDB ObjectId) are written as strings
+		// The types which declare a string conversion are written as strings
 		var typeConverter = TypeDescriptor.GetConverter(type);
 		if (typeConverter.GetType() != typeof(TypeConverter) && typeConverter is not ComponentConverter and not ReferenceConverter && typeConverter.CanConvertTo(typeof(string)))
 		{

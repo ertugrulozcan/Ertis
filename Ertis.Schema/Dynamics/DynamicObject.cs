@@ -1,8 +1,10 @@
 using System.Globalization;
 using System.Dynamic;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Ertis.Schema.Exceptions;
 using Ertis.Schema.Extensions;
+using Ertis.Schema.Serialization;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
@@ -11,6 +13,11 @@ using Ertis.Schema.Extensions;
 namespace Ertis.Schema.Dynamics;
 
 // ReSharper disable once UnusedType.Global
+/// <summary>
+/// Serialized by its converter with any JsonSerializerOptions (no registration needed): without it, System.Text.Json
+/// would write a DynamicObject as {} (it has no public properties)
+/// </summary>
+[JsonConverter(typeof(DynamicObjectJsonConverter))]
 public class DynamicObject : ICloneable, IDisposable
 {
 	#region Properties

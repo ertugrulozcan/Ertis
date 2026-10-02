@@ -119,6 +119,40 @@ public class DynamicObjectJsonConverterTests
 	
 	#endregion
 	
+	#region Without Registration
+	
+	// The converter is declared on the DynamicObject type: it is used with any options, also without being registered
+	
+	[Fact]
+	public void Serialize_WithoutRegisteredConverter_WritesTheObject()
+	{
+		var payload = new { user = DynamicObject.Parse("""{ "username": "jane", "age": 30 }"""), items = new[] { DynamicObject.Parse("""{ "n": 1 }""") } };
+		
+		var json = JsonSerializer.Serialize(payload);
+		
+		Assert.Equal("""{"user":{"username":"jane","age":30},"items":[{"n":1}]}""", json);
+	}
+	
+	[Fact]
+	public void Deserialize_WithoutRegisteredConverter_ReadsTheObject()
+	{
+		var model = JsonSerializer.Deserialize<EventModel>("""{ "id": "1", "document": { "name": "Jane", "address": { "city": "Istanbul" } } }""")!;
+		
+		Assert.NotNull(model.Document);
+		Assert.Equal("Istanbul", model.Document.GetValue("address.city"));
+	}
+	
+	[Fact]
+	public void ToJson_WithDynamicObjectSetAsAValue_WritesItsFields()
+	{
+		var dynamicObject = DynamicObject.Parse("""{ "name": "Jane" }""");
+		dynamicObject.SetValue("address", DynamicObject.Parse("""{ "city": "Istanbul" }"""), createIfNotExist: true);
+		
+		Assert.Equal("""{"name":"Jane","address":{"city":"Istanbul"}}""", dynamicObject.ToJson());
+	}
+	
+	#endregion
+	
 	#region Test Types
 	
 	public sealed class EventModel

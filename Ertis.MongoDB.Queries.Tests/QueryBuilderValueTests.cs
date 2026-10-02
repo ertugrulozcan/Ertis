@@ -185,4 +185,66 @@ public class QueryBuilderValueTests
 	}
 	
 	#endregion
+	
+	#region Other Value Types
+	
+	// The values were written with their ToString (culture dependent, unquoted): an invalid json, e.g. { "day": 31.01.2026 }
+	
+	[Fact]
+	public void Equals_DateOnly_WritesTheUtcMidnight()
+	{
+		using var _ = new CultureScope("tr-TR");
+		var query = QueryBuilder.Equals("day", new DateOnly(2026, 1, 31));
+		
+		Assert.Equal("""{ "day": { "$date": "2026-01-31T00:00:00.000Z" } }""", query.ToString());
+		QueryAssert.SingleField("day", new BsonDateTime(new DateTime(2026, 1, 31, 0, 0, 0, DateTimeKind.Utc)), query);
+	}
+	
+	[Fact]
+	public void Equals_TimeOnlyAndTimeSpan_WriteInvariantStrings()
+	{
+		using var _ = new CultureScope("tr-TR");
+		
+		QueryAssert.SingleField("time", "10:30:15.5", QueryBuilder.Equals("time", new TimeOnly(10, 30, 15, 500)));
+		QueryAssert.SingleField("time", "10:30:00", QueryBuilder.Equals("time", new TimeOnly(10, 30)));
+		QueryAssert.SingleField("duration", "1.02:03:04", QueryBuilder.Equals("duration", new TimeSpan(1, 2, 3, 4)));
+	}
+	
+	[Fact]
+	public void Equals_Uri_WritesTheOriginalStringEscaped()
+	{
+		QueryAssert.SingleField("url", "https://example.com/a?b=\"c\"", QueryBuilder.Equals("url", new Uri("https://example.com/a?b=\"c\"", UriKind.Absolute)));
+	}
+	
+	[Fact]
+	public void Equals_LargeAndHalfNumbers_WriteTheNumbers()
+	{
+		QueryAssert.SingleField("a", 12345, QueryBuilder.Equals("a", (Int128) 12345));
+		QueryAssert.SingleField("b", 1.5, QueryBuilder.Equals("b", (Half) 1.5));
+		QueryAssert.SingleField("c", 42, QueryBuilder.Equals("c", new System.Numerics.BigInteger(42)));
+	}
+	
+	[Fact]
+	public void Equals_ConvertibleWithoutBaseType_WritesItsInvariantString()
+	{
+		// e.g. MongoDB.Bson.ObjectId (Ertis.MongoDB converts an id string of an _id field to an ObjectId)
+		QueryAssert.SingleField("_id", "65a0f0c2e4b0a1b2c3d4e5f6", QueryBuilder.Equals("_id", global::MongoDB.Bson.ObjectId.Parse("65a0f0c2e4b0a1b2c3d4e5f6")));
+	}
+	
+	[Fact]
+	public void Equals_Array_WritesEachItem()
+	{
+		var date = new DateTime(2026, 1, 31, 0, 0, 0, DateTimeKind.Utc);
+		
+		QueryAssert.SingleField("tags", new BsonArray { "a", "b" }, QueryBuilder.Equals("tags", new[] { "a", "b" }));
+		QueryAssert.SingleField("dates", new BsonArray { new BsonDateTime(date) }, QueryBuilder.Equals("dates", new List<DateTime> { date }));
+	}
+	
+	[Fact]
+	public void Equals_Object_WritesTheJsonDocument()
+	{
+		QueryAssert.SingleField("address", new BsonDocument { { "city", "Istanbul" }, { "zip", 34000 } }, QueryBuilder.Equals("address", new { city = "Istanbul", zip = 34000 }));
+	}
+	
+	#endregion
 }

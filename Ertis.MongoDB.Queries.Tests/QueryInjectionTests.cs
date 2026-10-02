@@ -118,5 +118,23 @@ public class QueryInjectionTests
 		Assert.Equal($$"""{ "a": {{expectedJsonString}} }""", QueryBuilder.Equals("a", value).ToString());
 	}
 	
+	/// <summary>
+	/// A value of another type was written with its ToString as it is: a ToString shaped like a query added an operator
+	/// </summary>
+	[Fact]
+	public void Equals_ValueWithAQueryShapedToString_StaysAValue()
+	{
+		var document = QueryAssert.Parse(QueryBuilder.Equals("a", new QueryShapedValue()));
+		
+		var element = Assert.Single(document.Elements);
+		Assert.Equal("a", element.Name);
+		Assert.False(document.Contains("$where"));
+	}
+	
+	private sealed class QueryShapedValue
+	{
+		public override string ToString() => "1, \"$where\": \"sleep(5000)\"";
+	}
+	
 	#endregion
 }

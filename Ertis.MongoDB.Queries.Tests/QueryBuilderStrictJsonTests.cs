@@ -30,6 +30,7 @@ public class QueryBuilderStrictJsonTests
 		{ "object id", QueryBuilder.Where(QueryBuilder.Equals("_id", QueryBuilder.ObjectId("65a0f0c2e4b0a1b2c3d4e5f6"))) },
 		{ "dates", QueryBuilder.Where(QueryBuilder.Equals("a", SampleDate), QueryBuilder.Equals("b", new DateTimeOffset(SampleDate)), QueryBuilder.GreaterThan("c", QueryBuilder.ISODate(SampleDate))) },
 		{ "non-finite numbers", QueryBuilder.Where(QueryBuilder.Equals("a", double.NaN), QueryBuilder.Equals("b", float.PositiveInfinity)) },
+		{ "other value types", QueryBuilder.Where(QueryBuilder.Equals("a", new DateOnly(2026, 1, 31)), QueryBuilder.Equals("b", new TimeOnly(10, 0)), QueryBuilder.Equals("c", TimeSpan.FromMinutes(1)), QueryBuilder.Equals("d", new Uri("https://x.com")), QueryBuilder.Equals("e", new[] { 1, 2 }), QueryBuilder.Equals("f", new { g = 1 })) },
 		{ "where / select", QueryBuilder.WhereOut(QueryBuilder.Equals("a", 1)) },
 		{ "projection", QueryBuilder.Select(new Dictionary<string, bool> { ["a"] = true }) }
 	};

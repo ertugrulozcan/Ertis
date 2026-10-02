@@ -15,14 +15,14 @@ public class QueryBuilderSearchTests
 	{
 		var query = QueryBuilder.Regex("name", "^ja");
 		
-		Assert.Equal("""{ "name": { "$regex": "^ja" } }""", query.ToString());
-		QueryAssert.SingleField("name", new BsonRegularExpression("^ja"), query);
+		Assert.Equal("""{ "name": { "$regex": { "$regularExpression": { "pattern": "^ja", "options": "" } } } }""", query.ToString());
+		QueryAssert.SingleField("name", QueryAssert.RegexOperator("^ja"), query);
 	}
 	
 	[Fact]
 	public void Regex_WithSlashDelimiters_RemovesThem()
 	{
-		QueryAssert.SingleField("name", new BsonRegularExpression("^ja"), QueryBuilder.Regex("name", "/^ja/"));
+		QueryAssert.SingleField("name", QueryAssert.RegexOperator("^ja"), QueryBuilder.Regex("name", "/^ja/"));
 	}
 	
 	[Theory]
@@ -32,7 +32,7 @@ public class QueryBuilderSearchTests
 	[InlineData("//", "")]
 	public void Regex_TrimsOnlyTheDelimitersOfASlashForm(string regex, string expectedPattern)
 	{
-		QueryAssert.SingleField("path", new BsonRegularExpression(expectedPattern, string.Empty), QueryBuilder.Regex("path", regex));
+		QueryAssert.SingleField("path", QueryAssert.RegexOperator(expectedPattern, string.Empty), QueryBuilder.Regex("path", regex));
 	}
 	
 	[Theory]
@@ -48,7 +48,7 @@ public class QueryBuilderSearchTests
 	[InlineData(RegexOptions.Extended | RegexOptions.AllowDot, "sx")]
 	public void Regex_WithOptions_WritesTheOptions(RegexOptions options, string expectedOptions)
 	{
-		QueryAssert.SingleField("name", new BsonRegularExpression("^ja", expectedOptions), QueryBuilder.Regex("name", "^ja", options));
+		QueryAssert.SingleField("name", QueryAssert.RegexOperator("^ja", expectedOptions), QueryBuilder.Regex("name", "^ja", options));
 	}
 	
 	[Theory]
@@ -56,13 +56,13 @@ public class QueryBuilderSearchTests
 	[InlineData(RegexOptions.CaseInsensitivity | RegexOptions.Multiline | RegexOptions.Extended | RegexOptions.AllowDot, "imsx")]
 	public void Regex_WithThreeOrMoreOptions_WritesTheOptions(RegexOptions options, string expectedOptions)
 	{
-		QueryAssert.SingleField("name", new BsonRegularExpression("^ja", expectedOptions), QueryBuilder.Regex("name", "^ja", options));
+		QueryAssert.SingleField("name", QueryAssert.RegexOperator("^ja", expectedOptions), QueryBuilder.Regex("name", "^ja", options));
 	}
 	
 	[Fact]
 	public void Regex_WithBackslashes_KeepsThePattern()
 	{
-		QueryAssert.SingleField("code", new BsonRegularExpression(@"^\d+\.\w$"), QueryBuilder.Regex("code", @"^\d+\.\w$"));
+		QueryAssert.SingleField("code", QueryAssert.RegexOperator(@"^\d+\.\w$"), QueryBuilder.Regex("code", @"^\d+\.\w$"));
 	}
 	
 	#endregion

@@ -212,6 +212,35 @@ public class DynamicMongoRepositoryTests(MongoDbContainerFixture fixture) : Mong
 		Assert.Equal(["Jane", "jane"], result.Items.Select(x => (string) ((IDictionary<string, object?>) x)["name"]!));
 	}
 	
+	public static TheoryData<string, string[]> TextMatchingArrayAndRangeQueries => new()
+	{
+		{ Queries.QueryBuilder.StartsWith("name", "ja", ignoreCase: true).ToString(), ["Jane", "jane"] },
+		{ Queries.QueryBuilder.StartsWith("name", "ja").ToString(), ["jane"] },
+		{ Queries.QueryBuilder.EndsWith("name", "HN", ignoreCase: true).ToString(), ["John"] },
+		// Escaped: "." would match every name as a regular expression
+		{ Queries.QueryBuilder.ContainsText("name", ".").ToString(), [] },
+		{ Queries.QueryBuilder.All("tags", new[] { "a", "b" }).ToString(), ["Jane"] },
+		{ Queries.QueryBuilder.Size("tags", 0).ToString(), ["jane"] },
+		{ Queries.QueryBuilder.Mod("age", 20, 0).ToString(), ["John", "jane"] },
+		{ Queries.QueryBuilder.Between("created_at", Date, Date.AddDays(2), includeTo: false).ToString(), ["Jane", "John"] },
+		{ Queries.QueryBuilder.ElemMatch("tags", Queries.QueryBuilder.StartsWith("B", ignoreCase: true)).ToString(), ["Jane", "John"] },
+		{ Queries.QueryBuilder.Where(Queries.QueryBuilder.StartsWith("name", "j", ignoreCase: true), Queries.QueryBuilder.NotEquals("name", "John")).ToString(), ["Jane", "jane"] }
+	};
+	
+	/// <summary>
+	/// The text matching ($regex with the escaped text), array ($all, $size), $mod and range (Between) queries of the QueryBuilder
+	/// </summary>
+	[Theory]
+	[MemberData(nameof(TextMatchingArrayAndRangeQueries))]
+	public async Task FindAsync_WithQueryBuilderOperators_ReturnsTheMatches(string query, string[] expectedNames)
+	{
+		var (repository, _) = await this.SeedAsync();
+		
+		var result = await repository.FindAsync(query, skip: null, limit: null, withCount: true, orderBy: "age", sortDirection: SortDirection.Ascending, cancellationToken: CancellationToken);
+		
+		Assert.Equal(expectedNames.OrderBy(x => x, StringComparer.Ordinal), result.Items.Select(x => (string) ((IDictionary<string, object?>) x)["name"]!).OrderBy(x => x, StringComparer.Ordinal));
+	}
+	
 	[Fact]
 	public async Task Find_ReturnsTheMatchesAndTheCount()
 	{

@@ -23,5 +23,8 @@ internal enum MongoOperator
 	TextSearchLanguage,
 	TextSearchCaseSensitive,
 	TextSearchDiacriticSensitive,
-	ElemMatch
+	ElemMatch,
+	All,
+	Size,
+	Mod
 }

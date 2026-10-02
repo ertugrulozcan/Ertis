@@ -41,5 +41,13 @@ public static class QueryAssert
 		Assert.Equal(expectedValue, element.Value);
 	}
 	
+	/// <summary>
+	/// The $regex operator of a field with the regular expression value: { "$regex": /pattern/options }
+	/// </summary>
+	public static BsonDocument RegexOperator(string pattern, string options = "")
+	{
+		return new BsonDocument("$regex", new BsonRegularExpression(pattern, options));
+	}
+	
 	#endregion
 }

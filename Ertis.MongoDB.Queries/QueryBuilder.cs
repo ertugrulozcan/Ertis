@@ -1,9 +1,18 @@
-﻿// ReSharper disable UnusedMember.Global
+﻿using System.Buffers;
+using System.Text;
+
+// ReSharper disable UnusedMember.Global
 // ReSharper disable MemberCanBePrivate.Global
 namespace Ertis.MongoDB.Queries;
 
 public static class QueryBuilder
 {
+	#region Constants
+	
+	private static readonly SearchValues<char> RegexSpecialCharacters = SearchValues.Create("\\^$.|?*+()[]{}/");
+	
+	#endregion
+	
 	#region BuildIn Operators
 	
 	/// <summary>
@@ -514,6 +523,31 @@ public static class QueryBuilder
 		};
 	}
 	
+	/// <summary>
+	/// Between ($gte and $lte): the values in the range; a bound is excluded ($gt, $lt) when it is not included
+	/// (e.g. a date range including the start and excluding the end)
+	/// </summary>
+	public static IQueryExpression Between<T>(string key, T from, T to, bool includeFrom = true, bool includeTo = true)
+	{
+		return new QueryExpression
+		{
+			Field = key,
+			Value = Between(from, to, includeFrom, includeTo)
+		};
+	}
+	
+	/// <summary>
+	/// Between ($gte and $lte), without a field
+	/// </summary>
+	public static IQuery Between<T>(T from, T to, bool includeFrom = true, bool includeTo = true)
+	{
+		return CombineCore(
+		[
+			includeFrom ? GreaterThanOrEqual(from) : GreaterThan(from),
+			includeTo ? LessThanOrEqual(to) : LessThan(to)
+		]);
+	}
+	
 	#endregion
 	
 	#region Logical Queries
@@ -743,27 +777,11 @@ public static class QueryBuilder
 	/// <param name="options">Options</param>
 	public static IQueryExpression Regex(string key, string regex, RegexOptions? options = null)
 	{
-		var queryExpression = new QueryExpression
+		return new QueryExpression
 		{
 			Field = key,
-			Value = new Query
-			{
-				Operator = MongoOperator.Regex,
-				Value = new QueryValue<string>(TrimRegexDelimiters(regex))
-			}
+			Value = RegexCore(TrimRegexDelimiters(regex), options)
 		};
-		
-		var regexOptions = QueryHelper.ConvertRegexOptions(options);
-		if (!string.IsNullOrEmpty(regexOptions))
-		{
-			queryExpression.AddQuery(new Query
-			{
-				Operator = MongoOperator.RegexOptions,
-				Value = new QueryValue<string>(regexOptions)
-			});
-		}
-		
-		return queryExpression;
 	}
 	
 	/// <summary>
@@ -815,6 +833,122 @@ public static class QueryBuilder
 		return query;
 	}
 	
+	/// <summary>
+	/// Mod ($mod): the number field divided by the divisor has the remainder
+	/// </summary>
+	public static IQueryExpression Mod(string key, long divisor, long remainder)
+	{
+		return new QueryExpression
+		{
+			Field = key,
+			Value = Mod(divisor, remainder)
+		};
+	}
+	
+	/// <summary>
+	/// Mod ($mod), without a field
+	/// </summary>
+	public static IQuery Mod(long divisor, long remainder)
+	{
+		if (divisor == 0)
+		{
+			throw new ArgumentOutOfRangeException(nameof(divisor), "The divisor of $mod can not be zero");
+		}
+		
+		return new Query
+		{
+			Operator = MongoOperator.Mod,
+			Value = new QueryArray([new QueryValue<long>(divisor), new QueryValue<long>(remainder)])
+		};
+	}
+	
+	#endregion
+	
+	#region Text Matching Queries
+	
+	/// <summary>
+	/// The values starting with the text ($regex "^text"); the text is matched as it is, not as a pattern
+	/// </summary>
+	public static IQueryExpression StartsWith(string key, string text, bool ignoreCase = false)
+	{
+		return Regex(key, "^" + EscapeRegex(text), GetTextMatchingOptions(ignoreCase));
+	}
+	
+	/// <summary>
+	/// The values starting with the text ($regex "^text"), without a field (e.g. for the items of an array in ElemMatch)
+	/// </summary>
+	public static IQuery StartsWith(string text, bool ignoreCase = false)
+	{
+		return RegexCore("^" + EscapeRegex(text), GetTextMatchingOptions(ignoreCase));
+	}
+	
+	/// <summary>
+	/// The values ending with the text ($regex "text$"); the text is matched as it is, not as a pattern
+	/// </summary>
+	public static IQueryExpression EndsWith(string key, string text, bool ignoreCase = false)
+	{
+		return Regex(key, EscapeRegex(text) + "$", GetTextMatchingOptions(ignoreCase));
+	}
+	
+	/// <summary>
+	/// The values ending with the text ($regex "text$"), without a field
+	/// </summary>
+	public static IQuery EndsWith(string text, bool ignoreCase = false)
+	{
+		return RegexCore(EscapeRegex(text) + "$", GetTextMatchingOptions(ignoreCase));
+	}
+	
+	/// <summary>
+	/// The values containing the text ($regex "text"); the text is matched as it is, not as a pattern
+	/// (Contains is the $in operator)
+	/// </summary>
+	public static IQueryExpression ContainsText(string key, string text, bool ignoreCase = false)
+	{
+		return Regex(key, EscapeRegex(text), GetTextMatchingOptions(ignoreCase));
+	}
+	
+	/// <summary>
+	/// The values containing the text ($regex "text"), without a field
+	/// </summary>
+	public static IQuery ContainsText(string text, bool ignoreCase = false)
+	{
+		return RegexCore(EscapeRegex(text), GetTextMatchingOptions(ignoreCase));
+	}
+	
+	/// <summary>
+	/// Escapes the regular expression characters of the text, so it is matched as it is (e.g. a user input in a pattern).
+	/// The slash is escaped too: a pattern in slashes ('/pattern/') is read without them by Regex.
+	/// </summary>
+	public static string EscapeRegex(string text)
+	{
+		var builder = new StringBuilder(text.Length);
+		foreach (var character in text)
+		{
+			if (RegexSpecialCharacters.Contains(character))
+			{
+				builder.Append('\\');
+			}
+			
+			builder.Append(character);
+		}
+		
+		return builder.ToString();
+	}
+	
+	private static RegexOptions? GetTextMatchingOptions(bool ignoreCase)
+	{
+		return ignoreCase ? RegexOptions.CaseInsensitivity : null;
+	}
+	
+	private static IQuery RegexCore(string pattern, RegexOptions? options)
+	{
+		return new Query
+		{
+			Operator = MongoOperator.Regex,
+			Value = new RegularExpression(pattern, options)
+		};
+	}
+	
 	#endregion
 	
 	#region Array Queries
@@ -862,6 +996,55 @@ public static class QueryBuilder
 		{
 			Operator = MongoOperator.ElemMatch,
 			Value = CombineCore(queries)
+		};
+	}
+	
+	/// <summary>
+	/// All ($all): the array field contains all the values
+	/// </summary>
+	public static IQueryExpression All<T>(string key, IEnumerable<T> values)
+	{
+		return new QueryExpression
+		{
+			Field = key,
+			Value = All(values)
+		};
+	}
+	
+	/// <summary>
+	/// All ($all), without a field
+	/// </summary>
+	public static IQuery All<T>(IEnumerable<T> values)
+	{
+		return new Query
+		{
+			Operator = MongoOperator.All,
+			Value = new QueryArray(values.Select(x => new QueryValue<T>(x)))
+		};
+	}
+	
+	/// <summary>
+	/// Size ($size): the array field has exactly this number of items
+	/// </summary>
+	public static IQueryExpression Size(string key, int size)
+	{
+		return new QueryExpression
+		{
+			Field = key,
+			Value = Size(size)
+		};
+	}
+	
+	/// <summary>
+	/// Size ($size), without a field
+	/// </summary>
+	public static IQuery Size(int size)
+	{
+		ArgumentOutOfRangeException.ThrowIfNegative(size);
+		return new Query
+		{
+			Operator = MongoOperator.Size,
+			Value = new QueryValue<int>(size)
 		};
 	}
 	

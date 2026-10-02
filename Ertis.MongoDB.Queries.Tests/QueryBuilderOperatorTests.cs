@@ -1,4 +1,5 @@
 using Ertis.MongoDB.Queries.Tests.TestHelpers;
+using MongoDB.Bson;
 
 namespace Ertis.MongoDB.Queries.Tests;
 
@@ -135,7 +136,7 @@ public class QueryBuilderOperatorTests
 	public void Not_OfAnExpression_NegatesItsOperator()
 	{
 		Assert.Equal("""{ "age": { "$not": { "$gt": 18 } } }""", QueryBuilder.Not(QueryBuilder.GreaterThan("age", 18)).ToString());
-		Assert.Equal("""{ "name": { "$not": { "$regex": "^a" } } }""", QueryBuilder.Not(QueryBuilder.Regex("name", "^a")).ToString());
+		QueryAssert.SingleField("name", new BsonDocument("$not", QueryAssert.RegexOperator("^a")), QueryBuilder.Not(QueryBuilder.Regex("name", "^a")));
 	}
 	
 	#endregion

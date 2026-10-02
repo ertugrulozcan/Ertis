@@ -131,6 +131,53 @@ public class QueryInjectionTests
 		Assert.False(document.Contains("$where"));
 	}
 	
+	/// <summary>
+	/// A key starting with '$' is an operator for MongoDB (e.g. "$where" runs JavaScript): a field name coming from a user
+	/// (e.g. a dynamic filter) must not be able to add one
+	/// </summary>
+	[Theory]
+	[MemberData(nameof(OperatorKeyQueries))]
+	public void FieldName_StartingWithDollar_IsRejected(string name, Func<IQuery> build)
+	{
+		var exception = Assert.Throws<ArgumentException>(build);
+		
+		Assert.Contains("is not a field name", exception.Message);
+		Assert.False(string.IsNullOrEmpty(name));
+	}
+	
+	public static TheoryData<string, Func<IQuery>> OperatorKeyQueries => new()
+	{
+		{ "Equals", () => QueryBuilder.Equals("$where", "sleep(5000)") },
+		{ "Where", () => QueryBuilder.Where("$where", "sleep(5000)") },
+		{ "GreaterThan", () => QueryBuilder.GreaterThan("$expr", 1) },
+		{ "In", () => QueryBuilder.In("$or", new[] { 1 }) },
+		{ "Not", () => QueryBuilder.Not("$where", 1) },
+		{ "Exists", () => QueryBuilder.Exists("$where", true) },
+		{ "Regex", () => QueryBuilder.Regex("$where", ".*") },
+		{ "ElemMatch", () => QueryBuilder.ElemMatch("$where", QueryBuilder.Equals("a", 1)) },
+		{ "Combine", () => QueryBuilder.Combine("$expr", QueryBuilder.GreaterThan(1)) },
+		{ "Where on a field", () => QueryBuilder.Where("$where", new[] { QueryBuilder.GreaterThan(1) }) },
+		{ "Select", () => QueryBuilder.Select(new Dictionary<string, bool> { ["$where"] = true }) }
+	};
+	
+	/// <summary>
+	/// The other segments of a path may start with '$': MongoDB reads them as a path, not as an operator (e.g. the DBRef fields)
+	/// </summary>
+	[Theory]
+	[InlineData("owner.$id")]
+	[InlineData("owner.$ref")]
+	[InlineData("owner.$db")]
+	public void FieldPath_WithDollarInAnInnerSegment_IsAccepted(string path)
+	{
+		QueryAssert.SingleField(path, "x", QueryBuilder.Equals(path, "x"));
+	}
+	
+	[Fact]
+	public void Select_WithThePositionalOperator_IsAccepted()
+	{
+		QueryAssert.Filter("""{ "select": { "comments.$": 1 } }""", QueryBuilder.Select(new Dictionary<string, bool> { ["comments.$"] = true }));
+	}
+	
 	private sealed class QueryShapedValue
 	{
 		public override string ToString() => "1, \"$where\": \"sleep(5000)\"";

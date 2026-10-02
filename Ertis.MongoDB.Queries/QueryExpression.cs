@@ -4,7 +4,15 @@ internal class QueryExpression : IQueryExpression, IHasChildren
 {
 	#region Properties
 	
-	public required string Field { get; init; }
+	/// <summary>
+	/// A key starting with '$' is read by MongoDB as an operator, never as a field (e.g. "$where" runs JavaScript): it is rejected.
+	/// The other segments of a path may start with '$' (e.g. the DBRef fields "owner.$id", "owner.$ref").
+	/// </summary>
+	public required string Field
+	{
+		get;
+		init => field = value.StartsWith('$') ? throw new ArgumentException($"'{value}' is not a field name: a key starting with '$' is an operator (use the operator methods of the QueryBuilder)", nameof(value)) : value;
+	}
 	
 	internal required IQuery Value
 	{

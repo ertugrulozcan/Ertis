@@ -27,6 +27,7 @@ public class ErrorModel<T> : ErrorModel
 	#region Properties
 	
 	[JsonPropertyName("data")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public T? Data { get; set; }
 	
 	#endregion

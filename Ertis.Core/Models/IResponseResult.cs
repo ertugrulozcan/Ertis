@@ -43,6 +43,7 @@ public interface IResponseResult<out T> : IResponseResult
 	#region Properties
 	
 	[JsonPropertyName("data")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	T? Data { get; }
 	
 	#endregion

@@ -26,6 +26,14 @@ public class ErrorModel<T> : ErrorModel
 {
 	#region Properties
 	
+	/// <summary>
+	/// Additional error data; omitted from the JSON when null.
+	/// </summary>
+	/// <remarks>
+	/// Use a nullable type argument for value types (e.g. <c>ErrorModel&lt;int?&gt;</c>): for an unconstrained
+	/// <typeparamref name="T"/>, <c>T?</c> of a value type is the type itself, so <c>ErrorModel&lt;int&gt;</c>
+	/// throws an <see cref="System.InvalidOperationException"/> when serialized with System.Text.Json.
+	/// </remarks>
 	[JsonPropertyName("data")]
 	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 	public T? Data { get; set; }

@@ -9,7 +9,7 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<ProjectReference Include="..\Ertis.TemplateEngine\Ertis.TemplateEngine.csproj" />
+		<ProjectReference Include="..\..\src\Ertis.Core\Ertis.Core.csproj" />
 	</ItemGroup>
 	
 	<ItemGroup>
@@ -18,10 +18,6 @@
 		<PackageReference Include="NSubstitute" Version="6.2.0" />
 		<PackageReference Include="xunit.v3" Version="4.0.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0" />
-	</ItemGroup>
-	
-	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	
 	<ItemGroup>

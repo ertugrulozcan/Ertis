@@ -10,7 +10,7 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<ProjectReference Include="..\Ertis.Schema\Ertis.Schema.csproj" />
+		<ProjectReference Include="..\..\src\Ertis.ImageProcessing\Ertis.ImageProcessing.csproj" />
 	</ItemGroup>
 	
 	<ItemGroup>

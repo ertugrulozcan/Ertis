@@ -9,7 +9,7 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<ProjectReference Include="..\Ertis.Data\Ertis.Data.csproj" />
+		<ProjectReference Include="..\..\src\Ertis.Extensions.AspNetCore\Ertis.Extensions.AspNetCore.csproj" />
 	</ItemGroup>
 	
 	<ItemGroup>

@@ -9,7 +9,7 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<ProjectReference Include="..\Ertis.MongoDB\Ertis.MongoDB.csproj" />
+		<ProjectReference Include="..\..\src\Ertis.MongoDB\Ertis.MongoDB.csproj" />
 	</ItemGroup>
 	
 	<ItemGroup>

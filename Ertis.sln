@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Core", "Ertis.Core\Ertis.Core.csproj", "{36D2EF0E-61EF-4CA4-9DEA-0B10F568B7AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Core", "src\Ertis.Core\Ertis.Core.csproj", "{36D2EF0E-61EF-4CA4-9DEA-0B10F568B7AB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{B584356E-42DE-485B-839F-E1B2EC62E129}"
 EndProject
@@ -12,47 +12,47 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Network", "Network", "{160E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utilities", "Utilities", "{09B098D2-EB7D-422E-ABB1-A364C6AEF50A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Data", "Ertis.Data\Ertis.Data.csproj", "{25B61DA2-0F3D-47DC-AA0A-987271D17027}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Data", "src\Ertis.Data\Ertis.Data.csproj", "{25B61DA2-0F3D-47DC-AA0A-987271D17027}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.MongoDB", "Ertis.MongoDB\Ertis.MongoDB.csproj", "{9CF5D539-D2C8-4540-920F-A992790009F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.MongoDB", "src\Ertis.MongoDB\Ertis.MongoDB.csproj", "{9CF5D539-D2C8-4540-920F-A992790009F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.MongoDB.Queries", "Ertis.MongoDB.Queries\Ertis.MongoDB.Queries.csproj", "{58819DE3-8AF1-4D40-9CD5-344E6F089BB8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.MongoDB.Queries", "src\Ertis.MongoDB.Queries\Ertis.MongoDB.Queries.csproj", "{58819DE3-8AF1-4D40-9CD5-344E6F089BB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Extensions.AspNetCore", "Ertis.Extensions.AspNetCore\Ertis.Extensions.AspNetCore.csproj", "{F5BEB0F4-6E75-4AC7-8AEB-6AD8E3BD1E8C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Extensions.AspNetCore", "src\Ertis.Extensions.AspNetCore\Ertis.Extensions.AspNetCore.csproj", "{F5BEB0F4-6E75-4AC7-8AEB-6AD8E3BD1E8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Net", "Ertis.Net\Ertis.Net.csproj", "{23A22526-1B3F-44BD-934C-91CFAA0820E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Net", "src\Ertis.Net\Ertis.Net.csproj", "{23A22526-1B3F-44BD-934C-91CFAA0820E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Schema", "Ertis.Schema\Ertis.Schema.csproj", "{BBA68B62-1A08-4331-A250-B6FC2F11017A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Schema", "src\Ertis.Schema\Ertis.Schema.csproj", "{BBA68B62-1A08-4331-A250-B6FC2F11017A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.ImageProcessing", "Ertis.ImageProcessing\Ertis.ImageProcessing.csproj", "{074CCF82-5A5B-46C0-AFDD-91C501C037E7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.ImageProcessing", "src\Ertis.ImageProcessing\Ertis.ImageProcessing.csproj", "{074CCF82-5A5B-46C0-AFDD-91C501C037E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.TemplateEngine", "Ertis.TemplateEngine\Ertis.TemplateEngine.csproj", "{33A9CB7C-9542-43CC-A9E9-817723833014}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.TemplateEngine", "src\Ertis.TemplateEngine\Ertis.TemplateEngine.csproj", "{33A9CB7C-9542-43CC-A9E9-817723833014}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Schema.Tests", "Ertis.Schema.Tests\Ertis.Schema.Tests.csproj", "{51C46994-A578-4E55-B9CF-21A770B90732}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Schema.Tests", "tests\Ertis.Schema.Tests\Ertis.Schema.Tests.csproj", "{51C46994-A578-4E55-B9CF-21A770B90732}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmarks", "Benchmarks", "{FE2F6DED-B757-412C-A749-C14DBF00DB7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Schema.Benchmarks", "Ertis.Schema.Benchmarks\Ertis.Schema.Benchmarks.csproj", "{8D5301FC-03E0-44BB-A304-1A8BFD30014F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Schema.Benchmarks", "benchmarks\Ertis.Schema.Benchmarks\Ertis.Schema.Benchmarks.csproj", "{8D5301FC-03E0-44BB-A304-1A8BFD30014F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.ImageProcessing.Benchmarks", "Ertis.ImageProcessing.Benchmarks\Ertis.ImageProcessing.Benchmarks.csproj", "{4E6A8C0D-3F5B-4A7C-9E1D-6B8F0A2C4E3F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.ImageProcessing.Benchmarks", "benchmarks\Ertis.ImageProcessing.Benchmarks\Ertis.ImageProcessing.Benchmarks.csproj", "{4E6A8C0D-3F5B-4A7C-9E1D-6B8F0A2C4E3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.MongoDB.Queries.Tests", "Ertis.MongoDB.Queries.Tests\Ertis.MongoDB.Queries.Tests.csproj", "{2A418713-671E-438A-8C3F-53A2E7AE4B9B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.MongoDB.Queries.Tests", "tests\Ertis.MongoDB.Queries.Tests\Ertis.MongoDB.Queries.Tests.csproj", "{2A418713-671E-438A-8C3F-53A2E7AE4B9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Extensions.AspNetCore.Tests", "Ertis.Extensions.AspNetCore.Tests\Ertis.Extensions.AspNetCore.Tests.csproj", "{0884AD7E-BE2F-406C-A9BC-AE78B4DA8D35}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Extensions.AspNetCore.Tests", "tests\Ertis.Extensions.AspNetCore.Tests\Ertis.Extensions.AspNetCore.Tests.csproj", "{0884AD7E-BE2F-406C-A9BC-AE78B4DA8D35}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.TemplateEngine.Tests", "Ertis.TemplateEngine.Tests\Ertis.TemplateEngine.Tests.csproj", "{ABF626CB-4646-424B-87BD-09235BCBC92F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.TemplateEngine.Tests", "tests\Ertis.TemplateEngine.Tests\Ertis.TemplateEngine.Tests.csproj", "{ABF626CB-4646-424B-87BD-09235BCBC92F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.MongoDB.Tests", "Ertis.MongoDB.Tests\Ertis.MongoDB.Tests.csproj", "{6E0D4A1B-8C2F-4B7A-9D31-5F2C7A1E9B40}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.MongoDB.Tests", "tests\Ertis.MongoDB.Tests\Ertis.MongoDB.Tests.csproj", "{6E0D4A1B-8C2F-4B7A-9D31-5F2C7A1E9B40}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Data.Tests", "Ertis.Data.Tests\Ertis.Data.Tests.csproj", "{8A2E4C6D-1B3F-4D5A-B7C9-0E1F2A3B4C5D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Data.Tests", "tests\Ertis.Data.Tests\Ertis.Data.Tests.csproj", "{8A2E4C6D-1B3F-4D5A-B7C9-0E1F2A3B4C5D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Net.Tests", "Ertis.Net.Tests\Ertis.Net.Tests.csproj", "{5B7D9F1A-2C4E-4F6A-8B0D-1E3F5A7C9E2B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Net.Tests", "tests\Ertis.Net.Tests\Ertis.Net.Tests.csproj", "{5B7D9F1A-2C4E-4F6A-8B0D-1E3F5A7C9E2B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.ImageProcessing.Tests", "Ertis.ImageProcessing.Tests\Ertis.ImageProcessing.Tests.csproj", "{9C1E3A5B-7D2F-4E6A-8C0B-2D4F6A8C0E1D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.ImageProcessing.Tests", "tests\Ertis.ImageProcessing.Tests\Ertis.ImageProcessing.Tests.csproj", "{9C1E3A5B-7D2F-4E6A-8C0B-2D4F6A8C0E1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Core.Tests", "Ertis.Core.Tests\Ertis.Core.Tests.csproj", "{3C1F7B2A-5D4E-4A8B-9F6C-2E7D1A3B5C90}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ertis.Core.Tests", "tests\Ertis.Core.Tests\Ertis.Core.Tests.csproj", "{3C1F7B2A-5D4E-4A8B-9F6C-2E7D1A3B5C90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

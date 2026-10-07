@@ -57,11 +57,29 @@ public class ModelTests
 	[Fact]
 	public void ErrorModel_IsSerializedWithTheJsonNames()
 	{
-		var json = JsonSerializer.Serialize(new ErrorModel<int> { Message = "m", ErrorCode = "c", StatusCode = 400, Data = 5 });
-		
-		Assert.Equal("""{"data":5,"message":"m","errorCode":"c","statusCode":400}""", json);
+		var json = JsonSerializer.Serialize(new ErrorModel<string> { Message = "m", ErrorCode = "c", StatusCode = 400, Data = "d" });
+
+		Assert.Equal("""{"data":"d","message":"m","errorCode":"c","statusCode":400}""", json);
 	}
-	
+
+	[Fact]
+	public void ErrorModel_WithNullData_IsSerializedWithoutTheData()
+	{
+		var json = JsonSerializer.Serialize(new ErrorModel<string> { Message = "m", ErrorCode = "c", StatusCode = 400 });
+
+		Assert.Equal("""{"message":"m","errorCode":"c","statusCode":400}""", json);
+	}
+
+	[Theory]
+	[InlineData(0, """{"data":0,"message":"m","errorCode":"c","statusCode":400}""")]
+	[InlineData(null, """{"message":"m","errorCode":"c","statusCode":400}""")]
+	public void ErrorModel_WithNullableValueTypeData_WritesZeroAndSkipsNull(int? data, string expected)
+	{
+		var json = JsonSerializer.Serialize(new ErrorModel<int?> { Message = "m", ErrorCode = "c", StatusCode = 400, Data = data });
+
+		Assert.Equal(expected, json);
+	}
+
 	[Fact]
 	public void SysModel_IsSerializedWithoutTheNullValues()
 	{

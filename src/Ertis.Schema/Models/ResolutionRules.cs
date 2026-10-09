@@ -1,0 +1,201 @@
+using System.Text.Json.Serialization;
+using Ertis.Schema.Exceptions;
+
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+namespace Ertis.Schema.Models;
+
+public struct ResolutionRules : ICloneable
+{
+	#region Properties
+	
+	[JsonPropertyName("minWidth")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public int? MinWidth
+	{
+		get;
+		init
+		{
+			field = value;
+			
+			if (!this.ValidateMinWidth(out var exception) && exception != null)
+			{
+				throw exception;
+			}
+		}
+	}
+	
+	[JsonPropertyName("minHeight")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public int? MinHeight
+	{
+		get;
+		init
+		{
+			field = value;
+			
+			if (!this.ValidateMinHeight(out var exception) && exception != null)
+			{
+				throw exception;
+			}
+		}
+	}
+	
+	[JsonPropertyName("maxWidth")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public int? MaxWidth
+	{
+		get;
+		init
+		{
+			field = value;
+			
+			if (!this.ValidateMaxWidth(out var exception) && exception != null)
+			{
+				throw exception;
+			}
+		}
+	}
+	
+	[JsonPropertyName("maxHeight")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public int? MaxHeight
+	{
+		get;
+		init
+		{
+			field = value;
+			
+			if (!this.ValidateMaxHeight(out var exception) && exception != null)
+			{
+				throw exception;
+			}
+		}
+	}
+	
+	[JsonPropertyName("recommendedWidth")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public int? RecommendedWidth { get; set; }
+	
+	[JsonPropertyName("recommendedHeight")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+	public int? RecommendedHeight { get; set; }
+	
+	[JsonPropertyName("maxSizesRequired")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+	public bool MaxSizesRequired { get; set; }
+	
+	[JsonPropertyName("minSizesRequired")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+	public bool MinSizesRequired { get; set; }
+	
+	[JsonPropertyName("aspectRatioRequired")]
+	[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+	public bool AspectRatioRequired { get; set; }
+	
+	#endregion
+	
+	#region Methods
+	
+	private bool ValidateMinWidth(out Exception? exception)
+	{
+		if (this.MinWidth != null)
+		{
+			if (this.MinWidth < 0)
+			{
+				exception = new SchemaValidationException("The 'minWidth' value can not be less than zero");
+				return false;
+			}
+			
+			if (this.MaxWidth != null && this.MinWidth != null && this.MaxWidth < this.MinWidth)
+			{
+				exception = new SchemaValidationException("The 'minWidth' value can not be greater than the 'maxWidth' value");
+				return false;
+			}
+		}
+		
+		exception = null;
+		return true;
+	}
+	
+	private bool ValidateMinHeight(out Exception? exception)
+	{
+		if (this.MinHeight != null)
+		{
+			if (this.MinHeight < 0)
+			{
+				exception = new SchemaValidationException("The 'minHeight' value can not be less than zero");
+				return false;
+			}
+			
+			if (this.MaxHeight != null && this.MinHeight != null && this.MaxHeight < this.MinHeight)
+			{
+				exception = new SchemaValidationException("The 'minHeight' value can not be greater than the 'maxHeight' value");
+				return false;
+			}
+		}
+		
+		exception = null;
+		return true;
+	}
+	
+	private bool ValidateMaxWidth(out Exception? exception)
+	{
+		if (this.MaxWidth != null)
+		{
+			if (this.MaxWidth < 0)
+			{
+				exception = new SchemaValidationException("The 'maxWidth' value can not be less than zero");
+				return false;
+			}
+			
+			if (this.MinWidth != null && this.MaxWidth != null && this.MinWidth > this.MaxWidth)
+			{
+				exception = new SchemaValidationException("The 'minWidth' value can not be greater than the 'maxWidth' value");
+				return false;
+			}
+		}
+		
+		exception = null;
+		return true;
+	}
+	
+	private bool ValidateMaxHeight(out Exception? exception)
+	{
+		if (this.MaxHeight != null)
+		{
+			if (this.MaxHeight < 0)
+			{
+				exception = new SchemaValidationException("The 'maxHeight' value can not be less than zero");
+				return false;
+			}
+			
+			if (this.MinHeight != null && this.MaxHeight != null && this.MinHeight > this.MaxHeight)
+			{
+				exception = new SchemaValidationException("The 'minHeight' value can not be greater than the 'maxHeight' value");
+				return false;
+			}
+		}
+		
+		exception = null;
+		return true;
+	}
+	
+	public object Clone()
+	{
+		return new ResolutionRules
+		{
+			MinWidth = this.MinWidth,
+			MinHeight = this.MinHeight,
+			MaxWidth = this.MaxWidth,
+			MaxHeight = this.MaxHeight,
+			RecommendedWidth = this.RecommendedWidth,
+			RecommendedHeight = this.RecommendedHeight,
+			MinSizesRequired = this.MinSizesRequired,
+			MaxSizesRequired = this.MaxSizesRequired,
+			AspectRatioRequired = this.AspectRatioRequired
+		};
+	}
+	
+	#endregion
+}

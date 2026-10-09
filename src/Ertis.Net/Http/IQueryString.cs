@@ -1,0 +1,15 @@
+// ReSharper disable UnusedMember.Global
+namespace Ertis.Net.Http;
+
+public interface IQueryString : IEnumerable<object>
+{
+	IQueryString Add(string key, object value);
+	
+	IQueryString Add(KeyValuePair<string, object> pair);
+	
+	IQueryString Remove(string key);
+	
+	IDictionary<string, object> ToDictionary();
+	
+	bool ContainsKey(string key);
+}

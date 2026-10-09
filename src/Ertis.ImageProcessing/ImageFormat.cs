@@ -2,12 +2,12 @@ namespace Ertis.ImageProcessing;
 
 public enum ImageFormat
 {
-	Bmp,
-	Gif,
-	Jpeg,
-	Pbm,
-	Png,
-	Tga,
-	Tiff,
-	Webp
+	BMP,
+	GIF,
+	JPEG,
+	PBM,
+	PNG,
+	TGA,
+	TIFF,
+	WEBP
 }

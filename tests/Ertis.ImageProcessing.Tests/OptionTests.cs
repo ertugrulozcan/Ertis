@@ -71,7 +71,7 @@ public class OptionTests
 	[InlineData(9, WebpEncodingMethod.Level2)]
 	public void FormatEncoder_Webp_UsesTheLevel(int? level, WebpEncodingMethod expected)
 	{
-		var encoder = Assert.IsType<WebpEncoder>(FormatEncoder.GetDefaultFormatter(ImageFormat.Webp, 80, level));
+		var encoder = Assert.IsType<WebpEncoder>(FormatEncoder.GetDefaultFormatter(ImageFormat.WEBP, 80, level));
 		
 		Assert.Equal(expected, encoder.Method);
 		Assert.Equal(80, encoder.Quality);
@@ -84,7 +84,7 @@ public class OptionTests
 	[InlineData(12, PngCompressionLevel.DefaultCompression)]
 	public void FormatEncoder_Png_UsesTheLevel(int? level, PngCompressionLevel expected)
 	{
-		Assert.Equal(expected, Assert.IsType<PngEncoder>(FormatEncoder.GetDefaultFormatter(ImageFormat.Png, level: level)).CompressionLevel);
+		Assert.Equal(expected, Assert.IsType<PngEncoder>(FormatEncoder.GetDefaultFormatter(ImageFormat.PNG, level: level)).CompressionLevel);
 	}
 	
 	[Fact]

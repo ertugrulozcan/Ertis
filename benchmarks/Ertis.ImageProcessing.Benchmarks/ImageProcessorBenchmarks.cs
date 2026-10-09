@@ -36,20 +36,20 @@ public class ImageProcessorBenchmarks
 	}
 	
 	[Benchmark]
-	public Task<long> ResizeTo1200Jpeg() => this.ResizeAsync(1200, null, ImageFormat.Jpeg);
+	public Task<long> ResizeTo1200Jpeg() => this.ResizeAsync(1200, null, ImageFormat.JPEG);
 	
 	[Benchmark]
-	public Task<long> ResizeTo800Webp() => this.ResizeAsync(800, null, ImageFormat.Webp);
+	public Task<long> ResizeTo800Webp() => this.ResizeAsync(800, null, ImageFormat.WEBP);
 	
 	[Benchmark]
-	public Task<long> ThumbnailTo200x200Jpeg() => this.ResizeAsync(200, 200, ImageFormat.Jpeg);
+	public Task<long> ThumbnailTo200x200Jpeg() => this.ResizeAsync(200, 200, ImageFormat.JPEG);
 	
 	[Benchmark]
 	public async Task<long> Crop1000x1000Jpeg()
 	{
 		using var input = new MemoryStream(this._image);
 		using var output = new MemoryStream();
-		await ImageProcessor.CropAsync(input, output, new CropBounds { X = 500, Y = 500, Width = 1000, Height = 1000 }, ImageFormat.Jpeg, quality: 75);
+		await ImageProcessor.CropAsync(input, output, new CropBounds { X = 500, Y = 500, Width = 1000, Height = 1000 }, ImageFormat.JPEG, quality: 75);
 		return output.Length;
 	}
 	

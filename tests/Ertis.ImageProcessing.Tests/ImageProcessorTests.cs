@@ -20,14 +20,14 @@ public class ImageProcessorTests
 	#region Convert Methods
 	
 	[Theory]
-	[InlineData(ImageFormat.Bmp, "BMP")]
-	[InlineData(ImageFormat.Gif, "GIF")]
-	[InlineData(ImageFormat.Jpeg, "JPEG")]
-	[InlineData(ImageFormat.Pbm, "PBM")]
-	[InlineData(ImageFormat.Png, "PNG")]
-	[InlineData(ImageFormat.Tga, "TGA")]
-	[InlineData(ImageFormat.Tiff, "TIFF")]
-	[InlineData(ImageFormat.Webp, "Webp")]
+	[InlineData(ImageFormat.BMP, "BMP")]
+	[InlineData(ImageFormat.GIF, "GIF")]
+	[InlineData(ImageFormat.JPEG, "JPEG")]
+	[InlineData(ImageFormat.PBM, "PBM")]
+	[InlineData(ImageFormat.PNG, "PNG")]
+	[InlineData(ImageFormat.TGA, "TGA")]
+	[InlineData(ImageFormat.TIFF, "TIFF")]
+	[InlineData(ImageFormat.WEBP, "WEBP")]
 	public async Task Convert_WritesTheFormat(ImageFormat format, string expectedFormat)
 	{
 		using var input = TestImages.Create(20, 10);
@@ -53,9 +53,9 @@ public class ImageProcessorTests
 		using var low = new MemoryStream();
 		using var high = new MemoryStream();
 		
-		await ImageProcessor.ConvertAsync(input, low, ImageFormat.Jpeg, quality: 10, cancellationToken: CancellationToken);
+		await ImageProcessor.ConvertAsync(input, low, ImageFormat.JPEG, quality: 10, cancellationToken: CancellationToken);
 		input.Position = 0;
-		await ImageProcessor.ConvertAsync(input, high, ImageFormat.Jpeg, quality: 100, cancellationToken: CancellationToken);
+		await ImageProcessor.ConvertAsync(input, high, ImageFormat.JPEG, quality: 100, cancellationToken: CancellationToken);
 		
 		Assert.True(low.Length < high.Length);
 	}
@@ -77,7 +77,7 @@ public class ImageProcessorTests
 	{
 		using var input = TestImages.Create(4, 4);
 		
-		var exception = await Assert.ThrowsAsync<ImageProcessingException>(() => ImageProcessor.ConvertAsync(input, new MemoryStream(), ImageFormat.Jpeg, quality: quality, cancellationToken: CancellationToken));
+		var exception = await Assert.ThrowsAsync<ImageProcessingException>(() => ImageProcessor.ConvertAsync(input, new MemoryStream(), ImageFormat.JPEG, quality: quality, cancellationToken: CancellationToken));
 		
 		Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
 		Assert.Equal("InvalidQuality", exception.ErrorCode);
@@ -94,11 +94,11 @@ public class ImageProcessorTests
 		using var output = new MemoryStream();
 		using var syncOutput = new MemoryStream();
 		
-		await ImageProcessor.CropAsync(input, output, new CropBounds { X = 10, Y = 2, Width = 5, Height = 4 }, ImageFormat.Png, cancellationToken: CancellationToken);
+		await ImageProcessor.CropAsync(input, output, new CropBounds { X = 10, Y = 2, Width = 5, Height = 4 }, ImageFormat.PNG, cancellationToken: CancellationToken);
 		input.Position = 0;
 		
 		// ReSharper disable once MethodHasAsyncOverload
-		ImageProcessor.Crop(input, syncOutput, new CropBounds { X = 12 }, ImageFormat.Png);
+		ImageProcessor.Crop(input, syncOutput, new CropBounds { X = 12 }, ImageFormat.PNG);
 		
 		using var image = TestImages.Load(output).CloneAs<Rgba32>();
 		Assert.Equal((5, 4), (image.Width, image.Height));
@@ -112,7 +112,7 @@ public class ImageProcessorTests
 	{
 		using var input = TestImages.Create(20, 10);
 		
-		var exception = await Assert.ThrowsAsync<ImageProcessingException>(() => ImageProcessor.CropAsync(input, new MemoryStream(), new CropBounds { X = 18, Width = 5 }, ImageFormat.Png, cancellationToken: CancellationToken));
+		var exception = await Assert.ThrowsAsync<ImageProcessingException>(() => ImageProcessor.CropAsync(input, new MemoryStream(), new CropBounds { X = 18, Width = 5 }, ImageFormat.PNG, cancellationToken: CancellationToken));
 		
 		Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
 		Assert.Equal("CropBoundsOverflow", exception.ErrorCode);
@@ -171,7 +171,7 @@ public class ImageProcessorTests
 			expected.Mutate(x => x.Crop(bounds.ToRectangle(width, height)));
 			
 			using var output = new MemoryStream();
-			ImageProcessor.Crop(new MemoryStream(bytes), output, bounds, ImageFormat.Png);
+			ImageProcessor.Crop(new MemoryStream(bytes), output, bounds, ImageFormat.PNG);
 			output.Position = 0;
 			using var actual = Image.Load<Rgb24>(output);
 			
@@ -193,7 +193,7 @@ public class ImageProcessorTests
 		using var input = TestImages.Create(20, 10);
 		using var output = new MemoryStream();
 		
-		await ImageProcessor.ResizeAsync(input, output, width, height, ImageFormat.Png, cancellationToken: CancellationToken);
+		await ImageProcessor.ResizeAsync(input, output, width, height, ImageFormat.PNG, cancellationToken: CancellationToken);
 		
 		using var image = TestImages.Load(output);
 		Assert.Equal((expectedWidth, expectedHeight), (image.Width, image.Height));
@@ -207,11 +207,11 @@ public class ImageProcessorTests
 		using var stretch = new MemoryStream();
 		using var withoutTargetSize = new MemoryStream();
 		
-		ImageProcessor.Resize(input, max, 50, 50, ImageFormat.Jpeg, ResizeMode.Max, Anchor.TopLeft, SamplerAlgorithm.Lanczos, quality: 90);
+		ImageProcessor.Resize(input, max, 50, 50, ImageFormat.JPEG, ResizeMode.Max, Anchor.TopLeft, SamplerAlgorithm.Lanczos, quality: 90);
 		input.Position = 0;
-		ImageProcessor.Resize(input, stretch, 50, 50, ImageFormat.Webp, ResizeMode.Stretch, sampler: SamplerAlgorithm.NearestNeighbor, level: 4);
+		ImageProcessor.Resize(input, stretch, 50, 50, ImageFormat.WEBP, ResizeMode.Stretch, sampler: SamplerAlgorithm.NearestNeighbor, level: 4);
 		input.Position = 0;
-		ImageProcessor.Resize(input, withoutTargetSize, 100, null, ImageFormat.Png, targetSizeMode: TargetSizeMode.None);
+		ImageProcessor.Resize(input, withoutTargetSize, 100, null, ImageFormat.PNG, targetSizeMode: TargetSizeMode.None);
 		
 		using var maxImage = TestImages.Load(max);
 		using var stretchImage = TestImages.Load(stretch);
@@ -228,7 +228,7 @@ public class ImageProcessorTests
 	{
 		using var input = TestImages.Create(20, 10);
 		
-		var exception = await Assert.ThrowsAsync<ImageProcessingException>(() => ImageProcessor.ResizeAsync(input, new MemoryStream(), width, height, ImageFormat.Png, cancellationToken: CancellationToken));
+		var exception = await Assert.ThrowsAsync<ImageProcessingException>(() => ImageProcessor.ResizeAsync(input, new MemoryStream(), width, height, ImageFormat.PNG, cancellationToken: CancellationToken));
 		
 		Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
 		Assert.Equal("InvalidDimensions", exception.ErrorCode);
@@ -240,9 +240,9 @@ public class ImageProcessorTests
 		using var input = TestImages.Create(20, 10);
 		using var output = new MemoryStream();
 		
-		await ImageProcessor.ResizeAsync(input, output, null, null, ImageFormat.Webp, cancellationToken: CancellationToken);
+		await ImageProcessor.ResizeAsync(input, output, null, null, ImageFormat.WEBP, cancellationToken: CancellationToken);
 		
-		Assert.Equal("Webp", TestImages.DetectFormat(output).Name);
+		Assert.Equal("WEBP", TestImages.DetectFormat(output).Name);
 	}
 	
 	[Fact]
@@ -257,7 +257,7 @@ public class ImageProcessorTests
 		input.Position = 3;
 		using var output = new MemoryStream();
 		
-		await ImageProcessor.ResizeAsync(input, output, 10, null, ImageFormat.Png, cancellationToken: CancellationToken);
+		await ImageProcessor.ResizeAsync(input, output, 10, null, ImageFormat.PNG, cancellationToken: CancellationToken);
 		
 		using var result = TestImages.Load(output);
 		Assert.Equal(10, result.Width);
@@ -269,7 +269,7 @@ public class ImageProcessorTests
 		using var image = TestImages.Create(20, 10);
 		using var output = new MemoryStream();
 		
-		await ImageProcessor.ResizeAsync(new NonSeekableStream(image), output, 10, null, ImageFormat.Png, cancellationToken: CancellationToken);
+		await ImageProcessor.ResizeAsync(new NonSeekableStream(image), output, 10, null, ImageFormat.PNG, cancellationToken: CancellationToken);
 		
 		using var result = TestImages.Load(output);
 		Assert.Equal(10, result.Width);
@@ -302,7 +302,7 @@ public class ImageProcessorTests
 		using var input = new MemoryStream(TestImages.CreateDetailedJpeg(800, 600));
 		using var output = new MemoryStream();
 		
-		ImageProcessor.Resize(input, output, 100, null, ImageFormat.Jpeg, resizeQuality: resizeQuality);
+		ImageProcessor.Resize(input, output, 100, null, ImageFormat.JPEG, resizeQuality: resizeQuality);
 		
 		using var image = TestImages.Load(output);
 		Assert.Equal((100, 75), (image.Width, image.Height));
@@ -311,7 +311,7 @@ public class ImageProcessorTests
 	private async Task<double> ResizeToPsnrAsync(byte[] bytes, int width, ResizeQuality resizeQuality)
 	{
 		using var output = new MemoryStream();
-		await ImageProcessor.ResizeAsync(new MemoryStream(bytes), output, width, null, ImageFormat.Png, resizeQuality: resizeQuality, cancellationToken: CancellationToken);
+		await ImageProcessor.ResizeAsync(new MemoryStream(bytes), output, width, null, ImageFormat.PNG, resizeQuality: resizeQuality, cancellationToken: CancellationToken);
 		output.Position = 0;
 		using var result = await Image.LoadAsync<Rgb24>(output, CancellationToken);
 		using var reference = CreateReference(bytes, result.Width, result.Height);
@@ -337,7 +337,7 @@ public class ImageProcessorTests
 	{
 		using var input = new MemoryStream("not an image"u8.ToArray());
 		
-		var exception = await Assert.ThrowsAsync<ImageProcessingException>(() => ImageProcessor.ResizeAsync(input, new MemoryStream(), 10, 10, ImageFormat.Png, cancellationToken: CancellationToken));
+		var exception = await Assert.ThrowsAsync<ImageProcessingException>(() => ImageProcessor.ResizeAsync(input, new MemoryStream(), 10, 10, ImageFormat.PNG, cancellationToken: CancellationToken));
 		
 		Assert.Equal(HttpStatusCode.BadRequest, exception.StatusCode);
 		Assert.Equal("InvalidImageContent", exception.ErrorCode);
@@ -348,10 +348,10 @@ public class ImageProcessorTests
 	{
 		var exceptions = new[]
 		{
-			await Assert.ThrowsAsync<ImageProcessingException>(() => ImageProcessor.CropAsync(new MemoryStream("x"u8.ToArray()), new MemoryStream(), new CropBounds(), ImageFormat.Png, cancellationToken: CancellationToken)),
-			Assert.Throws<ImageProcessingException>(() => ImageProcessor.Crop(new MemoryStream("x"u8.ToArray()), new MemoryStream(), new CropBounds(), ImageFormat.Png)),
-			await Assert.ThrowsAsync<ImageProcessingException>(() => ImageProcessor.ConvertAsync(new MemoryStream("x"u8.ToArray()), new MemoryStream(), ImageFormat.Png, cancellationToken: CancellationToken)),
-			Assert.Throws<ImageProcessingException>(() => ImageProcessor.Convert(new MemoryStream("x"u8.ToArray()), new MemoryStream(), ImageFormat.Png))
+			await Assert.ThrowsAsync<ImageProcessingException>(() => ImageProcessor.CropAsync(new MemoryStream("x"u8.ToArray()), new MemoryStream(), new CropBounds(), ImageFormat.PNG, cancellationToken: CancellationToken)),
+			Assert.Throws<ImageProcessingException>(() => ImageProcessor.Crop(new MemoryStream("x"u8.ToArray()), new MemoryStream(), new CropBounds(), ImageFormat.PNG)),
+			await Assert.ThrowsAsync<ImageProcessingException>(() => ImageProcessor.ConvertAsync(new MemoryStream("x"u8.ToArray()), new MemoryStream(), ImageFormat.PNG, cancellationToken: CancellationToken)),
+			Assert.Throws<ImageProcessingException>(() => ImageProcessor.Convert(new MemoryStream("x"u8.ToArray()), new MemoryStream(), ImageFormat.PNG))
 		};
 		
 		// ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
@@ -368,9 +368,9 @@ public class ImageProcessorTests
 		using var cancellationTokenSource = new CancellationTokenSource();
 		await cancellationTokenSource.CancelAsync();
 		
-		await Assert.ThrowsAnyAsync<OperationCanceledException>(() => ImageProcessor.ResizeAsync(TestImages.Create(4, 4), new MemoryStream(), 2, 2, ImageFormat.Png, cancellationToken: cancellationTokenSource.Token));
-		await Assert.ThrowsAnyAsync<OperationCanceledException>(() => ImageProcessor.CropAsync(TestImages.Create(4, 4), new MemoryStream(), new CropBounds(), ImageFormat.Png, cancellationToken: cancellationTokenSource.Token));
-		await Assert.ThrowsAnyAsync<OperationCanceledException>(() => ImageProcessor.ConvertAsync(TestImages.Create(4, 4), new MemoryStream(), ImageFormat.Png, cancellationToken: cancellationTokenSource.Token));
+		await Assert.ThrowsAnyAsync<OperationCanceledException>(() => ImageProcessor.ResizeAsync(TestImages.Create(4, 4), new MemoryStream(), 2, 2, ImageFormat.PNG, cancellationToken: cancellationTokenSource.Token));
+		await Assert.ThrowsAnyAsync<OperationCanceledException>(() => ImageProcessor.CropAsync(TestImages.Create(4, 4), new MemoryStream(), new CropBounds(), ImageFormat.PNG, cancellationToken: cancellationTokenSource.Token));
+		await Assert.ThrowsAnyAsync<OperationCanceledException>(() => ImageProcessor.ConvertAsync(TestImages.Create(4, 4), new MemoryStream(), ImageFormat.PNG, cancellationToken: cancellationTokenSource.Token));
 	}
 	
 	#endregion
@@ -398,8 +398,8 @@ public class ImageProcessorTests
 		using var resizeOutput = new MemoryStream();
 		using var cropOutput = new MemoryStream();
 		
-		await ImageProcessor.ResizeAsync(TestImages.Create(20, 10, new JpegEncoder(), orientation: 6), resizeOutput, 5, null, ImageFormat.Png, cancellationToken: CancellationToken);
-		await ImageProcessor.CropAsync(TestImages.Create(20, 10, new JpegEncoder(), orientation: 6), cropOutput, new CropBounds { Width = 10, Height = 15 }, ImageFormat.Png, cancellationToken: CancellationToken);
+		await ImageProcessor.ResizeAsync(TestImages.Create(20, 10, new JpegEncoder(), orientation: 6), resizeOutput, 5, null, ImageFormat.PNG, cancellationToken: CancellationToken);
+		await ImageProcessor.CropAsync(TestImages.Create(20, 10, new JpegEncoder(), orientation: 6), cropOutput, new CropBounds { Width = 10, Height = 15 }, ImageFormat.PNG, cancellationToken: CancellationToken);
 		
 		using var resized = TestImages.Load(resizeOutput);
 		using var cropped = TestImages.Load(cropOutput);
@@ -415,7 +415,7 @@ public class ImageProcessorTests
 	{
 		using var output = new MemoryStream();
 		
-		await ImageProcessor.ConvertAsync(TestImages.Create(20, 10, new JpegEncoder(), orientation: 6), output, ImageFormat.Jpeg, cancellationToken: CancellationToken);
+		await ImageProcessor.ConvertAsync(TestImages.Create(20, 10, new JpegEncoder(), orientation: 6), output, ImageFormat.JPEG, cancellationToken: CancellationToken);
 		
 		using var image = TestImages.Load(output);
 		Assert.Equal((10, 20), (image.Width, image.Height));
@@ -432,14 +432,14 @@ public class ImageProcessorTests
 		using var resized = new MemoryStream();
 		using var cropped = new MemoryStream();
 		
-		await ImageProcessor.ConvertAsync(TestImages.Create(20, 10, new JpegEncoder(), withGps: true), kept, ImageFormat.Jpeg, cancellationToken: CancellationToken);
+		await ImageProcessor.ConvertAsync(TestImages.Create(20, 10, new JpegEncoder(), withGps: true), kept, ImageFormat.JPEG, cancellationToken: CancellationToken);
 		
 		// ReSharper disable once MethodHasAsyncOverload
-		ImageProcessor.Convert(TestImages.Create(20, 10, new JpegEncoder(), withGps: true), stripped, ImageFormat.Jpeg, stripMetadata: true);
-		await ImageProcessor.ResizeAsync(TestImages.Create(20, 10, new JpegEncoder(), withGps: true), resized, 10, null, ImageFormat.Jpeg, stripMetadata: true, cancellationToken: CancellationToken);
+		ImageProcessor.Convert(TestImages.Create(20, 10, new JpegEncoder(), withGps: true), stripped, ImageFormat.JPEG, stripMetadata: true);
+		await ImageProcessor.ResizeAsync(TestImages.Create(20, 10, new JpegEncoder(), withGps: true), resized, 10, null, ImageFormat.JPEG, stripMetadata: true, cancellationToken: CancellationToken);
 		
 		// ReSharper disable once MethodHasAsyncOverload
-		ImageProcessor.Crop(TestImages.Create(20, 10, new JpegEncoder(), withGps: true), cropped, new CropBounds { Width = 5 }, ImageFormat.Webp, stripMetadata: true);
+		ImageProcessor.Crop(TestImages.Create(20, 10, new JpegEncoder(), withGps: true), cropped, new CropBounds { Width = 5 }, ImageFormat.WEBP, stripMetadata: true);
 		
 		Assert.NotNull((await ImageProcessor.GetMetadataAsync(Rewind(kept), CancellationToken))?.ExifProfile);
 		Assert.Null((await ImageProcessor.GetMetadataAsync(Rewind(stripped), CancellationToken))?.ExifProfile);
@@ -460,7 +460,7 @@ public class ImageProcessorTests
 	{
 		using var output = new MemoryStream();
 		
-		await ImageProcessor.ResizeAsync(TestImages.Create(400, 200, new JpegEncoder(), orientation: 6), output, 20, null, ImageFormat.Png, cancellationToken: CancellationToken);
+		await ImageProcessor.ResizeAsync(TestImages.Create(400, 200, new JpegEncoder(), orientation: 6), output, 20, null, ImageFormat.PNG, cancellationToken: CancellationToken);
 		
 		using var image = TestImages.Load(output);
 		Assert.Equal((20, 40), (image.Width, image.Height));

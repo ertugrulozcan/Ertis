@@ -34,7 +34,7 @@ public static class QualityReport
 					foreach (var width in new[] { 1600, 800, 400, 200 })
 					{
 						using var output = new MemoryStream();
-						await ImageProcessor.ResizeAsync(new MemoryStream(bytes), output, width, null, ImageFormat.Png, sampler: sampler, resizeQuality: resizeQuality);
+						await ImageProcessor.ResizeAsync(new MemoryStream(bytes), output, width, null, ImageFormat.PNG, sampler: sampler, resizeQuality: resizeQuality);
 						output.Position = 0;
 						using var result = await Image.LoadAsync<Rgb24>(output);
 						

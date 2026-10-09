@@ -1,0 +1,7 @@
+<Project>
+	<PropertyGroup>
+		<!-- Lisans dosyası varsa onu kullan; yoksa CI/Docker'dan gelen ortam değişkenine düş -->
+		<SixLaborsLicenseFile Condition="Exists('$(MSBuildThisFileDirectory)sixlabors.lic')">$(MSBuildThisFileDirectory)sixlabors.lic</SixLaborsLicenseFile>
+		<SixLaborsLicenseKey Condition="'$(SixLaborsLicenseFile)' == '' And '$(SIXLABORS_LICENSE_KEY)' != ''">$(SIXLABORS_LICENSE_KEY)</SixLaborsLicenseKey>
+	</PropertyGroup>
+</Project>

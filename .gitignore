@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# SixLabors.ImageSharp License
+sixlabors.lic

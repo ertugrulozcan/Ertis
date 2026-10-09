@@ -22,7 +22,7 @@ public static class TestImages
 				var row = accessor.GetRowSpan(y);
 				for (var x = 0; x < row.Length; x++)
 				{
-					row[x] = x < width / 2 ? Color.Red : Color.Blue;
+					row[x] = x < width / 2 ? Color.Red.ToPixel<Rgba32>() : Color.Blue.ToPixel<Rgba32>();
 				}
 			}
 		});

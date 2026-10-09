@@ -19,29 +19,29 @@ public static class FormatEncoder
 	
 	public static IImageEncoder GetDefaultFormatter(ImageFormat format, int? quality = null, int? level = null)
 	{
-		if (quality is < 1 or > 100 && format is ImageFormat.Jpeg or ImageFormat.Webp)
+		if (quality is < 1 or > 100 && format is ImageFormat.JPEG or ImageFormat.WEBP)
 		{
 			throw new ImageProcessingException(HttpStatusCode.BadRequest, "Quality must be between 1 and 100.", "InvalidQuality");
 		}
 		
 		return format switch
 		{
-			ImageFormat.Bmp => new BmpEncoder(),
-			ImageFormat.Gif => new GifEncoder(),
-			ImageFormat.Jpeg => new JpegEncoder
+			ImageFormat.BMP => new BmpEncoder(),
+			ImageFormat.GIF => new GifEncoder(),
+			ImageFormat.JPEG => new JpegEncoder
 			{
 				Quality = quality ?? Constants.DefaultQuality,
 				Interleaved = true
 			},
-			ImageFormat.Pbm => new PbmEncoder(),
-			ImageFormat.Png => new PngEncoder
+			ImageFormat.PBM => new PbmEncoder(),
+			ImageFormat.PNG => new PngEncoder
 			{
 				// The level is the (lossless) compression level, 1 (the fastest) to 9 (the smallest); the default is 6
 				CompressionLevel = level is >= 1 and <= 9 ? (PngCompressionLevel) level.Value : PngCompressionLevel.DefaultCompression
 			},
-			ImageFormat.Tga => new TgaEncoder(),
-			ImageFormat.Tiff => new TiffEncoder(),
-			ImageFormat.Webp => new WebpEncoder
+			ImageFormat.TGA => new TgaEncoder(),
+			ImageFormat.TIFF => new TiffEncoder(),
+			ImageFormat.WEBP => new WebpEncoder
 			{
 				Quality = quality ?? Constants.DefaultQuality,
 				Method = level != null && Enum.IsDefined(typeof(WebpEncodingMethod), level) ? (WebpEncodingMethod)(object)level : WebpEncodingMethod.Level2,

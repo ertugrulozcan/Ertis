@@ -308,9 +308,11 @@ public class DynamicValueMappingTests
 	}
 	
 	[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+	// ReSharper disable once MemberCanBePrivate.Global
 	public sealed class StringIdModel
 	{
 		[JsonPropertyName("_id")]
+		// ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
 		public string Id { get; init; } = null!;
 		
 		[JsonPropertyName("name")]
@@ -360,6 +362,7 @@ public class DynamicValueMappingTests
 	/// <summary>
 	/// A convertible without a base type which converts only to string, like MongoDB.Bson.ObjectId
 	/// </summary>
+	// ReSharper disable once MemberCanBePrivate.Global
 	public sealed class FakeConvertibleId(string value) : BaseFakeConvertible
 	{
 		// ReSharper disable once UnusedMember.Global
@@ -373,6 +376,7 @@ public class DynamicValueMappingTests
 	/// <summary>
 	/// A convertible with an Int32 base type, like MongoDB.Bson.BsonInt32
 	/// </summary>
+	// ReSharper disable once MemberCanBePrivate.Global
 	public sealed class FakeConvertibleNumber(int value) : BaseFakeConvertible
 	{
 		public override TypeCode GetTypeCode() => TypeCode.Int32;
@@ -383,6 +387,7 @@ public class DynamicValueMappingTests
 	/// <summary>
 	/// A convertible with a String base type, like MongoDB.Bson.BsonString
 	/// </summary>
+	// ReSharper disable once MemberCanBePrivate.Global
 	public sealed class FakeConvertibleText(string value) : BaseFakeConvertible
 	{
 		public override TypeCode GetTypeCode() => TypeCode.String;
@@ -393,6 +398,7 @@ public class DynamicValueMappingTests
 	/// <summary>
 	/// A convertible collection which can not be converted to string, like MongoDB.Bson.BsonArray
 	/// </summary>
+	// ReSharper disable once MemberCanBePrivate.Global
 	public sealed class FakeConvertibleCollection(params int[] items) : BaseFakeConvertible, IEnumerable<int>
 	{
 		public override TypeCode GetTypeCode() => TypeCode.Object;

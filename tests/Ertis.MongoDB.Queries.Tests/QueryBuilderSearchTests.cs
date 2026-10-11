@@ -1,5 +1,4 @@
 using Ertis.MongoDB.Queries.Tests.TestHelpers;
-using MongoDB.Bson;
 
 namespace Ertis.MongoDB.Queries.Tests;
 

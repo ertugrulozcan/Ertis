@@ -41,7 +41,7 @@ public class ErtisException<T> : ErtisException
 	/// <param name="message"></param>
 	/// <param name="errorCode"></param>
 	/// <param name="innerException"></param>
-	protected ErtisException(HttpStatusCode statusCode, string message, string errorCode, Exception innerException) : base(statusCode, message, errorCode, innerException)
+	protected ErtisException(HttpStatusCode statusCode, string message, string errorCode, Exception? innerException = null) : base(statusCode, message, errorCode, innerException)
 	{ }
 	
 	#endregion
@@ -93,7 +93,7 @@ public class ErtisException : HttpStatusCodeException, IHasErrorModel
 	/// <param name="message"></param>
 	/// <param name="errorCode"></param>
 	/// <param name="innerException"></param>
-	protected ErtisException(HttpStatusCode statusCode, string message, string errorCode, Exception innerException) : base(statusCode, message, innerException)
+	protected ErtisException(HttpStatusCode statusCode, string message, string errorCode, Exception? innerException = null) : base(statusCode, message, innerException)
 	{
 		this.ErrorCode = errorCode;
 	}

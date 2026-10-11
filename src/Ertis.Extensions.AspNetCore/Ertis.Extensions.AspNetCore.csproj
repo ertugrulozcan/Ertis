@@ -4,8 +4,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<PackageId>Ertis.Extensions.AspNetCore</PackageId>
-		<PackageVersion>10.0.7</PackageVersion>
-		<Version>10.0.7</Version>
+		<PackageVersion>10.0.8</PackageVersion>
+		<Version>10.0.8</Version>
 		<Authors>Ertuğrul Özcan</Authors>
 	</PropertyGroup>
 	

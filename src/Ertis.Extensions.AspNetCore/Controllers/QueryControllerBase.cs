@@ -40,7 +40,7 @@ public abstract class QueryControllerBase : ControllerBase
 			Dictionary<string, bool> projection;
 			try
 			{
-				whereQuery = this.ExtractWhereQuery(body, body);
+				whereQuery = this.ExtractQuery(body, body);
 				projection = Helpers.QueryHelper.ExtractProjection(body);
 			}
 			catch (System.Text.Json.JsonException ex)
@@ -49,7 +49,7 @@ public abstract class QueryControllerBase : ControllerBase
 			}
 			
 			this.ExtractSortingParameters(out var sortField, out var sortDirection);
-			var result = await this.GetDataAsync(whereQuery ?? string.Empty, skip, limit, withCount, sortField, sortDirection, projection, cancellationToken: cancellationToken);
+			var result = await this.GetDataAsync(whereQuery, skip, limit, withCount, sortField, sortDirection, projection, cancellationToken: cancellationToken);
 			
 			return this.Ok(result);
 		}

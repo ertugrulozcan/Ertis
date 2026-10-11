@@ -33,22 +33,22 @@ public class ControllerExtensionsTests
 	}
 	
 	[Fact]
-	public async Task ExtractWhereQuery_ReturnsTheWhereNode()
+	public async Task ExtractQuery_ReturnsTheWhereNode()
 	{
 		var controller = TestQueryController.Create("""{ "where": { "a": 1 } }""");
 		
 		// ReSharper disable once MethodHasAsyncOverload
-		Assert.Equal(1, System.Text.Json.Nodes.JsonNode.Parse(controller.ExtractWhereQuery()!)!["a"]!.GetValue<int>());
-		Assert.Equal(1, System.Text.Json.Nodes.JsonNode.Parse((await controller.ExtractWhereQueryAsync(TestContext.Current.CancellationToken))!)!["a"]!.GetValue<int>());
+		Assert.Equal(1, System.Text.Json.Nodes.JsonNode.Parse(controller.ExtractQuery()!)!["a"]!.GetValue<int>());
+		Assert.Equal(1, System.Text.Json.Nodes.JsonNode.Parse((await controller.ExtractQueryAsync(TestContext.Current.CancellationToken))!)!["a"]!.GetValue<int>());
 	}
 	
 	[Fact]
-	public void ExtractWhereQuery_WithoutAWhereNode_ReturnsTheDefault()
+	public void ExtractQuery_WithoutAWhereNode_ReturnsTheDefault()
 	{
 		var controller = TestQueryController.Create("{}");
 		
-		Assert.Null(controller.ExtractWhereQuery("""{ "a": 1 }"""));
-		Assert.Equal("fallback", controller.ExtractWhereQuery("""{ "a": 1 }""", "fallback"));
+		Assert.Null(controller.ExtractQuery("""{ "a": 1 }"""));
+		Assert.Equal("fallback", controller.ExtractQuery("""{ "a": 1 }""", "fallback"));
 	}
 	
 	#endregion

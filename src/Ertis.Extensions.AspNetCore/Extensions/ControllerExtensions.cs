@@ -49,27 +49,27 @@ public static class ControllerExtensions
 		}
 	}
 	
-	public static string? ExtractWhereQuery(this ControllerBase _, string query, string? defaultValue = null)
+	public static string ExtractQuery(this ControllerBase _, string query, string defaultValue)
 	{
 		var whereQuery = Helpers.QueryHelper.ExtractWhereQuery(query);
-		if (string.IsNullOrEmpty(whereQuery) && defaultValue != null)
-		{
-			whereQuery = defaultValue;
-		}
-		
-		return whereQuery;
+		return string.IsNullOrEmpty(whereQuery) ? defaultValue : whereQuery;
 	}
 	
-	public static string? ExtractWhereQuery(this ControllerBase controller)
+	public static string? ExtractQuery(this ControllerBase _, string query)
+	{
+		return Helpers.QueryHelper.ExtractWhereQuery(query);
+	}
+	
+	public static string? ExtractQuery(this ControllerBase controller)
 	{
 		var query = controller.ExtractRequestBody();
-		return controller.ExtractWhereQuery(query);
+		return controller.ExtractQuery(query);
 	}
 	
-	public static async Task<string?> ExtractWhereQueryAsync(this ControllerBase controller, CancellationToken cancellationToken = default)
+	public static async Task<string?> ExtractQueryAsync(this ControllerBase controller, CancellationToken cancellationToken = default)
 	{
 		var query = await controller.ExtractRequestBodyAsync(cancellationToken: cancellationToken);
-		return controller.ExtractWhereQuery(query);
+		return controller.ExtractQuery(query);
 	}
 	
 	public static Dictionary<string, bool> ExtractProjectionFromQuery(this ControllerBase controller, char separator = ',')

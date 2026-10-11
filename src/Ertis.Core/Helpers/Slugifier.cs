@@ -52,7 +52,7 @@ public static class Slugifier
 	
 	#region Methods
 	
-	public static string Slugify(string input, SlugifierOptions? options = null)
+	public static string? Slugify(string? input, SlugifierOptions? options = null)
 	{
 		if (string.IsNullOrEmpty(input))
 		{

@@ -228,7 +228,7 @@ public class OverloadTests(MongoDbContainerFixture fixture) : MongoTestBase(fixt
 		Assert.Equal(3, await repository.CountAsync(x => true, NoHint, CancellationToken));
 		Assert.Equal(3, repository.Count(x => true));
 		Assert.Equal(1, repository.Count("""{ "age": 1 }""", NoHint));
-		Assert.Equal(1, await repository.CountAsync("""{ "age": 1 }""", NoHint, CancellationToken));
+		Assert.Equal(1, await repository.CountAsync("""{ "age": 1 }""", NoHint, cancellationToken: CancellationToken));
 		Assert.Equal([1, 2, 3], repository.Distinct<int>("age", x => true).Order());
 	}
 	

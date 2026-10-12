@@ -227,7 +227,18 @@ public class MongoRepositoryTests(MongoDbContainerFixture fixture) : MongoTestBa
 	{
 		var (repository, _) = await this.SeedAsync();
 		
-		var result = await repository.FindAsync("""{ "name": "JANE" }""", skip: null, limit: null, withCount: null, sorting: null, indexOptions: null, collationOptions: new CollationOptions { Locale = Locale.English, CaseInsensitive = true }, CancellationToken);
+		var result = await repository.FindAsync(
+			"""{ "name": "JANE" }""", 
+			skip: null, 
+			limit: null, 
+			withCount: null, 
+			sorting: null, 
+			indexOptions: null, 
+			collationOptions: new CollationOptions
+			{
+				Locale = Locale.English, CaseInsensitive = true
+			},
+			cancellationToken: CancellationToken);
 		
 		Assert.Equal(2, result.Items.Count());
 	}
@@ -238,8 +249,26 @@ public class MongoRepositoryTests(MongoDbContainerFixture fixture) : MongoTestBa
 		var (repository, _) = await this.SeedAsync();
 		var collation = new CollationOptions { Locale = Locale.English, CaseInsensitive = true };
 		
-		var result = await repository.QueryAsync("""{ "name": "JANE" }""", skip: null, limit: null, withCount: true, sorting: null, projection: null, indexOptions: null, collationOptions: collation, CancellationToken);
-		var found = await repository.FindAsync("""{ "name": "JANE" }""", skip: null, limit: null, withCount: true, sorting: null, indexOptions: null, collationOptions: collation, CancellationToken);
+		var result = await repository.QueryAsync(
+			"""{ "name": "JANE" }""", 
+			skip: null, 
+			limit: null, 
+			withCount: true, 
+			sorting: null, 
+			projection: null, 
+			indexOptions: null, 
+			collationOptions: collation,
+			cancellationToken: CancellationToken);
+		
+		var found = await repository.FindAsync(
+			"""{ "name": "JANE" }""", 
+			skip: null, 
+			limit: null, 
+			withCount: true, 
+			sorting: null, 
+			indexOptions: null, 
+			collationOptions: collation,
+			cancellationToken: CancellationToken);
 		
 		Assert.Equal(2, result.Count);
 		Assert.Equal(2, found.Count);
@@ -252,10 +281,18 @@ public class MongoRepositoryTests(MongoDbContainerFixture fixture) : MongoTestBa
 		await repository.CreateSingleIndexAsync("age", cancellationToken: CancellationToken);
 		var indexOptions = new IndexOptions { Hint = [new SingleIndexDefinition("age")] };
 		
-		var result = await repository.FindAsync("""{ "age": { "$gt": 25 } }""", skip: null, limit: null, withCount: true, sorting: null, indexOptions: indexOptions, collationOptions: null, CancellationToken);
+		var result = await repository.FindAsync(
+			"""{ "age": { "$gt": 25 } }""", 
+			skip: null, 
+			limit: null, 
+			withCount: true, 
+			sorting: null, 
+			indexOptions: indexOptions, 
+			collationOptions: null,
+			cancellationToken: CancellationToken);
 		
 		Assert.Equal(2, result.Count);
-		Assert.Equal(2, await repository.CountAsync("""{ "age": { "$gt": 25 } }""", indexOptions, CancellationToken));
+		Assert.Equal(2, await repository.CountAsync("""{ "age": { "$gt": 25 } }""", indexOptions, cancellationToken: CancellationToken));
 		Assert.Equal(3, repository.Count(indexOptions));
 	}
 	
@@ -345,8 +382,8 @@ public class MongoRepositoryTests(MongoDbContainerFixture fixture) : MongoTestBa
 	{
 		var (repository, _) = await this.SeedAsync();
 		
-		Assert.Equal(["a", "b"], (await repository.DistinctAsync<string>("tags", (string?) null, CancellationToken)).Order());
-		Assert.Equal(["b"], await repository.DistinctAsync<string>("tags", """{ "age": 20 }""", CancellationToken));
+		Assert.Equal(["a", "b"], (await repository.DistinctAsync<string>("tags", (string?) null, cancellationToken: CancellationToken)).Order());
+		Assert.Equal(["b"], await repository.DistinctAsync<string>("tags", """{ "age": 20 }""", cancellationToken: CancellationToken));
 		Assert.Equal([30, 40], (await repository.DistinctAsync<int>("age", x => x.Age > 25, CancellationToken)).Order());
 	}
 	

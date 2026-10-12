@@ -4,8 +4,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<PackageId>Ertis.MongoDB</PackageId>
-		<PackageVersion>10.1.3</PackageVersion>
-		<Version>10.1.3</Version>
+		<PackageVersion>10.1.4</PackageVersion>
+		<Version>10.1.4</Version>
 		<Authors>Ertuğrul Özcan</Authors>
 	</PropertyGroup>
 	

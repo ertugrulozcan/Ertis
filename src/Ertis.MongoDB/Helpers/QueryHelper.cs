@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
@@ -10,8 +11,15 @@ namespace Ertis.MongoDB.Helpers;
 /// Converts the string values of the json queries: the ids (the values of the _id fields) to ObjectIds and the ISO 8601 dates to dates.
 /// The queries are read with the MongoDB json reader, so the shell syntax (unquoted names, ObjectId(...), ISODate(...)) and the extended json are supported.
 /// </summary>
-public static class QueryHelper
+public static partial class QueryHelper
 {
+	#region Constants
+	
+	[GeneratedRegex(@"^ObjectId\((?:""([0-9a-fA-F]{24})""|([0-9a-fA-F]{24}))\)$")]
+	private static partial Regex ObjectIdRegex();
+	
+	#endregion
+	
 	#region Fields
 	
 	private static readonly JsonWriterSettings ShellWriterSettings = new() { OutputMode = JsonOutputMode.Shell };
@@ -119,9 +127,17 @@ public static class QueryHelper
 			case BsonString bsonString:
 			{
 				var text = bsonString.Value;
-				if (convertObjectIds && IsIdField(fieldName) && ObjectId.TryParse(text, out var objectId))
+				
+				if (convertObjectIds)
 				{
-					return objectId;
+					if (fieldName is "_id" && ObjectId.TryParse(text, out var objectId))
+					{
+						return objectId;
+					}
+					else if (IsObjectId(text, out var id) && ObjectId.TryParse(id, out var objectId2))
+					{
+						return objectId2;
+					}
 				}
 				
 				if (convertDates && ISODateHelper.TryParseDateTime(text, out var dateTime))
@@ -136,10 +152,27 @@ public static class QueryHelper
 		}
 	}
 	
-	private static bool IsIdField(string? fieldName)
+	private static bool IsObjectId(string value, out string? id)
 	{
-		return fieldName != null && (fieldName == "_id" || fieldName.EndsWith("._id", StringComparison.Ordinal));
+		if (string.IsNullOrWhiteSpace(value))
+		{
+			id = null;
+			return false;
+		}
+		
+		value = value.Trim();
+		
+		var match = ObjectIdRegex().Match(value);
+		if (!match.Success)
+		{
+			id = null;
+			return false;
+		}
+		
+		id = match.Groups[1].Success ? match.Groups[1].Value : match.Groups[2].Value;
+		
+		return ObjectId.TryParse(id, out _);
 	}
 	
-	#endregion
+    #endregion
 }

@@ -95,7 +95,7 @@ public class DynamicMongoRepositoryTests(MongoDbContainerFixture fixture) : Mong
 		await repository.UpsertAsync(new BsonDocument("name", "New"), cancellationToken: CancellationToken);
 		repository.Upsert(new BsonDocument("name", "New2"), ObjectId.GenerateNewId().ToString());
 		
-		var names = (await repository.DistinctAsync<string>("name", (string?) null, CancellationToken)).Order();
+		var names = (await repository.DistinctAsync<string>("name", cancellationToken: CancellationToken)).Order();
 		Assert.Equal(["New", "New2", "Updated", "Updated2", "Updated3"], names);
 	}
 	
@@ -262,7 +262,18 @@ public class DynamicMongoRepositoryTests(MongoDbContainerFixture fixture) : Mong
 	{
 		var (repository, _) = await this.SeedAsync();
 		
-		var result = await repository.FindAsync("""{ "name": "JANE" }""", skip: null, limit: null, withCount: null, sorting: null, indexOptions: null, collationOptions: new CollationOptions { Locale = Locale.English, CaseInsensitive = true }, CancellationToken);
+		var result = await repository.FindAsync(
+			"""{ "name": "JANE" }""", 
+			skip: null, 
+			limit: null, 
+			withCount: null, 
+			sorting: null, 
+			indexOptions: null, 
+			collationOptions: new CollationOptions
+			{
+				Locale = Locale.English, CaseInsensitive = true
+			}, 
+			cancellationToken: CancellationToken);
 		
 		Assert.Equal(2, result.Items.Count());
 	}
@@ -273,7 +284,16 @@ public class DynamicMongoRepositoryTests(MongoDbContainerFixture fixture) : Mong
 		var (repository, _) = await this.SeedAsync();
 		var collation = new CollationOptions { Locale = Locale.English, CaseInsensitive = true };
 		
-		var result = await repository.QueryAsync("""{ "name": "JANE" }""", skip: null, limit: null, withCount: true, sorting: null, projection: null, indexOptions: null, collationOptions: collation, CancellationToken);
+		var result = await repository.QueryAsync(
+			"""{ "name": "JANE" }""", 
+			skip: null, 
+			limit: null, 
+			withCount: true, 
+			sorting: null, 
+			projection: null, 
+			indexOptions: null, 
+			collationOptions: collation,
+			cancellationToken: CancellationToken);
 		
 		Assert.Equal(2, result.Count);
 	}
@@ -309,7 +329,7 @@ public class DynamicMongoRepositoryTests(MongoDbContainerFixture fixture) : Mong
 		
 		Assert.Equal(3, await repository.CountAsync(CancellationToken));
 		Assert.Equal(1, repository.Count($$"""{ "_id": "{{ids[0]}}" }"""));
-		Assert.Equal(2, await repository.CountAsync("""{ "age": { "$gt": 25 } }""", CancellationToken));
+		Assert.Equal(2, await repository.CountAsync("""{ "age": { "$gt": 25 } }""", cancellationToken: CancellationToken));
 		Assert.Equal(3, repository.Count((IndexOptions?) null));
 	}
 	
@@ -318,8 +338,8 @@ public class DynamicMongoRepositoryTests(MongoDbContainerFixture fixture) : Mong
 	{
 		var (repository, _) = await this.SeedAsync();
 		
-		Assert.Equal(["b"], await repository.DistinctAsync<string>("tags", """{ "age": 20 }""", CancellationToken));
-		Assert.Equal(["a", "b"], (await repository.DistinctAsync<string>("tags", (System.Linq.Expressions.Expression<Func<dynamic, bool>>?) null, CancellationToken)).Order());
+		Assert.Equal(["b"], await repository.DistinctAsync<string>("tags", """{ "age": 20 }""", cancellationToken: CancellationToken));
+		Assert.Equal(["a", "b"], (await repository.DistinctAsync<string>("tags", query: null, CancellationToken)).Order());
 	}
 	
 	[Fact]

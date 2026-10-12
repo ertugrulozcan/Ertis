@@ -121,7 +121,7 @@ public class QueryHelperTests
 	[Fact]
 	public void EnsureObjectIdsAndISODates_ConvertsTheIdOperatorValuesInLogicalOperators()
 	{
-		var query = EnsureQuery($$"""{ "$or": [{ "_id": { "$ne": "{{Id1}}" } }, { "owner._id": { "$in": ["{{Id2}}"] } }] }""");
+		var query = EnsureQuery($$"""{ "$or": [{ "_id": { "$ne": "ObjectId({{Id1}})" } }, { "owner._id": { "$in": ["ObjectId({{Id2}})"] } }] }""");
 		
 		Assert.Equal(ObjectId.Parse(Id1), query["$or"][0]["_id"]["$ne"]);
 		Assert.Equal(ObjectId.Parse(Id2), query["$or"][1]["owner._id"]["$in"][0]);
@@ -130,7 +130,7 @@ public class QueryHelperTests
 	[Fact]
 	public void EnsureObjectIdsAndISODates_ConvertsTheDottedIdFields()
 	{
-		Assert.Equal(ObjectId.Parse(Id1), EnsureQuery($$"""{ "owner._id": "{{Id1}}" }""")["owner._id"]);
+		Assert.Equal(ObjectId.Parse(Id1), EnsureQuery($$"""{ "owner._id": "ObjectId({{Id1}})" }""")["owner._id"]);
 	}
 	
 	#endregion

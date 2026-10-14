@@ -4,8 +4,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<PackageId>Ertis.Core</PackageId>
-		<PackageVersion>10.0.10</PackageVersion>
-		<Version>10.0.10</Version>
+		<PackageVersion>10.0.11</PackageVersion>
+		<Version>10.0.11</Version>
 		<Authors>Ertuğrul Özcan</Authors>
 	</PropertyGroup>
 </Project>

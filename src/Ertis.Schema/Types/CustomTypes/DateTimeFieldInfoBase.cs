@@ -127,7 +127,7 @@ public abstract class DateTimeFieldInfoBase : StringFieldInfo, IDateTimeFieldInf
 				return true;
 			case string text when !string.IsNullOrWhiteSpace(text):
 				var parsed = DateTime.TryParseExact(text, this.AcceptedFormats, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out dateTime);
-				if (parsed)
+				if (parsed && this.Type == FieldType.date)
 				{
 					dateTime = dateTime.Date;
 				}

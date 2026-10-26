@@ -8,7 +8,7 @@ public class DateTimeFieldInfo : DateTimeFieldInfoBase
 	
 	private const string STRING_FORMAT = "yyyy-MM-ddTHH:mm:ss.fffZ";
 	
-	private static readonly string[] ACCEPTED_FORMATS = ["yyyy-MM-ddTHH:mm:ssK", "yyyy-MM-ddTHH:mm:ss.FFFFFFFK"];
+	private static readonly string[] ACCEPTED_FORMATS = [STRING_FORMAT, "yyyy-MM-ddTHH:mm:ssK", "yyyy-MM-ddTHH:mm:ss.FFFFFFFK"];
 	
 	#endregion
 	

@@ -8,6 +8,8 @@ public class DateFieldInfo : DateTimeFieldInfoBase
 	
 	private const string STRING_FORMAT = "yyyy-MM-dd";
 	
+	private static readonly string[] ACCEPTED_FORMATS = [STRING_FORMAT, "yyyy-MM-ddTHH:mm:ssK", "yyyy-MM-ddTHH:mm:ss.FFFFFFFK"];
+	
 	#endregion
 	
 	#region Properties
@@ -18,6 +20,9 @@ public class DateFieldInfo : DateTimeFieldInfoBase
 	
 	[JsonIgnore]
 	protected override string StringFormat => STRING_FORMAT;
+	
+	[JsonIgnore]
+	protected override string[] AcceptedFormats => ACCEPTED_FORMATS;
 	
 	#endregion
 }

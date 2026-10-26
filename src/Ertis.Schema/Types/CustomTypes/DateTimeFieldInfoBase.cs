@@ -126,7 +126,13 @@ public abstract class DateTimeFieldInfoBase : StringFieldInfo, IDateTimeFieldInf
 				dateTime = dateTimeOffset.UtcDateTime;
 				return true;
 			case string text when !string.IsNullOrWhiteSpace(text):
-				return DateTime.TryParseExact(text, this.AcceptedFormats, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out dateTime);
+				var parsed = DateTime.TryParseExact(text, this.AcceptedFormats, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal, out dateTime);
+				if (parsed)
+				{
+					dateTime = dateTime.Date;
+				}
+				
+				return parsed;
 			default:
 				dateTime = default;
 				return false;

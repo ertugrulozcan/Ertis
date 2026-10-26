@@ -4,8 +4,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<PackageId>Ertis.MongoDB</PackageId>
-		<PackageVersion>10.1.5</PackageVersion>
-		<Version>10.1.5</Version>
+		<PackageVersion>10.1.6</PackageVersion>
+		<Version>10.1.6</Version>
 		<Authors>Ertuğrul Özcan</Authors>
 	</PropertyGroup>
 	
@@ -15,6 +15,6 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="MongoDB.Driver" Version="3.12.0" />
+		<PackageReference Include="MongoDB.Driver" Version="3.13.0" />
 	</ItemGroup>
 </Project>

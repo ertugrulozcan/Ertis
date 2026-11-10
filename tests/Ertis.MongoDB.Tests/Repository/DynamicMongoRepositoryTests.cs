@@ -224,7 +224,13 @@ public class DynamicMongoRepositoryTests(MongoDbContainerFixture fixture) : Mong
 		{ Queries.QueryBuilder.Mod("age", 20, 0).ToString(), ["John", "jane"] },
 		{ Queries.QueryBuilder.Between("created_at", Date, Date.AddDays(2), includeTo: false).ToString(), ["Jane", "John"] },
 		{ Queries.QueryBuilder.ElemMatch("tags", Queries.QueryBuilder.StartsWith("B", ignoreCase: true)).ToString(), ["Jane", "John"] },
-		{ Queries.QueryBuilder.Where(Queries.QueryBuilder.StartsWith("name", "j", ignoreCase: true), Queries.QueryBuilder.NotEquals("name", "John")).ToString(), ["Jane", "jane"] }
+		{ Queries.QueryBuilder.Where(Queries.QueryBuilder.StartsWith("name", "j", ignoreCase: true), Queries.QueryBuilder.NotEquals("name", "John")).ToString(), ["Jane", "jane"] },
+		// "$regex" with another operator in the same document (the MongoDB JsonReader can not read it)
+		{ Queries.QueryBuilder.Combine("name", Queries.QueryBuilder.StartsWith("j", ignoreCase: true), Queries.QueryBuilder.NotEquals("John")).ToString(), ["Jane", "jane"] },
+		{ """{ "name": { "$regex": "^j", "$options": "i", "$ne": "John" } }""", ["Jane", "jane"] },
+		{ """{ "$or": [{ "name": { "$regex": "^J", "$ne": "John" } }, { "age": 40 }] }""", ["Jane", "jane"] },
+		// A pattern like a date is not converted to a date ($regex needs a string)
+		{ """{ "name": { "$regex": "2026-01-31" } }""", [] }
 	};
 	
 	/// <summary>
@@ -360,6 +366,16 @@ public class DynamicMongoRepositoryTests(MongoDbContainerFixture fixture) : Mong
 		
 		Assert.Equal("Jane", ((Dictionary<string, object>) Assert.Single(result))["name"]);
 		Assert.Equal(90, ((Dictionary<string, object>) Assert.Single(syncResult))["total"]);
+	}
+	
+	[Fact]
+	public async Task Aggregate_WithRegexAndAnotherOperatorInMatch_RunsThePipeline()
+	{
+		var (repository, _) = await this.SeedAsync();
+		
+		IEnumerable<object> result = await repository.AggregateAsync("""[{ "$match": { "name": { "$regex": "^j", "$options": "i", "$ne": "John" } } }, { "$sort": { "age": 1 } }, { "$project": { "name": 1 } }]""", cancellationToken: CancellationToken);
+		
+		Assert.Equal(["Jane", "jane"], result.Select(x => (string) ((Dictionary<string, object>) x)["name"]));
 	}
 	
 	[Fact]

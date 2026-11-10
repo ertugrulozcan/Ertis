@@ -196,6 +196,120 @@ public class QueryHelperTests
 	
 	#endregion
 	
+	#region Strict Json Methods
+	
+	[Fact]
+	public void ParseQuery_WithRegexAndAnotherOperator_KeepsTheOperators()
+	{
+		// The MongoDB JsonReader fails with it: it reads a document which starts with "$regex" as a legacy regular expression value
+		const string json = """{ "name": { "$regex": "^a", "$ne": "abc" } }""";
+		Assert.Throws<FormatException>(() => BsonDocument.Parse(json));
+		
+		Assert.Equal(new BsonDocument("name", new BsonDocument { { "$regex", "^a" }, { "$ne", "abc" } }), QueryHelper.ParseQuery(json));
+	}
+	
+	[Theory]
+	[InlineData("""{ "name": { "$regex": "^a" } }""")]
+	[InlineData("""{ "name": { "$regex": "^a", "$options": "i" } }""")]
+	[InlineData("""{ "name": { "$regex": "^a", "$options": "i", "$nin": ["abc"] } }""")]
+	[InlineData("""{ "$or": [{ "name": { "$regex": "^a", "$ne": "" } }, { "$and": [{ "tags": { "$elemMatch": { "$regex": "b", "$ne": "bc" } } }] }] }""")]
+	public void ParseQuery_KeepsTheRegexOperatorDocuments(string json)
+	{
+		var query = QueryHelper.ParseQuery(json)!;
+		
+		Assert.DoesNotContain("$regularExpression", query.ToJson());
+		Assert.Equal(json.Replace(" ", string.Empty), query.ToJson().Replace(" ", string.Empty));
+	}
+	
+	[Fact]
+	public void ParseQuery_DoesNotConvertTheTextOperatorValues()
+	{
+		var query = QueryHelper.ParseQuery("""{ "a": { "$regex": "2026-01-31", "$ne": "2026-01-31" }, "$text": { "$search": "2026-01-31", "$language": "none" } }""")!;
+		
+		Assert.Equal("2026-01-31", query["a"]["$regex"]);
+		Assert.True(query["a"]["$ne"].IsValidDateTime);
+		Assert.Equal("2026-01-31", query["$text"]["$search"]);
+	}
+	
+	/// <summary>
+	/// The numbers and the extended json values are read like the MongoDB JsonReader reads them
+	/// </summary>
+	[Theory]
+	[InlineData("""{ "a": 1, "b": -1, "c": 2147483648, "d": 1.5, "e": 1e3, "f": 0 }""")]
+	[InlineData($$"""{ "_id": { "$oid": "{{Id1}}" } }""")]
+	[InlineData("""{ "a": { "$date": "2026-01-31T10:00:00Z" }, "b": { "$date": { "$numberLong": "1769853600000" } } }""")]
+	[InlineData("""{ "a": { "$numberLong": "5" }, "b": { "$numberDecimal": "1.5" }, "c": { "$numberInt": "5" }, "d": { "$numberDouble": "Infinity" } }""")]
+	[InlineData("""{ "a": { "$regularExpression": { "pattern": "^a", "options": "i" } } }""")]
+	[InlineData("""{ "a": { "$binary": { "base64": "AQID", "subType": "00" } }, "b": { "$timestamp": { "t": 1, "i": 2 } } }""")]
+	[InlineData("""{ "a": { "$type": "string" }, "b": { "$exists": true } }""")]
+	[InlineData("""[{ "$match": { "a": 1 } }, { "$limit": 5 }]""")]
+	public void ParseQuery_ReadsTheValuesLikeTheMongoJsonReader(string json)
+	{
+		var expected = json.StartsWith('[') ? (BsonValue) BsonSerializer.Deserialize<BsonArray>(json) : BsonDocument.Parse(json);
+		
+		Assert.True(QueryJsonReader.TryRead(json, out var value));
+		Assert.Equal(expected, value);
+	}
+	
+	[Fact]
+	public void QueryJsonReader_WithADuplicateName_ReturnsFalseLikeTheMongoJsonReaderFails()
+	{
+		const string json = """{ "a": 1, "a": 2 }""";
+		
+		Assert.False(QueryJsonReader.TryRead(json, out _));
+		Assert.Throws<InvalidOperationException>(() => BsonDocument.Parse(json));
+	}
+	
+	[Fact]
+	public void QueryJsonReader_WithTheShellSyntax_ReturnsFalse()
+	{
+		Assert.False(QueryJsonReader.TryRead("""{ name: "a" }""", out _));
+		Assert.False(QueryJsonReader.TryRead($$"""{ "_id": ObjectId("{{Id1}}") }""", out _));
+		Assert.False(QueryJsonReader.TryRead("{} extra", out _));
+	}
+	
+	[Fact]
+	public void ParseQuery_WithTheShellSyntax_ReadsIt()
+	{
+		var query = QueryHelper.ParseQuery($$"""{ _id: ObjectId("{{Id1}}"), age: { $gt: 18 } }""");
+		
+		Assert.Equal(new BsonDocument { { "_id", ObjectId.Parse(Id1) }, { "age", new BsonDocument("$gt", 18) } }, query);
+	}
+	
+	[Fact]
+	public void ParseQuery_ConvertsTheIdsAndTheDates()
+	{
+		var query = QueryHelper.ParseQuery($$"""{ "_id": "{{Id1}}", "a": "2026-01-31T10:00:00Z" }""")!;
+		
+		Assert.Equal(ObjectId.Parse(Id1), query["_id"]);
+		Assert.True(query["a"].IsValidDateTime);
+		
+		var notConverted = QueryHelper.ParseQuery($$"""{ "_id": "{{Id1}}", "a": "2026-01-31T10:00:00Z" }""", convertObjectIds: false, convertDates: false)!;
+		Assert.Equal(Id1, notConverted["_id"]);
+		Assert.Equal("2026-01-31T10:00:00Z", notConverted["a"]);
+	}
+	
+	[Theory]
+	[InlineData(null)]
+	[InlineData("")]
+	[InlineData("   ")]
+	public void ParseQuery_WithAnEmptyQuery_ReturnsNull(string? json)
+	{
+		Assert.Null(QueryHelper.ParseQuery(json));
+	}
+	
+	[Theory]
+	[InlineData("{ invalid")]
+	[InlineData("{} extra")]
+	[InlineData("[1, 2]")]
+	[InlineData("5")]
+	public void ParseQuery_WithAnInvalidQuery_ThrowsFormatException(string json)
+	{
+		Assert.Throws<FormatException>(() => QueryHelper.ParseQuery(json));
+	}
+	
+	#endregion
+	
 	#region Helper Methods
 	
 	[Fact]

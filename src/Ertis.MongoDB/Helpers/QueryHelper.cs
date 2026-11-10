@@ -9,7 +9,8 @@ namespace Ertis.MongoDB.Helpers;
 
 /// <summary>
 /// Converts the string values of the json queries: the ids (the values of the _id fields) to ObjectIds and the ISO 8601 dates to dates.
-/// The queries are read with the MongoDB json reader, so the shell syntax (unquoted names, ObjectId(...), ISODate(...)) and the extended json are supported.
+/// A strict json query is read with the QueryJsonReader, which keeps the operators as they are (e.g. "$regex" with another operator);
+/// the shell syntax (unquoted names, ObjectId(...), ISODate(...)) is read with the MongoDB json reader. The extended json is supported by both.
 /// </summary>
 public static partial class QueryHelper
 {
@@ -24,12 +25,18 @@ public static partial class QueryHelper
 	
 	private static readonly JsonWriterSettings ShellWriterSettings = new() { OutputMode = JsonOutputMode.Shell };
 	
+	/// <summary>
+	/// The operators whose values are texts or patterns, they are not converted (e.g. a pattern "2026-01-31" is not a date)
+	/// </summary>
+	private static readonly HashSet<string> TextOperators = ["$regex", "$options", "$search", "$language", "$comment"];
+	
 	#endregion
 	
 	#region Methods
 	
 	/// <summary>
-	/// Returns the query with the converted values in the shell syntax; an empty or invalid query is returned as it is
+	/// Returns the query with the converted values in the shell syntax; an empty or invalid query is returned as it is.
+	/// Use ParseQuery for a BsonDocument: the MongoDB JsonReader (BsonDocument.Parse) can not read a "$regex" operator with another operator.
 	/// </summary>
 	public static string EnsureObjectIdsAndISODates(string json)
 	{
@@ -37,7 +44,8 @@ public static partial class QueryHelper
 	}
 	
 	/// <summary>
-	/// Returns the query with the converted values in the shell syntax; an empty or invalid query is returned as it is
+	/// Returns the query with the converted values in the shell syntax; an empty or invalid query is returned as it is.
+	/// Use ParseQuery for a BsonDocument: the MongoDB JsonReader (BsonDocument.Parse) can not read a "$regex" operator with another operator.
 	/// </summary>
 	public static string EnsureQuery(string json, bool convertObjectIds, bool convertDates)
 	{
@@ -53,6 +61,25 @@ public static partial class QueryHelper
 		}
 		
 		return Convert(value, null, convertObjectIds, convertDates).ToJson(ShellWriterSettings);
+	}
+	
+	/// <summary>
+	/// The query document with the converted values; null for an empty query
+	/// </summary>
+	/// <exception cref="FormatException">The query is not a valid json document</exception>
+	public static BsonDocument? ParseQuery(string? json, bool convertObjectIds = true, bool convertDates = true)
+	{
+		if (string.IsNullOrWhiteSpace(json))
+		{
+			return null;
+		}
+		
+		if (Parse(json) is not BsonDocument document)
+		{
+			throw new FormatException("The query is not a valid json document");
+		}
+		
+		return (BsonDocument) Convert(document, null, convertObjectIds, convertDates);
 	}
 	
 	/// <summary>
@@ -79,12 +106,19 @@ public static partial class QueryHelper
 	/// </summary>
 	internal static PipelineDefinition<T, BsonDocument> CreatePipelineDefinition<T>(string pipeline)
 	{
-		var stages = BsonSerializer.Deserialize<BsonArray>(pipeline);
+		// An invalid pipeline is read by the BsonSerializer as before, which throws its parsing error
+		var stages = Parse(pipeline) as BsonArray ?? BsonSerializer.Deserialize<BsonArray>(pipeline);
 		return PipelineDefinition<T, BsonDocument>.Create(stages.Select(x => (BsonDocument) Convert(x.AsBsonDocument, null, convertObjectIds: true, convertDates: true)));
 	}
 	
 	private static BsonValue? Parse(string json)
 	{
+		if (QueryJsonReader.TryRead(json, out var strictJsonValue))
+		{
+			return strictJsonValue;
+		}
+		
+		// Not a strict json (e.g. the shell syntax) or an invalid json
 		try
 		{
 			using var reader = new JsonReader(json);
@@ -109,6 +143,11 @@ public static partial class QueryHelper
 			{
 				foreach (var element in document.Elements.ToArray())
 				{
+					if (TextOperators.Contains(element.Name))
+					{
+						continue;
+					}
+					
 					var elementFieldName = element.Name.StartsWith('$') ? fieldName : element.Name;
 					document[element.Name] = Convert(element.Value, elementFieldName, convertObjectIds, convertDates);
 				}
